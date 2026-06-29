@@ -125,6 +125,7 @@ POSIX_BIN_ALL =\
 	cmd/posix/date\
 	cmd/posix/dd\
 	cmd/posix/df\
+	cmd/posix/diff/diff\
 	cmd/posix/dirname\
 	cmd/posix/du\
 	cmd/posix/echo\
@@ -276,6 +277,8 @@ PSEUDO_BIN_ALL =\
 	cmd/extra/blkid\
 	cmd/extra/lsblk\
 	cmd/extra/fdisk\
+	cmd/extra/sync\
+	cmd/extra/diff3/diff3\
 	cmd/dev/ar/ar\
 	cmd/dev/as/as\
 	cmd/dev/ld/ld\
@@ -294,6 +297,13 @@ MAKEOBJ =\
 	cmd/posix/make/posix.o\
 	cmd/posix/make/rules.o
 
+DIFFOBJ =\
+	cmd/posix/diff/diff.o\
+	cmd/posix/diff/diffdir.o\
+	cmd/posix/diff/diffreg.o\
+	cmd/posix/diff/pr.o\
+	cmd/posix/diff/xmalloc.o
+
 BIN_basename_1 = cmd/posix/basename
 BIN_cal_1 = cmd/posix/cal
 BIN_cat_1 = cmd/posix/cat
@@ -308,6 +318,7 @@ BIN_cut_1 = cmd/posix/cut
 BIN_date_1 = cmd/posix/date
 BIN_dd_1 = cmd/posix/dd
 BIN_df_1 = cmd/posix/df
+BIN_diff_1 = cmd/posix/diff/diff
 BIN_dirname_1 = cmd/posix/dirname
 BIN_du_1 = cmd/posix/du
 BIN_echo_1 = cmd/posix/echo
@@ -455,6 +466,8 @@ BIN_b3sum_1 = cmd/extra/b3sum
 BIN_blkid_1 = cmd/extra/blkid
 BIN_lsblk_1 = cmd/extra/lsblk
 BIN_fdisk_1 = cmd/extra/fdisk
+BIN_sync_1 = cmd/extra/sync
+BIN_diff3_1 = cmd/extra/diff3/diff3
 BIN_ar_1 = cmd/dev/ar/ar
 BIN_as_1 = cmd/dev/as/as
 BIN_ld_1 = cmd/dev/ld/ld
@@ -481,6 +494,7 @@ POSIX_BIN = \
 	$(BIN_date_$(BUILD_POSIX_DATE)) \
 	$(BIN_dd_$(BUILD_POSIX_DD)) \
 	$(BIN_df_$(BUILD_POSIX_DF)) \
+	$(BIN_diff_$(BUILD_POSIX_DIFF)) \
 	$(BIN_dirname_$(BUILD_POSIX_DIRNAME)) \
 	$(BIN_du_$(BUILD_POSIX_DU)) \
 	$(BIN_echo_$(BUILD_POSIX_ECHO)) \
@@ -632,6 +646,8 @@ PSEUDO_BIN = \
 	$(BIN_blkid_$(BUILD_PSEUDO_BLKID)) \
 	$(BIN_lsblk_$(BUILD_PSEUDO_LSBLK)) \
 	$(BIN_fdisk_$(BUILD_PSEUDO_FDISK)) \
+	$(BIN_sync_$(BUILD_PSEUDO_SYNC)) \
+	$(BIN_diff3_$(BUILD_PSEUDO_DIFF3)) \
 	$(BIN_ar_$(BUILD_DEV_AR)) \
 	$(BIN_as_$(BUILD_DEV_CC)) \
 	$(BIN_ld_$(BUILD_DEV_LD)) \
@@ -670,6 +686,11 @@ $(MAKEOBJ): cmd/posix/make/make.h
 
 cmd/posix/make/make: $(MAKEOBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(MAKEOBJ) $(LIB) $(LDLIBS)
+
+$(DIFFOBJ): cmd/posix/diff/diff.h cmd/posix/diff/pr.h cmd/posix/diff/xmalloc.h
+
+cmd/posix/diff/diff: $(DIFFOBJ) $(LIB)
+	$(CC) $(LDFLAGS) -o $@ $(DIFFOBJ) $(LIB) $(LDLIBS) -lm
 
 shared/libutf/libutf.a: $(LIBUTFOBJ)
 	$(AR) $(ARFLAGS) $@ $?
@@ -718,9 +739,9 @@ man: scripts/mkman/mkman
 
 clean:
 	rm -f shared/libutf/*.o shared/libutil/*.o shared/libredline/*.o
-	rm -f cmd/posix/*.o cmd/posix/make/*.o cmd/posix/awk/*.o cmd/posix/sh/*.o
+	rm -f cmd/posix/*.o cmd/posix/diff/*.o cmd/posix/make/*.o cmd/posix/awk/*.o cmd/posix/sh/*.o
 	rm -f cmd/linux/*.o cmd/net/*.o cmd/xsi/*.o cmd/pseudo/*.o
-	rm -f cmd/extra/*.o cmd/dev/ar/*.o cmd/dev/ld/*.o cmd/dev/cc/*.o cmd/dev/as/*.o cmd/dev/xcutil/*.o
+	rm -f cmd/extra/*.o cmd/extra/diff3/*.o cmd/dev/ar/*.o cmd/dev/ld/*.o cmd/dev/cc/*.o cmd/dev/as/*.o cmd/dev/xcutil/*.o
 	rm -f $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_BIN_ALL) $(LIB)
 	rm -f cmd/posix/make/make cmd/posix/getconf.h cmd/posix/bc.c
 	rm -f cmd/posix/awk/awk cmd/posix/awk/maketab cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proctab.c
@@ -826,6 +847,9 @@ cmd/posix/sh/%.o: cmd/posix/sh/%.c
 
 cmd/posix/sh/sh: $(SHOBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(SHOBJ) $(LIB) $(LDLIBS)
+
+cmd/extra/diff3/diff3: cmd/extra/diff3/diff3.o cmd/posix/diff/xmalloc.o $(LIB)
+	$(CC) $(LDFLAGS) -o $@ cmd/extra/diff3/diff3.o cmd/posix/diff/xmalloc.o $(LIB) $(LDLIBS)
 
 cmd/net/wget: cmd/net/wget.o $(LIB)
 	$(CC) $(LDFLAGS) -o $@ cmd/net/wget.o $(LIB) $(LDLIBS) $(LDLIBS_TLS)

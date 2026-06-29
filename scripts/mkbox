@@ -47,7 +47,7 @@ mkdir -p "${BDIR}"
 OBJS=""
 DECL_F="${BDIR}/decls.inc"
 : > "${DECL_F}"
-for _c in posix linux net pseudo xsi; do
+for _c in posix linux net pseudo xsi extra; do
 	: > "${BDIR}/entries_${_c}.inc"
 done
 unset _c
@@ -112,6 +112,70 @@ compile_make() {
 	OBJS="${OBJS} ${combined}"
 	printf 'int make_main(int, char **);\n' >> "${DECL_F}"
 	printf '\t{ "make", make_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
+}
+
+compile_diff() {
+	ddir="${ROOT}/cmd/posix/diff"
+	symf="${BDIR}/diff.syms"
+	diff_objs=""
+
+	printf 'mkbox: cc diff (multi)\n'
+	for s in diff diffdir diffreg pr xmalloc; do
+		out="${BDIR}/diff_${s}.o"
+		eval "${CC} ${CPPFLAGS} -I\"\$ddir\" ${CFLAGS} -c \"\$ddir/\$s.c\" -o \"\$out\"" ||
+			die "compile failed: diff/${s}.c"
+		diff_objs="${diff_objs} ${out}"
+	done
+
+	combined="${BDIR}/diff_combined.o"
+	${LD:-ld} -r -o "${combined}" ${diff_objs} ||
+		die "ld -r failed: diff"
+
+	printf 'main diff_main\n' > "${symf}"
+	${OBJCOPY} --redefine-syms="${symf}" "${combined}" ||
+		die "objcopy failed: diff"
+	${OBJCOPY} --keep-global-symbol=diff_main "${combined}" ||
+		die "objcopy localize failed: diff"
+	rm -f "${symf}" ${diff_objs}
+
+	OBJS="${OBJS} ${combined}"
+	LDLIBS="${LDLIBS} -lm"
+	printf 'int diff_main(int, char **);\n' >> "${DECL_F}"
+	printf '\t{ "diff", diff_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
+}
+
+compile_diff3() {
+	ddir="${ROOT}/cmd/extra/diff3"
+	pdir="${ROOT}/cmd/posix/diff"
+	symf="${BDIR}/diff3.syms"
+	diff3_objs=""
+
+	printf 'mkbox: cc diff3 (multi)\n'
+	for s in diff3; do
+		out="${BDIR}/diff3_${s}.o"
+		eval "${CC} ${CPPFLAGS} -I\"\$pdir\" ${CFLAGS} -c \"\$ddir/\$s.c\" -o \"\$out\"" ||
+			die "compile failed: diff3/${s}.c"
+		diff3_objs="${diff3_objs} ${out}"
+	done
+	out="${BDIR}/diff3_xmalloc.o"
+	eval "${CC} ${CPPFLAGS} -I\"\$pdir\" ${CFLAGS} -c \"\$pdir/xmalloc.c\" -o \"\$out\"" ||
+		die "compile failed: diff/xmalloc.c"
+	diff3_objs="${diff3_objs} ${out}"
+
+	combined="${BDIR}/diff3_combined.o"
+	${LD:-ld} -r -o "${combined}" ${diff3_objs} ||
+		die "ld -r failed: diff3"
+
+	printf 'main diff3_main\n' > "${symf}"
+	${OBJCOPY} --redefine-syms="${symf}" "${combined}" ||
+		die "objcopy failed: diff3"
+	${OBJCOPY} --keep-global-symbol=diff3_main "${combined}" ||
+		die "objcopy localize failed: diff3"
+	rm -f "${symf}" ${diff3_objs}
+
+	OBJS="${OBJS} ${combined}"
+	printf 'int diff3_main(int, char **);\n' >> "${DECL_F}"
+	printf '\t{ "diff3", diff3_main, "extra" },\n' >> "${BDIR}/entries_extra.inc"
 }
 
 compile_awk() {
@@ -236,6 +300,7 @@ process_dir() {
 }
 
 process_dir "${ROOT}/cmd/posix" "posix"
+compile_diff
 compile_awk
 compile_sh
 compile_make
@@ -243,6 +308,8 @@ process_dir "${ROOT}/cmd/linux" "linux"
 process_dir "${ROOT}/cmd/net" "net"
 process_dir "${ROOT}/cmd/pseudo" "pseudo"
 process_dir "${ROOT}/cmd/xsi" "xsi"
+process_dir "${ROOT}/cmd/extra" "extra"
+compile_diff3
 
 DISP="${BDIR}/aruu-box.c"
 printf 'mkbox: generating dispatch\n'
@@ -280,7 +347,7 @@ DISPATCH_STRUCT
 # sort each category alphabetically by tool name at build time;
 # entries have the form: \t{ "name", fn_main, "cat" },
 # splitting on " makes field 2 the tool name
-for _c in posix linux net pseudo xsi; do
+for _c in posix linux net pseudo xsi extra; do
 	sort -t'"' -k2,2 "${BDIR}/entries_${_c}.inc"
 done >> "${DISP}"
 unset _c

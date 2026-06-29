@@ -271,6 +271,9 @@ build_simple_tools() {
 	for src in cmd/"$cat"/*.c; do
 		[ -f "$src" ] || continue
 		base=${src##*/}; base=${base%.c}
+		if [ "$cat" = posix ] && [ "$base" = diff ]; then
+			continue
+		fi
 		var=$(cfgvar "$cat" "$base")
 		cfg_enabled "$var" || continue
 		compile_c "$src" "${src%.c}.o"
@@ -285,6 +288,30 @@ build_simple_tools() {
 
 # generated multi-file tools under cmd/posix
 #
+build_diff() {
+	cfg_enabled BUILD_POSIX_DIFF || return 0
+	local dir=cmd/posix/diff
+	local objs=""
+	EXTRA_HDR="$dir/diff.h $dir/pr.h $dir/xmalloc.h"
+	compile_c "$dir/diff.c" "$dir/diff.o"
+	compile_c "$dir/diffdir.c" "$dir/diffdir.o"
+	compile_c "$dir/diffreg.c" "$dir/diffreg.o"
+	compile_c "$dir/pr.c" "$dir/pr.o"
+	compile_c "$dir/xmalloc.c" "$dir/xmalloc.o"
+	EXTRA_HDR=
+	objs="$dir/diff.o $dir/diffdir.o $dir/diffreg.o $dir/pr.o $dir/xmalloc.o"
+	link_bin "$dir/diff" $objs -- $LIB -lm
+}
+
+build_diff3() {
+	cfg_enabled BUILD_PSEUDO_DIFF3 || return 0
+	local dir=cmd/extra/diff3
+	EXTRA_HDR="cmd/posix/diff/xmalloc.h"
+	compile_c "$dir/diff3.c" "$dir/diff3.o"
+	EXTRA_HDR=
+	link_bin "$dir/diff3" "$dir/diff3.o" cmd/posix/diff/xmalloc.o -- $LIB
+}
+
 build_awk() {
 	cfg_enabled BUILD_POSIX_AWK || return 0
 	local dir=cmd/posix/awk
@@ -379,6 +406,7 @@ build_posix() {
 		scripts/getconf.sh > cmd/posix/getconf.h || { rm -f cmd/posix/getconf.h; exit 1; }
 	}
 	build_simple_tools posix
+	build_diff
 	build_awk
 	build_sh
 	build_make
@@ -495,6 +523,8 @@ build_man() {
 			build_man_for "$(cfgvar "$cat" "$base")" "$src"
 		done
 	done
+	build_man_for BUILD_POSIX_DIFF cmd/posix/diff/diff.c
+	build_man_for BUILD_PSEUDO_DIFF3 cmd/extra/diff3/diff3.c
 }
 
 # install and clean
@@ -535,18 +565,19 @@ case "$TARGET" in
 		build_lib
 		build_posix
 		build_dev
-		build_simple_tools linux
-		build_simple_tools net
-		build_simple_tools xsi
-		build_simple_tools pseudo
-		build_simple_tools extra
+	build_simple_tools linux
+	build_simple_tools net
+	build_simple_tools xsi
+	build_simple_tools pseudo
+	build_simple_tools extra
+	build_diff3
 		;;
 	lib)             build_lib ;;
 	posix)           build_lib; build_posix ;;
 	dev)             build_lib; build_dev ;;
 	make)            build_lib; build_make ;;
 	linux|net|xsi|pseudo|extra)
-	                 build_lib; build_simple_tools "$TARGET" ;;
+	                 build_lib; build_simple_tools "$TARGET"; [ "$TARGET" = extra ] && build_diff3 ;;
 	man)             build_man ;;
 	install)         do_install ;;
 	clean)           do_clean ;;
