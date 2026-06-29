@@ -713,7 +713,11 @@ set_argstr(char **av, char **ave)
 	size_t argsize;
 	char **ap;
 
-	argsize = 4 + *ave - *av + 1;
+	argsize = strlen("diff") + 1;
+	for (ap = av + 1; ap < ave; ap++) {
+		if (strcmp(*ap, "--") != 0)
+			argsize += 1 + strlen(*ap);
+	}
 	diffargs = xmalloc(argsize);
 	strlcpy(diffargs, "diff", argsize);
 	for (ap = av + 1; ap < ave; ap++) {
