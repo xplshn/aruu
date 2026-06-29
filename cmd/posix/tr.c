@@ -190,7 +190,7 @@ usage(void)
 }
 
 // ?man tr: translate characters
-// ?man arguments: set1 [set2
+// ?man arguments: set1 [set2]
 // ?man translate, squeeze, or delete characters from standard input
 int
 main(int argc, char *argv[])

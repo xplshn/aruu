@@ -15,7 +15,7 @@ usage(void)
 }
 
 // ?man setsid: run in new session
-// ?man arguments: cmd [arg ...
+// ?man arguments: cmd [arg ...]
 // ?man run a program in a new session
 int
 main(int argc, char *argv[])

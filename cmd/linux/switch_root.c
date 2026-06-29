@@ -67,7 +67,7 @@ usage(void)
 }
 
 // ?man switch_root: switch to another root filesystem
-// ?man arguments: newroot] [init] (PID 1)
+// ?man arguments: newroot [init] (PID 1)
 // ?man switch to another filesystem as the root of the mount tree
 int
 main(int argc, char *argv[])

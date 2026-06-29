@@ -17,7 +17,7 @@ usage(void)
 }
 
 // ?man time: time command execution
-// ?man arguments: cmd [arg ...
+// ?man arguments: cmd [arg ...]
 // ?man run a command and report its execution duration
 int
 main(int argc, char *argv[])

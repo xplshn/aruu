@@ -14,7 +14,7 @@ usage(void)
 }
 
 // ?man basename: strip directory and suffix from filenames
-// ?man arguments: path [suffix
+// ?man arguments: path [suffix]
 // ?man print filename with leading directories and optional suffix removed
 int
 main(int argc, char *argv[])

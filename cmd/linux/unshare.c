@@ -16,7 +16,7 @@ usage(void)
 }
 
 // ?man unshare: run program in new namespaces
-// ?man arguments: cmd [args...
+// ?man arguments: cmd [args ...]
 // ?man run a program with some namespaces unshared from the parent
 int
 main(int argc, char *argv[])

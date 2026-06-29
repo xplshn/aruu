@@ -17,7 +17,7 @@ usage(void)
 }
 
 // ?man nohup: run command immune to hangups
-// ?man arguments: cmd [arg ...
+// ?man arguments: cmd [arg ...]
 // ?man run a command that persists after logging out
 int
 main(int argc, char *argv[])

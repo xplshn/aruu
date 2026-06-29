@@ -32,7 +32,7 @@ usage(void)
 }
 
 // ?man respawn: restart command on exit
-// ?man arguments: cmd [args...
+// ?man arguments: cmd [args ...]
 // ?man run a command and restart it automatically when it exits
 int
 main(int argc, char *argv[])

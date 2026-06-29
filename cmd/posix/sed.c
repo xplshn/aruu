@@ -1750,7 +1750,7 @@ old_next(void)
 }
 
 // ?man sed: stream editor
-// ?man arguments: script [file ...
+// ?man arguments: script [file ...]
 // ?man stream editor for filtering and transforming text
 int
 main(int argc, char *argv[])

@@ -27,7 +27,7 @@ usage(void)
 }
 
 // ?man getty: set terminal mode
-// ?man arguments: tty] [term] [cmd] [args...
+// ?man arguments: tty [term] [cmd] [args ...]
 // ?man set terminal line discipline, speed, and mode
 int
 main(int argc, char *argv[])

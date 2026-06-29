@@ -18,7 +18,7 @@ usage(void)
 }
 
 // ?man flock: manage locks
-// ?man arguments: file cmd [arg ...
+// ?man arguments: file cmd [arg ...]
 // ?man acquire or release locks from shell scripts
 int
 main(int argc, char *argv[])

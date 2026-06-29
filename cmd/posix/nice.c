@@ -24,7 +24,7 @@ usage(void)
 }
 
 // ?man nice: run command with modified priority
-// ?man arguments: cmd [arg ...
+// ?man arguments: cmd [arg ...]
 // ?man run a command with modified scheduling priority
 int
 main(int argc, char *argv[])

@@ -14,7 +14,7 @@ usage(void)
 }
 
 // ?man chroot: run command in new root
-// ?man arguments: dir [cmd [arg ...
+// ?man arguments: dir [cmd [arg ...]]
 // ?man run a command or shell with a substitute root directory
 int
 main(int argc, char *argv[])

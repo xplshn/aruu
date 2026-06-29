@@ -99,7 +99,7 @@ usage(void)
 }
 
 // ?man uuencode: encode binary file
-// ?man arguments: file] name
+// ?man arguments: [file] name
 // ?man encode a binary file into ascii text
 int
 main(int argc, char *argv[])

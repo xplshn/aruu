@@ -18,7 +18,7 @@ usage(void)
 }
 
 // ?man env: run command in modified environment
-// ?man arguments: ... [var=value] ... [cmd [arg ...
+// ?man arguments: [var=value ...] [cmd [arg ...]]
 // ?man set environment variables and run a command
 int
 main(int argc, char *argv[])

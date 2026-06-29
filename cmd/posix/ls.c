@@ -552,7 +552,7 @@ usage(void)
 }
 
 // ?man ls: list directory contents
-// ?man arguments: [file ...
+// ?man arguments: [file ...]
 // ?man list information about files and directories
 int
 main(int argc, char *argv[])

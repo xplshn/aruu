@@ -64,7 +64,7 @@ setdate(const char *s, struct tm *now)
 }
 
 // ?man date: print or set system date and time
-// ?man arguments: +format | mmddHHMM[[CC]yy
+// ?man arguments: +format | mmddHHMM[[CC]yy]
 // ?man display or configure the system date and time
 int
 main(int argc, char *argv[])

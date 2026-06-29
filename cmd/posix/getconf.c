@@ -23,7 +23,7 @@ usage(void)
 }
 
 // ?man getconf: query configuration variables
-// ?man arguments: var [path
+// ?man arguments: var [path]
 // ?man query system configuration variables
 int
 main(int argc, char *argv[])

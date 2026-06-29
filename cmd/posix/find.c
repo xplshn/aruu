@@ -1421,7 +1421,7 @@ usage(void)
 }
 
 // ?man find: search for files
-// ?man arguments: path ... [expression ...
+// ?man arguments: path ... [expression ...]
 // ?man search for files in a directory hierarchy
 int
 main(int argc, char **argv)

@@ -162,7 +162,7 @@ usage(void)
 }
 
 // ?man cut: cut out fields from lines
-// ?man arguments: -b list [file ...
+// ?man arguments: -b list [file ...]
 // ?man print selected parts of lines from files
 int
 main(int argc, char *argv[])

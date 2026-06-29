@@ -801,7 +801,7 @@ usage(void)
 }
 
 // ?man tar: tape archiver
-// ?man arguments: x | t | -x | -t] [file ...
+// ?man arguments: [x | t | -x | -t] [file ...]
 // ?man tar [c | -c] [-C dir] [-J | -Z | -a | -j | -z] [-h] [-T file] [-X file] path ... [-f file]
 // ?man manipulate tape archive files
 int

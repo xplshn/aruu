@@ -75,7 +75,7 @@ usage(void)
 }
 
 // ?man printf: format and print data
-// ?man arguments: format [arg ...
+// ?man arguments: format [arg ...]
 // ?man format and print arguments to standard output
 int
 main(int argc, char *argv[])

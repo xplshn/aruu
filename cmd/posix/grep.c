@@ -244,7 +244,7 @@ usage(void)
 }
 
 // ?man grep: search files for a pattern
-// ?man arguments: pattern] [file ...
+// ?man arguments: pattern [file ...]
 // ?man grep searches the named input files for lines matching the given pattern
 // ?man if no files are named, or a file is -, standard input is searched
 // ?man by default, matching lines are written to standard output

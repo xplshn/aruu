@@ -191,7 +191,7 @@ usage(void)
 }
 
 // ?man mount: mount a filesystem
-// ?man arguments: source] [target
+// ?man arguments: source [target]
 // ?man mount a filesystem to the directory tree
 int
 main(int argc, char *argv[])

@@ -19,7 +19,7 @@ usage(void)
 }
 
 // ?man ln: make links between files
-// ?man arguments: target [name
+// ?man arguments: target [name]
 // ?man create hard or symbolic links between files
 int
 main(int argc, char *argv[])

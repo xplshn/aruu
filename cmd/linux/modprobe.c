@@ -535,7 +535,7 @@ usage(void)
 }
 
 // ?man modprobe: add or remove modules from the Linux kernel
-// ?man arguments: module [symbol=value ...
+// ?man arguments: module [symbol=value ...]
 // ?man modprobe loads or removes kernel modules from the running system.
 // ?man It reads modules.dep, modules.alias, and modules.symbols from the appropriate
 // ?man /lib/modules/release directory to resolve module names and dependencies,

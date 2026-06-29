@@ -17,7 +17,7 @@ usage(void)
 }
 
 // ?man insmod: insert a module into the Linux kernel
-// ?man arguments: filename [args...
+// ?man arguments: filename [args ...]
 // ?man insmod inserts a kernel module from filename into the running kernel
 int
 main(int argc, char *argv[])

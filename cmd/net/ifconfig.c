@@ -98,7 +98,7 @@ list_interfaces(int all)
 }
 
 // ?man ifconfig: configure network interfaces
-// ?man arguments: interface [action ...
+// ?man arguments: interface [action ...]
 // ?man configure network interface parameters and view stats
 int
 main(int argc, char *argv[])
