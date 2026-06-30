@@ -78,6 +78,9 @@ main(int argc, char *argv[])
 	printf("%s\n", hdrbuf);
 
 	for (curr = list; curr; curr = curr->next) {
+		if (strncmp(curr->name, "ram", 3) == 0)
+			continue;
+
 		print_line(max_len,
 		           curr->name,
 		           curr->major, curr->minor,

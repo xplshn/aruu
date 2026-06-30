@@ -2,11 +2,11 @@
 #include "util.h"
 #include "diskutil.h"
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 struct MbrPartition {
 	uint8_t boot;
@@ -49,6 +49,47 @@ struct GptPartition {
 	uint16_t name[36];
 } __attribute__((packed));
 
+struct BsdPartition {
+	uint32_t size;
+	uint32_t offset;
+	uint16_t offset_h;
+	uint16_t size_h;
+	uint8_t fstype;
+	uint8_t fragblock;
+	uint16_t cpg;
+} __attribute__((packed));
+
+struct BsdDisklabel {
+	uint32_t d_magic;
+	uint16_t d_type;
+	uint16_t d_subtype;
+	char     d_typename[16];
+	char     d_packname[16];
+	uint32_t d_secsize;
+	uint32_t d_nsectors;
+	uint32_t d_ntracks;
+	uint32_t d_ncylinders;
+	uint32_t d_secpercyl;
+	uint32_t d_secperunit;
+	uint8_t  d_uid[8];
+	uint32_t d_acylinders;
+	uint16_t d_bstarth;
+	uint16_t d_bendh;
+	uint32_t d_bstart;
+	uint32_t d_bend;
+	uint32_t d_flags;
+	uint32_t d_spare4[5];
+	uint16_t d_secperunith;
+	uint16_t d_version;
+	uint32_t d_spare[4];
+	uint32_t d_magic2;
+	uint16_t d_checksum;
+	uint16_t d_npartitions;
+	uint32_t d_spare2;
+	uint32_t d_spare3;
+	struct BsdPartition d_partitions[16];
+} __attribute__((packed));
+
 static uint32_t crc32_table[256];
 static int crc32_table_initialized = 0;
 
@@ -84,9 +125,11 @@ static int opt_list = 0;
 static int opt_print = 0;
 static int opt_init_gpt = 0;
 static int opt_init_mbr = 0;
+static int opt_init_bsd = 0;
 static int opt_add = 0;
 static int opt_del = 0;
 static int opt_part_idx = -1;
+static int opt_part_is_letter = 0;
 static uint64_t opt_start = 0;
 static uint64_t opt_end = 0;
 static const char *opt_type = NULL;
@@ -94,11 +137,11 @@ static const char *opt_type = NULL;
 static void
 usage(void)
 {
-	eprintf("usage: %s [-l] [-p] [-g] [-m] [-a] [-d] [-n index] [-b start] [-e end] [-t type] [device]\n", argv0);
+	eprintf("usage: %s [-l] [-p] [-g] [-m] [-s] [-a] [-d] [-n index] [-b start] [-e end] [-t type] [device]\n", argv0);
 }
 
 static void
-print_mbr(struct MbrHeader *mbr, const char *path)
+mbr_print(struct MbrHeader *mbr, const char *path)
 {
 	int i;
 	printf("Disk: %s\n", path);
@@ -118,7 +161,7 @@ print_mbr(struct MbrHeader *mbr, const char *path)
 }
 
 static void
-print_gpt(struct GptHeader *hdr, struct GptPartition *parts, const char *path)
+gpt_print(struct GptHeader *hdr, struct GptPartition *parts, const char *path)
 {
 	uint32_t i;
 	char guid[37];
@@ -147,7 +190,7 @@ print_gpt(struct GptHeader *hdr, struct GptPartition *parts, const char *path)
 }
 
 static int
-read_gpt(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *parts)
+gpt_read(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *parts)
 {
 	unsigned char sector[512];
 	size_t part_sectors;
@@ -168,31 +211,31 @@ read_gpt(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *parts
 }
 
 static int
-write_gpt(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *parts)
+gpt_write(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *parts)
 {
 	unsigned char sector[512];
-	size_t part_sectors = (hdr->num_parts * hdr->part_size + dev->sec_size - 1) / dev->sec_size;
+	struct MbrHeader pmbr;
+	struct GptHeader backup_hdr;
+	uint64_t limit;
+	size_t part_sectors;
 
-	/* update partition entries crc */
+	part_sectors = (hdr->num_parts * hdr->part_size + dev->sec_size - 1) / dev->sec_size;
+
 	hdr->parts_crc = crc32(~0U, parts, hdr->num_parts * hdr->part_size) ^ ~0U;
 
-	/* calculate header crc (zeroing the crc field first) */
 	hdr->crc = 0;
 	hdr->crc = crc32(~0U, hdr, hdr->size) ^ ~0U;
 
-	/* write protective mbr to sector 0 */
-	struct MbrHeader pmbr;
 	memset(&pmbr, 0, sizeof(pmbr));
 	pmbr.parts[0].type = 0xEE;
 	pmbr.parts[0].start_lba = 1;
-	uint64_t limit = dev->size / dev->sec_size - 1;
+	limit = dev->size / dev->sec_size - 1;
 	pmbr.parts[0].size = limit > 0xFFFFFFFFU ? 0xFFFFFFFFU : (uint32_t)limit;
 	pmbr.sig[0] = 0x55;
 	pmbr.sig[1] = 0xAA;
 	if (blockdev_write(dev, 0, &pmbr, 1) < 0)
 		return -1;
 
-	/* write primary header and partition entries */
 	memset(sector, 0, sizeof(sector));
 	memcpy(sector, hdr, sizeof(*hdr));
 	if (blockdev_write(dev, 1, sector, 1) < 0)
@@ -200,8 +243,7 @@ write_gpt(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *part
 	if (blockdev_write(dev, hdr->partition_lba, parts, part_sectors) < 0)
 		return -1;
 
-	/* write backup partition entries and backup header */
-	struct GptHeader backup_hdr = *hdr;
+	backup_hdr = *hdr;
 	backup_hdr.current_lba = hdr->backup_lba;
 	backup_hdr.backup_lba = hdr->current_lba;
 	backup_hdr.partition_lba = backup_hdr.current_lba - part_sectors;
@@ -220,6 +262,99 @@ write_gpt(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *part
 	return 0;
 }
 
+static uint16_t
+bsd_dkcksum(void *lp, size_t nparts)
+{
+	uint16_t *start;
+	uint16_t *end;
+	uint16_t sum = 0;
+
+	start = (uint16_t *)lp;
+	end = (uint16_t *)((char *)lp + 148 + nparts * 16);
+	while (start < end)
+		sum ^= *start++;
+	return sum;
+}
+
+static int
+bsd_is_partition_type(uint8_t type)
+{
+	return type == 0xa5 || type == 0xa6 || type == 0xa9;
+}
+
+static int
+bsd_read(struct BlockDev *dev, uint64_t base_sec, struct BsdDisklabel *lp)
+{
+	unsigned char sector[512];
+	if (blockdev_read(dev, base_sec + 1, sector, 1) < 0)
+		return -1;
+	memcpy(lp, sector, sizeof(*lp));
+	if (lp->d_magic != 0x82564557U || lp->d_magic2 != 0x82564557U)
+		return -1;
+	return 0;
+}
+
+static int
+bsd_write(struct BlockDev *dev, uint64_t base_sec, struct BsdDisklabel *lp)
+{
+	unsigned char sector[512];
+	memset(sector, 0, sizeof(sector));
+	lp->d_checksum = 0;
+	lp->d_checksum = bsd_dkcksum(lp, lp->d_npartitions);
+	memcpy(sector, lp, sizeof(*lp));
+	if (blockdev_write(dev, base_sec + 1, sector, 1) < 0)
+		return -1;
+	return 0;
+}
+
+static void
+bsd_print(struct BsdDisklabel *lp, const char *path, uint64_t base_sec)
+{
+	uint64_t start, size;
+	int i;
+
+	printf("Disk: %s (at sector %llu)\n", path, (unsigned long long)base_sec);
+	printf("Partition table (BSD disklabel):\n");
+	printf("%-5s %-12s %-12s %-10s\n", "Index", "Start", "Size", "Type");
+	for (i = 0; i < lp->d_npartitions; i++) {
+		struct BsdPartition *p = &lp->d_partitions[i];
+		start = ((uint64_t)p->offset_h << 32) | p->offset;
+		size = ((uint64_t)p->size_h << 32) | p->size;
+		if (size == 0)
+			continue;
+		printf("%-5c %-12llu %-12llu 0x%02x\n",
+		       'a' + i,
+		       (unsigned long long)start,
+		       (unsigned long long)size,
+		       p->fstype);
+	}
+}
+
+static int
+bsd_find_label(struct BlockDev *dev, uint64_t *base_sec, struct BsdDisklabel *lp)
+{
+	struct MbrHeader mbr;
+	int i;
+
+	if (bsd_read(dev, 0, lp) == 0) {
+		*base_sec = 0;
+		return 0;
+	}
+
+	if (blockdev_read(dev, 0, &mbr, 1) == 0 && mbr.sig[0] == 0x55 && mbr.sig[1] == 0xAA) {
+		for (i = 0; i < 4; i++) {
+			if (mbr.parts[i].size > 0 && bsd_is_partition_type(mbr.parts[i].type)) {
+				if (bsd_read(dev, mbr.parts[i].start_lba, lp) == 0) {
+					*base_sec = mbr.parts[i].start_lba;
+					return 0;
+				}
+			}
+		}
+	}
+
+	return -1;
+}
+
 static int
 do_print(const char *path)
 {
@@ -227,17 +362,36 @@ do_print(const char *path)
 	struct MbrHeader mbr;
 	struct GptHeader gpt_hdr;
 	struct GptPartition gpt_parts[128];
+	struct BsdDisklabel bsd_lp;
+	int i;
+	int found_bsd = 0;
 
 	if (blockdev_open(&dev, path, 0) < 0) {
 		weprintf("cannot open %s:", path);
 		return -1;
 	}
 
-	if (read_gpt(&dev, &gpt_hdr, gpt_parts) == 0) {
-		print_gpt(&gpt_hdr, gpt_parts, path);
+	if (gpt_read(&dev, &gpt_hdr, gpt_parts) == 0) {
+		gpt_print(&gpt_hdr, gpt_parts, path);
+	} else if (blockdev_read(&dev, 0, &mbr, 1) == 0 && mbr.sig[0] == 0x55 && mbr.sig[1] == 0xAA) {
+		for (i = 0; i < 4; i++) {
+			if (mbr.parts[i].size > 0 && bsd_is_partition_type(mbr.parts[i].type)) {
+				if (bsd_read(&dev, mbr.parts[i].start_lba, &bsd_lp) == 0) {
+					bsd_print(&bsd_lp, path, mbr.parts[i].start_lba);
+					found_bsd = 1;
+				}
+			}
+		}
+		if (!found_bsd) {
+			if (bsd_read(&dev, 0, &bsd_lp) == 0) {
+				bsd_print(&bsd_lp, path, 0);
+			} else {
+				mbr_print(&mbr, path);
+			}
+		}
 	} else {
-		if (blockdev_read(&dev, 0, &mbr, 1) == 0 && mbr.sig[0] == 0x55 && mbr.sig[1] == 0xAA) {
-			print_mbr(&mbr, path);
+		if (bsd_read(&dev, 0, &bsd_lp) == 0) {
+			bsd_print(&bsd_lp, path, 0);
 		} else {
 			printf("Disk %s: unpartitioned or unknown format\n", path);
 		}
@@ -254,14 +408,25 @@ do_fdisk(const char *path)
 	struct MbrHeader mbr;
 	struct GptHeader gpt_hdr;
 	struct GptPartition gpt_parts[128];
+	struct BsdDisklabel lp;
+	struct BsdDisklabel bsd_lp;
+	struct GptPartition *gp;
+	struct BsdPartition *bp;
+	struct MbrPartition *mp;
+	uint64_t base_sec;
+	uint64_t limit;
+	uint64_t bsd_base;
+	uint64_t size;
+	int idx;
 	int has_gpt = 0;
+	int has_bsd = 0;
 
 	if (blockdev_open(&dev, path, 1) < 0) {
 		weprintf("cannot open %s:", path);
 		return -1;
 	}
 
-	has_gpt = (read_gpt(&dev, &gpt_hdr, gpt_parts) == 0);
+	has_gpt = (gpt_read(&dev, &gpt_hdr, gpt_parts) == 0);
 
 	if (opt_init_mbr) {
 		memset(&mbr, 0, sizeof(mbr));
@@ -291,12 +456,48 @@ do_fdisk(const char *path)
 		gpt_hdr.part_size = 128;
 		memset(gpt_parts, 0, sizeof(gpt_parts));
 
-		if (write_gpt(&dev, &gpt_hdr, gpt_parts) < 0) {
+		if (gpt_write(&dev, &gpt_hdr, gpt_parts) < 0) {
 			weprintf("cannot write GPT to %s:", path);
 			blockdev_close(&dev);
 			return -1;
 		}
 		printf("Initialized GPT partition table on %s\n", path);
+		blockdev_close(&dev);
+		return 0;
+	}
+
+	if (opt_init_bsd) {
+		base_sec = 0;
+		limit = dev.size / dev.sec_size;
+
+		if (blockdev_read(&dev, 0, &mbr, 1) == 0 && mbr.sig[0] == 0x55 && mbr.sig[1] == 0xAA) {
+			if (!opt_part_is_letter && opt_part_idx >= 1 && opt_part_idx <= 4) {
+				mp = &mbr.parts[opt_part_idx - 1];
+				if (mp->size > 0) {
+					base_sec = mp->start_lba;
+					limit = base_sec + mp->size;
+				}
+			}
+		}
+
+		memset(&lp, 0, sizeof(lp));
+		lp.d_magic = 0x82564557U;
+		lp.d_magic2 = 0x82564557U;
+		lp.d_secsize = dev.sec_size;
+		lp.d_npartitions = 8;
+		lp.d_partitions[2].offset = (uint32_t)base_sec;
+		lp.d_partitions[2].offset_h = (uint16_t)(base_sec >> 32);
+		size = limit - base_sec;
+		lp.d_partitions[2].size = (uint32_t)size;
+		lp.d_partitions[2].size_h = (uint16_t)(size >> 32);
+		lp.d_partitions[2].fstype = 0;
+
+		if (bsd_write(&dev, base_sec, &lp) < 0) {
+			weprintf("cannot write BSD disklabel to %s:", path);
+			blockdev_close(&dev);
+			return -1;
+		}
+		printf("Initialized BSD disklabel on %s (at sector %llu)\n", path, (unsigned long long)base_sec);
 		blockdev_close(&dev);
 		return 0;
 	}
@@ -314,46 +515,76 @@ do_fdisk(const char *path)
 				blockdev_close(&dev);
 				return -1;
 			}
-			struct GptPartition *p = &gpt_parts[opt_part_idx - 1];
-			p->start_lba = opt_start;
-			p->end_lba = opt_end;
-			/* default type guid: linux filesystem data */
-			p->type_guid[0] = 0xAF; p->type_guid[1] = 0x3D; p->type_guid[2] = 0xC6; p->type_guid[3] = 0x0F;
-			p->type_guid[4] = 0x83; p->type_guid[5] = 0x84;
-			p->type_guid[6] = 0x72; p->type_guid[7] = 0x47;
-			p->type_guid[8] = 0x8E; p->type_guid[9] = 0x79;
-			p->type_guid[10] = 0x3D; p->type_guid[11] = 0x69; p->type_guid[12] = 0xD8; p->type_guid[13] = 0x47; p->type_guid[14] = 0x7D; p->type_guid[15] = 0xE4;
+			gp = &gpt_parts[opt_part_idx - 1];
+			gp->start_lba = opt_start;
+			gp->end_lba = opt_end;
+			gp->type_guid[0] = 0xAF; gp->type_guid[1] = 0x3D; gp->type_guid[2] = 0xC6; gp->type_guid[3] = 0x0F;
+			gp->type_guid[4] = 0x83; gp->type_guid[5] = 0x84;
+			gp->type_guid[6] = 0x72; gp->type_guid[7] = 0x47;
+			gp->type_guid[8] = 0x8E; gp->type_guid[9] = 0x79;
+			gp->type_guid[10] = 0x3D; gp->type_guid[11] = 0x69; gp->type_guid[12] = 0xD8; gp->type_guid[13] = 0x47; gp->type_guid[14] = 0x7D; gp->type_guid[15] = 0xE4;
 
-			if (write_gpt(&dev, &gpt_hdr, gpt_parts) < 0) {
+			if (gpt_write(&dev, &gpt_hdr, gpt_parts) < 0) {
 				weprintf("cannot update GPT on %s:", path);
 				blockdev_close(&dev);
 				return -1;
 			}
 			printf("Added GPT partition %d to %s\n", opt_part_idx, path);
 		} else {
-			if (blockdev_read(&dev, 0, &mbr, 1) < 0) {
-				weprintf("cannot read MBR from %s:", path);
-				blockdev_close(&dev);
-				return -1;
-			}
-			if (opt_part_idx > 4) {
-				weprintf("MBR partition index must be 1-4\n");
-				blockdev_close(&dev);
-				return -1;
-			}
-			struct MbrPartition *p = &mbr.parts[opt_part_idx - 1];
-			p->start_lba = (uint32_t)opt_start;
-			p->size = (uint32_t)(opt_end - opt_start + 1);
-			p->type = opt_type ? (uint8_t)strtoul(opt_type, NULL, 0) : 0x83;
-			mbr.sig[0] = 0x55;
-			mbr.sig[1] = 0xAA;
+			has_bsd = (bsd_find_label(&dev, &bsd_base, &bsd_lp) == 0);
+			if (opt_part_is_letter || has_bsd) {
+				if (!has_bsd) {
+					weprintf("BSD disklabel not found on %s\n", path);
+					blockdev_close(&dev);
+					return -1;
+				}
+				idx = opt_part_idx - 1;
+				if (idx >= 16) {
+					weprintf("BSD partition index must be a-p\n");
+					blockdev_close(&dev);
+					return -1;
+				}
+				bp = &bsd_lp.d_partitions[idx];
+				bp->offset = (uint32_t)opt_start;
+				bp->offset_h = (uint16_t)(opt_start >> 32);
+				size = opt_end - opt_start + 1;
+				bp->size = (uint32_t)size;
+				bp->size_h = (uint16_t)(size >> 32);
+				bp->fstype = opt_type ? (uint8_t)strtoul(opt_type, NULL, 0) : 7;
+				if (idx >= bsd_lp.d_npartitions)
+					bsd_lp.d_npartitions = idx + 1;
 
-			if (blockdev_write(&dev, 0, &mbr, 1) < 0) {
-				weprintf("cannot update MBR on %s:", path);
-				blockdev_close(&dev);
-				return -1;
+				if (bsd_write(&dev, bsd_base, &bsd_lp) < 0) {
+					weprintf("cannot update BSD disklabel on %s:", path);
+					blockdev_close(&dev);
+					return -1;
+				}
+				printf("Added BSD partition %c to %s\n", 'a' + idx, path);
+			} else {
+				if (blockdev_read(&dev, 0, &mbr, 1) < 0) {
+					weprintf("cannot read MBR from %s:", path);
+					blockdev_close(&dev);
+					return -1;
+				}
+				if (opt_part_idx > 4) {
+					weprintf("MBR partition index must be 1-4\n");
+					blockdev_close(&dev);
+					return -1;
+				}
+				mp = &mbr.parts[opt_part_idx - 1];
+				mp->start_lba = (uint32_t)opt_start;
+				mp->size = (uint32_t)(opt_end - opt_start + 1);
+				mp->type = opt_type ? (uint8_t)strtoul(opt_type, NULL, 0) : 0x83;
+				mbr.sig[0] = 0x55;
+				mbr.sig[1] = 0xAA;
+
+				if (blockdev_write(&dev, 0, &mbr, 1) < 0) {
+					weprintf("cannot update MBR on %s:", path);
+					blockdev_close(&dev);
+					return -1;
+				}
+				printf("Added MBR partition %d to %s\n", opt_part_idx, path);
 			}
-			printf("Added MBR partition %d to %s\n", opt_part_idx, path);
 		}
 	}
 
@@ -371,30 +602,53 @@ do_fdisk(const char *path)
 				return -1;
 			}
 			memset(&gpt_parts[opt_part_idx - 1], 0, sizeof(struct GptPartition));
-			if (write_gpt(&dev, &gpt_hdr, gpt_parts) < 0) {
+			if (gpt_write(&dev, &gpt_hdr, gpt_parts) < 0) {
 				weprintf("cannot update GPT on %s:", path);
 				blockdev_close(&dev);
 				return -1;
 			}
 			printf("Deleted GPT partition %d from %s\n", opt_part_idx, path);
 		} else {
-			if (blockdev_read(&dev, 0, &mbr, 1) < 0) {
-				weprintf("cannot read MBR from %s:", path);
-				blockdev_close(&dev);
-				return -1;
+			has_bsd = (bsd_find_label(&dev, &bsd_base, &bsd_lp) == 0);
+			if (opt_part_is_letter || has_bsd) {
+				if (!has_bsd) {
+					weprintf("BSD disklabel not found on %s\n", path);
+					blockdev_close(&dev);
+					return -1;
+				}
+				idx = opt_part_idx - 1;
+				if (idx >= 16) {
+					weprintf("BSD partition index must be a-p\n");
+					blockdev_close(&dev);
+					return -1;
+				}
+				memset(&bsd_lp.d_partitions[idx], 0, sizeof(struct BsdPartition));
+				if (bsd_write(&dev, bsd_base, &bsd_lp) < 0) {
+					weprintf("cannot update BSD disklabel on %s:", path);
+					blockdev_close(&dev);
+					return -1;
+				}
+				printf("Deleted BSD partition %c from %s\n", 'a' + idx, path);
+			} else {
+				if (blockdev_read(&dev, 0, &mbr, 1) < 0) {
+					weprintf("cannot read MBR from %s:", path);
+					blockdev_close(&dev);
+					return -1;
+				}
+				if (opt_part_idx > 4) {
+					weprintf("MBR partition index must be 1-4\n");
+					blockdev_close(&dev);
+					return -1;
+				}
+				mp = &mbr.parts[opt_part_idx - 1];
+				memset(mp, 0, sizeof(struct MbrPartition));
+				if (blockdev_write(&dev, 0, &mbr, 1) < 0) {
+					weprintf("cannot update MBR on %s:", path);
+					blockdev_close(&dev);
+					return -1;
+				}
+				printf("Deleted MBR partition %d from %s\n", opt_part_idx, path);
 			}
-			if (opt_part_idx > 4) {
-				weprintf("MBR partition index must be 1-4\n");
-				blockdev_close(&dev);
-				return -1;
-			}
-			memset(&mbr.parts[opt_part_idx - 1], 0, sizeof(struct MbrPartition));
-			if (blockdev_write(&dev, 0, &mbr, 1) < 0) {
-				weprintf("cannot update MBR on %s:", path);
-				blockdev_close(&dev);
-				return -1;
-			}
-			printf("Deleted MBR partition %d from %s\n", opt_part_idx, path);
 		}
 	}
 
@@ -403,11 +657,13 @@ do_fdisk(const char *path)
 }
 
 // ?man fdisk: partition table manipulator
-// ?man arguments: [-l] [-p] [-g] [-m] [-a] [-d] [-n index] [-b start] [-e end] [-t type] [device]
-// ?man fdisk performs partition table operations for MBR and GPT disks
+// ?man arguments: [-l] [-p] [-g] [-m] [-s] [-a] [-d] [-n index] [-b start] [-e end] [-t type] [device]
+// ?man fdisk performs partition table operations for MBR, GPT and BSD disklabels
 int
 main(int argc, char *argv[])
 {
+	int ret = 0;
+
 	ARGBEGIN {
 	// ?man -l:list partitions of all devices
 	case 'l':
@@ -425,6 +681,10 @@ main(int argc, char *argv[])
 	case 'm':
 		opt_init_mbr = 1;
 		break;
+	// ?man -s:initialize disk with BSD disklabel
+	case 's':
+		opt_init_bsd = 1;
+		break;
 	// ?man -a:add partition
 	case 'a':
 		opt_add = 1;
@@ -433,10 +693,18 @@ main(int argc, char *argv[])
 	case 'd':
 		opt_del = 1;
 		break;
-	// ?man -n:partition index
-	case 'n':
-		opt_part_idx = (int)estrtol(EARGF(usage()), 10);
+	// ?man -n:partition index or letter
+	case 'n': {
+		char *arg = EARGF(usage());
+		if (arg[0] >= 'a' && arg[0] <= 'p' && arg[1] == '\0') {
+			opt_part_idx = arg[0] - 'a' + 1;
+			opt_part_is_letter = 1;
+		} else {
+			opt_part_idx = (int)estrtol(arg, 10);
+			opt_part_is_letter = 0;
+		}
 		break;
+	}
 	// ?man -b:starting sector LBA
 	case 'b':
 		opt_start = (uint64_t)estrtoul(EARGF(usage()), 10);
@@ -445,7 +713,7 @@ main(int argc, char *argv[])
 	case 'e':
 		opt_end = (uint64_t)estrtoul(EARGF(usage()), 10);
 		break;
-	// ?man -t:partition type (MBR hex or GPT string)
+	// ?man -t:partition type (MBR/BSD hex or GPT string)
 	case 't':
 		opt_type = EARGF(usage());
 		break;
@@ -459,20 +727,24 @@ main(int argc, char *argv[])
 		if (!list)
 			return 1;
 		for (curr = list; curr; curr = curr->next) {
-			char devpath[128];
-			snprintf(devpath, sizeof(devpath), "/dev/%s", curr->name);
-			do_print(devpath);
+			do_print(curr->path);
 		}
 		blockdev_free_list(list);
-		return 0;
+		if (fshut(stdin, "<stdin>") | fshut(stdout, "<stdout>"))
+			ret = 2;
+		return ret;
 	}
 
 	if (argc != 1)
 		usage();
 
 	if (opt_print) {
-		return do_print(argv[0]) < 0 ? 1 : 0;
+		ret = do_print(argv[0]) < 0 ? 1 : 0;
+	} else {
+		ret = do_fdisk(argv[0]) < 0 ? 1 : 0;
 	}
 
-	return do_fdisk(argv[0]) < 0 ? 1 : 0;
+	if (fshut(stdin, "<stdin>") | fshut(stdout, "<stdout>"))
+		ret = 2;
+	return ret;
 }
