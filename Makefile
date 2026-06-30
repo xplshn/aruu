@@ -1,7 +1,5 @@
 .POSIX:
 include config.mk
-
-.SUFFIXES:
 .SUFFIXES: .y .o .c
 
 HDR =\
@@ -673,6 +671,8 @@ PSEUDO_BIN = \
 OBJ = $(LIBUTFOBJ) $(LIBUTILOBJ) $(MAKEOBJ)
 
 all: $(LIB) $(POSIX_BIN) $(LINUX_BIN) $(NET_BIN) $(XSI_BIN) $(PSEUDO_BIN)
+
+include deps.mk
 
 $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_BIN_ALL): $(LIB)
 
