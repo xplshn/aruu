@@ -303,6 +303,15 @@ build_diff() {
 	link_bin "$dir/diff" $objs -- $LIB -lm
 }
 
+build_patch() {
+	cfg_enabled BUILD_POSIX_PATCH || return 0
+	local dir=cmd/posix/patch
+	EXTRA_HDR="$dir/common.h $dir/util.h $dir/pch.h $dir/inp.h $dir/backupfile.h $dir/pathnames.h"
+	objs_for "$dir" "" "-I$dir"
+	EXTRA_HDR=
+	link_bin "$dir/patch" $_objs -- $LIB
+}
+
 build_diff3() {
 	cfg_enabled BUILD_PSEUDO_DIFF3 || return 0
 	local dir=cmd/extra/diff3
@@ -407,6 +416,7 @@ build_posix() {
 	}
 	build_simple_tools posix
 	build_diff
+	build_patch
 	build_awk
 	build_sh
 	build_make
@@ -524,6 +534,7 @@ build_man() {
 		done
 	done
 	build_man_for BUILD_POSIX_DIFF cmd/posix/diff/diff.c
+	build_man_for BUILD_POSIX_PATCH cmd/posix/patch/patch.c
 	build_man_for BUILD_PSEUDO_DIFF3 cmd/extra/diff3/diff3.c
 }
 
@@ -549,6 +560,7 @@ do_clean() {
 	find cmd -type f ! -name '*.*' -perm -100     -exec rm -f {} +
 	rm -f shared/libaruuelf.so
 	rm -f cmd/posix/bc.c cmd/posix/getconf.h
+	rm -f cmd/posix/patch/patch
 	rm -f cmd/posix/awk/maketab cmd/posix/awk/proctab.c
 	rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h
 	rm -f cmd/posix/sh/mknodes cmd/posix/sh/mksyntax

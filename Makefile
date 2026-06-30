@@ -126,6 +126,7 @@ POSIX_BIN_ALL =\
 	cmd/posix/dd\
 	cmd/posix/df\
 	cmd/posix/diff/diff\
+	cmd/posix/patch/patch\
 	cmd/posix/dirname\
 	cmd/posix/du\
 	cmd/posix/echo\
@@ -304,6 +305,14 @@ DIFFOBJ =\
 	cmd/posix/diff/pr.o\
 	cmd/posix/diff/xmalloc.o
 
+PATCHOBJ =\
+	cmd/posix/patch/patch.o\
+	cmd/posix/patch/pch.o\
+	cmd/posix/patch/inp.o\
+	cmd/posix/patch/util.o\
+	cmd/posix/patch/backupfile.o\
+	cmd/posix/patch/mkpath.o
+
 BIN_basename_1 = cmd/posix/basename
 BIN_cal_1 = cmd/posix/cal
 BIN_cat_1 = cmd/posix/cat
@@ -319,6 +328,7 @@ BIN_date_1 = cmd/posix/date
 BIN_dd_1 = cmd/posix/dd
 BIN_df_1 = cmd/posix/df
 BIN_diff_1 = cmd/posix/diff/diff
+BIN_patch_1 = cmd/posix/patch/patch
 BIN_dirname_1 = cmd/posix/dirname
 BIN_du_1 = cmd/posix/du
 BIN_echo_1 = cmd/posix/echo
@@ -495,6 +505,7 @@ POSIX_BIN = \
 	$(BIN_dd_$(BUILD_POSIX_DD)) \
 	$(BIN_df_$(BUILD_POSIX_DF)) \
 	$(BIN_diff_$(BUILD_POSIX_DIFF)) \
+	$(BIN_patch_$(BUILD_POSIX_PATCH)) \
 	$(BIN_dirname_$(BUILD_POSIX_DIRNAME)) \
 	$(BIN_du_$(BUILD_POSIX_DU)) \
 	$(BIN_echo_$(BUILD_POSIX_ECHO)) \
@@ -692,6 +703,16 @@ $(DIFFOBJ): cmd/posix/diff/diff.h cmd/posix/diff/pr.h cmd/posix/diff/xmalloc.h
 cmd/posix/diff/diff: $(DIFFOBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(DIFFOBJ) $(LIB) $(LDLIBS) -lm
 
+$(PATCHOBJ): cmd/posix/patch/common.h cmd/posix/patch/util.h \
+	cmd/posix/patch/pch.h cmd/posix/patch/inp.h \
+	cmd/posix/patch/backupfile.h cmd/posix/patch/pathnames.h
+
+cmd/posix/patch/%.o: cmd/posix/patch/%.c
+	$(CC) $(CPPFLAGS) -Icmd/posix/patch $(CFLAGS) -o $@ -c $<
+
+cmd/posix/patch/patch: $(PATCHOBJ) $(LIB)
+	$(CC) $(LDFLAGS) -o $@ $(PATCHOBJ) $(LIB) $(LDLIBS)
+
 shared/libutf/libutf.a: $(LIBUTFOBJ)
 	$(AR) $(ARFLAGS) $@ $?
 	$(RANLIB) $@
@@ -739,11 +760,12 @@ man: scripts/mkman/mkman
 
 clean:
 	rm -f shared/libutf/*.o shared/libutil/*.o shared/libredline/*.o
-	rm -f cmd/posix/*.o cmd/posix/diff/*.o cmd/posix/make/*.o cmd/posix/awk/*.o cmd/posix/sh/*.o
+	rm -f cmd/posix/*.o cmd/posix/diff/*.o cmd/posix/patch/*.o cmd/posix/make/*.o cmd/posix/awk/*.o cmd/posix/sh/*.o
 	rm -f cmd/linux/*.o cmd/net/*.o cmd/xsi/*.o cmd/pseudo/*.o
 	rm -f cmd/extra/*.o cmd/extra/diff3/*.o cmd/dev/ar/*.o cmd/dev/ld/*.o cmd/dev/cc/*.o cmd/dev/as/*.o cmd/dev/xcutil/*.o
 	rm -f $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_BIN_ALL) $(LIB)
 	rm -f cmd/posix/make/make cmd/posix/getconf.h cmd/posix/bc.c
+	rm -f cmd/posix/patch/patch
 	rm -f cmd/posix/awk/awk cmd/posix/awk/maketab cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proctab.c
 	rm -f cmd/posix/sh/sh cmd/posix/sh/mknodes cmd/posix/sh/mksyntax
 	rm -f cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h cmd/posix/sh/token.h

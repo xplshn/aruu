@@ -144,6 +144,35 @@ compile_diff() {
 	printf '\t{ "diff", diff_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
 }
 
+compile_patch() {
+	pdir="${ROOT}/cmd/posix/patch"
+	symf="${BDIR}/patch.syms"
+	patch_objs=""
+
+	printf 'mkbox: cc patch (multi)\n'
+	for s in patch pch inp util backupfile mkpath; do
+		out="${BDIR}/patch_${s}.o"
+		eval "${CC} ${CPPFLAGS} -I\"\$pdir\" ${CFLAGS} -c \"\$pdir/\$s.c\" -o \"\$out\"" ||
+			die "compile failed: patch/${s}.c"
+		patch_objs="${patch_objs} ${out}"
+	done
+
+	combined="${BDIR}/patch_combined.o"
+	${LD:-ld} -r -o "${combined}" ${patch_objs} ||
+		die "ld -r failed: patch"
+
+	printf 'main patch_main\n' > "${symf}"
+	${OBJCOPY} --redefine-syms="${symf}" "${combined}" ||
+		die "objcopy failed: patch"
+	${OBJCOPY} --keep-global-symbol=patch_main "${combined}" ||
+		die "objcopy localize failed: patch"
+	rm -f "${symf}" ${patch_objs}
+
+	OBJS="${OBJS} ${combined}"
+	printf 'int patch_main(int, char **);\n' >> "${DECL_F}"
+	printf '\t{ "patch", patch_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
+}
+
 compile_diff3() {
 	ddir="${ROOT}/cmd/extra/diff3"
 	pdir="${ROOT}/cmd/posix/diff"
@@ -301,6 +330,7 @@ process_dir() {
 
 process_dir "${ROOT}/cmd/posix" "posix"
 compile_diff
+compile_patch
 compile_awk
 compile_sh
 compile_make
