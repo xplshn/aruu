@@ -2,9 +2,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Copyright (c) 1993
- *	The Regents of the University of California.  All rights reserved.
+ *      The Regents of the University of California.  All rights reserved.
  * Copyright (c) 2007
- *	Herbert Xu <herbert@gondor.apana.org.au>.  All rights reserved.
+ *      Herbert Xu <herbert@gondor.apana.org.au>.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Kenneth Almquist.
@@ -33,6 +33,8 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+
+#include "shell.h"
 
 #define ARITH_ASS 1
 

@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *      The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Kenneth Almquist.
@@ -129,9 +129,9 @@
 
 /*
  * The follow should be set to reflect the type of system you have:
- *	JOBS -> 1 if you have Berkeley job control, 0 otherwise.
- *	define DEBUG=1 to compile in debugging (set global "debug" to turn on)
- *	define DEBUG=2 to compile in and turn on debugging.
+ *      JOBS -> 1 if you have Berkeley job control, 0 otherwise.
+ *      define DEBUG=1 to compile in debugging (set global "debug" to turn on)
+ *      define DEBUG=2 to compile in and turn on debugging.
  *
  * When debugging is on, debugging info will be written to ./trace and
  * a quit signal will generate a core dump.
@@ -148,7 +148,10 @@ typedef intmax_t arith_t;
 #define ARITH_MIN        INTMAX_MIN
 #define ARITH_MAX        INTMAX_MAX
 
+#ifndef _SH_POINTER_TYPEDEF
+#define _SH_POINTER_TYPEDEF
 typedef void *pointer;
+#endif
 
 #if defined(__has_include)
 #if __has_include(<sys/cdefs.h>)

@@ -32,6 +32,8 @@
  * SUCH DAMAGE.
  */
 
+#include "sh_cdefs.h"
+
 #ifndef OUTPUT_INCL
 
 #include <stdarg.h>

@@ -22,6 +22,8 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 ****************************************************************/
 
+#include <stddef.h>
+#include <stdio.h>
 extern int   yywrap(void);
 extern void  setfname(Cell *);
 extern int   constnode(Node *);

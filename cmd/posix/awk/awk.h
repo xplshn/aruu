@@ -23,6 +23,7 @@ THIS SOFTWARE.
 ****************************************************************/
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #ifndef bool

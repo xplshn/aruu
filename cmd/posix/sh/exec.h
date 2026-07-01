@@ -32,6 +32,8 @@
  * SUCH DAMAGE.
  */
 
+#include "sh_cdefs.h"
+
 /* values of cmdtype */
 #define CMDUNKNOWN  -1 /* no entry in table for command */
 #define CMDNORMAL   0  /* command is an executable program */

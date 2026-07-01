@@ -29,6 +29,8 @@
  * SUCH DAMAGE.
  */
 
+#include "sh_cdefs.h"
+
 void showtree(union node *);
 #ifdef DEBUG
 void sh_trace(const char *, ...) __printflike(1, 2);

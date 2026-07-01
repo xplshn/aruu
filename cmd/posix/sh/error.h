@@ -32,6 +32,8 @@
  * SUCH DAMAGE.
  */
 
+#include "sh_cdefs.h"
+
 /*
  * We enclose jmp_buf in a structure so that we can declare pointers to
  * jump locations.  The global variable handler contains the location to

@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *      The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Kenneth Almquist.
@@ -32,6 +32,8 @@
  * SUCH DAMAGE.
  */
 
+#include "sh_cdefs.h"
+#include <stddef.h>
 #include <string.h>
 
 struct stackmark {

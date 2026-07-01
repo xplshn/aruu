@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *      The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
  * Kenneth Almquist.
@@ -37,6 +37,7 @@
 #define FORK_BG    1
 #define FORK_NOJOB 2
 
+#include "shell.h"
 #include <signal.h> /* for sig_atomic_t */
 
 struct job;
