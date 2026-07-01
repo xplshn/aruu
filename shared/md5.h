@@ -1,5 +1,6 @@
 /* public domain md5 implementation based on rfc1321 and libtomcrypt */
 
+#include <stdint.h>
 struct md5 {
   uint64_t len;     /* processed message length */
   uint32_t h[4];    /* hash state */

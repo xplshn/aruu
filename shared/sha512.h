@@ -1,5 +1,6 @@
 /* public domain sha512 implementation based on fips180-3 */
 
+#include <stdint.h>
 struct sha512 {
   uint64_t len;      /* processed message length */
   uint64_t h[8];     /* hash state */

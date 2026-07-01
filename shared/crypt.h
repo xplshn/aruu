@@ -1,4 +1,5 @@
 /* See LICENSE file for copyright and license details. */
+#include <stdint.h>
 struct crypt_ops {
   void (*init)(void *);
   void (*update)(void *, const void *, unsigned long);

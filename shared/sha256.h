@@ -1,5 +1,6 @@
 /* public domain sha256 implementation based on fips180-3 */
 
+#include <stdint.h>
 struct sha256 {
   uint64_t len;     /* processed message length */
   uint32_t h[8];    /* hash state */

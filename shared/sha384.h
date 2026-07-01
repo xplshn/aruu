@@ -1,6 +1,7 @@
 /* public domain sha512 implementation based on fips180-3 */
 
 #include "sha512.h"
+#include <stdint.h>
 
 #define sha384 sha512 /*struct*/
 

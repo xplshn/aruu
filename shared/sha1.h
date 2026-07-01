@@ -1,5 +1,6 @@
 /* public domain sha1 implementation based on rfc3174 and libtomcrypt */
 
+#include <stdint.h>
 struct sha1 {
   uint64_t len;     /* processed message length */
   uint32_t h[5];    /* hash state */
