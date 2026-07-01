@@ -44,6 +44,7 @@ feature_let=1
 feature_ulimit=1
 feature_setvar=1
 feature_wordexp=1
+feature_easter=1
 
 if [ -f ../../config.mk ]; then
 	feature_histedit=$(grep '^[[:space:]]*FEATURE_SH_HISTEDIT[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
@@ -52,6 +53,7 @@ if [ -f ../../config.mk ]; then
 	feature_ulimit=$(grep '^[[:space:]]*FEATURE_SH_ULIMIT[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
 	feature_setvar=$(grep '^[[:space:]]*FEATURE_SH_SETVAR[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
 	feature_wordexp=$(grep '^[[:space:]]*FEATURE_SH_WORDEXP[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
+	feature_easter=$(grep '^[[:space:]]*FEATURE_SH_EASTER[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
 fi
 
 exec > builtins.c
@@ -72,6 +74,7 @@ awk '/^[^#]/ {
 	if ($0 ~ /#FEATURE_SH_ULIMIT/ && '$feature_ulimit' != 1) next;
 	if ($0 ~ /#FEATURE_SH_SETVAR/ && '$feature_setvar' != 1) next;
 	if ($0 ~ /#FEATURE_SH_WORDEXP/ && '$feature_wordexp' != 1) next;
+	if ($0 ~ /#FEATURE_SH_EASTER/ && '$feature_easter' != 1) next;
 
 	if ('$havejobs' || $2 != "-j") {
 		sub(/#[A-Z0-9_]*/, "");

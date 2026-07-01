@@ -785,6 +785,7 @@ SHOBJ =\
 	cmd/posix/sh/cd.o\
 	cmd/posix/sh/echo.o\
 	cmd/posix/sh/error.o\
+	cmd/posix/sh/easter.o\
 	cmd/posix/sh/eval.o\
 	cmd/posix/sh/exec.o\
 	cmd/posix/sh/expand.o\

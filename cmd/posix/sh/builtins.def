@@ -89,3 +89,5 @@ unaliascmd	unalias
 unsetcmd	-s unset
 waitcmd		wait
 wordexpcmd	wordexp	#FEATURE_SH_WORDEXP
+bogometercmd -n	bogometer #FEATURE_SH_EASTER
+boguscmd -n	bogus #FEATURE_SH_EASTER
