@@ -282,6 +282,7 @@ PSEUDO_BIN_ALL =\
 	cmd/extra/lsblk\
 	cmd/extra/fdisk\
 	cmd/extra/sync\
+	cmd/extra/yap/yap\
 	cmd/dev/ar/ar\
 	cmd/dev/as/as\
 	cmd/dev/ld/ld\
@@ -466,6 +467,7 @@ BIN_blkid_1 = cmd/extra/blkid
 BIN_lsblk_1 = cmd/extra/lsblk
 BIN_fdisk_1 = cmd/extra/fdisk
 BIN_sync_1 = cmd/extra/sync
+BIN_yap_1 = cmd/extra/yap/yap
 BIN_diff3_1 = cmd/posix/diff3
 BIN_ar_1 = cmd/dev/ar/ar
 BIN_as_1 = cmd/dev/as/as
@@ -811,6 +813,23 @@ SHOBJ =\
 	cmd/posix/sh/nodes.o\
 	cmd/posix/sh/syntax.o
 
+YAPOBJ =\
+	cmd/extra/yap/ansi.o\
+	cmd/extra/yap/commands.o\
+	cmd/extra/yap/display.o\
+	cmd/extra/yap/getcomm.o\
+	cmd/extra/yap/getline.o\
+	cmd/extra/yap/help.o\
+	cmd/extra/yap/keys.o\
+	cmd/extra/yap/machine.o\
+	cmd/extra/yap/main.o\
+	cmd/extra/yap/options.o\
+	cmd/extra/yap/output.o\
+	cmd/extra/yap/pattern.o\
+	cmd/extra/yap/process.o\
+	cmd/extra/yap/prompt.o\
+	cmd/extra/yap/term.o
+
 cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h: cmd/posix/awk/awkgram.y
 	$(YACC) -d -o cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.y
 	@if [ ! -f cmd/posix/awk/awkgram.tab.h ]; then \
@@ -857,6 +876,12 @@ cmd/posix/sh/%.o: cmd/posix/sh/%.c
 
 cmd/posix/sh/sh: $(SHOBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(SHOBJ) $(LIB) $(LDLIBS)
+
+cmd/extra/yap/%.o: cmd/extra/yap/%.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
+
+cmd/extra/yap/yap: $(YAPOBJ) $(LIB)
+	$(CC) $(LDFLAGS) -o $@ $(YAPOBJ) $(LIB) $(LDLIBS) -ltinfo
 
 cmd/extra/diff3/diff3: cmd/extra/diff3/diff3.o cmd/posix/diff/xmalloc.o $(LIB)
 	$(CC) $(LDFLAGS) -o $@ cmd/extra/diff3/diff3.o cmd/posix/diff/xmalloc.o $(LIB) $(LDLIBS)

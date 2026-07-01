@@ -116,6 +116,7 @@ compile_make() {
 
 compile_diff() {
         ddir="${ROOT}/cmd/posix/diff"
+        [ -d "${ddir}" ] || return 0
         symf="${BDIR}/diff.syms"
         diff_objs=""
 
@@ -146,6 +147,7 @@ compile_diff() {
 
 compile_patch() {
         pdir="${ROOT}/cmd/posix/patch"
+        [ -d "${pdir}" ] || return 0
         symf="${BDIR}/patch.syms"
         patch_objs=""
 
@@ -175,6 +177,7 @@ compile_patch() {
 
 compile_diff3() {
         ddir="${ROOT}/cmd/extra/diff3"
+        [ -d "${ddir}" ] || return 0
         pdir="${ROOT}/cmd/posix/diff"
         symf="${BDIR}/diff3.syms"
         diff3_objs=""
@@ -205,6 +208,40 @@ compile_diff3() {
         OBJS="${OBJS} ${combined}"
         printf 'int diff3_main(int, char **);\n' >> "${DECL_F}"
         printf '\t{ "diff3", diff3_main, "extra" },\n' >> "${BDIR}/entries_extra.inc"
+}
+
+compile_yap() {
+        ydir="${ROOT}/cmd/extra/yap"
+        symf="${BDIR}/yap.syms"
+        yap_objs=""
+
+        [ -d "${ydir}" ] || return 0
+        printf 'mkbox: cc yap (multi)\n'
+        for src in "${ydir}"/*.c; do
+                [ -f "${src}" ] || continue
+                s=${src##*/}
+                s=${s%.c}
+                out="${BDIR}/yap_${s}.o"
+                eval "${CC} ${CPPFLAGS} ${CFLAGS} -c \"\$src\" -o \"\$out\"" ||
+                        die "compile failed: yap/${s}.c"
+                yap_objs="${yap_objs} ${out}"
+        done
+
+        combined="${BDIR}/yap_combined.o"
+        ${LD:-ld} -r -o "${combined}" ${yap_objs} ||
+                die "ld -r failed: yap"
+
+        printf 'main yap_main\n' > "${symf}"
+        ${OBJCOPY} --redefine-syms="${symf}" "${combined}" ||
+                die "objcopy failed: yap"
+        ${OBJCOPY} --keep-global-symbol=yap_main "${combined}" ||
+                die "objcopy localize failed: yap"
+        rm -f "${symf}" ${yap_objs}
+
+        OBJS="${OBJS} ${combined}"
+        LDLIBS="${LDLIBS} -ltinfo"
+        printf 'int yap_main(int, char **);\n' >> "${DECL_F}"
+        printf '\t{ "yap", yap_main, "extra" },\n' >> "${BDIR}/entries_extra.inc"
 }
 
 compile_awk() {
@@ -283,7 +320,7 @@ compile_sh() {
         (cd "${sdir}" && sh mktokens) ||
                 die "mktokens failed"
 
-        for s in alias arith_yacc arith_yylex cd echo error eval exec \
+        for s in alias arith_yacc arith_yylex cd easter echo error eval exec \
                   expand lineedit input jobs kill mail main memalloc \
                   miscbltin mystring options output parser printf redir \
                   show test trap var builtins nodes syntax; do
@@ -328,6 +365,8 @@ process_dir() {
         done
 }
 
+[ -f "${ROOT}/cmd/posix/diff.c" ] && LDLIBS="${LDLIBS} -lm"
+
 process_dir "${ROOT}/cmd/posix" "posix"
 compile_diff
 compile_patch
@@ -340,6 +379,7 @@ process_dir "${ROOT}/cmd/pseudo" "pseudo"
 process_dir "${ROOT}/cmd/xsi" "xsi"
 process_dir "${ROOT}/cmd/extra" "extra"
 compile_diff3
+compile_yap
 
 DISP="${BDIR}/aruu-box.c"
 printf 'mkbox: generating dispatch\n'
