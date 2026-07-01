@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -10,7 +9,7 @@
 static void
 usage(void)
 {
-	eprintf("usage: %s [name]\n", argv0);
+  eprintf("usage: %s [name]\n", argv0);
 }
 
 // ?man hostname: show or set hostname
@@ -19,23 +18,25 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	char host[HOST_NAME_MAX + 1];
+  char host[HOST_NAME_MAX + 1];
 
-	ARGBEGIN {
-	default:
-		usage();
-	} ARGEND
+  ARGBEGIN
+  {
+    default:
+      usage();
+  }
+  ARGEND
 
-	if (!argc) {
-		if (gethostname(host, sizeof(host)) < 0)
-			eprintf("gethostname:");
-		puts(host);
-	} else if (argc == 1) {
-		if (sethostname(argv[0], strlen(argv[0])) < 0)
-			eprintf("sethostname:");
-	} else {
-		usage();
-	}
+  if (!argc) {
+    if (gethostname(host, sizeof(host)) < 0)
+      eprintf("gethostname:");
+    puts(host);
+  } else if (argc == 1) {
+    if (sethostname(argv[0], strlen(argv[0])) < 0)
+      eprintf("sethostname:");
+  } else {
+    usage();
+  }
 
-	return fshut(stdout, "<stdout>");
+  return fshut(stdout, "<stdout>");
 }

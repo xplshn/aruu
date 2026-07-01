@@ -9,19 +9,19 @@
 int
 fputrune(const Rune *r, FILE *fp)
 {
-	char buf[UTFmax];
+  char buf[UTFmax];
 
-	return fwrite(buf, runetochar(buf, r), 1, fp);
+  return fwrite(buf, runetochar(buf, r), 1, fp);
 }
 
 int
 efputrune(const Rune *r, FILE *fp, const char *file)
 {
-	int ret;
+  int ret;
 
-	if ((ret = fputrune(r, fp)) < 0) {
-		fprintf(stderr, "fputrune %s: %s\n", file, strerror(errno));
-		exit(1);
-	}
-	return ret;
+  if ((ret = fputrune(r, fp)) < 0) {
+    fprintf(stderr, "fputrune %s: %s\n", file, strerror(errno));
+    exit(1);
+  }
+  return ret;
 }

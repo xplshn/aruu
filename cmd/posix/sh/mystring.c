@@ -40,19 +40,17 @@
  *	is_number(s)		Return true if s is a string of digits.
  */
 
-#include <stdlib.h>
+#include "mystring.h"
+#include "error.h"
 #include "shell.h"
 #include "syntax.h"
-#include "error.h"
-#include "mystring.h"
+#include <stdlib.h>
 
-
-char nullstr[1];		/* zero length string */
+char nullstr[1]; /* zero length string */
 
 /*
  * equal - #defined in mystring.h
  */
-
 
 /*
  * Convert a string of digits to an integer, printing an error message on
@@ -62,12 +60,10 @@ char nullstr[1];		/* zero length string */
 int
 number(const char *s)
 {
-	if (! is_number(s))
-		error("Illegal number: %s", s);
-	return atoi(s);
+  if (!is_number(s))
+    error("Illegal number: %s", s);
+  return atoi(s);
 }
-
-
 
 /*
  * Check for a valid number.  This should be elsewhere.
@@ -76,17 +72,16 @@ number(const char *s)
 int
 is_number(const char *p)
 {
-	const char *q;
+  const char *q;
 
-	if (*p == '\0')
-		return 0;
-	while (*p == '0')
-		p++;
-	for (q = p; *q != '\0'; q++)
-		if (! is_digit(*q))
-			return 0;
-	if (q - p > 10 ||
-	    (q - p == 10 && memcmp(p, "2147483647", 10) > 0))
-		return 0;
-	return 1;
+  if (*p == '\0')
+    return 0;
+  while (*p == '0')
+    p++;
+  for (q = p; *q != '\0'; q++)
+    if (!is_digit(*q))
+      return 0;
+  if (q - p > 10 || (q - p == 10 && memcmp(p, "2147483647", 10) > 0))
+    return 0;
+  return 1;
 }

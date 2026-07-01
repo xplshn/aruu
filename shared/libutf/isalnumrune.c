@@ -5,5 +5,5 @@
 int
 isalnumrune(Rune r)
 {
-	return isalpharune(r) || isdigitrune(r);
+  return isalpharune(r) || isdigitrune(r);
 }

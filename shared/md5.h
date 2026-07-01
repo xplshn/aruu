@@ -1,9 +1,9 @@
 /* public domain md5 implementation based on rfc1321 and libtomcrypt */
 
 struct md5 {
-	uint64_t len;    /* processed message length */
-	uint32_t h[4];   /* hash state */
-	uint8_t buf[64]; /* message block buffer */
+  uint64_t len;     /* processed message length */
+  uint32_t h[4];    /* hash state */
+  uint8_t  buf[64]; /* message block buffer */
 };
 
 enum { MD5_DIGEST_LENGTH = 16 };

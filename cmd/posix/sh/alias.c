@@ -32,241 +32,240 @@
  * SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include "shell.h"
-#include "output.h"
+#include "alias.h"
+#include "builtins.h"
 #include "error.h"
 #include "memalloc.h"
 #include "mystring.h"
-#include "alias.h"
 #include "options.h"
-#include "builtins.h"
+#include "output.h"
+#include "shell.h"
+#include <stdlib.h>
 
 #define ATABSIZE 39
 
 static struct alias *atab[ATABSIZE];
-static int aliases;
+static int           aliases;
 
-static void setalias(const char *, const char *);
-static int unalias(const char *);
+static void   setalias(const char *, const char *);
+static int    unalias(const char *);
 static size_t hashalias(const char *);
 
-static
-void
+static void
 setalias(const char *name, const char *val)
 {
-	struct alias *ap, **app;
+  struct alias *ap, **app;
 
-	unalias(name);
-	app = &atab[hashalias(name)];
-	INTOFF;
-	ap = ckmalloc(sizeof (struct alias));
-	ap->name = savestr(name);
-	ap->val = savestr(val);
-	ap->flag = 0;
-	ap->next = *app;
-	*app = ap;
-	aliases++;
-	INTON;
+  unalias(name);
+  app = &atab[hashalias(name)];
+  INTOFF;
+  ap       = ckmalloc(sizeof(struct alias));
+  ap->name = savestr(name);
+  ap->val  = savestr(val);
+  ap->flag = 0;
+  ap->next = *app;
+  *app     = ap;
+  aliases++;
+  INTON;
 }
 
 static void
 freealias(struct alias *ap)
 {
-	ckfree(ap->name);
-	ckfree(ap->val);
-	ckfree(ap);
+  ckfree(ap->name);
+  ckfree(ap->val);
+  ckfree(ap);
 }
 
 static int
 unalias(const char *name)
 {
-	struct alias *ap, **app;
+  struct alias *ap, **app;
 
-	app = &atab[hashalias(name)];
+  app = &atab[hashalias(name)];
 
-	for (ap = *app; ap; app = &(ap->next), ap = ap->next) {
-		if (equal(name, ap->name)) {
-			/*
-			 * if the alias is currently in use (i.e. its
-			 * buffer is being used by the input routine) we
-			 * just null out the name instead of freeing it.
-			 * We could clear it out later, but this situation
-			 * is so rare that it hardly seems worth it.
-			 */
-			if (ap->flag & ALIASINUSE)
-				*ap->name = '\0';
-			else {
-				INTOFF;
-				*app = ap->next;
-				freealias(ap);
-				INTON;
-			}
-			aliases--;
-			return (0);
-		}
-	}
+  for (ap = *app; ap; app = &(ap->next), ap = ap->next) {
+    if (equal(name, ap->name)) {
+      /*
+       * if the alias is currently in use (i.e. its
+       * buffer is being used by the input routine) we
+       * just null out the name instead of freeing it.
+       * We could clear it out later, but this situation
+       * is so rare that it hardly seems worth it.
+       */
+      if (ap->flag & ALIASINUSE)
+        *ap->name = '\0';
+      else {
+        INTOFF;
+        *app = ap->next;
+        freealias(ap);
+        INTON;
+      }
+      aliases--;
+      return (0);
+    }
+  }
 
-	return (1);
+  return (1);
 }
 
 static void
 rmaliases(void)
 {
-	struct alias *ap, **app;
-	int i;
+  struct alias *ap, **app;
+  int           i;
 
-	INTOFF;
-	for (i = 0; i < ATABSIZE; i++) {
-		app = &atab[i];
-		while (*app) {
-			ap = *app;
-			if (ap->flag & ALIASINUSE) {
-				*ap->name = '\0';
-				app = &(*app)->next;
-			} else {
-				*app = ap->next;
-				freealias(ap);
-			}
-		}
-	}
-	aliases = 0;
-	INTON;
+  INTOFF;
+  for (i = 0; i < ATABSIZE; i++) {
+    app = &atab[i];
+    while (*app) {
+      ap = *app;
+      if (ap->flag & ALIASINUSE) {
+        *ap->name = '\0';
+        app       = &(*app)->next;
+      } else {
+        *app = ap->next;
+        freealias(ap);
+      }
+    }
+  }
+  aliases = 0;
+  INTON;
 }
 
 struct alias *
 lookupalias(const char *name, int check)
 {
-	struct alias *ap;
+  struct alias *ap;
 
-	if (aliases == 0)
-		return (NULL);
-	for (ap = atab[hashalias(name)]; ap; ap = ap->next) {
-		if (equal(name, ap->name)) {
-			if (check && (ap->flag & ALIASINUSE))
-				return (NULL);
-			return (ap);
-		}
-	}
+  if (aliases == 0)
+    return (NULL);
+  for (ap = atab[hashalias(name)]; ap; ap = ap->next) {
+    if (equal(name, ap->name)) {
+      if (check && (ap->flag & ALIASINUSE))
+        return (NULL);
+      return (ap);
+    }
+  }
 
-	return (NULL);
+  return (NULL);
 }
 
 static int
 comparealiases(const void *p1, const void *p2)
 {
-	const struct alias *const *a1 = p1;
-	const struct alias *const *a2 = p2;
+  const struct alias *const *a1 = p1;
+  const struct alias *const *a2 = p2;
 
-	return strcmp((*a1)->name, (*a2)->name);
+  return strcmp((*a1)->name, (*a2)->name);
 }
 
 static void
 printalias(const struct alias *a)
 {
-	out1fmt("%s=", a->name);
-	out1qstr(a->val);
-	out1c('\n');
+  out1fmt("%s=", a->name);
+  out1qstr(a->val);
+  out1c('\n');
 }
 
 static void
 printaliases(void)
 {
-	int i, j;
-	struct alias **sorted, *ap;
+  int            i, j;
+  struct alias **sorted, *ap;
 
-	INTOFF;
-	sorted = ckmalloc(aliases * sizeof(*sorted));
-	j = 0;
-	for (i = 0; i < ATABSIZE; i++)
-		for (ap = atab[i]; ap; ap = ap->next)
-			if (*ap->name != '\0')
-				sorted[j++] = ap;
-	qsort(sorted, aliases, sizeof(*sorted), comparealiases);
-	for (i = 0; i < aliases; i++) {
-		printalias(sorted[i]);
-		if (int_pending())
-			break;
-	}
-	ckfree(sorted);
-	INTON;
+  INTOFF;
+  sorted = ckmalloc(aliases * sizeof(*sorted));
+  j      = 0;
+  for (i = 0; i < ATABSIZE; i++)
+    for (ap = atab[i]; ap; ap = ap->next)
+      if (*ap->name != '\0')
+        sorted[j++] = ap;
+  qsort(sorted, aliases, sizeof(*sorted), comparealiases);
+  for (i = 0; i < aliases; i++) {
+    printalias(sorted[i]);
+    if (int_pending())
+      break;
+  }
+  ckfree(sorted);
+  INTON;
 }
 
 int
 aliascmd(int argc __unused, char **argv __unused)
 {
-	char *n, *v;
-	int ret = 0;
-	struct alias *ap;
+  char         *n, *v;
+  int           ret = 0;
+  struct alias *ap;
 
-	nextopt("");
+  nextopt("");
 
-	if (*argptr == NULL) {
-		printaliases();
-		return (0);
-	}
-	while ((n = *argptr++) != NULL) {
-		if (n[0] == '\0') {
-			warning("'': not found");
-			ret = 1;
-			continue;
-		}
-		if ((v = strchr(n+1, '=')) == NULL) /* n+1: funny ksh stuff */
-			if ((ap = lookupalias(n, 0)) == NULL) {
-				warning("%s: not found", n);
-				ret = 1;
-			} else
-				printalias(ap);
-		else {
-			*v++ = '\0';
-			setalias(n, v);
-		}
-	}
+  if (*argptr == NULL) {
+    printaliases();
+    return (0);
+  }
+  while ((n = *argptr++) != NULL) {
+    if (n[0] == '\0') {
+      warning("'': not found");
+      ret = 1;
+      continue;
+    }
+    if ((v = strchr(n + 1, '=')) == NULL) /* n+1: funny ksh stuff */
+      if ((ap = lookupalias(n, 0)) == NULL) {
+        warning("%s: not found", n);
+        ret = 1;
+      } else
+        printalias(ap);
+    else {
+      *v++ = '\0';
+      setalias(n, v);
+    }
+  }
 
-	return (ret);
+  return (ret);
 }
 
 int
 unaliascmd(int argc __unused, char **argv __unused)
 {
-	int i;
+  int i;
 
-	while ((i = nextopt("a")) != '\0') {
-		if (i == 'a') {
-			rmaliases();
-			return (0);
-		}
-	}
-	for (i = 0; *argptr; argptr++)
-		i |= unalias(*argptr);
+  while ((i = nextopt("a")) != '\0') {
+    if (i == 'a') {
+      rmaliases();
+      return (0);
+    }
+  }
+  for (i = 0; *argptr; argptr++)
+    i |= unalias(*argptr);
 
-	return (i);
+  return (i);
 }
 
 static size_t
 hashalias(const char *p)
 {
-	unsigned int hashval;
+  unsigned int hashval;
 
-	hashval = (unsigned char)*p << 4;
-	while (*p)
-		hashval+= *p++;
-	return (hashval % ATABSIZE);
+  hashval = (unsigned char)*p << 4;
+  while (*p)
+    hashval += *p++;
+  return (hashval % ATABSIZE);
 }
 
 const struct alias *
 iteralias(const struct alias *index)
 {
-	size_t i = 0;
+  size_t i = 0;
 
-	if (index != NULL) {
-		if (index->next != NULL)
-			return (index->next);
-		i = hashalias(index->name) + 1;
-	}
-	for (; i < ATABSIZE; i++)
-		if (atab[i] != NULL)
-			return (atab[i]);
+  if (index != NULL) {
+    if (index->next != NULL)
+      return (index->next);
+    i = hashalias(index->name) + 1;
+  }
+  for (; i < ATABSIZE; i++)
+    if (atab[i] != NULL)
+      return (atab[i]);
 
-	return (NULL);
+  return (NULL);
 }

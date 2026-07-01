@@ -6,13 +6,12 @@
 char *
 agetcwd(void)
 {
-	char *buf;
-	long size;
+  char *buf;
+  long  size;
 
-	apathmax(&buf, &size);
-	if (!getcwd(buf, size))
-		eprintf("getcwd:");
+  apathmax(&buf, &size);
+  if (!getcwd(buf, size))
+    eprintf("getcwd:");
 
-	return buf;
+  return buf;
 }
-

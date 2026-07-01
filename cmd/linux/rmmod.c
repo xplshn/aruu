@@ -13,7 +13,7 @@
 static void
 usage(void)
 {
-	eprintf("usage: %s [-fw] module...\n", argv0);
+  eprintf("usage: %s [-fw] module...\n", argv0);
 }
 
 // ?man rmmod: remove a module from the Linux kernel
@@ -24,34 +24,36 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	char *mod, *p;
-	int i;
-	int flags = O_NONBLOCK;
+  char *mod, *p;
+  int   i;
+  int   flags = O_NONBLOCK;
 
-	ARGBEGIN {
-	// ?man -f: specify f option
-	case 'f':
-		flags |= O_TRUNC;
-		break;
-	// ?man -w: specify w option
-	case 'w':
-		flags &= ~O_NONBLOCK;
-		break;
-	default:
-		usage();
-	} ARGEND;
+  ARGBEGIN
+  {
+    // ?man -f: specify f option
+    case 'f':
+      flags |= O_TRUNC;
+      break;
+    // ?man -w: specify w option
+    case 'w':
+      flags &= ~O_NONBLOCK;
+      break;
+    default:
+      usage();
+  }
+  ARGEND;
 
-	if (argc < 1)
-		usage();
+  if (argc < 1)
+    usage();
 
-	for (i = 0; i < argc; i++) {
-		mod = argv[i];
-		p = strrchr(mod, '.');
-		if (p && !strcmp(p, ".ko"))
-			*p = '\0';
-		if (syscall(__NR_delete_module, mod, flags) < 0)
-			eprintf("delete_module:");
-	}
+  for (i = 0; i < argc; i++) {
+    mod = argv[i];
+    p   = strrchr(mod, '.');
+    if (p && !strcmp(p, ".ko"))
+      *p = '\0';
+    if (syscall(__NR_delete_module, mod, flags) < 0)
+      eprintf("delete_module:");
+  }
 
-	return 0;
+  return 0;
 }

@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <libgen.h>
 #include <stdio.h>
 
@@ -9,7 +8,7 @@
 static void
 usage(void)
 {
-	eprintf("usage: %s path\n", argv0);
+  eprintf("usage: %s path\n", argv0);
 }
 
 // ?man dirname: strip non-directory suffix from filename
@@ -18,15 +17,17 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	ARGBEGIN {
-	default:
-		usage();
-	} ARGEND
+  ARGBEGIN
+  {
+    default:
+      usage();
+  }
+  ARGEND
 
-	if (argc != 1)
-		usage();
+  if (argc != 1)
+    usage();
 
-	puts(dirname(argv[0]));
+  puts(dirname(argv[0]));
 
-	return fshut(stdout, "<stdout>");
+  return fshut(stdout, "<stdout>");
 }

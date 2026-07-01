@@ -61,127 +61,128 @@ static void usage(void) __dead2;
 int
 main(int argc, char *argv[])
 {
-	char signame[SIG2STR_MAX];
-	long pidl;
-	pid_t pid;
-	int errors, numsig, ret;
-	char *ep;
+  char  signame[SIG2STR_MAX];
+  long  pidl;
+  pid_t pid;
+  int   errors, numsig, ret;
+  char *ep;
 
-	if (argc < 2)
-		usage();
+  if (argc < 2)
+    usage();
 
-	numsig = SIGTERM;
+  numsig = SIGTERM;
 
-	argc--, argv++;
-	if (!strcmp(*argv, "-l")) {
-		argc--, argv++;
-		if (argc > 1)
-			usage();
-		if (argc == 1) {
-			if (!isdigit(**argv))
-				usage();
-			numsig = strtol(*argv, &ep, 10);
-			if (!**argv || *ep)
-				errx(2, "invalid signal number: %s", *argv);
-			if (numsig >= 128)
-				numsig -= 128;
-			if (sig2str(numsig, signame) < 0)
-				nosig(*argv);
-			printf("%s\n", signame);
-			return (0);
-		}
-		printsignals(stdout);
-		return (0);
-	}
+  argc--, argv++;
+  if (!strcmp(*argv, "-l")) {
+    argc--, argv++;
+    if (argc > 1)
+      usage();
+    if (argc == 1) {
+      if (!isdigit(**argv))
+        usage();
+      numsig = strtol(*argv, &ep, 10);
+      if (!**argv || *ep)
+        errx(2, "invalid signal number: %s", *argv);
+      if (numsig >= 128)
+        numsig -= 128;
+      if (sig2str(numsig, signame) < 0)
+        nosig(*argv);
+      printf("%s\n", signame);
+      return (0);
+    }
+    printsignals(stdout);
+    return (0);
+  }
 
-	if (!strcmp(*argv, "-s")) {
-		argc--, argv++;
-		if (argc < 1) {
-			warnx("option requires an argument -- s");
-			usage();
-		}
-		if (strcmp(*argv, "0") == 0)
-			numsig = 0;
-		else if (str2sig(*argv, &numsig) < 0)
-			nosig(*argv);
-		argc--, argv++;
-	} else if (**argv == '-' && *(*argv + 1) != '-') {
-		++*argv;
-		if (strcmp(*argv, "0") == 0)
-			numsig = 0;
-		else if (str2sig(*argv, &numsig) < 0)
-			nosig(*argv);
-		argc--, argv++;
-	}
+  if (!strcmp(*argv, "-s")) {
+    argc--, argv++;
+    if (argc < 1) {
+      warnx("option requires an argument -- s");
+      usage();
+    }
+    if (strcmp(*argv, "0") == 0)
+      numsig = 0;
+    else if (str2sig(*argv, &numsig) < 0)
+      nosig(*argv);
+    argc--, argv++;
+  } else if (**argv == '-' && *(*argv + 1) != '-') {
+    ++*argv;
+    if (strcmp(*argv, "0") == 0)
+      numsig = 0;
+    else if (str2sig(*argv, &numsig) < 0)
+      nosig(*argv);
+    argc--, argv++;
+  }
 
-	if (argc > 0 && strncmp(*argv, "--", 2) == 0)
-		argc--, argv++;
+  if (argc > 0 && strncmp(*argv, "--", 2) == 0)
+    argc--, argv++;
 
-	if (argc == 0)
-		usage();
+  if (argc == 0)
+    usage();
 
-	for (errors = 0; argc; argc--, argv++) {
+  for (errors = 0; argc; argc--, argv++) {
 #ifdef SHELL
-		if (**argv == '%')
-			ret = killjob(*argv, numsig);
-		else
+    if (**argv == '%')
+      ret = killjob(*argv, numsig);
+    else
 #endif
-		{
-			pidl = strtol(*argv, &ep, 10);
-			/* Check for overflow of pid_t. */
-			pid = (pid_t)pidl;
-			if (!**argv || *ep || pid != pidl)
-				errx(2, "illegal process id: %s", *argv);
-			ret = kill(pid, numsig);
-		}
-		if (ret == -1) {
-			warn("%s", *argv);
-			errors = 1;
-		}
-	}
+    {
+      pidl = strtol(*argv, &ep, 10);
+      /* Check for overflow of pid_t. */
+      pid = (pid_t)pidl;
+      if (!**argv || *ep || pid != pidl)
+        errx(2, "illegal process id: %s", *argv);
+      ret = kill(pid, numsig);
+    }
+    if (ret == -1) {
+      warn("%s", *argv);
+      errors = 1;
+    }
+  }
 
-	return (errors);
+  return (errors);
 }
 
 static void
 nosig(const char *name)
 {
-
-	warnx("unknown signal %s; valid signals:", name);
-	printsignals(stderr);
+  warnx("unknown signal %s; valid signals:", name);
+  printsignals(stderr);
 #ifdef SHELL
-	error(NULL);
+  error(NULL);
 #else
-	exit(2);
+  exit(2);
 #endif
 }
 
 static void
 printsignals(FILE *fp)
 {
-	int n;
+  int n;
 
-	for (n = 1; n < sys_nsig; n++) {
-		(void)fprintf(fp, "%s", sys_signame[n]);
-		if (n == (sys_nsig / 2) || n == (sys_nsig - 1))
-			(void)fprintf(fp, "\n");
-		else
-			(void)fprintf(fp, " ");
-	}
+  for (n = 1; n < sys_nsig; n++) {
+    (void)fprintf(fp, "%s", sys_signame[n]);
+    if (n == (sys_nsig / 2) || n == (sys_nsig - 1))
+      (void)fprintf(fp, "\n");
+    else
+      (void)fprintf(fp, " ");
+  }
 }
 
 static void
 usage(void)
 {
-
-	(void)fprintf(stderr, "%s\n%s\n%s\n%s\n",
-		"usage: kill [-s signal_name] pid ...",
-		"       kill -l [exit_status]",
-		"       kill -signal_name pid ...",
-		"       kill -signal_number pid ...");
+  (void)fprintf(
+      stderr,
+      "%s\n%s\n%s\n%s\n",
+      "usage: kill [-s signal_name] pid ...",
+      "       kill -l [exit_status]",
+      "       kill -signal_name pid ...",
+      "       kill -signal_number pid ..."
+  );
 #ifdef SHELL
-	error(NULL);
+  error(NULL);
 #else
-	exit(2);
+  exit(2);
 #endif
 }

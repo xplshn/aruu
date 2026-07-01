@@ -4,28 +4,28 @@
 #include <sys/types.h>
 
 struct history {
-	struct history *prev;
-	dev_t dev;
-	ino_t ino;
+  struct history *prev;
+  dev_t           dev;
+  ino_t           ino;
 };
 
 struct recursor {
-	void (*fn)(int, const char *, struct stat *, void *, struct recursor *);
-	char path[PATH_MAX];
-	size_t pathlen;
-	struct history *hist;
-	int depth;
-	int maxdepth;
-	int follow;
-	int flags;
+  void (*fn)(int, const char *, struct stat *, void *, struct recursor *);
+  char            path[PATH_MAX];
+  size_t          pathlen;
+  struct history *hist;
+  int             depth;
+  int             maxdepth;
+  int             follow;
+  int             flags;
 };
 
 enum {
-	SAMEDEV  = 1 << 0,
-	DIRFIRST = 1 << 1,
-	SILENT   = 1 << 2,
-	CONFIRM  = 1 << 3,
-	IGNORE   = 1 << 4,
+  SAMEDEV  = 1 << 0,
+  DIRFIRST = 1 << 1,
+  SILENT   = 1 << 2,
+  CONFIRM  = 1 << 3,
+  IGNORE   = 1 << 4,
 };
 
 extern int cp_aflag;
@@ -43,5 +43,5 @@ extern int recurse_status;
 
 void recurse(int, const char *, void *, struct recursor *);
 
-int cp(const char *, const char *, int);
+int  cp(const char *, const char *, int);
 void rm(int, const char *, struct stat *st, void *, struct recursor *);

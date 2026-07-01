@@ -5,5 +5,5 @@
 int
 isgraphrune(Rune r)
 {
-	return !isspacerune(r) && isprintrune(r);
+  return !isspacerune(r) && isprintrune(r);
 }

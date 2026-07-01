@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <stdio.h>
 
 #include "util.h"
@@ -8,7 +7,7 @@
 static void
 usage(void)
 {
-	eprintf("usage: %s\n", argv0);
+  eprintf("usage: %s\n", argv0);
 }
 
 // ?man clear: clear terminal screen
@@ -16,12 +15,12 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	argv0 = argv[0], argc--, argv++;
+  argv0 = argv[0], argc--, argv++;
 
-	if (argc)
-		usage();
+  if (argc)
+    usage();
 
-	printf("\x1b[2J\x1b[H");
+  printf("\x1b[2J\x1b[H");
 
-	return 0;
+  return 0;
 }

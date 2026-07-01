@@ -32,40 +32,40 @@
  * SUCH DAMAGE.
  */
 
-#include <stdio.h>	/* defines BUFSIZ */
-#include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h> /* defines BUFSIZ */
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 /*
  * This file implements the input routines used by the parser.
  */
 
-#include "shell.h"
-#include "redir.h"
-#include "syntax.h"
-#include "input.h"
-#include "output.h"
-#include "options.h"
-#include "memalloc.h"
-#include "error.h"
 #include "alias.h"
+#include "error.h"
+#include "input.h"
+#include "memalloc.h"
+#include "options.h"
+#include "output.h"
 #include "parser.h"
+#include "redir.h"
+#include "shell.h"
+#include "syntax.h"
 #ifndef NO_HISTORY
 #include "lineedit.h"
 #endif
 #include "trap.h"
 
-#define EOF_NLEFT -99		/* value of parsenleft when EOF pushed back */
+#define EOF_NLEFT -99 /* value of parsenleft when EOF pushed back */
 
 struct strpush {
-	struct strpush *prev;	/* preceding string on stack */
-	const char *prevstring;
-	int prevnleft;
-	int prevlleft;
-	struct alias *ap;	/* if push was associated with an alias */
+  struct strpush *prev; /* preceding string on stack */
+  const char     *prevstring;
+  int             prevnleft;
+  int             prevlleft;
+  struct alias   *ap; /* if push was associated with an alias */
 };
 
 /*
@@ -74,44 +74,42 @@ struct strpush {
  */
 
 struct parsefile {
-	struct parsefile *prev;	/* preceding file on stack */
-	int linno;		/* current line */
-	int fd;			/* file descriptor (or -1 if string) */
-	int nleft;		/* number of chars left in this line */
-	int lleft;		/* number of lines left in this buffer */
-	const char *nextc;	/* next char in buffer */
-	char *buf;		/* input buffer */
-	size_t bufsize;		/* input buffer size */
-	struct strpush *strpush; /* for pushing strings at this level */
-	struct strpush basestrpush; /* so pushing one is fast */
+  struct parsefile *prev;        /* preceding file on stack */
+  int               linno;       /* current line */
+  int               fd;          /* file descriptor (or -1 if string) */
+  int               nleft;       /* number of chars left in this line */
+  int               lleft;       /* number of lines left in this buffer */
+  const char       *nextc;       /* next char in buffer */
+  char             *buf;         /* input buffer */
+  size_t            bufsize;     /* input buffer size */
+  struct strpush   *strpush;     /* for pushing strings at this level */
+  struct strpush    basestrpush; /* so pushing one is fast */
 };
 
-
-int plinno = 1;			/* input line number */
-int parsenleft;			/* copy of parsefile->nleft */
-static int parselleft;		/* copy of parsefile->lleft */
-const char *parsenextc;		/* copy of parsefile->nextc */
-static char basebuf[BUFSIZ + 1];/* buffer for top level input file */
-static struct parsefile basepf = {	/* top level input file */
-	.nextc = basebuf,
-	.buf = basebuf,
-	.bufsize = sizeof(basebuf),
+int                     plinno = 1;          /* input line number */
+int                     parsenleft;          /* copy of parsefile->nleft */
+static int              parselleft;          /* copy of parsefile->lleft */
+const char             *parsenextc;          /* copy of parsefile->nextc */
+static char             basebuf[BUFSIZ + 1]; /* buffer for top level input file */
+static struct parsefile basepf = {
+    /* top level input file */
+    .nextc   = basebuf,
+    .buf     = basebuf,
+    .bufsize = sizeof(basebuf),
 };
-static struct parsefile *parsefile = &basepf;	/* current input file */
-int whichprompt;		/* 1 == PS1, 2 == PS2 */
+static struct parsefile *parsefile = &basepf; /* current input file */
+int                      whichprompt;         /* 1 == PS1, 2 == PS2 */
 
 static void pushfile(void);
-static int preadfd(void);
+static int  preadfd(void);
 static void popstring(void);
 
 void
 resetinput(void)
 {
-	popallfiles();
-	parselleft = parsenleft = 0;	/* clear input buffer */
+  popallfiles();
+  parselleft = parsenleft = 0; /* clear input buffer */
 }
-
-
 
 /*
  * Read a character from the script, returning PEOF on end of file.
@@ -121,74 +119,73 @@ resetinput(void)
 int
 pgetc(void)
 {
-	return pgetc_macro();
+  return pgetc_macro();
 }
-
 
 static int
 preadfd(void)
 {
-	int nr;
+  int nr;
 
-	retry:
+retry:
 #ifndef NO_HISTORY
-	if (parsefile->fd == 0 && sh_history_enabled) {
-		char *line;
+  if (parsefile->fd == 0 && sh_history_enabled) {
+    char *line;
 
-		line = redline(getprompt(NULL));
-		if (line != NULL) {
-			nr = strlen(line) + 1;
-			if (parsefile->bufsize < (size_t)nr + 1) {
-				size_t bufsize;
+    line = redline(getprompt(NULL));
+    if (line != NULL) {
+      nr = strlen(line) + 1;
+      if (parsefile->bufsize < (size_t)nr + 1) {
+        size_t bufsize;
 
-				INTOFF;
-				if (parsefile->buf != basebuf) {
-					ckfree(parsefile->buf);
-					parsefile->buf = NULL;
-					parsefile->bufsize = 0;
-				}
-				bufsize = (size_t)nr + BUFSIZ + 1;
-				bufsize -= bufsize % BUFSIZ;
-				parsefile->buf = ckmalloc(bufsize);
-				parsefile->bufsize = bufsize;
-				INTON;
-			}
-			memcpy(parsefile->buf, line, nr - 1);
-			parsefile->buf[nr - 1] = '\n';
-			parsefile->buf[nr] = '\0';
-			free(line);
-		} else {
-			nr = 0;
-		}
-	} else
+        INTOFF;
+        if (parsefile->buf != basebuf) {
+          ckfree(parsefile->buf);
+          parsefile->buf     = NULL;
+          parsefile->bufsize = 0;
+        }
+        bufsize = (size_t)nr + BUFSIZ + 1;
+        bufsize -= bufsize % BUFSIZ;
+        parsefile->buf     = ckmalloc(bufsize);
+        parsefile->bufsize = bufsize;
+        INTON;
+      }
+      memcpy(parsefile->buf, line, nr - 1);
+      parsefile->buf[nr - 1] = '\n';
+      parsefile->buf[nr]     = '\0';
+      free(line);
+    } else {
+      nr = 0;
+    }
+  } else
 #endif
-	nr = read(parsefile->fd, parsefile->buf, parsefile->bufsize - 1);
+    nr = read(parsefile->fd, parsefile->buf, parsefile->bufsize - 1);
 
-	if (nr < 0)
-		switch (errno) {
-			int flags;
+  if (nr < 0)
+    switch (errno) {
+      int flags;
 
-		case EINTR:
-			goto retry;
-		case EWOULDBLOCK:
-			if (parsefile->fd != 0)
-				break;
-			if ((flags = fcntl(0, F_GETFL, 0)) < 0)
-				break;
-			if (!(flags & O_NONBLOCK))
-				break;
-			if (fcntl(0, F_SETFL, flags & ~O_NONBLOCK) < 0)
-				break;
-			out2fmt_flush("sh: turning off NDELAY mode\n");
-			goto retry;
-                }
-	else if (nr > 0)
-		parsefile->buf[nr] = '\0';
-	else
-		nr = -1;
+      case EINTR:
+        goto retry;
+      case EWOULDBLOCK:
+        if (parsefile->fd != 0)
+          break;
+        if ((flags = fcntl(0, F_GETFL, 0)) < 0)
+          break;
+        if (!(flags & O_NONBLOCK))
+          break;
+        if (fcntl(0, F_SETFL, flags & ~O_NONBLOCK) < 0)
+          break;
+        out2fmt_flush("sh: turning off NDELAY mode\n");
+        goto retry;
+    }
+  else if (nr > 0)
+    parsefile->buf[nr] = '\0';
+  else
+    nr = -1;
 
-	parsenextc = parsefile->buf;
-	return nr;
+  parsenextc = parsefile->buf;
+  return nr;
 }
 
 /*
@@ -204,78 +201,77 @@ preadfd(void)
 int
 preadbuffer(void)
 {
-	const char *end;
-	char *q, *r;
-	char savec;
+  const char *end;
+  char       *q, *r;
+  char        savec;
 
-	while (parsefile->strpush) {
-		/*
-		 * Add a space to the end of an alias to ensure that the
-		 * alias remains in use while parsing its last word.
-		 * This avoids alias recursions.
-		 */
-		if (parsenleft == -1 && parsefile->strpush->ap != NULL)
-			return ' ';
-		popstring();
-		if (--parsenleft >= 0)
-			return (*parsenextc++);
-	}
-	if (parsenleft == EOF_NLEFT || parsefile->buf == NULL)
-		return PEOF;
+  while (parsefile->strpush) {
+    /*
+     * Add a space to the end of an alias to ensure that the
+     * alias remains in use while parsing its last word.
+     * This avoids alias recursions.
+     */
+    if (parsenleft == -1 && parsefile->strpush->ap != NULL)
+      return ' ';
+    popstring();
+    if (--parsenleft >= 0)
+      return (*parsenextc++);
+  }
+  if (parsenleft == EOF_NLEFT || parsefile->buf == NULL)
+    return PEOF;
 
-	again:
-	if (parselleft <= 0 && (parselleft = preadfd()) == -1) {
-		parselleft = parsenleft = EOF_NLEFT;
-		return (PEOF);
-	}
-	end = parsenextc + parselleft;
-	q = strchrnul(parsenextc, '\n');
-	if (*q == '\0' && q != end) {
-		/* delete nul characters */
-		for (r = q++; q != end; q++)
-			if (*q != '\0')
-				*r++ = *q;
-		*r = '\0';
-		parselleft = r - parsenextc;
-		goto again;
-	}
-	if (*q == '\0') {
-		parsenleft = parselleft;
-		parselleft = 0;
-	} else /* *q == '\n' */ {
-		q++;
-		parsenleft = q - parsenextc;
-		parselleft -= parsenleft;
-	}
-	parsenleft--;
+again:
+  if (parselleft <= 0 && (parselleft = preadfd()) == -1) {
+    parselleft = parsenleft = EOF_NLEFT;
+    return (PEOF);
+  }
+  end = parsenextc + parselleft;
+  q   = strchrnul(parsenextc, '\n');
+  if (*q == '\0' && q != end) {
+    /* delete nul characters */
+    for (r = q++; q != end; q++)
+      if (*q != '\0')
+        *r++ = *q;
+    *r         = '\0';
+    parselleft = r - parsenextc;
+    goto again;
+  }
+  if (*q == '\0') {
+    parsenleft = parselleft;
+    parselleft = 0;
+  } else /* *q == '\n' */ {
+    q++;
+    parsenleft = q - parsenextc;
+    parselleft -= parsenleft;
+  }
+  parsenleft--;
 
-	savec = *q;
-	*q = '\0';
+  savec = *q;
+  *q    = '\0';
 
 #ifndef NO_HISTORY
-	if (parsefile->fd == 0 && sh_history_enabled &&
-	    parsenextc[strspn(parsenextc, " \t\n")] != '\0') {
-		char *histline = strdup(parsenextc);
-		if (histline) {
-			char *nl = strchr(histline, '\n');
-			if (nl)
-				*nl = '\0';
-			INTOFF;
-			redlineHistoryAdd(histline);
-			INTON;
-			free(histline);
-		}
-	}
+  if (parsefile->fd == 0 && sh_history_enabled && parsenextc[strspn(parsenextc, " \t\n")] != '\0') {
+    char *histline = strdup(parsenextc);
+    if (histline) {
+      char *nl = strchr(histline, '\n');
+      if (nl)
+        *nl = '\0';
+      INTOFF;
+      redlineHistoryAdd(histline);
+      INTON;
+      free(histline);
+    }
+  }
 #endif
 
-	if (vflag) {
-		out2str(parsenextc);
-		flushout(out2);
-	}
+  if (vflag) {
+    out2str(parsenextc);
+    flushout(out2);
+  }
 
-	*q = savec;
+  *q = savec;
 
-	return *parsenextc++;
+  return *parsenextc++;
 }
 
 /*
@@ -286,13 +282,13 @@ preadbuffer(void)
 int
 preadateof(void)
 {
-	if (parsenleft > 0)
-		return 0;
-	if (parsefile->strpush)
-		return 0;
-	if (parsenleft == EOF_NLEFT || parsefile->buf == NULL)
-		return 1;
-	return 0;
+  if (parsenleft > 0)
+    return 0;
+  if (parsefile->strpush)
+    return 0;
+  if (parsenleft == EOF_NLEFT || parsefile->buf == NULL)
+    return 1;
+  return 0;
 }
 
 /*
@@ -303,8 +299,8 @@ preadateof(void)
 void
 pungetc(void)
 {
-	parsenleft++;
-	parsenextc--;
+  parsenleft++;
+  parsenextc--;
 }
 
 /*
@@ -314,47 +310,47 @@ pungetc(void)
 void
 pushstring(const char *s, int len, struct alias *ap)
 {
-	struct strpush *sp;
+  struct strpush *sp;
 
-	INTOFF;
-/*out2fmt_flush("*** calling pushstring: %s, %d\n", s, len);*/
-	if (parsefile->strpush) {
-		sp = ckmalloc(sizeof(struct strpush));
-		sp->prev = parsefile->strpush;
-		parsefile->strpush = sp;
-	} else
-		sp = parsefile->strpush = &(parsefile->basestrpush);
-	sp->prevstring = parsenextc;
-	sp->prevnleft = parsenleft;
-	sp->prevlleft = parselleft;
-	sp->ap = ap;
-	if (ap)
-		ap->flag |= ALIASINUSE;
-	parsenextc = s;
-	parsenleft = len;
-	INTON;
+  INTOFF;
+  /*out2fmt_flush("*** calling pushstring: %s, %d\n", s, len);*/
+  if (parsefile->strpush) {
+    sp                 = ckmalloc(sizeof(struct strpush));
+    sp->prev           = parsefile->strpush;
+    parsefile->strpush = sp;
+  } else
+    sp = parsefile->strpush = &(parsefile->basestrpush);
+  sp->prevstring = parsenextc;
+  sp->prevnleft  = parsenleft;
+  sp->prevlleft  = parselleft;
+  sp->ap         = ap;
+  if (ap)
+    ap->flag |= ALIASINUSE;
+  parsenextc = s;
+  parsenleft = len;
+  INTON;
 }
 
 static void
 popstring(void)
 {
-	struct strpush *sp = parsefile->strpush;
+  struct strpush *sp = parsefile->strpush;
 
-	INTOFF;
-	if (sp->ap) {
-		if (parsenextc != sp->ap->val &&
-		    (parsenextc[-1] == ' ' || parsenextc[-1] == '\t'))
-			forcealias();
-		sp->ap->flag &= ~ALIASINUSE;
-	}
-	parsenextc = sp->prevstring;
-	parsenleft = sp->prevnleft;
-	parselleft = sp->prevlleft;
-/*out2fmt_flush("*** calling popstring: restoring to '%s'\n", parsenextc);*/
-	parsefile->strpush = sp->prev;
-	if (sp != &(parsefile->basestrpush))
-		ckfree(sp);
-	INTON;
+  INTOFF;
+  if (sp->ap) {
+    if (parsenextc != sp->ap->val && (parsenextc[-1] == ' ' || parsenextc[-1] == '\t'))
+      forcealias();
+    sp->ap->flag &= ~ALIASINUSE;
+  }
+  parsenextc = sp->prevstring;
+  parsenleft = sp->prevnleft;
+  parselleft = sp->prevlleft;
+  /*out2fmt_flush("*** calling popstring: restoring to '%s'\n",
+   * parsenextc);*/
+  parsefile->strpush = sp->prev;
+  if (sp != &(parsefile->basestrpush))
+    ckfree(sp);
+  INTON;
 }
 
 /*
@@ -369,31 +365,31 @@ popstring(void)
 void
 setinputfile(const char *fname, int push, int verify)
 {
-	int e;
-	int fd;
-	int fd2;
-	int oflags = O_RDONLY | O_CLOEXEC;
+  int e;
+  int fd;
+  int fd2;
+  int oflags = O_RDONLY | O_CLOEXEC;
 
-	if (verify == 1 || (verify == -1 && verifyflag))
-		oflags |= O_VERIFY;
+  if (verify == 1 || (verify == -1 && verifyflag))
+    oflags |= O_VERIFY;
 
-	INTOFF;
-	if ((fd = open(fname, oflags)) < 0) {
-		e = errno;
-		errorwithstatus(e == ENOENT || e == ENOTDIR ? 127 : 126,
-		    "cannot open %s: %s", fname, strerror(e));
-	}
-	if (fd < 10) {
-		fd2 = fcntl(fd, F_DUPFD_CLOEXEC, 10);
-		close(fd);
-		if (fd2 < 0)
-			error("Out of file descriptors");
-		fd = fd2;
-	}
-	setinputfd(fd, push);
-	INTON;
+  INTOFF;
+  if ((fd = open(fname, oflags)) < 0) {
+    e = errno;
+    errorwithstatus(
+        e == ENOENT || e == ENOTDIR ? 127 : 126, "cannot open %s: %s", fname, strerror(e)
+    );
+  }
+  if (fd < 10) {
+    fd2 = fcntl(fd, F_DUPFD_CLOEXEC, 10);
+    close(fd);
+    if (fd2 < 0)
+      error("Out of file descriptors");
+    fd = fd2;
+  }
+  setinputfd(fd, push);
+  INTON;
 }
-
 
 /*
  * Like setinputfile, but takes an open file descriptor (which should have
@@ -403,19 +399,18 @@ setinputfile(const char *fname, int push, int verify)
 void
 setinputfd(int fd, int push)
 {
-	if (push)
-		pushfile();
-	if (parsefile->fd > 0)
-		close(parsefile->fd);
-	parsefile->fd = fd;
-	if (parsefile->buf == NULL) {
-		parsefile->buf = ckmalloc(BUFSIZ + 1);
-		parsefile->bufsize = BUFSIZ + 1;
-	}
-	parselleft = parsenleft = 0;
-	plinno = 1;
+  if (push)
+    pushfile();
+  if (parsefile->fd > 0)
+    close(parsefile->fd);
+  parsefile->fd = fd;
+  if (parsefile->buf == NULL) {
+    parsefile->buf     = ckmalloc(BUFSIZ + 1);
+    parsefile->bufsize = BUFSIZ + 1;
+  }
+  parselleft = parsenleft = 0;
+  plinno                  = 1;
 }
-
 
 /*
  * Like setinputfile, but takes input from a string.
@@ -424,15 +419,13 @@ setinputfd(int fd, int push)
 void
 setinputstring(const char *string)
 {
-	INTOFF;
-	pushfile();
-	parsenextc = string;
-	parselleft = parsenleft = strlen(string);
-	plinno = 1;
-	INTON;
+  INTOFF;
+  pushfile();
+  parsenextc = string;
+  parselleft = parsenleft = strlen(string);
+  plinno                  = 1;
+  INTON;
 }
-
-
 
 /*
  * To handle the "." command, a stack of input files is used.  Pushfile
@@ -442,39 +435,37 @@ setinputstring(const char *string)
 static void
 pushfile(void)
 {
-	struct parsefile *pf;
+  struct parsefile *pf;
 
-	pf = (struct parsefile *)ckmalloc(sizeof(struct parsefile));
-	*pf = (struct parsefile){ .prev = parsefile, .fd = -1 };
-	parsefile->nleft = parsenleft;
-	parsefile->lleft = parselleft;
-	parsefile->nextc = parsenextc;
-	parsefile->linno = plinno;
-	parsefile = pf;
+  pf               = (struct parsefile *)ckmalloc(sizeof(struct parsefile));
+  *pf              = (struct parsefile){.prev = parsefile, .fd = -1};
+  parsefile->nleft = parsenleft;
+  parsefile->lleft = parselleft;
+  parsefile->nextc = parsenextc;
+  parsefile->linno = plinno;
+  parsefile        = pf;
 }
-
 
 void
 popfile(void)
 {
-	struct parsefile *pf = parsefile;
+  struct parsefile *pf = parsefile;
 
-	INTOFF;
-	if (pf->fd >= 0)
-		close(pf->fd);
-	if (pf->buf)
-		ckfree(pf->buf);
-	while (pf->strpush)
-		popstring();
-	parsefile = pf->prev;
-	ckfree(pf);
-	parsenleft = parsefile->nleft;
-	parselleft = parsefile->lleft;
-	parsenextc = parsefile->nextc;
-	plinno = parsefile->linno;
-	INTON;
+  INTOFF;
+  if (pf->fd >= 0)
+    close(pf->fd);
+  if (pf->buf)
+    ckfree(pf->buf);
+  while (pf->strpush)
+    popstring();
+  parsefile = pf->prev;
+  ckfree(pf);
+  parsenleft = parsefile->nleft;
+  parselleft = parsefile->lleft;
+  parsenextc = parsefile->nextc;
+  plinno     = parsefile->linno;
+  INTON;
 }
-
 
 /*
  * Return current file (to go back to it later using popfilesupto()).
@@ -483,9 +474,8 @@ popfile(void)
 struct parsefile *
 getcurrentfile(void)
 {
-	return parsefile;
+  return parsefile;
 }
-
 
 /*
  * Pop files until the given file is on top again. Useful for regular
@@ -496,10 +486,10 @@ getcurrentfile(void)
 void
 popfilesupto(struct parsefile *file)
 {
-	while (parsefile != file && parsefile != &basepf)
-		popfile();
-	if (parsefile != file)
-		error("popfilesupto() misused");
+  while (parsefile != file && parsefile != &basepf)
+    popfile();
+  if (parsefile != file)
+    error("popfilesupto() misused");
 }
 
 /*
@@ -509,11 +499,9 @@ popfilesupto(struct parsefile *file)
 void
 popallfiles(void)
 {
-	while (parsefile != &basepf)
-		popfile();
+  while (parsefile != &basepf)
+    popfile();
 }
-
-
 
 /*
  * Close the file(s) that the shell is reading commands from.  Called
@@ -523,9 +511,9 @@ popallfiles(void)
 void
 closescript(void)
 {
-	popallfiles();
-	if (parsefile->fd > 0) {
-		close(parsefile->fd);
-		parsefile->fd = 0;
-	}
+  popallfiles();
+  if (parsefile->fd > 0) {
+    close(parsefile->fd);
+    parsefile->fd = 0;
+  }
 }

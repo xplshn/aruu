@@ -50,48 +50,52 @@ THIS SOFTWARE.
 #define FE_UNDERFLOW 0
 #endif
 
-#define errclear()							\
-	do {								\
-		errno = 0;						\
-		feclearexcept(FE_ALL_EXCEPT);				\
-	} while (0)
+#define errclear()                                                                                 \
+  do {                                                                                             \
+    errno = 0;                                                                                     \
+    feclearexcept(FE_ALL_EXCEPT);                                                                  \
+  } while (0)
 
-static double errcheck(double x, const char *s)
+static double
+errcheck(double x, const char *s)
 {
-	if (errno == EDOM || fetestexcept(FE_INVALID)) {
-		errno = 0;
-		WARNING("%s argument out of domain", s);
-		x = 1;
-	} else if (errno == ERANGE || fetestexcept(FE_DIVBYZERO | FE_OVERFLOW |
-	    FE_UNDERFLOW)) {
-		errno = 0;
-		WARNING("%s result out of range", s);
-		x = 1;
-	}
+  if (errno == EDOM || fetestexcept(FE_INVALID)) {
+    errno = 0;
+    WARNING("%s argument out of domain", s);
+    x = 1;
+  } else if (errno == ERANGE || fetestexcept(FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW)) {
+    errno = 0;
+    WARNING("%s result out of range", s);
+    x = 1;
+  }
 
-	return x;
+  return x;
 }
 
-double exp_errcheck(double x)
+double
+exp_errcheck(double x)
 {
-	errclear();
-	return errcheck(exp(x), "exp");
+  errclear();
+  return errcheck(exp(x), "exp");
 }
 
-double log_errcheck(double x)
+double
+log_errcheck(double x)
 {
-	errclear();
-	return errcheck(log(x), "log");
+  errclear();
+  return errcheck(log(x), "log");
 }
 
-double pow_errcheck(double x, double y)
+double
+pow_errcheck(double x, double y)
 {
-	errclear();
-	return errcheck(pow(x, y), "pow");
+  errclear();
+  return errcheck(pow(x, y), "pow");
 }
 
-double sqrt_errcheck(double x)
+double
+sqrt_errcheck(double x)
 {
-	errclear();
-	return errcheck(sqrt(x), "sqrt");
+  errclear();
+  return errcheck(sqrt(x), "sqrt");
 }

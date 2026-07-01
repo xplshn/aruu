@@ -8,11 +8,11 @@
 double
 estrtod(const char *s)
 {
-	char *end;
-	double d;
+  char  *end;
+  double d;
 
-	d = strtod(s, &end);
-	if (end == s || *end != '\0')
-		eprintf("%s: not a real number\n", s);
-	return d;
+  d = strtod(s, &end);
+  if (end == s || *end != '\0')
+    eprintf("%s: not a real number\n", s);
+  return d;
 }

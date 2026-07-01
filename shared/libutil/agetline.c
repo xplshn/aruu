@@ -9,5 +9,5 @@
 ssize_t
 agetline(char **p, size_t *size, FILE *fp)
 {
-	return getline(p, size, fp);
+  return getline(p, size, fp);
 }

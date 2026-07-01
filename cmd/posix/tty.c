@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <stdio.h>
 #include <unistd.h>
 
@@ -9,7 +8,7 @@
 static void
 usage(void)
 {
-	enprintf(2, "usage: %s\n", argv0);
+  enprintf(2, "usage: %s\n", argv0);
 }
 
 // ?man tty: print terminal filename
@@ -17,19 +16,21 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	char *tty;
+  char *tty;
 
-	ARGBEGIN {
-	default:
-		usage();
-	} ARGEND
+  ARGBEGIN
+  {
+    default:
+      usage();
+  }
+  ARGEND
 
-	if (argc)
-		usage();
+  if (argc)
+    usage();
 
-	tty = ttyname(STDIN_FILENO);
-	puts(tty ? tty : "not a tty");
+  tty = ttyname(STDIN_FILENO);
+  puts(tty ? tty : "not a tty");
 
-	enfshut(2, stdout, "<stdout>");
-	return !tty;
+  enfshut(2, stdout, "<stdout>");
+  return !tty;
 }

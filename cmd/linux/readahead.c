@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
@@ -11,7 +10,7 @@
 static void
 usage(void)
 {
-	eprintf("usage: %s file...\n", argv0);
+  eprintf("usage: %s file...\n", argv0);
 }
 
 // ?man readahead: read files into page cache
@@ -20,24 +19,26 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	FILE *fp;
+  FILE *fp;
 
-	ARGBEGIN {
-	default:
-		usage();
-	} ARGEND;
+  ARGBEGIN
+  {
+    default:
+      usage();
+  }
+  ARGEND;
 
-	if (argc == 0)
-		usage();
+  if (argc == 0)
+    usage();
 
-	for (; argc > 0; argc--, argv++) {
-		if (!(fp = fopen(argv[0], "r"))) {
-			weprintf("fopen %s:", argv[0]);
-			continue;
-		}
-		if (readahead(fileno(fp), 0, -1) < 0)
-			weprintf("readahead %s:", argv[0]);
-		fclose(fp);
-	}
-	return 0;
+  for (; argc > 0; argc--, argv++) {
+    if (!(fp = fopen(argv[0], "r"))) {
+      weprintf("fopen %s:", argv[0]);
+      continue;
+    }
+    if (readahead(fileno(fp), 0, -1) < 0)
+      weprintf("readahead %s:", argv[0]);
+    fclose(fp);
+  }
+  return 0;
 }

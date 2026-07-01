@@ -7,96 +7,96 @@
 #include <strings.h>
 
 const char *const aruu_sys_signame[NSIG] = {
-	[0] = "EXIT",
+    [0] = "EXIT",
 #ifdef SIGHUP
-	[SIGHUP] = "HUP",
+    [SIGHUP] = "HUP",
 #endif
 #ifdef SIGINT
-	[SIGINT] = "INT",
+    [SIGINT] = "INT",
 #endif
 #ifdef SIGQUIT
-	[SIGQUIT] = "QUIT",
+    [SIGQUIT] = "QUIT",
 #endif
 #ifdef SIGILL
-	[SIGILL] = "ILL",
+    [SIGILL] = "ILL",
 #endif
 #ifdef SIGTRAP
-	[SIGTRAP] = "TRAP",
+    [SIGTRAP] = "TRAP",
 #endif
 #ifdef SIGABRT
-	[SIGABRT] = "ABRT",
+    [SIGABRT] = "ABRT",
 #endif
 #ifdef SIGBUS
-	[SIGBUS] = "BUS",
+    [SIGBUS] = "BUS",
 #endif
 #ifdef SIGFPE
-	[SIGFPE] = "FPE",
+    [SIGFPE] = "FPE",
 #endif
 #ifdef SIGKILL
-	[SIGKILL] = "KILL",
+    [SIGKILL] = "KILL",
 #endif
 #ifdef SIGUSR1
-	[SIGUSR1] = "USR1",
+    [SIGUSR1] = "USR1",
 #endif
 #ifdef SIGSEGV
-	[SIGSEGV] = "SEGV",
+    [SIGSEGV] = "SEGV",
 #endif
 #ifdef SIGUSR2
-	[SIGUSR2] = "USR2",
+    [SIGUSR2] = "USR2",
 #endif
 #ifdef SIGPIPE
-	[SIGPIPE] = "PIPE",
+    [SIGPIPE] = "PIPE",
 #endif
 #ifdef SIGALRM
-	[SIGALRM] = "ALRM",
+    [SIGALRM] = "ALRM",
 #endif
 #ifdef SIGTERM
-	[SIGTERM] = "TERM",
+    [SIGTERM] = "TERM",
 #endif
 #ifdef SIGCHLD
-	[SIGCHLD] = "CHLD",
+    [SIGCHLD] = "CHLD",
 #endif
 #ifdef SIGCONT
-	[SIGCONT] = "CONT",
+    [SIGCONT] = "CONT",
 #endif
 #ifdef SIGSTOP
-	[SIGSTOP] = "STOP",
+    [SIGSTOP] = "STOP",
 #endif
 #ifdef SIGTSTP
-	[SIGTSTP] = "TSTP",
+    [SIGTSTP] = "TSTP",
 #endif
 #ifdef SIGTTIN
-	[SIGTTIN] = "TTIN",
+    [SIGTTIN] = "TTIN",
 #endif
 #ifdef SIGTTOU
-	[SIGTTOU] = "TTOU",
+    [SIGTTOU] = "TTOU",
 #endif
 #ifdef SIGURG
-	[SIGURG] = "URG",
+    [SIGURG] = "URG",
 #endif
 #ifdef SIGXCPU
-	[SIGXCPU] = "XCPU",
+    [SIGXCPU] = "XCPU",
 #endif
 #ifdef SIGXFSZ
-	[SIGXFSZ] = "XFSZ",
+    [SIGXFSZ] = "XFSZ",
 #endif
 #ifdef SIGVTALRM
-	[SIGVTALRM] = "VTALRM",
+    [SIGVTALRM] = "VTALRM",
 #endif
 #ifdef SIGPROF
-	[SIGPROF] = "PROF",
+    [SIGPROF] = "PROF",
 #endif
 #ifdef SIGWINCH
-	[SIGWINCH] = "WINCH",
+    [SIGWINCH] = "WINCH",
 #endif
 #ifdef SIGIO
-	[SIGIO] = "IO",
+    [SIGIO] = "IO",
 #endif
 #ifdef SIGPWR
-	[SIGPWR] = "PWR",
+    [SIGPWR] = "PWR",
 #endif
 #ifdef SIGSYS
-	[SIGSYS] = "SYS",
+    [SIGSYS] = "SYS",
 #endif
 };
 
@@ -105,59 +105,61 @@ const int aruu_sys_nsig = NSIG;
 int
 aruu_sig2str(int signo, char *str)
 {
-	const char *name;
+  const char *name;
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
-	if (signo <= 0 || signo >= sys_nsig)
-		return -1;
-	name = sys_signame[signo];
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)  \
+    || defined(__APPLE__)
+  if (signo <= 0 || signo >= sys_nsig)
+    return -1;
+  name = sys_signame[signo];
 #else
-	if (signo <= 0 || signo >= aruu_sys_nsig)
-		return -1;
-	name = aruu_sys_signame[signo];
+  if (signo <= 0 || signo >= aruu_sys_nsig)
+    return -1;
+  name = aruu_sys_signame[signo];
 #endif
 
-	if (name == NULL)
-		return -1;
-	strcpy(str, name);
-	return 0;
+  if (name == NULL)
+    return -1;
+  strcpy(str, name);
+  return 0;
 }
 
 int
 aruu_str2sig(const char *str, int *signop)
 {
-	int n;
-	const char *s = str;
-	const char *const *table;
-	int limit;
+  int                n;
+  const char        *s = str;
+  const char *const *table;
+  int                limit;
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
-	table = sys_signame;
-	limit = sys_nsig;
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)  \
+    || defined(__APPLE__)
+  table = sys_signame;
+  limit = sys_nsig;
 #else
-	table = aruu_sys_signame;
-	limit = aruu_sys_nsig;
+  table = aruu_sys_signame;
+  limit = aruu_sys_nsig;
 #endif
 
-	if (strncasecmp(s, "SIG", 3) == 0)
-		s += 3;
+  if (strncasecmp(s, "SIG", 3) == 0)
+    s += 3;
 
-	/* check if it is a number */
-	char *ep;
-	long l = strtol(s, &ep, 10);
-	if (*s && !*ep) {
-		if (l >= 0 && l < limit) {
-			*signop = (int)l;
-			return 0;
-		}
-		return -1;
-	}
+  /* check if it is a number */
+  char *ep;
+  long  l = strtol(s, &ep, 10);
+  if (*s && !*ep) {
+    if (l >= 0 && l < limit) {
+      *signop = (int)l;
+      return 0;
+    }
+    return -1;
+  }
 
-	for (n = 1; n < limit; n++) {
-		if (table[n] && strcasecmp(table[n], s) == 0) {
-			*signop = n;
-			return 0;
-		}
-	}
-	return -1;
+  for (n = 1; n < limit; n++) {
+    if (table[n] && strcasecmp(table[n], s) == 0) {
+      *signop = n;
+      return 0;
+    }
+  }
+  return -1;
 }

@@ -1,9 +1,9 @@
 /* public domain sha512 implementation based on fips180-3 */
 
 struct sha512 {
-	uint64_t len;     /* processed message length */
-	uint64_t h[8];    /* hash state */
-	uint8_t buf[128]; /* message block buffer */
+  uint64_t len;      /* processed message length */
+  uint64_t h[8];     /* hash state */
+  uint8_t  buf[128]; /* message block buffer */
 };
 
 enum { SHA512_DIGEST_LENGTH = 64 };

@@ -36,30 +36,28 @@
  * Errors and exceptions.
  */
 
-#include "shell.h"
+#include "error.h"
 #include "eval.h"
 #include "main.h"
+#include "nodes.h" /* show.h needs nodes.h */
 #include "options.h"
 #include "output.h"
-#include "error.h"
-#include "nodes.h" /* show.h needs nodes.h */
+#include "shell.h"
 #include "show.h"
 #include "trap.h"
+#include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
-
 
 /*
  * Code to handle exceptions in C.
  */
 
-struct jmploc *handler;
+struct jmploc        *handler;
 volatile sig_atomic_t exception;
 volatile sig_atomic_t suppressint;
 volatile sig_atomic_t intpending;
-
 
 static void verrorwithstatus(int, const char *, va_list) __printf0like(2, 0) __dead2;
 
@@ -75,13 +73,12 @@ static void verrorwithstatus(int, const char *, va_list) __printf0like(2, 0) __d
 void
 exraise(int e)
 {
-	INTOFF;
-	if (handler == NULL)
-		abort();
-	exception = e;
-	longjmp(handler->loc, 1);
+  INTOFF;
+  if (handler == NULL)
+    abort();
+  exception = e;
+  longjmp(handler->loc, 1);
 }
-
 
 /*
  * Called from trap.c when a SIGINT is received and not suppressed, or when
@@ -97,50 +94,47 @@ exraise(int e)
 void
 onint(void)
 {
-	sigset_t sigs;
+  sigset_t sigs;
 
-	intpending = 0;
-	sigemptyset(&sigs);
-	sigprocmask(SIG_SETMASK, &sigs, NULL);
+  intpending = 0;
+  sigemptyset(&sigs);
+  sigprocmask(SIG_SETMASK, &sigs, NULL);
 
-	/*
-	 * This doesn't seem to be needed, since main() emits a newline.
-	 */
+  /*
+   * This doesn't seem to be needed, since main() emits a newline.
+   */
 #if 0
 	if (tcgetpgrp(0) == getpid())
 		write(STDERR_FILENO, "\n", 1);
 #endif
-	if (rootshell && iflag)
-		exraise(EXINT);
-	else {
-		signal(SIGINT, SIG_DFL);
-		kill(getpid(), SIGINT);
-		_exit(128 + SIGINT);
-	}
+  if (rootshell && iflag)
+    exraise(EXINT);
+  else {
+    signal(SIGINT, SIG_DFL);
+    kill(getpid(), SIGINT);
+    _exit(128 + SIGINT);
+  }
 }
-
 
 static void
 vwarning(const char *msg, va_list ap)
 {
-	if (commandname)
-		outfmt(out2, "%s: ", commandname);
-	else if (arg0)
-		outfmt(out2, "%s: ", arg0);
-	doformat(out2, msg, ap);
-	out2fmt_flush("\n");
+  if (commandname)
+    outfmt(out2, "%s: ", commandname);
+  else if (arg0)
+    outfmt(out2, "%s: ", arg0);
+  doformat(out2, msg, ap);
+  out2fmt_flush("\n");
 }
-
 
 void
 warning(const char *msg, ...)
 {
-	va_list ap;
-	va_start(ap, msg);
-	vwarning(msg, ap);
-	va_end(ap);
+  va_list ap;
+  va_start(ap, msg);
+  vwarning(msg, ap);
+  va_end(ap);
 }
-
 
 /*
  * Exverror is called to raise the error exception.  If the first argument
@@ -150,47 +144,43 @@ warning(const char *msg, ...)
 static void
 verrorwithstatus(int status, const char *msg, va_list ap)
 {
-	/*
-	 * An interrupt trumps an error.  Certain places catch error
-	 * exceptions or transform them to a plain nonzero exit code
-	 * in child processes, and if an error exception can be handled,
-	 * an interrupt can be handled as well.
-	 *
-	 * exraise() will disable interrupts for the exception handler.
-	 */
-	FORCEINTON;
+  /*
+   * An interrupt trumps an error.  Certain places catch error
+   * exceptions or transform them to a plain nonzero exit code
+   * in child processes, and if an error exception can be handled,
+   * an interrupt can be handled as well.
+   *
+   * exraise() will disable interrupts for the exception handler.
+   */
+  FORCEINTON;
 
 #ifdef DEBUG
-	if (msg)
-		TRACE(("verrorwithstatus(%d, \"%s\") pid=%d\n",
-		    status, msg, getpid()));
-	else
-		TRACE(("verrorwithstatus(%d, NULL) pid=%d\n",
-		    status, getpid()));
+  if (msg)
+    TRACE(("verrorwithstatus(%d, \"%s\") pid=%d\n", status, msg, getpid()));
+  else
+    TRACE(("verrorwithstatus(%d, NULL) pid=%d\n", status, getpid()));
 #endif
-	if (msg)
-		vwarning(msg, ap);
-	flushall();
-	exitstatus = status;
-	exraise(EXERROR);
+  if (msg)
+    vwarning(msg, ap);
+  flushall();
+  exitstatus = status;
+  exraise(EXERROR);
 }
-
 
 void
 error(const char *msg, ...)
 {
-	va_list ap;
-	va_start(ap, msg);
-	verrorwithstatus(2, msg, ap);
-	va_end(ap);
+  va_list ap;
+  va_start(ap, msg);
+  verrorwithstatus(2, msg, ap);
+  va_end(ap);
 }
-
 
 void
 errorwithstatus(int status, const char *msg, ...)
 {
-	va_list ap;
-	va_start(ap, msg);
-	verrorwithstatus(status, msg, ap);
-	va_end(ap);
+  va_list ap;
+  va_start(ap, msg);
+  verrorwithstatus(status, msg, ap);
+  va_end(ap);
 }

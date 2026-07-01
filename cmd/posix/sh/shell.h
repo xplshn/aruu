@@ -59,7 +59,7 @@
 
 #ifndef ALIGN
 #define ALIGNBYTES (sizeof(void *) - 1)
-#define ALIGN(p) (((uintptr_t)(p) + ALIGNBYTES) & ~ALIGNBYTES)
+#define ALIGN(p)   (((uintptr_t)(p) + ALIGNBYTES) & ~ALIGNBYTES)
 #endif
 
 #ifndef __dead2
@@ -96,15 +96,15 @@
 #endif
 
 #ifndef timespecsub
-#define timespecsub(a, b, result) \
-	do { \
-		(result)->tv_sec = (a)->tv_sec - (b)->tv_sec; \
-		(result)->tv_nsec = (a)->tv_nsec - (b)->tv_nsec; \
-		if ((result)->tv_nsec < 0) { \
-			--(result)->tv_sec; \
-			(result)->tv_nsec += 1000000000L; \
-		} \
-	} while (0)
+#define timespecsub(a, b, result)                                                                  \
+  do {                                                                                             \
+    (result)->tv_sec  = (a)->tv_sec - (b)->tv_sec;                                                 \
+    (result)->tv_nsec = (a)->tv_nsec - (b)->tv_nsec;                                               \
+    if ((result)->tv_nsec < 0) {                                                                   \
+      --(result)->tv_sec;                                                                          \
+      (result)->tv_nsec += 1000000000L;                                                            \
+    }                                                                                              \
+  } while (0)
 #endif
 
 #ifndef MAXLOGNAME
@@ -137,17 +137,16 @@
  * a quit signal will generate a core dump.
  */
 
-
-#define	JOBS 1
+#define JOBS 1
 /* #define DEBUG 1 */
 
 /*
  * Type of used arithmetic. SUSv3 requires us to have at least signed long.
  */
 typedef intmax_t arith_t;
-#define	ARITH_FORMAT_STR  "%" PRIdMAX
-#define	ARITH_MIN INTMAX_MIN
-#define	ARITH_MAX INTMAX_MAX
+#define ARITH_FORMAT_STR "%" PRIdMAX
+#define ARITH_MIN        INTMAX_MIN
+#define ARITH_MAX        INTMAX_MAX
 
 typedef void *pointer;
 
@@ -159,10 +158,10 @@ typedef void *pointer;
 #include <sys/cdefs.h>
 #endif
 
-extern char nullstr[1];		/* null string */
+extern char nullstr[1]; /* null string */
 
 #ifdef DEBUG
-#define TRACE(param)  sh_trace param
+#define TRACE(param) sh_trace param
 #else
 #define TRACE(param)
 #endif

@@ -18,13 +18,14 @@
 #endif
 
 extern const char *const aruu_sys_signame[NSIG];
-extern const int aruu_sys_nsig;
+extern const int         aruu_sys_nsig;
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) || defined(__APPLE__)
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)  \
+    || defined(__APPLE__)
 /* system already provides sys_signame and sys_nsig */
 #else
 #define sys_signame aruu_sys_signame
-#define sys_nsig aruu_sys_nsig
+#define sys_nsig    aruu_sys_nsig
 #endif
 
 #define sig2str aruu_sig2str

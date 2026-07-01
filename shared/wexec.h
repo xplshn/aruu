@@ -14,14 +14,14 @@ int wexecvp(const char *name, char *const *argv);
 int wexecv(const char *path, char *const *argv);
 
 FILE *wpopen(const char *name, char *const *argv, const char *mode);
-int wpclose(FILE *fp);
+int   wpclose(FILE *fp);
 
 int wsystem(const char *cmd);
 
 void wexecvp_self(const char *name, char *const *argv);
 void wexecv_self(const char *path, char *const *argv);
 
-int wpopen_track(FILE *fp, pid_t pid);
+int   wpopen_track(FILE *fp, pid_t pid);
 pid_t wpopen_untrack(FILE *fp);
 
 #endif

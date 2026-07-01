@@ -13,13 +13,13 @@
 #define UTF8_POINT(c) (((c) & 0xc0) != 0x80)
 
 #undef MIN
-#define MIN(x,y)  ((x) < (y) ? (x) : (y))
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
 #undef MAX
-#define MAX(x,y)  ((x) > (y) ? (x) : (y))
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
 #undef LIMIT
-#define LIMIT(x, a, b)  (x) = (x) < (a) ? (a) : (x) > (b) ? (b) : (x)
+#define LIMIT(x, a, b) (x) = (x)<(a) ? (a) : (x)>(b) ? (b) : (x)
 
-#define LEN(x) (sizeof (x) / sizeof *(x))
+#define LEN(x) (sizeof(x) / sizeof *(x))
 
 extern char *argv0;
 
@@ -47,7 +47,7 @@ void eprintf(const char *, ...);
 void weprintf(const char *, ...);
 void xvprintf(const char *, va_list);
 
-int confirm(const char*, ...);
+int confirm(const char *, ...);
 
 double estrtod(const char *);
 
@@ -76,85 +76,85 @@ int eregcomp(regex_t *, const char *, int);
 
 /* io */
 ssize_t writeall(int, const void *, size_t);
-int concat(int, const char *, int, const char *);
+int     concat(int, const char *, int, const char *);
 
 /* misc */
-void enmasse(int, char **, int (*)(const char *, const char *, int));
-void fnck(const char *, const char *, int (*)(const char *, const char *, int), int);
+void   enmasse(int, char **, int (*)(const char *, const char *, int));
+void   fnck(const char *, const char *, int (*)(const char *, const char *, int), int);
 mode_t getumask(void);
-char *humansize(off_t);
+char  *humansize(off_t);
 mode_t parsemode(const char *, mode_t, mode_t);
-off_t parseoffset(const char *);
-void putword(FILE *, const char *);
+off_t  parseoffset(const char *);
+void   putword(FILE *, const char *);
 #undef strtonum
 #define strtonum xstrtonum
 long long strtonum(const char *, long long, long long, const char **);
 long long enstrtonum(int, const char *, long long, long long);
 long long estrtonum(const char *, long long, long long);
-size_t unescape(char *);
-int mkdirp(const char *, mode_t, mode_t);
+size_t    unescape(char *);
+int       mkdirp(const char *, mode_t, mode_t);
 #undef memmem
 #define memmem xmemmem
 void *memmem(const void *, size_t, const void *, size_t);
 
 /* ubase functions */
-char *agetcwd(void);
-void apathmax(char **, long *);
-long estrtol(const char *, int);
+char         *agetcwd(void);
+void          apathmax(char **, long *);
+long          estrtol(const char *, int);
 unsigned long estrtoul(const char *, int);
 #undef explicit_bzero
 void explicit_bzero(void *, size_t);
 void recurse_dir(const char *, void (*)(const char *));
 void devtotty(int, int *, int *);
-int ttytostr(int, int, char *, size_t);
+int  ttytostr(int, int, char *, size_t);
 
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 
 #ifndef IFNAMSIZ
 #define IFNAMSIZ 16
 #endif
 
 struct NetStats {
-        unsigned long long rx_bytes;
-        unsigned long long rx_packets;
-        unsigned long long rx_errs;
-        unsigned long long rx_drop;
-        unsigned long long tx_bytes;
-        unsigned long long tx_packets;
-        unsigned long long tx_errs;
-        unsigned long long tx_drop;
+  unsigned long long rx_bytes;
+  unsigned long long rx_packets;
+  unsigned long long rx_errs;
+  unsigned long long rx_drop;
+  unsigned long long tx_bytes;
+  unsigned long long tx_packets;
+  unsigned long long tx_errs;
+  unsigned long long tx_drop;
 };
 
 struct NetInterface {
-        char name[IFNAMSIZ];
-        unsigned int flags;
-        int mtu;
-        int metric;
-        unsigned char mac[6];
-        int has_mac;
+  char          name[IFNAMSIZ];
+  unsigned int  flags;
+  int           mtu;
+  int           metric;
+  unsigned char mac[6];
+  int           has_mac;
 
-        /* ipv4 addresses */
-        struct sockaddr_in ipv4_addr;
-        int has_ipv4;
-        struct sockaddr_in ipv4_mask;
-        struct sockaddr_in ipv4_brd;
+  /* ipv4 addresses */
+  struct sockaddr_in ipv4_addr;
+  int                has_ipv4;
+  struct sockaddr_in ipv4_mask;
+  struct sockaddr_in ipv4_brd;
 
-        /* ipv6 addresses */
-        struct sockaddr_in6 ipv6_addr;
-        int has_ipv6;
-        unsigned int ipv6_scope;
-        unsigned int ipv6_prefix;
+  /* ipv6 addresses */
+  struct sockaddr_in6 ipv6_addr;
+  int                 has_ipv6;
+  unsigned int        ipv6_scope;
+  unsigned int        ipv6_prefix;
 };
 
 struct MemInfo {
-        unsigned long long total;
-        unsigned long long free;
-        unsigned long long shared;
-        unsigned long long buffers;
-        unsigned long long cached;
-        unsigned long long totalswap;
-        unsigned long long freeswap;
+  unsigned long long total;
+  unsigned long long free;
+  unsigned long long shared;
+  unsigned long long buffers;
+  unsigned long long cached;
+  unsigned long long totalswap;
+  unsigned long long freeswap;
 };
 
 int net_get_interfaces(struct NetInterface **, int *);

@@ -1,18 +1,17 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <errno.h>
 #include <unistd.h>
 
-#include "wexec.h"
 #include "util.h"
+#include "wexec.h"
 
 static int fflag = 0;
 
 static void
 usage(void)
 {
-	eprintf("usage: %s [-f] cmd [arg ...]\n", argv0);
+  eprintf("usage: %s [-f] cmd [arg ...]\n", argv0);
 }
 
 // ?man setsid: run in new session
@@ -21,35 +20,37 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	int savederrno;
+  int savederrno;
 
-	ARGBEGIN {
-	// ?man -f: force the operation
-	case 'f':
-		fflag = 1;
-		break;
-	default:
-		usage();
-	} ARGEND
+  ARGBEGIN
+  {
+    // ?man -f: force the operation
+    case 'f':
+      fflag = 1;
+      break;
+    default:
+      usage();
+  }
+  ARGEND
 
-	if (!argc)
-		usage();
+  if (!argc)
+    usage();
 
-	if (fflag || getpgrp() == getpid()) {
-		switch (fork()) {
-		case -1:
-			eprintf("fork:");
-		case 0:
-			break;
-		default:
-			return 0;
-		}
-	}
-	if (setsid() < 0)
-		eprintf("setsid:");
-	wexecvp_self(argv[0], argv);
-	savederrno = errno;
-	weprintf("wexecvp %s:", argv[0]);
+  if (fflag || getpgrp() == getpid()) {
+    switch (fork()) {
+      case -1:
+        eprintf("fork:");
+      case 0:
+        break;
+      default:
+        return 0;
+    }
+  }
+  if (setsid() < 0)
+    eprintf("setsid:");
+  wexecvp_self(argv[0], argv);
+  savederrno = errno;
+  weprintf("wexecvp %s:", argv[0]);
 
-	_exit(126 + (savederrno == ENOENT));
+  _exit(126 + (savederrno == ENOENT));
 }

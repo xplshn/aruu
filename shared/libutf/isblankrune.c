@@ -5,5 +5,5 @@
 int
 isblankrune(Rune r)
 {
-	return r == ' ' || r == '\t';
+  return r == ' ' || r == '\t';
 }

@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -9,8 +8,8 @@
 #include <limits.h>
 #include <search.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include "fs.h"
@@ -24,90 +23,94 @@ static int sflag = 0;
 static int hflag = 0;
 
 struct file {
-	dev_t devno;
-	ino_t inode;
+  dev_t devno;
+  ino_t inode;
 };
 
 static void
 printpath(off_t n, const char *path)
 {
-	if (hflag)
-		printf("%s\t%s\n", humansize(n * blksize), path);
-	else
-		printf("%jd\t%s\n", (intmax_t)n, path);
+  if (hflag)
+    printf("%s\t%s\n", humansize(n * blksize), path);
+  else
+    printf("%jd\t%s\n", (intmax_t)n, path);
 }
 
 static off_t
 nblks(blkcnt_t blocks)
 {
-	return (512 * blocks + blksize - 1) / blksize;
+  return (512 * blocks + blksize - 1) / blksize;
 }
 
 static int
 cmp(const void *p1, const void *p2)
 {
-	const struct file *f1 = p1, *f2 = p2;
+  const struct file *f1 = p1, *f2 = p2;
 
-	if (f1->devno > f2->devno)
-		return -1;
-	if (f1->devno < f2->devno)
-		return 1;
+  if (f1->devno > f2->devno)
+    return -1;
+  if (f1->devno < f2->devno)
+    return 1;
 
-	/* f1->devno == f2->devno */
-	if (f1->inode < f2->inode)
-		return -1;
-	if (f1->inode > f2->inode)
-		return 1;
+  /* f1->devno == f2->devno */
+  if (f1->inode < f2->inode)
+    return -1;
+  if (f1->inode > f2->inode)
+    return 1;
 
-	return 0;
+  return 0;
 }
 
 static int
 duplicated(dev_t dev, ino_t ino)
 {
-	static void *tree;
-	struct file **fpp, *fp, file = {dev, ino};
+  static void  *tree;
+  struct file **fpp, *fp, file = {dev, ino};
 
-	if ((fpp = tsearch(&file, &tree, cmp)) == NULL)
-		eprintf("%s:", argv0);
+  if ((fpp = tsearch(&file, &tree, cmp)) == NULL)
+    eprintf("%s:", argv0);
 
-	if (*fpp != &file)
-		return 1;
+  if (*fpp != &file)
+    return 1;
 
-	/* new file added */
-	fp = emalloc(sizeof(*fp));
-	*fp = file;
-	*fpp = fp;
+  /* new file added */
+  fp   = emalloc(sizeof(*fp));
+  *fp  = file;
+  *fpp = fp;
 
-	return 0;
+  return 0;
 }
 
 static void
 du(int dirfd, const char *path, struct stat *st, void *data, struct recursor *r)
 {
-	off_t *total = data, subtotal;
+  off_t *total = data, subtotal;
 
-	subtotal = nblks(st->st_blocks);
-	if (S_ISDIR(st->st_mode)) {
-		recurse(dirfd, path, &subtotal, r);
-	} else if (r->follow != 'P' || st->st_nlink > 1) {
-		if (duplicated(st->st_dev, st->st_ino))
-			goto print;
-	}
+  subtotal = nblks(st->st_blocks);
+  if (S_ISDIR(st->st_mode)) {
+    recurse(dirfd, path, &subtotal, r);
+  } else if (r->follow != 'P' || st->st_nlink > 1) {
+    if (duplicated(st->st_dev, st->st_ino))
+      goto print;
+  }
 
-	*total += subtotal;
+  *total += subtotal;
 
 print:
-	if (!r->depth)
-		printpath(*total, r->path);
-	else if (!sflag && (size_t)r->depth <= maxdepth && (S_ISDIR(st->st_mode) || aflag))
-		printpath(subtotal, r->path);
+  if (!r->depth)
+    printpath(*total, r->path);
+  else if (!sflag && (size_t)r->depth <= maxdepth && (S_ISDIR(st->st_mode) || aflag))
+    printpath(subtotal, r->path);
 }
 
 static void
 usage(void)
 {
-	eprintf("usage: %s [-a | -s] [-d depth] [-h] [-k] [-H | -L | -P] [-x] [file ...]\n", argv0);
+  eprintf(
+      "usage: %s [-a | -s] [-d depth] [-h] [-k] [-H | -L | -P] [-x] "
+      "[file ...]\n",
+      argv0
+  );
 }
 
 // ?man du: estimate file space usage
@@ -116,66 +119,70 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	struct recursor r = { .fn = du, .follow = 'P' };
-	off_t n = 0;
-	int kflag = 0, dflag = 0;
-	char *bsize;
+  struct recursor r     = {.fn = du, .follow = 'P'};
+  off_t           n     = 0;
+  int             kflag = 0, dflag = 0;
+  char           *bsize;
 
-	ARGBEGIN {
-	// ?man -a: print or show all entries
-	case 'a':
-		aflag = 1;
-		break;
-	// ?man -d:num: specify directory
-	case 'd':
-		dflag = 1;
-		maxdepth = estrtonum(EARGF(usage()), 0, MIN((unsigned long long)LLONG_MAX, (unsigned long long)SIZE_MAX));
-		break;
-	// ?man -h: suppress headers or print help
-	case 'h':
-		hflag = 1;
-		break;
-	// ?man -k: specify option flag
-	case 'k':
-		kflag = 1;
-		break;
-	// ?man -s: silent mode or print summary
-	case 's':
-		sflag = 1;
-		break;
-	// ?man -x: hex format or match whole lines
-	case 'x':
-		r.flags |= SAMEDEV;
-		break;
-	// ?man -H: specify option flag
-	case 'H':
-	// ?man -L: specify option flag
-	case 'L':
-	// ?man -P: specify option flag
-	case 'P':
-		r.follow = ARGC();
-		break;
-	default:
-		usage();
-	} ARGEND
+  ARGBEGIN
+  {
+    // ?man -a: print or show all entries
+    case 'a':
+      aflag = 1;
+      break;
+    // ?man -d:num: specify directory
+    case 'd':
+      dflag    = 1;
+      maxdepth = estrtonum(
+          EARGF(usage()), 0, MIN((unsigned long long)LLONG_MAX, (unsigned long long)SIZE_MAX)
+      );
+      break;
+    // ?man -h: suppress headers or print help
+    case 'h':
+      hflag = 1;
+      break;
+    // ?man -k: specify option flag
+    case 'k':
+      kflag = 1;
+      break;
+    // ?man -s: silent mode or print summary
+    case 's':
+      sflag = 1;
+      break;
+    // ?man -x: hex format or match whole lines
+    case 'x':
+      r.flags |= SAMEDEV;
+      break;
+    // ?man -H: specify option flag
+    case 'H':
+    // ?man -L: specify option flag
+    case 'L':
+    // ?man -P: specify option flag
+    case 'P':
+      r.follow = ARGC();
+      break;
+    default:
+      usage();
+  }
+  ARGEND
 
-	if ((aflag && sflag) || (dflag && sflag))
-		usage();
+  if ((aflag && sflag) || (dflag && sflag))
+    usage();
 
-	bsize = getenv("BLOCKSIZE");
-	if (bsize)
-		blksize = estrtonum(bsize, 1, MIN((unsigned long long)LLONG_MAX, (unsigned long long)SIZE_MAX));
-	if (kflag)
-		blksize = 1024;
+  bsize = getenv("BLOCKSIZE");
+  if (bsize)
+    blksize = estrtonum(bsize, 1, MIN((unsigned long long)LLONG_MAX, (unsigned long long)SIZE_MAX));
+  if (kflag)
+    blksize = 1024;
 
-	if (!argc) {
-		recurse(AT_FDCWD, ".", &n, &r);
-	} else {
-		for (; *argv; argc--, argv++) {
-			n = 0;
-			recurse(AT_FDCWD, *argv, &n, &r);
-		}
-	}
+  if (!argc) {
+    recurse(AT_FDCWD, ".", &n, &r);
+  } else {
+    for (; *argv; argc--, argv++) {
+      n = 0;
+      recurse(AT_FDCWD, *argv, &n, &r);
+    }
+  }
 
-	return fshut(stdout, "<stdout>") || recurse_status;
+  return fshut(stdout, "<stdout>") || recurse_status;
 }

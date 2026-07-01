@@ -1,24 +1,41 @@
 Language: Cpp
 BasedOnStyle: LLVM
-AlignAfterOpenBracket: Align
-AlignConsecutiveMacros: false
-AlignConsecutiveAssignments: false
-AlignConsecutiveDeclarations: false
+
+IndentWidth: 2
+TabWidth: 2
+ContinuationIndentWidth: 4
+UseTab: Never
+IndentCaseLabels: true
+IndentPPDirectives: None
+IndentWrappedFunctionNames: false
+NamespaceIndentation: None
+
+ColumnLimit: 100
+
+AlignAfterOpenBracket: BlockIndent
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
 AlignEscapedNewlines: Right
 AlignOperands: Align
 AlignTrailingComments: true
+
 AllowAllArgumentsOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: false
+
+AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
+
 AlwaysBreakAfterDefinitionReturnType: TopLevel
 AlwaysBreakAfterReturnType: TopLevelDefinitions
 AlwaysBreakBeforeMultilineStrings: false
-BinPackArguments: true
-BinPackParameters: true
+
+BreakBeforeBraces: Custom
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false
@@ -36,12 +53,11 @@ BraceWrapping:
   SplitEmptyFunction: true
   SplitEmptyRecord: true
   SplitEmptyNamespace: true
-BreakBeforeBinaryOperators: None
-BreakBeforeBraces: Custom
+
+BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeTernaryOperators: true
 BreakStringLiterals: true
-ColumnLimit: 80
-ContinuationIndentWidth: 8
+
 DerivePointerAlignment: false
 DisableFormat: false
 FixNamespaceComments: true
@@ -51,16 +67,11 @@ IncludeCategories:
     Priority: 1
   - Regex: '^<.*>'
     Priority: 2
-IndentCaseLabels: false
-IndentPPDirectives: None
-IndentWidth: 8
-IndentWrappedFunctionNames: false
 KeepEmptyLinesAtTheStartOfBlocks: false
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: None
 PointerAlignment: Right
 ReflowComments: true
-SortIncludes: true
+SortIncludes: CaseSensitive
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
 SpaceBeforeAssignmentOperators: true
@@ -73,5 +84,3 @@ SpacesInCStyleCastParentheses: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard: c++03
-TabWidth: 8
-UseTab: Always

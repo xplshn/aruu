@@ -1,9 +1,9 @@
 /* public domain sha1 implementation based on rfc3174 and libtomcrypt */
 
 struct sha1 {
-	uint64_t len;    /* processed message length */
-	uint32_t h[5];   /* hash state */
-	uint8_t buf[64]; /* message block buffer */
+  uint64_t len;     /* processed message length */
+  uint32_t h[5];    /* hash state */
+  uint8_t  buf[64]; /* message block buffer */
 };
 
 enum { SHA1_DIGEST_LENGTH = 20 };

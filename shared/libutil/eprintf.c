@@ -11,47 +11,47 @@ char *argv0;
 void
 eprintf(const char *fmt, ...)
 {
-	va_list ap;
+  va_list ap;
 
-	va_start(ap, fmt);
-	xvprintf(fmt, ap);
-	va_end(ap);
+  va_start(ap, fmt);
+  xvprintf(fmt, ap);
+  va_end(ap);
 
-	exit(1);
+  exit(1);
 }
 
 void
 enprintf(int status, const char *fmt, ...)
 {
-	va_list ap;
+  va_list ap;
 
-	va_start(ap, fmt);
-	xvprintf(fmt, ap);
-	va_end(ap);
+  va_start(ap, fmt);
+  xvprintf(fmt, ap);
+  va_end(ap);
 
-	exit(status);
+  exit(status);
 }
 
 void
 weprintf(const char *fmt, ...)
 {
-	va_list ap;
+  va_list ap;
 
-	va_start(ap, fmt);
-	xvprintf(fmt, ap);
-	va_end(ap);
+  va_start(ap, fmt);
+  xvprintf(fmt, ap);
+  va_end(ap);
 }
 
 void
 xvprintf(const char *fmt, va_list ap)
 {
-	if (argv0 && strncmp(fmt, "usage", strlen("usage")))
-		fprintf(stderr, "%s: ", argv0);
+  if (argv0 && strncmp(fmt, "usage", strlen("usage")))
+    fprintf(stderr, "%s: ", argv0);
 
-	vfprintf(stderr, fmt, ap);
+  vfprintf(stderr, fmt, ap);
 
-	if (fmt[0] && fmt[strlen(fmt)-1] == ':') {
-		fputc(' ', stderr);
-		perror(NULL);
-	}
+  if (fmt[0] && fmt[strlen(fmt) - 1] == ':') {
+    fputc(' ', stderr);
+    perror(NULL);
+  }
 }

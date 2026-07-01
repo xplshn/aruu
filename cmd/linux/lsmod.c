@@ -3,68 +3,68 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "text.h"
 #include "paths.h"
+#include "text.h"
 #include "util.h"
 
-static void parse_modline(char *buf, char **name, char **size,
-			  char **refcount, char **users);
+static void parse_modline(char *buf, char **name, char **size, char **refcount, char **users);
 
 static void
 usage(void)
 {
-	eprintf("usage: %s\n", argv0);
+  eprintf("usage: %s\n", argv0);
 }
 
 // ?man lsmod: show the status of modules in the Linux kernel
-// ?man lsmod formats and displays /proc/modules, showing currently loaded modules
+// ?man lsmod formats and displays /proc/modules, showing currently loaded
+// modules
 int
 main(int argc, char *argv[])
 {
-	const char *modfile = ARUU_LINUX_PATH_PROC_MODULES;
-	FILE *fp;
-	char *buf = NULL;
-	char *name, *size, *refcount, *users;
-	size_t bufsize = 0;
-	size_t len;
+  const char *modfile = ARUU_LINUX_PATH_PROC_MODULES;
+  FILE       *fp;
+  char       *buf = NULL;
+  char       *name, *size, *refcount, *users;
+  size_t      bufsize = 0;
+  size_t      len;
 
-	ARGBEGIN {
-	default:
-		usage();
-	} ARGEND;
+  ARGBEGIN
+  {
+    default:
+      usage();
+  }
+  ARGEND;
 
-	if (argc > 0)
-		usage();
+  if (argc > 0)
+    usage();
 
-	fp = fopen(modfile, "r");
-	if (!fp)
-		eprintf("fopen %s:", modfile);
+  fp = fopen(modfile, "r");
+  if (!fp)
+    eprintf("fopen %s:", modfile);
 
-	printf("%-23s Size  Used by\n", "Module");
+  printf("%-23s Size  Used by\n", "Module");
 
-	while (agetline(&buf, &bufsize, fp) != -1) {
-		parse_modline(buf, &name, &size, &refcount, &users);
-		if (!name || !size || !refcount || !users)
-			eprintf("invalid format: %s\n", modfile);
-		len = strlen(users) - 1;
-		if (users[len] == ',' || users[len] == '-')
-			users[len] = '\0';
-		printf("%-20s%8s%3s %s\n", name, size, refcount,
-		       users);
-	}
-	if (ferror(fp))
-		eprintf("%s: read error:", modfile);
-	free(buf);
-	fclose(fp);
-	return 0;
+  while (agetline(&buf, &bufsize, fp) != -1) {
+    parse_modline(buf, &name, &size, &refcount, &users);
+    if (!name || !size || !refcount || !users)
+      eprintf("invalid format: %s\n", modfile);
+    len = strlen(users) - 1;
+    if (users[len] == ',' || users[len] == '-')
+      users[len] = '\0';
+    printf("%-20s%8s%3s %s\n", name, size, refcount, users);
+  }
+  if (ferror(fp))
+    eprintf("%s: read error:", modfile);
+  free(buf);
+  fclose(fp);
+  return 0;
 }
 
 static void
-parse_modline(char *buf, char **name, char **size,
-	      char **refcount, char **users)
+parse_modline(char *buf, char **name, char **size, char **refcount, char **users)
 {
-	*name = strtok(buf, " ");
-	*size = strtok(NULL, " ");
-	*refcount = strtok(NULL, " ");
-	*users = strtok(NULL, " ");
+  *name     = strtok(buf, " ");
+  *size     = strtok(NULL, " ");
+  *refcount = strtok(NULL, " ");
+  *users    = strtok(NULL, " ");
 }

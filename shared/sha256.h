@@ -1,9 +1,9 @@
 /* public domain sha256 implementation based on fips180-3 */
 
 struct sha256 {
-	uint64_t len;    /* processed message length */
-	uint32_t h[8];   /* hash state */
-	uint8_t buf[64]; /* message block buffer */
+  uint64_t len;     /* processed message length */
+  uint32_t h[8];    /* hash state */
+  uint8_t  buf[64]; /* message block buffer */
 };
 
 enum { SHA256_DIGEST_LENGTH = 32 };

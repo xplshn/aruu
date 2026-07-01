@@ -5,5 +5,5 @@
 int
 ispunctrune(Rune r)
 {
-	return isgraphrune(r) && !isalnumrune(r);
+  return isgraphrune(r) && !isalnumrune(r);
 }

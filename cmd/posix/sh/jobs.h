@@ -33,34 +33,34 @@
  */
 
 /* Mode argument to forkshell.  Don't change FORK_FG or FORK_BG. */
-#define FORK_FG 0
-#define FORK_BG 1
+#define FORK_FG    0
+#define FORK_BG    1
 #define FORK_NOJOB 2
 
-#include <signal.h>		/* for sig_atomic_t */
+#include <signal.h> /* for sig_atomic_t */
 
 struct job;
 
 enum {
-	SHOWJOBS_DEFAULT,	/* job number, status, command */
-	SHOWJOBS_VERBOSE,	/* job number, PID, status, command */
-	SHOWJOBS_PIDS,		/* PID only */
-	SHOWJOBS_PGIDS		/* PID of the group leader only */
+  SHOWJOBS_DEFAULT, /* job number, status, command */
+  SHOWJOBS_VERBOSE, /* job number, PID, status, command */
+  SHOWJOBS_PIDS,    /* PID only */
+  SHOWJOBS_PGIDS    /* PID of the group leader only */
 };
 
-extern int job_warning;		/* user was warned about stopped jobs */
+extern int job_warning; /* user was warned about stopped jobs */
 
-void setjobctl(int);
-void showjobs(int, int);
+void        setjobctl(int);
+void        showjobs(int, int);
 struct job *makejob(union node *, int);
-pid_t forkshell(struct job *, union node *, int);
-pid_t vforkexecshell(struct job *, char **, char **, const char *, int, int [2]);
-int waitforjob(struct job *, int *);
-int stoppedjobs(void);
-int backgndpidset(void);
-pid_t backgndpidval(void);
-char *commandtext(union node *);
+pid_t       forkshell(struct job *, union node *, int);
+pid_t       vforkexecshell(struct job *, char **, char **, const char *, int, int[2]);
+int         waitforjob(struct job *, int *);
+int         stoppedjobs(void);
+int         backgndpidset(void);
+pid_t       backgndpidval(void);
+char       *commandtext(union node *);
 
-#if ! JOBS
-#define setjobctl(on)	/* do nothing */
+#if !JOBS
+#define setjobctl(on) /* do nothing */
 #endif

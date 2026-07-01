@@ -8,20 +8,20 @@
 int
 enregcomp(int status, regex_t *preg, const char *regex, int cflags)
 {
-	char errbuf[BUFSIZ] = "";
-	int r;
+  char errbuf[BUFSIZ] = "";
+  int  r;
 
-	if ((r = regcomp(preg, regex, cflags)) == 0)
-		return r;
+  if ((r = regcomp(preg, regex, cflags)) == 0)
+    return r;
 
-	regerror(r, preg, errbuf, sizeof(errbuf));
-	enprintf(status, "invalid regex: %s\n", errbuf);
+  regerror(r, preg, errbuf, sizeof(errbuf));
+  enprintf(status, "invalid regex: %s\n", errbuf);
 
-	return r;
+  return r;
 }
 
 int
 eregcomp(regex_t *preg, const char *regex, int cflags)
 {
-	return enregcomp(1, preg, regex, cflags);
+  return enregcomp(1, preg, regex, cflags);
 }

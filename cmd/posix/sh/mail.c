@@ -36,24 +36,20 @@
  * Routines to check for mail.  (Perhaps make part of main.c?)
  */
 
-#include "shell.h"
 #include "mail.h"
-#include "var.h"
-#include "output.h"
-#include "memalloc.h"
 #include "error.h"
-#include <sys/types.h>
-#include <sys/stat.h>
+#include "memalloc.h"
+#include "output.h"
+#include "shell.h"
+#include "var.h"
 #include <stdlib.h>
-
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #define MAXMBOXES 10
 
-
-static int nmboxes;			/* number of mailboxes */
-static time_t mailtime[MAXMBOXES];	/* times of mailboxes */
-
-
+static int    nmboxes;             /* number of mailboxes */
+static time_t mailtime[MAXMBOXES]; /* times of mailboxes */
 
 /*
  * Print appropriate message(s) if mail has arrived.  If the argument is
@@ -64,50 +60,50 @@ static time_t mailtime[MAXMBOXES];	/* times of mailboxes */
 void
 chkmail(int silent)
 {
-	int i;
-	char *mpath;
-	char *p;
-	char *msg;
-	struct stackmark smark;
-	struct stat statb;
+  int              i;
+  char            *mpath;
+  char            *p;
+  char            *msg;
+  struct stackmark smark;
+  struct stat      statb;
 
-	if (silent)
-		nmboxes = 10;
-	if (nmboxes == 0)
-		return;
-	setstackmark(&smark);
-	mpath = stsavestr(mpathset()? mpathval() : mailval());
-	for (i = 0 ; i < nmboxes ; i++) {
-		p = mpath;
-		if (*p == '\0')
-			break;
-		mpath = strchrnul(mpath, ':');
-		if (*mpath != '\0') {
-			*mpath++ = '\0';
-			if (p == mpath - 1)
-				continue;
-		}
-		msg = strchr(p, '%');
-		if (msg != NULL)
-			*msg++ = '\0';
+  if (silent)
+    nmboxes = 10;
+  if (nmboxes == 0)
+    return;
+  setstackmark(&smark);
+  mpath = stsavestr(mpathset() ? mpathval() : mailval());
+  for (i = 0; i < nmboxes; i++) {
+    p = mpath;
+    if (*p == '\0')
+      break;
+    mpath = strchrnul(mpath, ':');
+    if (*mpath != '\0') {
+      *mpath++ = '\0';
+      if (p == mpath - 1)
+        continue;
+    }
+    msg = strchr(p, '%');
+    if (msg != NULL)
+      *msg++ = '\0';
 #ifdef notdef /* this is what the System V shell claims to do (it lies) */
-		if (stat(p, &statb) < 0)
-			statb.st_mtime = 0;
-		if (statb.st_mtime > mailtime[i] && ! silent) {
-			out2str(msg? msg : "you have mail");
-			out2c('\n');
-		}
-		mailtime[i] = statb.st_mtime;
+    if (stat(p, &statb) < 0)
+      statb.st_mtime = 0;
+    if (statb.st_mtime > mailtime[i] && !silent) {
+      out2str(msg ? msg : "you have mail");
+      out2c('\n');
+    }
+    mailtime[i] = statb.st_mtime;
 #else /* this is what it should do */
-		if (stat(p, &statb) < 0)
-			statb.st_size = 0;
-		if (statb.st_size > mailtime[i] && ! silent) {
-			out2str(msg? msg : "you have mail");
-			out2c('\n');
-		}
-		mailtime[i] = statb.st_size;
+    if (stat(p, &statb) < 0)
+      statb.st_size = 0;
+    if (statb.st_size > mailtime[i] && !silent) {
+      out2str(msg ? msg : "you have mail");
+      out2c('\n');
+    }
+    mailtime[i] = statb.st_size;
 #endif
-	}
-	nmboxes = i;
-	popstackmark(&smark);
+  }
+  nmboxes = i;
+  popstackmark(&smark);
 }

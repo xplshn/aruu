@@ -14,38 +14,38 @@ int rm_status = 0;
 void
 rm(int dirfd, const char *name, struct stat *st, void *data, struct recursor *r)
 {
-	int quiet, ask, write, flags, ignore;
+  int quiet, ask, write, flags, ignore;
 
-	(void)data;
+  (void)data;
 
-	ignore = r->flags & IGNORE;
-	quiet = r->flags & SILENT;
-	ask = r->flags & CONFIRM;
-	write = S_ISLNK(st->st_mode) || faccessat(dirfd, name, W_OK, 0) == 0;
-	flags = 0;
+  ignore = r->flags & IGNORE;
+  quiet  = r->flags & SILENT;
+  ask    = r->flags & CONFIRM;
+  write  = S_ISLNK(st->st_mode) || faccessat(dirfd, name, W_OK, 0) == 0;
+  flags  = 0;
 
-	if (S_ISDIR(st->st_mode) && r->maxdepth) {
-		errno = EISDIR;
-		goto err;
-	}
+  if (S_ISDIR(st->st_mode) && r->maxdepth) {
+    errno = EISDIR;
+    goto err;
+  }
 
-	if (!quiet && ((!write && isatty(0)) || ask)) {
-		if (!confirm("remove file '%s'? ", r->path))
-			return;
-	}
+  if (!quiet && ((!write && isatty(0)) || ask)) {
+    if (!confirm("remove file '%s'? ", r->path))
+      return;
+  }
 
-	if (S_ISDIR(st->st_mode)) {
-		flags = AT_REMOVEDIR;
-		recurse(dirfd, name, NULL, r);
-	}
+  if (S_ISDIR(st->st_mode)) {
+    flags = AT_REMOVEDIR;
+    recurse(dirfd, name, NULL, r);
+  }
 
-	if (unlinkat(dirfd, name, flags) < 0)
-		goto err;
-	return;
+  if (unlinkat(dirfd, name, flags) < 0)
+    goto err;
+  return;
 
 err:
-	if (!ignore) {
-		weprintf("cannot remove '%s':", r->path);
-		rm_status = 1;
-	}
+  if (!ignore) {
+    weprintf("cannot remove '%s':", r->path);
+    rm_status = 1;
+  }
 }

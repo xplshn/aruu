@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <sys/file.h>
 #include <sys/wait.h>
 
@@ -9,13 +8,13 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "wexec.h"
 #include "util.h"
+#include "wexec.h"
 
 static void
 usage(void)
 {
-	eprintf("usage: %s [-nosux] file cmd [arg ...]\n", argv0);
+  eprintf("usage: %s [-nosux] file cmd [arg ...]\n", argv0);
 }
 
 // ?man flock: manage locks
@@ -24,71 +23,73 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	int fd, status, savederrno, flags = LOCK_EX, nonblk = 0, oflag = 0;
-	pid_t pid;
+  int   fd, status, savederrno, flags = LOCK_EX, nonblk = 0, oflag = 0;
+  pid_t pid;
 
-	ARGBEGIN {
-	// ?man -n: print line numbers or counts
-	case 'n':
-		nonblk = LOCK_NB;
-		break;
-	// ?man -o: specify output file
-	case 'o':
-		oflag = 1;
-		break;
-	// ?man -s: silent mode or print summary
-	case 's':
-		flags = LOCK_SH;
-		break;
-	// ?man -u: unbuffered output
-	case 'u':
-		flags = LOCK_UN;
-		break;
-	// ?man -x: hex format or match whole lines
-	case 'x':
-		flags = LOCK_EX;
-		break;
-	default:
-		usage();
-	} ARGEND
+  ARGBEGIN
+  {
+    // ?man -n: print line numbers or counts
+    case 'n':
+      nonblk = LOCK_NB;
+      break;
+    // ?man -o: specify output file
+    case 'o':
+      oflag = 1;
+      break;
+    // ?man -s: silent mode or print summary
+    case 's':
+      flags = LOCK_SH;
+      break;
+    // ?man -u: unbuffered output
+    case 'u':
+      flags = LOCK_UN;
+      break;
+    // ?man -x: hex format or match whole lines
+    case 'x':
+      flags = LOCK_EX;
+      break;
+    default:
+      usage();
+  }
+  ARGEND
 
-	if (argc < 2)
-		usage();
+  if (argc < 2)
+    usage();
 
-	if ((fd = open(*argv, O_RDONLY | O_CREAT, 0644)) < 0)
-		eprintf("open %s:", *argv);
+  if ((fd = open(*argv, O_RDONLY | O_CREAT, 0644)) < 0)
+    eprintf("open %s:", *argv);
 
-	if (flock(fd, flags | nonblk)) {
-		if (nonblk && errno == EWOULDBLOCK)
-			return 1;
-		eprintf("flock:");
-	}
+  if (flock(fd, flags | nonblk)) {
+    if (nonblk && errno == EWOULDBLOCK)
+      return 1;
+    eprintf("flock:");
+  }
 
-	switch ((pid = fork())) {
-	case -1:
-		eprintf("fork:");
-		/* fallthrough */
-	case 0:
-		if (oflag && close(fd) < 0)
-			eprintf("close:");
-		argv++;
-		wexecvp_self(*argv, argv);
-		savederrno = errno;
-		weprintf("wexecvp %s:", *argv);
-		_exit(126 + (savederrno == ENOENT));
-	default:
-		break;
-	}
-	if (waitpid(pid, &status, 0) < 0)
-		eprintf("waitpid:");
+  switch ((pid = fork())) {
+    case -1:
+      eprintf("fork:");
+      /* fallthrough */
+    case 0:
+      if (oflag && close(fd) < 0)
+        eprintf("close:");
+      argv++;
+      wexecvp_self(*argv, argv);
+      savederrno = errno;
+      weprintf("wexecvp %s:", *argv);
+      _exit(126 + (savederrno == ENOENT));
+    default:
+      break;
+  }
+  if (waitpid(pid, &status, 0) < 0)
+    eprintf("waitpid:");
 
-	if (close(fd) < 0)
-		eprintf("close:");
+  if (close(fd) < 0)
+    eprintf("close:");
 
-	if (WIFSIGNALED(status))
-		return 128 + WTERMSIG(status);
-	if (WIFEXITED(status))
-		return WEXITSTATUS(status);
+  if (WIFSIGNALED(status))
+    return 128 + WTERMSIG(status);
+  if (WIFEXITED(status))
+    return WEXITSTATUS(status);
 
-	return 0;
+  return 0;
 }

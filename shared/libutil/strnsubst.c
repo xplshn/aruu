@@ -25,37 +25,36 @@
 void
 strnsubst(char **str, const char *match, const char *replstr, size_t maxsize)
 {
-	char *s1, *s2, *this;
-	size_t matchlen, s2len;
-	int n;
+  char  *s1, *s2, *this;
+  size_t matchlen, s2len;
+  int    n;
 
-	if ((s1 = *str) == NULL)
-		return;
-	s2 = emalloc(maxsize);
+  if ((s1 = *str) == NULL)
+    return;
+  s2 = emalloc(maxsize);
 
-	if (replstr == NULL)
-		replstr = "";
+  if (replstr == NULL)
+    replstr = "";
 
-	if (match == NULL || *match == '\0' || strlen(s1) >= maxsize) {
-		strlcpy(s2, s1, maxsize);
-		goto done;
-	}
+  if (match == NULL || *match == '\0' || strlen(s1) >= maxsize) {
+    strlcpy(s2, s1, maxsize);
+    goto done;
+  }
 
-	*s2 = '\0';
-	s2len = 0;
-	matchlen = strlen(match);
-	for (;;) {
-		if ((this = strstr(s1, match)) == NULL)
-			break;
-		n = snprintf(s2 + s2len, maxsize - s2len, "%.*s%s",
-		    (int)(this - s1), s1, replstr);
-		if (n == -1 || n + s2len + strlen(this + matchlen) >= maxsize)
-			break;			/* out of room */
-		s2len += n;
-		s1 = this + matchlen;
-	}
-	strlcpy(s2 + s2len, s1, maxsize - s2len);
+  *s2      = '\0';
+  s2len    = 0;
+  matchlen = strlen(match);
+  for (;;) {
+    if ((this = strstr(s1, match)) == NULL)
+      break;
+    n = snprintf(s2 + s2len, maxsize - s2len, "%.*s%s", (int)(this - s1), s1, replstr);
+    if (n == -1 || n + s2len + strlen(this + matchlen) >= maxsize)
+      break; /* out of room */
+    s2len += n;
+    s1 = this + matchlen;
+  }
+  strlcpy(s2 + s2len, s1, maxsize - s2len);
 done:
-	*str = s2;
-	return;
+  *str = s2;
+  return;
 }

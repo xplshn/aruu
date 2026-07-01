@@ -6,11 +6,11 @@
 void
 putword(FILE *fp, const char *s)
 {
-	static int first = 1;
+  static int first = 1;
 
-	if (!first)
-		fputc(' ', fp);
+  if (!first)
+    fputc(' ', fp);
 
-	fputs(s, fp);
-	first = 0;
+  fputs(s, fp);
+  first = 0;
 }

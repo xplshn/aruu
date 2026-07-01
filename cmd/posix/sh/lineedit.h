@@ -17,11 +17,11 @@ void histsave(void);
 
 #else
 
-#define histedit()        ((void)0)
-#define sethistsize(s)    ((void)0)
-#define setterm(t)        ((void)0)
-#define histload()        ((void)0)
-#define histsave()        ((void)0)
+#define histedit()     ((void)0)
+#define sethistsize(s) ((void)0)
+#define setterm(t)     ((void)0)
+#define histload()     ((void)0)
+#define histsave()     ((void)0)
 
 #endif
 

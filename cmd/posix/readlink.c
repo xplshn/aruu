@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,9 +12,9 @@ static void
 usage(void)
 {
 #if FEATURE_READLINK_REALPATH
-	eprintf("usage: %s [-fn] path\n", argv0);
+  eprintf("usage: %s [-fn] path\n", argv0);
 #else
-	eprintf("usage: %s [-n] path\n", argv0);
+  eprintf("usage: %s [-n] path\n", argv0);
 #endif
 }
 
@@ -25,51 +24,51 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	char buf[PATH_MAX];
-	ssize_t n;
-	int nflag = 0;
+  char    buf[PATH_MAX];
+  ssize_t n;
+  int     nflag = 0;
 #if FEATURE_READLINK_REALPATH
-	int fflag = 0;
+  int fflag = 0;
 #endif
 
-	ARGBEGIN
-	{
+  ARGBEGIN
+  {
 #if FEATURE_READLINK_REALPATH
-	// ?man -f: force the operation
-	case 'f':
-		fflag = 1;
-		break;
+    // ?man -f: force the operation
+    case 'f':
+      fflag = 1;
+      break;
 #endif
-	// ?man -n: print line numbers or counts
-	case 'n':
-		nflag = 1;
-		break;
-	default:
-		usage();
-	}
-	ARGEND
+    // ?man -n: print line numbers or counts
+    case 'n':
+      nflag = 1;
+      break;
+    default:
+      usage();
+  }
+  ARGEND
 
-	if (argc != 1)
-		usage();
+  if (argc != 1)
+    usage();
 
-	if (strlen(argv[0]) >= PATH_MAX)
-		eprintf("path too long\n");
+  if (strlen(argv[0]) >= PATH_MAX)
+    eprintf("path too long\n");
 
 #if FEATURE_READLINK_REALPATH
-	if (fflag) {
-		if (!realpath(argv[0], buf))
-			eprintf("realpath %s:", argv[0]);
-	} else
+  if (fflag) {
+    if (!realpath(argv[0], buf))
+      eprintf("realpath %s:", argv[0]);
+  } else
 #endif
-	{
-		if ((n = readlink(argv[0], buf, PATH_MAX - 1)) < 0)
-			eprintf("readlink %s:", argv[0]);
-		buf[n] = '\0';
-	}
+  {
+    if ((n = readlink(argv[0], buf, PATH_MAX - 1)) < 0)
+      eprintf("readlink %s:", argv[0]);
+    buf[n] = '\0';
+  }
 
-	fputs(buf, stdout);
-	if (!nflag)
-		putchar('\n');
+  fputs(buf, stdout);
+  if (!nflag)
+    putchar('\n');
 
-	return fshut(stdout, "<stdout>");
+  return fshut(stdout, "<stdout>");
 }

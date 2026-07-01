@@ -20,7 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#define nelem(x)  (sizeof (x) / sizeof *(x))
+#define nelem(x) (sizeof(x) / sizeof *(x))
 
 int rune1cmp(const void *, const void *);
 int rune2cmp(const void *, const void *);

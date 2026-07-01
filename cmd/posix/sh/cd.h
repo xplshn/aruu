@@ -29,4 +29,4 @@
  * SUCH DAMAGE.
  */
 
-void	 pwd_init(int);
+void pwd_init(int);

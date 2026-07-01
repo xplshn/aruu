@@ -1,21 +1,20 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "wexec.h"
 #include "util.h"
+#include "wexec.h"
 
 extern char **environ;
 
 static void
 usage(void)
 {
-	eprintf("usage: %s [-i] [-u var] ... [var=value] ... [cmd [arg ...]]\n", argv0);
+  eprintf("usage: %s [-i] [-u var] ... [var=value] ... [cmd [arg ...]]\n", argv0);
 }
 
 // ?man env: run command in modified environment
@@ -24,34 +23,36 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	int savederrno;
+  int savederrno;
 
-	ARGBEGIN {
-	// ?man -i: interactive mode or prompt for confirmation
-	case 'i':
-		*environ = NULL;
-		break;
-	// ?man -u:str: unbuffered output
-	case 'u':
-		if (unsetenv(EARGF(usage())) < 0)
-			eprintf("unsetenv:");
-		break;
-	default:
-		usage();
-	} ARGEND
+  ARGBEGIN
+  {
+    // ?man -i: interactive mode or prompt for confirmation
+    case 'i':
+      *environ = NULL;
+      break;
+    // ?man -u:str: unbuffered output
+    case 'u':
+      if (unsetenv(EARGF(usage())) < 0)
+        eprintf("unsetenv:");
+      break;
+    default:
+      usage();
+  }
+  ARGEND
 
-	for (; *argv && strchr(*argv, '='); argc--, argv++)
-		putenv(*argv);
+  for (; *argv && strchr(*argv, '='); argc--, argv++)
+    putenv(*argv);
 
-	if (*argv) {
-		wexecvp_self(*argv, argv);
-		savederrno = errno;
-		weprintf("wexecvp %s:", *argv);
-		_exit(126 + (savederrno == ENOENT));
-	}
+  if (*argv) {
+    wexecvp_self(*argv, argv);
+    savederrno = errno;
+    weprintf("wexecvp %s:", *argv);
+    _exit(126 + (savederrno == ENOENT));
+  }
 
-	for (; *environ; environ++)
-		puts(*environ);
+  for (; *environ; environ++)
+    puts(*environ);
 
-	return fshut(stdout, "<stdout>");
+  return fshut(stdout, "<stdout>");
 }

@@ -36,10 +36,10 @@
  * Miscellaneous builtins.
  */
 
-#include <sys/types.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/time.h>
-#include <sys/resource.h>
+#include <sys/types.h>
 
 #include <errno.h>
 #include <poll.h>
@@ -50,99 +50,98 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "shell.h"
 #include "redline.h"
+#include "shell.h"
 
 #ifndef timespeccmp
-#define timespeccmp(tvp, uvp, cmp) \
-	(((tvp)->tv_sec == (uvp)->tv_sec) ? \
-	((tvp)->tv_nsec cmp (uvp)->tv_nsec) : \
-	((tvp)->tv_sec cmp (uvp)->tv_sec))
+#define timespeccmp(tvp, uvp, cmp)                                                                 \
+  (((tvp)->tv_sec == (uvp)->tv_sec) ? ((tvp)->tv_nsec cmp(uvp)->tv_nsec)                           \
+                                    : ((tvp)->tv_sec cmp(uvp)->tv_sec))
 #endif
-#include "options.h"
-#include "var.h"
-#include "output.h"
-#include "memalloc.h"
 #include "error.h"
+#include "memalloc.h"
 #include "mystring.h"
+#include "options.h"
+#include "output.h"
 #include "syntax.h"
 #include "trap.h"
+#include "var.h"
 
 #undef eflag
 
-#define	READ_BUFLEN	1024
+#define READ_BUFLEN 1024
 struct fdctx {
-	int	fd;
-	size_t	off;	/* offset in buf */
-	size_t	buflen;
-	char	*ep;	/* tail pointer */
-	char	buf[READ_BUFLEN];
+  int    fd;
+  size_t off; /* offset in buf */
+  size_t buflen;
+  char  *ep; /* tail pointer */
+  char   buf[READ_BUFLEN];
 };
 
-static void fdctx_init(int, struct fdctx *);
-static void fdctx_destroy(struct fdctx *);
+static void    fdctx_init(int, struct fdctx *);
+static void    fdctx_destroy(struct fdctx *);
 static ssize_t fdgetc(struct fdctx *, char *);
-int readcmd(int, char **);
-int umaskcmd(int, char **);
-int ulimitcmd(int, char **);
+int            readcmd(int, char **);
+int            umaskcmd(int, char **);
+int            ulimitcmd(int, char **);
 
 extern mode_t parsemode(const char *str, mode_t mode, mode_t mask);
 
 static void
 fdctx_init(int fd, struct fdctx *fdc)
 {
-	off_t cur;
+  off_t cur;
 
-	/* Check if fd is seekable. */
-	cur = lseek(fd, 0, SEEK_CUR);
-	*fdc = (struct fdctx){
-		.fd = fd,
-		.buflen = (cur != -1) ? READ_BUFLEN : 1,
-		.ep = &fdc->buf[0],	/* No data */
-	};
+  /* Check if fd is seekable. */
+  cur  = lseek(fd, 0, SEEK_CUR);
+  *fdc = (struct fdctx){
+      .fd     = fd,
+      .buflen = (cur != -1) ? READ_BUFLEN : 1,
+      .ep     = &fdc->buf[0], /* No data */
+  };
 }
 
 static ssize_t
 fdgetc(struct fdctx *fdc, char *c)
 {
-	ssize_t nread;
+  ssize_t nread;
 
-	if (&fdc->buf[fdc->off] == fdc->ep) {
-		nread = read(fdc->fd, fdc->buf, fdc->buflen);
-		if (nread > 0) {
-			fdc->off = 0;
-			fdc->ep = fdc->buf + nread;
-		} else
-			return (nread);
-	}
-	*c = fdc->buf[fdc->off++];
+  if (&fdc->buf[fdc->off] == fdc->ep) {
+    nread = read(fdc->fd, fdc->buf, fdc->buflen);
+    if (nread > 0) {
+      fdc->off = 0;
+      fdc->ep  = fdc->buf + nread;
+    } else
+      return (nread);
+  }
+  *c = fdc->buf[fdc->off++];
 
-	return (1);
+  return (1);
 }
 
 static void
 fdctx_destroy(struct fdctx *fdc)
 {
-	off_t residue;
+  off_t residue;
 
-	if (fdc->buflen > 1) {
-	/*
-	 * Reposition the file offset.  Here is the layout of buf:
-	 *
-	 *     | off
-	 *     v
-	 * |*****************|-------|
-	 * buf               ep   buf+buflen
-	 *     |<- residue ->|
-	 *
-	 * off: current character
-	 * ep:  offset just after read(2)
-	 * residue: length for reposition
-	 */
-		residue = (fdc->ep - fdc->buf) - fdc->off;
-		if (residue > 0)
-			(void) lseek(fdc->fd, -residue, SEEK_CUR);
-	}
+  if (fdc->buflen > 1) {
+    /*
+     * Reposition the file offset.  Here is the layout of buf:
+     *
+     *     | off
+     *     v
+     * |*****************|-------|
+     * buf               ep   buf+buflen
+     *     |<- residue ->|
+     *
+     * off: current character
+     * ep:  offset just after read(2)
+     * residue: length for reposition
+     */
+    residue = (fdc->ep - fdc->buf) - fdc->off;
+    if (residue > 0)
+      (void)lseek(fdc->fd, -residue, SEEK_CUR);
+  }
 }
 
 /*
@@ -163,345 +162,343 @@ fdctx_destroy(struct fdctx *fdc)
 int
 readcmd(int argc __unused, char **argv __unused)
 {
-	char **ap;
-	int backslash;
-	char c;
-	int rflag;
-	char *prompt;
-	const char *ifs;
-	char *p;
-	int startword;
-	int status;
-	int i;
-	int is_ifs;
-	int saveall = 0;
-	ptrdiff_t lastnonifs, lastnonifsws;
-	sigset_t set, oset;
-	intmax_t number, timeout;
-	struct timespec tnow, tend, tresid;
-	struct pollfd pfd;
-	char *endptr;
-	ssize_t nread;
-	int sig;
-	struct fdctx fdctx;
+  char          **ap;
+  int             backslash;
+  char            c;
+  int             rflag;
+  char           *prompt;
+  const char     *ifs;
+  char           *p;
+  int             startword;
+  int             status;
+  int             i;
+  int             is_ifs;
+  int             saveall = 0;
+  ptrdiff_t       lastnonifs, lastnonifsws;
+  sigset_t        set, oset;
+  intmax_t        number, timeout;
+  struct timespec tnow, tend, tresid;
+  struct pollfd   pfd;
+  char           *endptr;
+  ssize_t         nread;
+  int             sig;
+  struct fdctx    fdctx;
 #if FEATURE_SH_HISTEDIT
-	int eflag;
-	char *rl_line;
-	char *rl_line_ptr;
-	size_t rl_idx;
+  int    eflag;
+  char  *rl_line;
+  char  *rl_line_ptr;
+  size_t rl_idx;
 #endif
 
-	rflag = 0;
-	prompt = NULL;
-	timeout = -1;
+  rflag   = 0;
+  prompt  = NULL;
+  timeout = -1;
 #if FEATURE_SH_HISTEDIT
-	eflag = 0;
-	rl_line = NULL;
-	rl_line_ptr = NULL;
-	rl_idx = 0;
+  eflag       = 0;
+  rl_line     = NULL;
+  rl_line_ptr = NULL;
+  rl_idx      = 0;
 #endif
 
-	while ((i = nextopt(
+  while ((i = nextopt(
 #if FEATURE_SH_HISTEDIT
-		"erp:t:"
+              "erp:t:"
 #else
-		"rp:t:"
+              "rp:t:"
 #endif
-	)) != '\0') {
-		switch(i) {
-		case 'p':
-			prompt = shoptarg;
-			break;
+          ))
+         != '\0') {
+    switch (i) {
+      case 'p':
+        prompt = shoptarg;
+        break;
 #if FEATURE_SH_HISTEDIT
-		case 'e':
-			eflag = 1;
-			break;
+      case 'e':
+        eflag = 1;
+        break;
 #endif
-		case 'r':
-			rflag = 1;
-			break;
-		case 't':
-			timeout = 0;
-			do {
-				number = strtol(shoptarg, &endptr, 0);
-				if (number < 0 || endptr == shoptarg)
-					error("timeout value");
-				switch (*endptr) {
-				case 's':
-					endptr++;
-					break;
-				case 'h':
-					number *= 60;
-					/* FALLTHROUGH */
-				case 'm':
-					number *= 60;
-					endptr++;
-					break;
-				}
-				if (*endptr != '\0' &&
-				    !(*endptr >= '0' && *endptr <= '9'))
-					error("timeout unit");
-				timeout += number;
-				shoptarg = endptr;
-			} while (*shoptarg != '\0');
-			break;
-		}
-	}
+      case 'r':
+        rflag = 1;
+        break;
+      case 't':
+        timeout = 0;
+        do {
+          number = strtol(shoptarg, &endptr, 0);
+          if (number < 0 || endptr == shoptarg)
+            error("timeout value");
+          switch (*endptr) {
+            case 's':
+              endptr++;
+              break;
+            case 'h':
+              number *= 60;
+              /* FALLTHROUGH */
+            case 'm':
+              number *= 60;
+              endptr++;
+              break;
+          }
+          if (*endptr != '\0' && !(*endptr >= '0' && *endptr <= '9'))
+            error("timeout unit");
+          timeout += number;
+          shoptarg = endptr;
+        } while (*shoptarg != '\0');
+        break;
+    }
+  }
 #if FEATURE_SH_HISTEDIT
-	if (eflag && isatty(STDIN_FILENO) && isatty(STDOUT_FILENO)) {
-		rl_line = redline(prompt ? prompt : "");
-		rl_line_ptr = rl_line;
-	} else
+  if (eflag && isatty(STDIN_FILENO) && isatty(STDOUT_FILENO)) {
+    rl_line     = redline(prompt ? prompt : "");
+    rl_line_ptr = rl_line;
+  } else
 #endif
-	if (prompt && isatty(0)) {
-		out2str(prompt);
-		flushall();
-	}
-	if (*(ap = argptr) == NULL)
-		error("arg count");
-	if ((ifs = bltinlookup("IFS", 1)) == NULL)
-		ifs = " \t\n";
+      if (prompt && isatty(0)) {
+    out2str(prompt);
+    flushall();
+  }
+  if (*(ap = argptr) == NULL)
+    error("arg count");
+  if ((ifs = bltinlookup("IFS", 1)) == NULL)
+    ifs = " \t\n";
 
-	if (timeout >= 0) {
-		/*
-		 * Wait for something to become available.
-		 */
-		pfd.fd = STDIN_FILENO;
-		pfd.events = POLLIN;
-		status = sig = 0;
-		sigfillset(&set);
-		sigprocmask(SIG_SETMASK, &set, &oset);
-		if (pendingsig) {
-			/* caught a signal already */
-			status = -1;
-		} else if (timeout == 0) {
-			status = poll(&pfd, 1, 0);
-		} else {
-			clock_gettime(CLOCK_UPTIME, &tnow);
-			tend = tnow;
-			tend.tv_sec += timeout;
-			do {
-				timespecsub(&tend, &tnow, &tresid);
-				status = ppoll(&pfd, 1, &tresid, &oset);
-				if (status >= 0 || pendingsig != 0)
-					break;
-				clock_gettime(CLOCK_UPTIME, &tnow);
-			} while (timespeccmp(&tnow, &tend, <));
-		}
-		sigprocmask(SIG_SETMASK, &oset, NULL);
-		/*
-		 * If there's nothing ready, return an error.
-		 */
-		if (status <= 0) {
-			while (*ap != NULL)
-				setvar(*ap++, "", 0);
-			sig = pendingsig;
-			return (128 + (sig != 0 ? sig : SIGALRM));
-		}
-	}
+  if (timeout >= 0) {
+    /*
+     * Wait for something to become available.
+     */
+    pfd.fd     = STDIN_FILENO;
+    pfd.events = POLLIN;
+    status = sig = 0;
+    sigfillset(&set);
+    sigprocmask(SIG_SETMASK, &set, &oset);
+    if (pendingsig) {
+      /* caught a signal already */
+      status = -1;
+    } else if (timeout == 0) {
+      status = poll(&pfd, 1, 0);
+    } else {
+      clock_gettime(CLOCK_UPTIME, &tnow);
+      tend = tnow;
+      tend.tv_sec += timeout;
+      do {
+        timespecsub(&tend, &tnow, &tresid);
+        status = ppoll(&pfd, 1, &tresid, &oset);
+        if (status >= 0 || pendingsig != 0)
+          break;
+        clock_gettime(CLOCK_UPTIME, &tnow);
+      } while (timespeccmp(&tnow, &tend, <));
+    }
+    sigprocmask(SIG_SETMASK, &oset, NULL);
+    /*
+     * If there's nothing ready, return an error.
+     */
+    if (status <= 0) {
+      while (*ap != NULL)
+        setvar(*ap++, "", 0);
+      sig = pendingsig;
+      return (128 + (sig != 0 ? sig : SIGALRM));
+    }
+  }
 
-	status = 0;
-	startword = 2;
-	backslash = 0;
-	STARTSTACKSTR(p);
-	lastnonifs = lastnonifsws = -1;
-	fdctx_init(STDIN_FILENO, &fdctx);
-	for (;;) {
-		c = 0;
+  status    = 0;
+  startword = 2;
+  backslash = 0;
+  STARTSTACKSTR(p);
+  lastnonifs = lastnonifsws = -1;
+  fdctx_init(STDIN_FILENO, &fdctx);
+  for (;;) {
+    c = 0;
 #if FEATURE_SH_HISTEDIT
-		if (rl_line_ptr) {
-			c = rl_line_ptr[rl_idx];
-			if (c == '\0') {
-				c = '\n';
-				nread = 1;
-				rl_line_ptr = NULL;
-			} else {
-				rl_idx++;
-				nread = 1;
-			}
-		} else
+    if (rl_line_ptr) {
+      c = rl_line_ptr[rl_idx];
+      if (c == '\0') {
+        c           = '\n';
+        nread       = 1;
+        rl_line_ptr = NULL;
+      } else {
+        rl_idx++;
+        nread = 1;
+      }
+    } else
 #endif
-		{
-			nread = fdgetc(&fdctx, &c);
-		}
-		if (nread == -1) {
-			if (errno == EINTR) {
-				sig = pendingsig;
-				if (sig == 0)
-					continue;
-				status = 128 + sig;
-				break;
-			}
-			warning("read error: %s", strerror(errno));
-			status = 2;
-			break;
-		} else if (nread != 1) {
-			status = 1;
-			break;
-		}
-		if (c == '\0')
-			continue;
-		CHECKSTRSPACE(1, p);
-		if (backslash) {
-			backslash = 0;
-			if (c != '\n') {
-				startword = 0;
-				lastnonifs = lastnonifsws = p - stackblock();
-				USTPUTC(c, p);
-			}
-			continue;
-		}
-		if (!rflag && c == '\\' && !backslash) {
-			backslash++;
-			continue;
-		}
-		if (c == '\n')
-			break;
-		if (strchr(ifs, c))
-			is_ifs = strchr(" \t\n", c) ? 1 : 2;
-		else
-			is_ifs = 0;
+    {
+      nread = fdgetc(&fdctx, &c);
+    }
+    if (nread == -1) {
+      if (errno == EINTR) {
+        sig = pendingsig;
+        if (sig == 0)
+          continue;
+        status = 128 + sig;
+        break;
+      }
+      warning("read error: %s", strerror(errno));
+      status = 2;
+      break;
+    } else if (nread != 1) {
+      status = 1;
+      break;
+    }
+    if (c == '\0')
+      continue;
+    CHECKSTRSPACE(1, p);
+    if (backslash) {
+      backslash = 0;
+      if (c != '\n') {
+        startword  = 0;
+        lastnonifs = lastnonifsws = p - stackblock();
+        USTPUTC(c, p);
+      }
+      continue;
+    }
+    if (!rflag && c == '\\' && !backslash) {
+      backslash++;
+      continue;
+    }
+    if (c == '\n')
+      break;
+    if (strchr(ifs, c))
+      is_ifs = strchr(" \t\n", c) ? 1 : 2;
+    else
+      is_ifs = 0;
 
-		if (startword != 0) {
-			if (is_ifs == 1) {
-				/* Ignore leading IFS whitespace */
-				if (saveall)
-					USTPUTC(c, p);
-				continue;
-			}
-			if (is_ifs == 2 && startword == 1) {
-				/* Only one non-whitespace IFS per word */
-				startword = 2;
-				if (saveall) {
-					lastnonifsws = p - stackblock();
-					USTPUTC(c, p);
-				}
-				continue;
-			}
-		}
+    if (startword != 0) {
+      if (is_ifs == 1) {
+        /* Ignore leading IFS whitespace */
+        if (saveall)
+          USTPUTC(c, p);
+        continue;
+      }
+      if (is_ifs == 2 && startword == 1) {
+        /* Only one non-whitespace IFS per word */
+        startword = 2;
+        if (saveall) {
+          lastnonifsws = p - stackblock();
+          USTPUTC(c, p);
+        }
+        continue;
+      }
+    }
 
-		if (is_ifs == 0) {
-			/* append this character to the current variable */
-			startword = 0;
-			if (saveall)
-				/* Not just a spare terminator */
-				saveall++;
-			lastnonifs = lastnonifsws = p - stackblock();
-			USTPUTC(c, p);
-			continue;
-		}
+    if (is_ifs == 0) {
+      /* append this character to the current variable */
+      startword = 0;
+      if (saveall)
+        /* Not just a spare terminator */
+        saveall++;
+      lastnonifs = lastnonifsws = p - stackblock();
+      USTPUTC(c, p);
+      continue;
+    }
 
-		/* end of variable... */
-		startword = is_ifs;
+    /* end of variable... */
+    startword = is_ifs;
 
-		if (ap[1] == NULL) {
-			/* Last variable needs all IFS chars */
-			saveall++;
-			if (is_ifs == 2)
-				lastnonifsws = p - stackblock();
-			USTPUTC(c, p);
-			continue;
-		}
+    if (ap[1] == NULL) {
+      /* Last variable needs all IFS chars */
+      saveall++;
+      if (is_ifs == 2)
+        lastnonifsws = p - stackblock();
+      USTPUTC(c, p);
+      continue;
+    }
 
-		STACKSTRNUL(p);
-		setvar(*ap, stackblock(), 0);
-		ap++;
-		STARTSTACKSTR(p);
-		lastnonifs = lastnonifsws = -1;
-	}
-	fdctx_destroy(&fdctx);
-	STACKSTRNUL(p);
+    STACKSTRNUL(p);
+    setvar(*ap, stackblock(), 0);
+    ap++;
+    STARTSTACKSTR(p);
+    lastnonifs = lastnonifsws = -1;
+  }
+  fdctx_destroy(&fdctx);
+  STACKSTRNUL(p);
 
-	/*
-	 * Remove trailing IFS chars: always remove whitespace, don't remove
-	 * non-whitespace unless it was naked
-	 */
-	if (saveall <= 1)
-		lastnonifsws = lastnonifs;
-	stackblock()[lastnonifsws + 1] = '\0';
-	setvar(*ap, stackblock(), 0);
+  /*
+   * Remove trailing IFS chars: always remove whitespace, don't remove
+   * non-whitespace unless it was naked
+   */
+  if (saveall <= 1)
+    lastnonifsws = lastnonifs;
+  stackblock()[lastnonifsws + 1] = '\0';
+  setvar(*ap, stackblock(), 0);
 
-	/* Set any remaining args to "" */
-	while (*++ap != NULL)
-		setvar(*ap, "", 0);
+  /* Set any remaining args to "" */
+  while (*++ap != NULL)
+    setvar(*ap, "", 0);
 #if FEATURE_SH_HISTEDIT
-	free(rl_line);
+  free(rl_line);
 #endif
-	return status;
+  return status;
 }
-
-
 
 int
 umaskcmd(int argc __unused, char **argv __unused)
 {
-	char *ap;
-	int mask;
-	int i;
-	int symbolic_mode = 0;
+  char *ap;
+  int   mask;
+  int   i;
+  int   symbolic_mode = 0;
 
-	while ((i = nextopt("S")) != '\0') {
-		symbolic_mode = 1;
-	}
+  while ((i = nextopt("S")) != '\0') {
+    symbolic_mode = 1;
+  }
 
-	INTOFF;
-	mask = umask(0);
-	umask(mask);
-	INTON;
+  INTOFF;
+  mask = umask(0);
+  umask(mask);
+  INTON;
 
-	if ((ap = *argptr) == NULL) {
-		if (symbolic_mode) {
-			char u[4], g[4], o[4];
+  if ((ap = *argptr) == NULL) {
+    if (symbolic_mode) {
+      char u[4], g[4], o[4];
 
-			i = 0;
-			if ((mask & S_IRUSR) == 0)
-				u[i++] = 'r';
-			if ((mask & S_IWUSR) == 0)
-				u[i++] = 'w';
-			if ((mask & S_IXUSR) == 0)
-				u[i++] = 'x';
-			u[i] = '\0';
+      i = 0;
+      if ((mask & S_IRUSR) == 0)
+        u[i++] = 'r';
+      if ((mask & S_IWUSR) == 0)
+        u[i++] = 'w';
+      if ((mask & S_IXUSR) == 0)
+        u[i++] = 'x';
+      u[i] = '\0';
 
-			i = 0;
-			if ((mask & S_IRGRP) == 0)
-				g[i++] = 'r';
-			if ((mask & S_IWGRP) == 0)
-				g[i++] = 'w';
-			if ((mask & S_IXGRP) == 0)
-				g[i++] = 'x';
-			g[i] = '\0';
+      i = 0;
+      if ((mask & S_IRGRP) == 0)
+        g[i++] = 'r';
+      if ((mask & S_IWGRP) == 0)
+        g[i++] = 'w';
+      if ((mask & S_IXGRP) == 0)
+        g[i++] = 'x';
+      g[i] = '\0';
 
-			i = 0;
-			if ((mask & S_IROTH) == 0)
-				o[i++] = 'r';
-			if ((mask & S_IWOTH) == 0)
-				o[i++] = 'w';
-			if ((mask & S_IXOTH) == 0)
-				o[i++] = 'x';
-			o[i] = '\0';
+      i = 0;
+      if ((mask & S_IROTH) == 0)
+        o[i++] = 'r';
+      if ((mask & S_IWOTH) == 0)
+        o[i++] = 'w';
+      if ((mask & S_IXOTH) == 0)
+        o[i++] = 'x';
+      o[i] = '\0';
 
-			out1fmt("u=%s,g=%s,o=%s\n", u, g, o);
-		} else {
-			out1fmt("%.4o\n", mask);
-		}
-	} else {
-		if (is_digit(*ap)) {
-			mask = 0;
-			do {
-				if (*ap >= '8' || *ap < '0')
-					error("Illegal number: %s", *argptr);
-				mask = (mask << 3) + (*ap - '0');
-			} while (*++ap != '\0');
-			umask(mask);
-		} else {
-			mode_t newmask;
-			INTOFF;
-			newmask = parsemode(ap, ~mask & 0777, mask);
-			umask(~newmask & 0777);
-			INTON;
-		}
-	}
-	return 0;
+      out1fmt("u=%s,g=%s,o=%s\n", u, g, o);
+    } else {
+      out1fmt("%.4o\n", mask);
+    }
+  } else {
+    if (is_digit(*ap)) {
+      mask = 0;
+      do {
+        if (*ap >= '8' || *ap < '0')
+          error("Illegal number: %s", *argptr);
+        mask = (mask << 3) + (*ap - '0');
+      } while (*++ap != '\0');
+      umask(mask);
+    } else {
+      mode_t newmask;
+      INTOFF;
+      newmask = parsemode(ap, ~mask & 0777, mask);
+      umask(~newmask & 0777);
+      INTON;
+    }
+  }
+  return 0;
 }
 
 /*
@@ -515,175 +512,170 @@ umaskcmd(int argc __unused, char **argv __unused)
  */
 
 struct limits {
-	const char *name;
-	const char *units;
-	int	cmd;
-	short	factor;	/* multiply by to get rlim_{cur,max} values */
-	char	option;
+  const char *name;
+  const char *units;
+  int         cmd;
+  short       factor; /* multiply by to get rlim_{cur,max} values */
+  char        option;
 };
 
 static const struct limits limits[] = {
 #ifdef RLIMIT_CPU
-	{ "cpu time",		"seconds",	RLIMIT_CPU,	   1, 't' },
+    {"cpu time", "seconds", RLIMIT_CPU, 1, 't'},
 #endif
 #ifdef RLIMIT_FSIZE
-	{ "file size",		"512-blocks",	RLIMIT_FSIZE,	 512, 'f' },
+    {"file size", "512-blocks", RLIMIT_FSIZE, 512, 'f'},
 #endif
 #ifdef RLIMIT_DATA
-	{ "data seg size",	"kbytes",	RLIMIT_DATA,	1024, 'd' },
+    {"data seg size", "kbytes", RLIMIT_DATA, 1024, 'd'},
 #endif
 #ifdef RLIMIT_STACK
-	{ "stack size",		"kbytes",	RLIMIT_STACK,	1024, 's' },
+    {"stack size", "kbytes", RLIMIT_STACK, 1024, 's'},
 #endif
-#ifdef  RLIMIT_CORE
-	{ "core file size",	"512-blocks",	RLIMIT_CORE,	 512, 'c' },
+#ifdef RLIMIT_CORE
+    {"core file size", "512-blocks", RLIMIT_CORE, 512, 'c'},
 #endif
 #ifdef RLIMIT_RSS
-	{ "max memory size",	"kbytes",	RLIMIT_RSS,	1024, 'm' },
+    {"max memory size", "kbytes", RLIMIT_RSS, 1024, 'm'},
 #endif
 #ifdef RLIMIT_MEMLOCK
-	{ "locked memory",	"kbytes",	RLIMIT_MEMLOCK, 1024, 'l' },
+    {"locked memory", "kbytes", RLIMIT_MEMLOCK, 1024, 'l'},
 #endif
 #ifdef RLIMIT_NPROC
-	{ "max user processes",	(char *)0,	RLIMIT_NPROC,      1, 'u' },
+    {"max user processes", (char *)0, RLIMIT_NPROC, 1, 'u'},
 #endif
 #ifdef RLIMIT_NOFILE
-	{ "open files",		(char *)0,	RLIMIT_NOFILE,     1, 'n' },
+    {"open files", (char *)0, RLIMIT_NOFILE, 1, 'n'},
 #endif
 #ifdef RLIMIT_VMEM
-	{ "virtual mem size",	"kbytes",	RLIMIT_VMEM,	1024, 'v' },
+    {"virtual mem size", "kbytes", RLIMIT_VMEM, 1024, 'v'},
 #endif
 #ifdef RLIMIT_SWAP
-	{ "swap limit",		"kbytes",	RLIMIT_SWAP,	1024, 'w' },
+    {"swap limit", "kbytes", RLIMIT_SWAP, 1024, 'w'},
 #endif
 #ifdef RLIMIT_SBSIZE
-	{ "socket buffer size",	"bytes",	RLIMIT_SBSIZE,	   1, 'b' },
+    {"socket buffer size", "bytes", RLIMIT_SBSIZE, 1, 'b'},
 #endif
 #ifdef RLIMIT_NPTS
-	{ "pseudo-terminals",	(char *)0,	RLIMIT_NPTS,	   1, 'p' },
+    {"pseudo-terminals", (char *)0, RLIMIT_NPTS, 1, 'p'},
 #endif
 #ifdef RLIMIT_KQUEUES
-	{ "kqueues",		(char *)0,	RLIMIT_KQUEUES,	   1, 'k' },
+    {"kqueues", (char *)0, RLIMIT_KQUEUES, 1, 'k'},
 #endif
 #ifdef RLIMIT_UMTXP
-	{ "umtx shared locks",	(char *)0,	RLIMIT_UMTXP,	   1, 'o' },
+    {"umtx shared locks", (char *)0, RLIMIT_UMTXP, 1, 'o'},
 #endif
 #ifdef RLIMIT_PIPEBUF
-	{ "pipebuf",		"kbytes",	RLIMIT_PIPEBUF, 1024, 'y' },
+    {"pipebuf", "kbytes", RLIMIT_PIPEBUF, 1024, 'y'},
 #endif
 #ifdef RLIMIT_VMM
-	{ "virtual machines",	(char *)0,	RLIMIT_VMM,	   1, 'V' },
+    {"virtual machines", (char *)0, RLIMIT_VMM, 1, 'V'},
 #endif
-	{ (char *) 0,		(char *)0,	0,		   0, '\0' }
+    {(char *)0, (char *)0, 0, 0, '\0'}
 };
 
 enum limithow { SOFT = 0x1, HARD = 0x2 };
 
 static void
-printlimit(enum limithow how, const struct rlimit *limit,
-    const struct limits *l)
+printlimit(enum limithow how, const struct rlimit *limit, const struct limits *l)
 {
-	rlim_t val = 0;
+  rlim_t val = 0;
 
-	if (how & SOFT)
-		val = limit->rlim_cur;
-	else if (how & HARD)
-		val = limit->rlim_max;
-	if (val == RLIM_INFINITY)
-		out1str("unlimited\n");
-	else
-	{
-		val /= l->factor;
-		out1fmt("%jd\n", (intmax_t)val);
-	}
+  if (how & SOFT)
+    val = limit->rlim_cur;
+  else if (how & HARD)
+    val = limit->rlim_max;
+  if (val == RLIM_INFINITY)
+    out1str("unlimited\n");
+  else {
+    val /= l->factor;
+    out1fmt("%jd\n", (intmax_t)val);
+  }
 }
 
 int
 ulimitcmd(int argc __unused, char **argv __unused)
 {
-	rlim_t val = 0;
-	enum limithow how = SOFT | HARD;
-	const struct limits	*l;
-	int		set, all = 0;
-	int		optc, what;
-	struct rlimit	limit;
+  rlim_t               val = 0;
+  enum limithow        how = SOFT | HARD;
+  const struct limits *l;
+  int                  set, all = 0;
+  int                  optc, what;
+  struct rlimit        limit;
 
-	what = 'f';
-	while ((optc = nextopt("abcdfHklmnopSstuVvwy")) != '\0')
-		switch (optc) {
-		case 'H':
-			how = HARD;
-			break;
-		case 'S':
-			how = SOFT;
-			break;
-		case 'a':
-			all = 1;
-			break;
-		default:
-			what = optc;
-		}
+  what = 'f';
+  while ((optc = nextopt("abcdfHklmnopSstuVvwy")) != '\0')
+    switch (optc) {
+      case 'H':
+        how = HARD;
+        break;
+      case 'S':
+        how = SOFT;
+        break;
+      case 'a':
+        all = 1;
+        break;
+      default:
+        what = optc;
+    }
 
-	for (l = limits; l->name && l->option != what; l++)
-		;
-	if (!l->name)
-		error("internal error (%c)", what);
+  for (l = limits; l->name && l->option != what; l++)
+    ;
+  if (!l->name)
+    error("internal error (%c)", what);
 
-	set = *argptr ? 1 : 0;
-	if (set) {
-		char *p = *argptr;
+  set = *argptr ? 1 : 0;
+  if (set) {
+    char *p = *argptr;
 
-		if (all || argptr[1])
-			error("too many arguments");
-		if (strcmp(p, "unlimited") == 0)
-			val = RLIM_INFINITY;
-		else {
-			char *end;
-			uintmax_t uval;
+    if (all || argptr[1])
+      error("too many arguments");
+    if (strcmp(p, "unlimited") == 0)
+      val = RLIM_INFINITY;
+    else {
+      char     *end;
+      uintmax_t uval;
 
-			if (*p < '0' || *p > '9')
-				error("bad number");
-			errno = 0;
-			uval = strtoumax(p, &end, 10);
-			if (errno != 0 || *end != '\0')
-				error("bad number");
-			if (uval > UINTMAX_MAX / l->factor)
-				error("bad number");
-			uval *= l->factor;
-			val = (rlim_t)uval;
-			if ((intmax_t)val < 0 || (uintmax_t)val != uval ||
-			    val == RLIM_INFINITY)
-				error("bad number");
-		}
-	}
-	if (all) {
-		for (l = limits; l->name; l++) {
-			char optbuf[40];
-			if (getrlimit(l->cmd, &limit) < 0)
-				error("can't get limit: %s", strerror(errno));
+      if (*p < '0' || *p > '9')
+        error("bad number");
+      errno = 0;
+      uval  = strtoumax(p, &end, 10);
+      if (errno != 0 || *end != '\0')
+        error("bad number");
+      if (uval > UINTMAX_MAX / l->factor)
+        error("bad number");
+      uval *= l->factor;
+      val = (rlim_t)uval;
+      if ((intmax_t)val < 0 || (uintmax_t)val != uval || val == RLIM_INFINITY)
+        error("bad number");
+    }
+  }
+  if (all) {
+    for (l = limits; l->name; l++) {
+      char optbuf[40];
+      if (getrlimit(l->cmd, &limit) < 0)
+        error("can't get limit: %s", strerror(errno));
 
-			if (l->units)
-				snprintf(optbuf, sizeof(optbuf),
-					"(%s, -%c) ", l->units, l->option);
-			else
-				snprintf(optbuf, sizeof(optbuf),
-					"(-%c) ", l->option);
-			out1fmt("%-18s %18s ", l->name, optbuf);
-			printlimit(how, &limit, l);
-		}
-		return 0;
-	}
+      if (l->units)
+        snprintf(optbuf, sizeof(optbuf), "(%s, -%c) ", l->units, l->option);
+      else
+        snprintf(optbuf, sizeof(optbuf), "(-%c) ", l->option);
+      out1fmt("%-18s %18s ", l->name, optbuf);
+      printlimit(how, &limit, l);
+    }
+    return 0;
+  }
 
-	if (getrlimit(l->cmd, &limit) < 0)
-		error("can't get limit: %s", strerror(errno));
-	if (set) {
-		if (how & SOFT)
-			limit.rlim_cur = val;
-		if (how & HARD)
-			limit.rlim_max = val;
-		if (setrlimit(l->cmd, &limit) < 0)
-			error("bad limit: %s", strerror(errno));
-	} else
-		printlimit(how, &limit, l);
-	return 0;
+  if (getrlimit(l->cmd, &limit) < 0)
+    error("can't get limit: %s", strerror(errno));
+  if (set) {
+    if (how & SOFT)
+      limit.rlim_cur = val;
+    if (how & HARD)
+      limit.rlim_max = val;
+    if (setrlimit(l->cmd, &limit) < 0)
+      error("bad limit: %s", strerror(errno));
+  } else
+    printlimit(how, &limit, l);
+  return 0;
 }

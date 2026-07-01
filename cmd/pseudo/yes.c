@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
 
-
 #include <stdio.h>
 
 #include "util.h"
@@ -8,7 +7,7 @@
 static void
 usage(void)
 {
-	eprintf("usage: %s [string]\n", argv0);
+  eprintf("usage: %s [string]\n", argv0);
 }
 
 // ?man yes: output string repeatedly
@@ -17,14 +16,16 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	const char *s;
+  const char *s;
 
-	ARGBEGIN {
-	default:
-		usage();
-	} ARGEND
+  ARGBEGIN
+  {
+    default:
+      usage();
+  }
+  ARGEND
 
-	s = argc ? argv[0] : "y";
-	for (;;)
-		puts(s);
+  s = argc ? argv[0] : "y";
+  for (;;)
+    puts(s);
 }
