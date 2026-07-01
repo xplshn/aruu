@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include "rtc.h"
+#include "paths.h"
 #include "util.h"
 
 static void
@@ -120,7 +121,7 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	char *dev = "/dev/rtc";
+	char *dev = ARUU_PATH_DEV "/rtc";
 	int rflag = 0;
 	int sflag = 0;
 	int wflag = 0;

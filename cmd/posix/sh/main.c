@@ -40,9 +40,9 @@
 #include <locale.h>
 #include <errno.h>
 #include <termios.h>
-#include <paths.h>
 #include <unistd.h>
 
+#include "../../../shared/paths.h"
 #include "shell.h"
 #include "main.h"
 #include "mail.h"
@@ -134,7 +134,7 @@ main(int argc, char *argv[])
 		 * file descriptors 0, 1, and 2 on /dev/console.
 		 */
 		if (fcntl(STDIN_FILENO, F_GETFL, NULL) == -1 && errno == EBADF) {
-			(void)open(_PATH_CONSOLE, O_RDWR);
+			(void)open(ARUU_PATH_DEVCONSOLE, O_RDWR);
 			(void)setsid();
 			(void)tcsetsid(STDIN_FILENO, rootpid);
 		}

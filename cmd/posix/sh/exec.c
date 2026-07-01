@@ -37,7 +37,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <paths.h>
 #include <stdlib.h>
 
 /*
@@ -49,6 +48,7 @@
  * would make the command name "hash" a misnomer.
  */
 
+#include "../../../shared/paths.h"
 #include "shell.h"
 #include "main.h"
 #include "nodes.h"
@@ -186,8 +186,8 @@ tryexec(char *cmd, char **argv, char **envp)
 			}
 		}
 		*argv = cmd;
-		*--argv = __DECONST(char *, _PATH_BSHELL);
-		execve(_PATH_BSHELL, argv, envp);
+		*--argv = __DECONST(char *, ARUU_PATH_BSHELL);
+		execve(ARUU_PATH_BSHELL, argv, envp);
 	}
 	errno = e;
 }

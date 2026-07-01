@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "../proc.h"
+#include "../paths.h"
 #include "../util.h"
 
 int
@@ -19,7 +20,7 @@ parsecmdline(pid_t pid, char *buf, size_t siz)
 	char path[PATH_MAX];
 	ssize_t n, i;
 
-	snprintf(path, sizeof(path), "/proc/%ld/cmdline", (long)pid);
+	snprintf(path, sizeof(path), ARUU_LINUX_PATH_PROC "/%ld/cmdline", (long)pid);
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 		return -1;
@@ -48,7 +49,7 @@ parsestat(pid_t pid, struct procstat *ps)
 	FILE *fp;
 	size_t len;
 
-	snprintf(path, sizeof(path), "/proc/%d/stat", pid);
+	snprintf(path, sizeof(path), ARUU_LINUX_PATH_PROC "/%d/stat", pid);
 	if (!(fp = fopen(path, "r")))
 		return -1;
 	fscanf(fp, "%d %s %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu",
@@ -78,7 +79,7 @@ parsestatus(pid_t pid, struct procstatus *pstatus)
 	int fd;
 	ssize_t n;
 
-	snprintf(path, sizeof(path), "/proc/%d/status", pid);
+	snprintf(path, sizeof(path), ARUU_LINUX_PATH_PROC "/%d/status", pid);
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 		return -1;

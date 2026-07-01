@@ -1,6 +1,7 @@
 
 
 #include "fs.h"
+#include "wexec.h"
 #include "util.h"
 
 #include <dirent.h>
@@ -181,15 +182,15 @@ scan_cb(int fd, const char *name, struct stat *st, void *data, struct recursor *
 		fp = fopen(r->path, "r");
 	} else if (strcmp(comp, ".gz") == 0) {
 		snprintf(cmd, sizeof(cmd), "gzip -dc '%s'", r->path);
-		fp = popen(cmd, "r");
+		fp = wpopen(cmd, NULL, "r");
 		is_pipe = 1;
 	} else if (strcmp(comp, ".xz") == 0) {
 		snprintf(cmd, sizeof(cmd), "xz -dc '%s'", r->path);
-		fp = popen(cmd, "r");
+		fp = wpopen(cmd, NULL, "r");
 		is_pipe = 1;
 	} else if (strcmp(comp, ".zst") == 0) {
 		snprintf(cmd, sizeof(cmd), "zstd -dc '%s'", r->path);
-		fp = popen(cmd, "r");
+		fp = wpopen(cmd, NULL, "r");
 		is_pipe = 1;
 	} else {
 		fp = fopen(r->path, "r");
@@ -202,7 +203,7 @@ scan_cb(int fd, const char *name, struct stat *st, void *data, struct recursor *
 
 	buf = read_all(fp, &len);
 	if (is_pipe)
-		pclose(fp);
+		wpclose(fp);
 	else
 		fclose(fp);
 

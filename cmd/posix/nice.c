@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 #ifndef PRIO_MIN
@@ -54,9 +55,9 @@ main(int argc, char *argv[])
 	if (setpriority(PRIO_PROCESS, 0, val) < 0)
 		weprintf("setpriority:");
 
-	execvp(argv[0], argv);
+	wexecvp_self(argv[0], argv);
 	savederrno = errno;
-	weprintf("execvp %s:", argv[0]);
+	weprintf("wexecvp %s:", argv[0]);
 
 	_exit(126 + (savederrno == ENOENT));
 }

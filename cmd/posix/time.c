@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 static void
@@ -50,9 +51,9 @@ main(int argc, char *argv[])
 		eprintf("fork:");
 		/* fallthrough */
 	case 0:
-		execvp(argv[0], argv);
+		wexecvp_self(argv[0], argv);
 		savederrno = errno;
-		weprintf("execvp %s:", argv[0]);
+		weprintf("wexecvp %s:", argv[0]);
 		_exit(126 + (savederrno == ENOENT));
 	default:
 		break;

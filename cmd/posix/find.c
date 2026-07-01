@@ -2,6 +2,7 @@
 
 
 #include "config.h"
+#include "wexec.h"
 #include "util.h"
 
 #include <dirent.h>
@@ -344,7 +345,7 @@ spawn(char *argv[])
 		eprintf("fork:");
 		break;
 	case 0:
-		execvp(*argv, argv);
+		wexecvp_self(*argv, argv);
 		weprintf("exec %s failed:", *argv);
 		_exit(1);
 	}

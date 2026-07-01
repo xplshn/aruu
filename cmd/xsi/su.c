@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
-
-
-#include <sys/types.h>
+#include "config.h"
+#include "passwd.h"
+#include "util.h"
 
 #include <errno.h>
 #include <grp.h>
@@ -9,12 +9,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 
-#include "passwd.h"
-#include "util.h"
-
 extern char **environ;
+
+#ifndef ENV_PATH_SHELL
+#define ENV_PATH_SHELL "/bin/sh"
+#endif
 
 static int lflag = 0;
 static int pflag = 0;
@@ -25,9 +27,9 @@ usage(void)
 	eprintf("usage: %s [-lp] [username]\n", argv0);
 }
 
-// ?man su: run command with substitute user id
-// ?man arguments: username
-// ?man run a shell or command with another user id
+// ?man su: run a command with substitute user and group id
+// ?man arguments: [username]
+// ?man run a shell or command as the named user. defaults to root
 int
 main(int argc, char *argv[])
 {
@@ -38,17 +40,17 @@ main(int argc, char *argv[])
 	uid_t uid;
 
 	ARGBEGIN {
-	// ?man -l: list in long format
 	case 'l':
+		// ?man -l: make the shell a login shell
 		lflag = 1;
 		break;
-	// ?man -p: preserve file attributes
 	case 'p':
+		// ?man -p: preserve the current environment
 		pflag = 1;
 		break;
 	default:
 		usage();
-	} ARGEND;
+	} ARGEND
 
 	if (argc > 1)
 		usage();
@@ -70,6 +72,7 @@ main(int argc, char *argv[])
 			eprintf("getpass:");
 		if (pw_check(pw, pass) <= 0)
 			exit(1);
+		explicit_bzero(pass, strlen(pass));
 	}
 
 	if (initgroups(usr, pw->pw_gid) < 0)
@@ -79,7 +82,7 @@ main(int argc, char *argv[])
 	if (setuid(pw->pw_uid) < 0)
 		eprintf("setuid:");
 
-	shell = pw->pw_shell[0] == '\0' ? "/bin/sh" : pw->pw_shell;
+	shell = pw->pw_shell[0] == '\0' ? ENV_PATH_SHELL : pw->pw_shell;
 	if (lflag) {
 		term = getenv("TERM");
 		clearenv();
@@ -87,7 +90,8 @@ main(int argc, char *argv[])
 		setenv("SHELL", shell, 1);
 		setenv("USER", pw->pw_name, 1);
 		setenv("LOGNAME", pw->pw_name, 1);
-		setenv("TERM", term ? term : "linux", 1);
+		setenv("TERM", term ? term : "dumb", 1);
+		setenv("PATH", ENV_PATH, 1);
 		if (chdir(pw->pw_dir) < 0)
 			eprintf("chdir %s:", pw->pw_dir);
 		newargv[0] = shell;

@@ -32,6 +32,7 @@
  * SUCH DAMAGE.
  */
 
+#include "../../../shared/paths.h"
 #include "shell.h"
 #include "output.h"
 #include "expand.h"
@@ -53,7 +54,6 @@
 
 #include <langinfo.h>
 #include <locale.h>
-#include <paths.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -102,7 +102,7 @@ static const struct varinit varinit[] = {
 	  NULL },
 	{ &vmpath,	VUNSET,				"MAILPATH=",
 	  NULL },
-	{ &vpath,	0,				"PATH=" _PATH_DEFPATH,
+	{ &vpath,	0,				"PATH=" ARUU_PATH_DEFPATH,
 	  changepath },
 	/*
 	 * vps1 depends on uid

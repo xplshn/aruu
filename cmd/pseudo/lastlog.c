@@ -2,7 +2,6 @@
 
 
 #include <errno.h>
-#include <paths.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +10,7 @@
 #include <utmp.h>
 
 #include "text.h"
+#include "paths.h"
 #include "util.h"
 
 #define PASSWD   "/etc/passwd"
@@ -37,7 +37,7 @@ lastlog(char *user)
 	fread(&ll, sizeof(struct lastlog), 1, last);
 
 	if (ferror(last))
-		eprintf("%s: read error:", _PATH_LASTLOG);
+		eprintf("%s: read error:", ARUU_PATH_LASTLOG);
 
 	/* on glibc `ll_time' can be an int32_t with compat32
 	 * avoid compiler warning when calling ctime() */
@@ -55,8 +55,8 @@ main(int argc, char **argv)
 	char *line = NULL, *p;
 	size_t sz = 0;
 
-	if ((last = fopen(_PATH_LASTLOG, "r")) == NULL)
-		eprintf("fopen %s:", _PATH_LASTLOG);
+	if ((last = fopen(ARUU_PATH_LASTLOG, "r")) == NULL)
+		eprintf("fopen %s:", ARUU_PATH_LASTLOG);
 
 	if (argc > 1) {
 		while (*++argv)
@@ -76,7 +76,7 @@ main(int argc, char **argv)
 	}
 
 	if (fclose(last))
-		eprintf("fclose %s:", _PATH_LASTLOG);
+		eprintf("fclose %s:", ARUU_PATH_LASTLOG);
 
 	return 0;
 }

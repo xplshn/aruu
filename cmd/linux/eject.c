@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "paths.h"
 #include "util.h"
 
 enum {
@@ -64,7 +65,7 @@ main(int argc, char *argv[])
 	} ARGEND;
 
 	if (!argc) {
-		eject("/dev/sr0");
+		eject(ARUU_PATH_DEV "/sr0");
 	} else {
 		for (; *argv; argc--, argv++)
 			eject(*argv);

@@ -3,7 +3,6 @@
 
 #include <errno.h>
 #include <libgen.h>
-#include <paths.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +12,7 @@
 #include <unistd.h>
 
 #include "config.h"
+#include "paths.h"
 #include "util.h"
 
 static void

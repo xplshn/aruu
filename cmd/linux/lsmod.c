@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "text.h"
+#include "paths.h"
 #include "util.h"
 
 static void parse_modline(char *buf, char **name, char **size,
@@ -20,7 +21,7 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	const char *modfile = "/proc/modules";
+	const char *modfile = ARUU_LINUX_PATH_PROC_MODULES;
 	FILE *fp;
 	char *buf = NULL;
 	char *name, *size, *refcount, *users;

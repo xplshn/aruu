@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 static void
@@ -41,14 +42,14 @@ main(int argc, char *argv[])
 
 	if (argc == 1) {
 		cmd = *shell;
-		execvp(cmd, shell);
+		wexecvp_self(cmd, shell);
 	} else {
 		cmd = argv[1];
-		execvp(cmd, argv + 1);
+		wexecvp_self(cmd, argv + 1);
 	}
 
 	savederrno = errno;
-	weprintf("execvp %s:", cmd);
+	weprintf("wexecvp %s:", cmd);
 
 	_exit(126 + (savederrno == ENOENT));
 }

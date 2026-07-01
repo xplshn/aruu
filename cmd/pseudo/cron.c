@@ -17,6 +17,8 @@
 #include <unistd.h>
 
 #include "queue.h"
+#include "paths.h"
+#include "wexec.h"
 #include "util.h"
 
 struct field {
@@ -121,7 +123,7 @@ runjob(char *cmd)
 		setsid();
 		loginfo("run: %s pid: %d at %s",
 			cmd, getpid(), ctime(&t));
-		execl("/bin/sh", "/bin/sh", "-c", cmd, (char *)NULL);
+		wexecv_self(ARUU_PATH_BIN "/sh", (char *const[]){"sh", "-c", cmd, NULL});
 		logerr("error: failed to execute job: %s time: %s",
 		       cmd, ctime(&t));
 		_exit(1);

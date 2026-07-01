@@ -10,9 +10,10 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "paths.h"
 #include "util.h"
 
-#define CONSOLE "/dev/console"
+#define CONSOLE ARUU_PATH_DEVCONSOLE
 
 #define VT_LOCKSWITCH   0x560B  /* disallow vt switching */
 #define VT_UNLOCKSWITCH 0x560C  /* allow vt switching */

@@ -39,6 +39,7 @@
 #endif
 
 #include "util.h"
+#include "../../../shared/paths.h"
 #include "shell.h"
 #include "alias.h"
 #include "builtins.h"
@@ -63,7 +64,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <paths.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -693,7 +693,7 @@ operands:
 	if (editor) {
 		int fd;
 		INTOFF;
-		sprintf(editfilestr, "%s/_shXXXXXX", _PATH_TMP);
+		sprintf(editfilestr, "%s/_shXXXXXX", ARUU_PATH_TMP);
 		if ((fd = mkstemp(editfilestr)) < 0)
 			error("can't create temporary file %s", editfile);
 		editfile = editfilestr;

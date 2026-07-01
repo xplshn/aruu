@@ -15,6 +15,8 @@
 #include <unistd.h>
 
 #include "text.h"
+#include "paths.h"
+#include "wexec.h"
 #include "util.h"
 
 #define FSOPTS_MAXLEN 512
@@ -134,10 +136,10 @@ mounthelper(const char *fsname, const char *dir, const char *fstype)
 		eargv[i++] = dir;
 		eargv[i] = NULL;
 
-		execvp(eprog, (char * const *)eargv);
+		wexecvp_self(eprog, (char *const *)eargv);
 		if (errno == ENOENT)
 			_exit(1);
-		weprintf("execvp:");
+		weprintf("wexecvp:");
 		_exit(1);
 		break;
 	default:
@@ -166,8 +168,8 @@ mounted(const char *dir)
 		weprintf("stat %s:", dir);
 		return 0;
 	}
-	if (!(fp = setmntent("/proc/mounts", "r")))
-		eprintf("setmntent %s:", "/proc/mounts");
+	if (!(fp = setmntent(ARUU_LINUX_PATH_PROC_MOUNTS, "r")))
+		eprintf("setmntent %s:", ARUU_LINUX_PATH_PROC_MOUNTS);
 
 	while ((me = getmntent_r(fp, &mebuf, linebuf, sizeof(linebuf)))) {
 		if (stat(me->mnt_dir, &st2) < 0) {
@@ -197,7 +199,7 @@ int
 main(int argc, char *argv[])
 {
 	char *types = NULL, data[FSOPTS_MAXLEN] = "", *resolvpath = NULL;
-	char *files[] = { "/proc/mounts", "/etc/fstab", NULL };
+	char *files[] = { ARUU_LINUX_PATH_PROC_MOUNTS, "/etc/fstab", NULL };
 	const char *source, *target;
 	struct mntent *me = NULL;
 	int aflag = 0, status = 0, i, r;
@@ -263,7 +265,7 @@ main(int argc, char *argv[])
 
 	for (i = 0; files[i]; i++) {
 		if (!(fp = setmntent(files[i], "r"))) {
-			if (strcmp(files[i], "/proc/mounts") != 0)
+			if (strcmp(files[i], ARUU_LINUX_PATH_PROC_MOUNTS) != 0)
 				weprintf("setmntent %s:", files[i]);
 			continue;
 		}

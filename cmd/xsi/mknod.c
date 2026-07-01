@@ -1,13 +1,7 @@
 /* See LICENSE file for copyright and license details. */
-
-
 #include <sys/stat.h>
 #include <sys/types.h>
-#ifndef makedev
-#include <sys/sysmacros.h>
-#endif
 
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,17 +9,21 @@
 
 #include "util.h"
 
+#ifndef makedev
+#include <sys/sysmacros.h>
+#endif
+
 static void
 usage(void)
 {
 	eprintf("usage: %s [-m mode] name b|c|u major minor\n"
-	        "       %s [-m mode] name p\n",
-	        argv0, argv0);
+		"       %s [-m mode] name p\n",
+		argv0, argv0);
 }
 
 // ?man mknod: create special files
-// ?man arguments: name b|c|u major minor
-// ?man create block or character special files
+// ?man arguments: name type [major minor]
+// ?man create a block special, character special, or fifo file
 int
 main(int argc, char *argv[])
 {
@@ -33,13 +31,13 @@ main(int argc, char *argv[])
 	dev_t dev;
 
 	ARGBEGIN {
-// ?man -m:mode: specify mode or limit
-case 'm':
+	case 'm':
+		// ?man -m:mode: set the file mode bits of the created node
 		mode = parsemode(EARGF(usage()), mode, umask(0));
 		break;
 	default:
 		usage();
-	} ARGEND;
+	} ARGEND
 
 	if (argc < 2)
 		usage();
@@ -69,7 +67,8 @@ case 'm':
 	} else {
 		if (argc != 4)
 			usage();
-		dev = makedev(estrtonum(argv[2], 0, LLONG_MAX), estrtonum(argv[3], 0, LLONG_MAX));
+		dev = makedev(estrtonum(argv[2], 0, LLONG_MAX),
+		              estrtonum(argv[3], 0, LLONG_MAX));
 	}
 
 	if (mknod(argv[0], mode, dev) == -1)

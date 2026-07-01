@@ -1,51 +1,50 @@
 #include <stddef.h>
 #include <time.h>
 
+#include "util.h"
+#include "wexec.h"
+
 typedef struct target Target;
 
 enum {
-	NOEXPORT,
-	EXPORT,
+        NOEXPORT,
+        EXPORT,
 };
 
 enum {
-	UNDEF,
-	ENVIRON,
-	CMDLINE,
-	INTERNAL,
-	MAKEFILE,
-	MAKEFLAGS,
+        UNDEF,
+        ENVIRON,
+        CMDLINE,
+        INTERNAL,
+        MAKEFILE,
+        MAKEFLAGS,
 };
 
 struct loc {
-	char *fname;
-	int lineno;
+        char *fname;
+        int lineno;
 };
 
 struct action {
-	char *line;
-	struct loc loc;
+        char *line;
+        struct loc loc;
 };
 
 struct target {
-	char *name;
-	char *target;
-	char *req;
-	time_t stamp;
-	int defined;
+        char *name;
+        char *target;
+        char *req;
+        time_t stamp;
+        int defined;
 
-	int ndeps;
-	struct target **deps;
+        int ndeps;
+        struct target **deps;
 
-	int nactions;
-	struct action *actions;
+        int nactions;
+        struct action *actions;
 
-	struct target *next;
+        struct target *next;
 };
-
-void *emalloc(size_t);
-void *erealloc(void *, size_t);
-char *estrdup(char *);
 
 void dumprules(void);
 void dumpmacros(void);
@@ -57,7 +56,7 @@ int build(char *);
 int hash(char *);
 int parse(char *);
 void debug(char *, ...);
-void error(char *, ...);
+void error(char *, ...) __attribute__((noreturn));
 void warning(char *, ...);
 void adddep(char *, char *);
 void addrule(char *, struct action *, int);

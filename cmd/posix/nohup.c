@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 static void
@@ -45,9 +46,9 @@ main(int argc, char *argv[])
 	if (isatty(STDERR_FILENO) && dup2(STDOUT_FILENO, STDERR_FILENO) < 0)
 		enprintf(127, "dup2:");
 
-	execvp(argv[0], argv);
+	wexecvp_self(argv[0], argv);
 	savederrno = errno;
-	weprintf("execvp %s:", argv[0]);
+	weprintf("wexecvp %s:", argv[0]);
 
 	_exit(126 + (savederrno == ENOENT));
 }

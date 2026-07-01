@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "paths.h"
 #include "util.h"
 
 #if FEATURE_UMOUNT_OPTIONS
@@ -87,9 +88,9 @@ umountall(int flags
 	char **mntdirs = NULL;
 	int len = 0;
 
-	fp = setmntent("/proc/mounts", "r");
+	fp = setmntent(ARUU_LINUX_PATH_PROC_MOUNTS, "r");
 	if (!fp)
-		eprintf("setmntent %s:", "/proc/mounts");
+		eprintf("setmntent %s:", ARUU_LINUX_PATH_PROC_MOUNTS);
 	while ((me = getmntent(fp))) {
 		if (strcmp(me->mnt_type, "proc") == 0)
 			continue;

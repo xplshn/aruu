@@ -11,6 +11,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "paths.h"
 #include "util.h"
 
 static void
@@ -81,11 +82,11 @@ main(int argc, char *argv[])
 		return 0;
 	}
 
-	fp = setmntent("/proc/mounts", "r");
+	fp = setmntent(ARUU_LINUX_PATH_PROC_MOUNTS, "r");
 	if (!fp) {
 		if (qflag)
 			return 1;
-		eprintf("setmntent %s:", "/proc/mounts");
+		eprintf("setmntent %s:", ARUU_LINUX_PATH_PROC_MOUNTS);
 	}
 	while ((me = getmntent(fp)) != NULL) {
 		if (stat(me->mnt_dir, &st2) < 0) {

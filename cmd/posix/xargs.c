@@ -11,6 +11,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 #define NARGS 10000
@@ -245,9 +246,9 @@ dospawn:
 		eprintf("fork:");
 		/* fallthrough */
 	case 0:
-		execvp(*cmd, cmd);
+		wexecvp_self(*cmd, cmd);
 		savederrno = errno;
-		weprintf("execvp %s:", *cmd);
+		weprintf("wexecvp %s:", *cmd);
 		_exit(126 + (savederrno == ENOENT));
 	}
 	curprocs++;

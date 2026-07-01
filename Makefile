@@ -7,6 +7,7 @@ HDR =\
 	shared/compat.h\
 	shared/config.h\
 	shared/crypt.h\
+	shared/wexec.h\
 	shared/fs.h\
 	shared/md5.h\
 	shared/queue.h\
@@ -21,6 +22,7 @@ HDR =\
 	shared/utf.h\
 	shared/util.h\
 	shared/passwd.h\
+	shared/paths.h\
 	shared/reboot.h\
 	shared/rtc.h\
 	shared/proc.h\
@@ -52,6 +54,8 @@ LIBUTILOBJ =\
 	shared/libutil/cp.o\
 	shared/libutil/crypt.o\
 	shared/libutil/confirm.o\
+	shared/libutil/diffutil.o\
+	shared/libutil/wexec.o\
 	shared/libutil/ealloc.o\
 	shared/libutil/enmasse.o\
 	shared/libutil/eprintf.o\
@@ -734,20 +738,28 @@ man: scripts/mkman/mkman
 	done
 
 clean:
-	rm -f shared/libutf/*.o shared/libutil/*.o shared/libredline/*.o
-	rm -f cmd/posix/*.o cmd/posix/make/*.o cmd/posix/awk/*.o cmd/posix/sh/*.o
-	rm -f cmd/linux/*.o cmd/net/*.o cmd/xsi/*.o cmd/pseudo/*.o
-	rm -f cmd/extra/*.o cmd/dev/ar/*.o cmd/dev/ld/*.o cmd/dev/cc/*.o cmd/dev/as/*.o cmd/dev/xcutil/*.o
-	rm -f $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_BIN_ALL) $(LIB)
-	rm -f cmd/posix/make/make cmd/posix/getconf.h cmd/posix/bc.c
-	rm -f
-	rm -f cmd/posix/awk/awk cmd/posix/awk/maketab cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proctab.c
-	rm -f cmd/posix/sh/sh cmd/posix/sh/mknodes cmd/posix/sh/mksyntax
-	rm -f cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h cmd/posix/sh/token.h
-	rm -f cmd/dev/cc/cc1 cmd/dev/cc/cpp cmd/dev/as/as cmd/dev/ld/ld cmd/dev/ar/ar shared/libaruuelf.so
-	rm -f cmd/dev/config.h cmd/dev/cc/config.h cmd/dev/version.h
-	rm -rf aruu-box .box man/man1 man/man8 scripts/mkman/mkman
-
+	@printf "  CLEAN object files\n"
+	@find shared cmd -name "*.o" -exec rm -f {} +
+	@printf "  CLEAN static libraries\n"
+	@rm -f $(LIB)
+	@printf "  CLEAN compiled binaries\n"
+	@rm -f $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_BIN_ALL)
+	@printf "  CLEAN generated headers\n"
+	@rm -f cmd/posix/getconf.h cmd/posix/bc.c
+	@rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h
+	@rm -f cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h
+	@rm -f cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
+	@printf "  CLEAN generated sources\n"
+	@rm -f cmd/posix/awk/proctab.c
+	@printf "  CLEAN build tools\n"
+	@rm -f cmd/posix/awk/maketab cmd/posix/sh/mknodes cmd/posix/sh/mksyntax
+	@rm -f scripts/mkman/mkman
+	@printf "  CLEAN dev artifacts\n"
+	@rm -f cmd/dev/cc/cc1 cmd/dev/cc/cpp cmd/dev/as/as cmd/dev/ld/ld cmd/dev/ar/ar shared/libaruuelf.so
+	@rm -f cmd/dev/config.h cmd/dev/cc/config.h cmd/dev/version.h
+	@printf "  CLEAN misc\n"
+	@rm -rf aruu-box .box man/man1 man/man8
+	@printf "  CLEAN done\n"
 AWKOBJ =\
 	cmd/posix/awk/b.o\
 	cmd/posix/awk/main.o\

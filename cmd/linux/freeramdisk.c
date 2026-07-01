@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "paths.h"
 #include "util.h"
 
 static void

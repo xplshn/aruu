@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include "passwd.h"
+#include "wexec.h"
 #include "util.h"
 
 /* Write utmp entry */
@@ -58,8 +59,8 @@ dologin(struct passwd *pw, int preserve)
 	setenv("PATH", ENV_PATH, 1);
 	if (chdir(pw->pw_dir) < 0)
 		eprintf("chdir %s:", pw->pw_dir);
-	execlp(shell, shell, "-l", NULL);
-	weprintf("execlp %s:", shell);
+	wexecvp_self(shell, (char *const[]){shell, "-l", NULL});
+	weprintf("wexecvp %s:", shell);
 	return (errno == ENOENT) ? 127 : 126;
 }
 

@@ -10,6 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "paths.h"
 #include "util.h"
 
 #define KDGKBTYPE	0x4B33	/* get keyboard type */
@@ -18,9 +19,9 @@
 #define VT_WAITACTIVE	0x5607	/* wait for vt active */
 
 static char *vt[] = {
-	"/proc/self/fd/0",
-	"/dev/console",
-	"/dev/tty",
+	ARUU_LINUX_PATH_PROC "/self/fd/0",
+	ARUU_PATH_DEVCONSOLE,
+	ARUU_PATH_DEVTTY,
 	"/dev/tty0",
 };
 

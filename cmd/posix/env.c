@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 extern char **environ;
@@ -43,9 +44,9 @@ main(int argc, char *argv[])
 		putenv(*argv);
 
 	if (*argv) {
-		execvp(*argv, argv);
+		wexecvp_self(*argv, argv);
 		savederrno = errno;
-		weprintf("execvp %s:", *argv);
+		weprintf("wexecvp %s:", *argv);
 		_exit(126 + (savederrno == ENOENT));
 	}
 

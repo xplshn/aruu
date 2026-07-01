@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "wexec.h"
 #include "util.h"
 
 #define REGEXSIZE  100
@@ -837,13 +838,13 @@ dowrite(const char *fname, int trunc)
 	char *mode;
 
 	if (fp) {
-		sh ? pclose(fp) : fclose(fp);
+		sh ? wpclose(fp) : fclose(fp);
 		fp = NULL;
 	}
 
 	if (fname[0] == '!') {
 		sh = 1;
-		if((fp = popen(expandcmd(), "w")) == NULL)
+		if((fp = wpopen(expandcmd(), NULL, "w")) == NULL)
 			error("bad exec");
 	} else {
 		sh = 0;
@@ -865,7 +866,7 @@ dowrite(const char *fname, int trunc)
 
 	aux = fp;
 	fp = NULL;
-	r = sh ? pclose(aux) : fclose(aux);
+	r = sh ? wpclose(aux) : fclose(aux);
 	if (r)
 		error("input/output error");
 	strcpy(savfname, fname);
@@ -890,13 +891,13 @@ doread(const char *fname)
 	static FILE *fp;
 
 	if (fp) {
-		sh ? pclose(fp) : fclose(fp);
+		sh ? wpclose(fp) : fclose(fp);
 		fp = NULL;
 	}
 
 	if(fname[0] == '!') {
 		sh = 1;
-		if((fp = popen(expandcmd(), "r")) == NULL)
+		if((fp = wpopen(expandcmd(), NULL, "r")) == NULL)
 			error("bad exec");
 	} else if ((fp = fopen(fname, "r")) == NULL) {
 		error("cannot open input file");
@@ -921,7 +922,7 @@ doread(const char *fname)
 
 	aux = fp;
 	fp = NULL;
-	r = sh ? pclose(aux) : fclose(aux);
+	r = sh ? wpclose(aux) : fclose(aux);
 	if (r)
 		error("input/output error");
 }
@@ -1153,7 +1154,7 @@ copy(int where)
 static void
 execsh(void)
 {
-	system(expandcmd());
+	wsystem(expandcmd());
 	if (optdiag)
 		puts("!");
 }

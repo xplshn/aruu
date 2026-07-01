@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 static int fflag = 0;
@@ -46,9 +47,9 @@ main(int argc, char *argv[])
 	}
 	if (setsid() < 0)
 		eprintf("setsid:");
-	execvp(argv[0], argv);
+	wexecvp_self(argv[0], argv);
 	savederrno = errno;
-	weprintf("execvp %s:", argv[0]);
+	weprintf("wexecvp %s:", argv[0]);
 
 	_exit(126 + (savederrno == ENOENT));
 }

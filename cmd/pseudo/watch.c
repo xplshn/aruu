@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 static void
@@ -58,7 +59,7 @@ main(int argc, char *argv[])
 	for (;;) {
 		printf("\x1b[2J\x1b[H"); /* clear */
 		fflush(NULL);
-		system(cmd);
+		wsystem(cmd);
 		usleep(interval);
 	}
 	return 0;

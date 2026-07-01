@@ -32,7 +32,6 @@
  * SUCH DAMAGE.
  */
 
-#include <paths.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -43,6 +42,7 @@
  * Evaluate a command.
  */
 
+#include "../../../shared/paths.h"
 #include "shell.h"
 #include "nodes.h"
 #include "syntax.h"
@@ -989,7 +989,7 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
 						argv += 2;
 						argc -= 2;
 					}
-					path = _PATH_STDPATH;
+					path = ARUU_PATH_STDPATH;
 					clearcmdentry();
 					do_clearcmdentry = 1;
 				} else if (!strcmp(argv[1], "--")) {
@@ -1318,7 +1318,7 @@ commandcmd(int argc __unused, char **argv __unused)
 	while ((ch = nextopt("pvV")) != '\0') {
 		switch (ch) {
 		case 'p':
-			path = _PATH_STDPATH;
+			path = ARUU_PATH_STDPATH;
 			break;
 		case 'v':
 			cmd = TYPECMD_SMALLV;

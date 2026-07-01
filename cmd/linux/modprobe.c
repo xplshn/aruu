@@ -1,6 +1,7 @@
 
 #include "arg.h"
 #include "fs.h"
+#include "paths.h"
 #include "util.h"
 
 #include <ctype.h>
@@ -344,7 +345,7 @@ mark_loaded(void)
 	char *p;
 	struct Module *m;
 
-	if (!(fp = fopen("/proc/modules", "r")))
+	if (!(fp = fopen(ARUU_LINUX_PATH_PROC_MODULES, "r")))
 		return;
 
 	while (fgets(line, sizeof(line), fp)) {

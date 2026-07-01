@@ -39,12 +39,12 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <paths.h>
 #include <signal.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "../../../shared/paths.h"
 #include "shell.h"
 #if JOBS
 #include <termios.h>
@@ -179,7 +179,7 @@ setjobctl(int on)
 	if (on) {
 		if (ttyfd != -1)
 			close(ttyfd);
-		if ((ttyfd = open(_PATH_TTY, O_RDWR | O_CLOEXEC)) < 0) {
+		if ((ttyfd = open(ARUU_PATH_DEVTTY, O_RDWR | O_CLOEXEC)) < 0) {
 			i = 0;
 			while (i <= 2 && !isatty(i))
 				i++;
@@ -942,9 +942,9 @@ forkshell(struct job *jp, union node *n, int mode)
 			if ((jp == NULL || jp->nprocs == 0) &&
 			    ! fd0_redirected_p ()) {
 				close(0);
-				if (open(_PATH_DEVNULL, O_RDONLY) != 0)
+				if (open(ARUU_PATH_DEVNULL, O_RDONLY) != 0)
 					error("cannot open %s: %s",
-					    _PATH_DEVNULL, strerror(errno));
+					    ARUU_PATH_DEVNULL, strerror(errno));
 			}
 		}
 #else
@@ -954,9 +954,9 @@ forkshell(struct job *jp, union node *n, int mode)
 			if ((jp == NULL || jp->nprocs == 0) &&
 			    ! fd0_redirected_p ()) {
 				close(0);
-				if (open(_PATH_DEVNULL, O_RDONLY) != 0)
+				if (open(ARUU_PATH_DEVNULL, O_RDONLY) != 0)
 					error("cannot open %s: %s",
-					    _PATH_DEVNULL, strerror(errno));
+					    ARUU_PATH_DEVNULL, strerror(errno));
 			}
 		}
 #endif

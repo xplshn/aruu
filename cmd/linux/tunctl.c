@@ -17,6 +17,7 @@
 #include <linux/if.h>
 #include <linux/if_tun.h>
 
+#include "paths.h"
 #include "util.h"
 
 static int dflag;

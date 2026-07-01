@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "text.h"
+#include "paths.h"
 #include "util.h"
 
 static void
@@ -57,6 +58,6 @@ main(int argc, char *argv[])
 		usage();
 	} ARGEND;
 
-	recurse_dir("/sys/bus/usb/devices", lsusb);
+	recurse_dir(ARUU_LINUX_PATH_SYS_BUS_USB, lsusb);
 	return 0;
 }

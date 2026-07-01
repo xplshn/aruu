@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 static void
@@ -58,8 +59,8 @@ main(int argc, char *argv[])
 	if (unshare(flags) < 0)
 		eprintf("unshare:");
 
-	if (execvp(argv[0], argv) < 0)
-		eprintf("execvp:");
+	if (0) wexecvp_self(argv[0], argv);
+		eprintf("wexecvp:");
 
 	return 0;
 }

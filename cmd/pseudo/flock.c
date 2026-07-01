@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "wexec.h"
 #include "util.h"
 
 static void
@@ -71,9 +72,9 @@ main(int argc, char *argv[])
 		if (oflag && close(fd) < 0)
 			eprintf("close:");
 		argv++;
-		execvp(*argv, argv);
+		wexecvp_self(*argv, argv);
 		savederrno = errno;
-		weprintf("execvp %s:", *argv);
+		weprintf("wexecvp %s:", *argv);
 		_exit(126 + (savederrno == ENOENT));
 	default:
 		break;
