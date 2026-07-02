@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -85,6 +86,99 @@ wexec_is_builtin(const char *name)
 }
 
 #if FEATURE_INPROC_EXEC
+static int inproc_enabled  = 1;
+
+#if FEATURE_INPROC_EXEC_OVERRIDE
+static int inproc_env_read = 0;
+
+/* ARUU_INPROC_EXEC=0 forces fork+exec at runtime, even though the box was
+ * built with FEATURE_INPROC_EXEC=1. lets a person reach an external tool
+ * that shares a name with a builtin without giving its full path. only
+ * compiled in when the box is also built with FEATURE_INPROC_EXEC_OVERRIDE=1;
+ * without that flag this env var is never read and inproc dispatch cannot be
+ * bypassed except through an explicit wexec_set_inproc() call. read once
+ * and cached, an explicit wexec_set_inproc() call overrides it */
+static void
+inproc_read_env(void)
+{
+  const char *e;
+
+  if (inproc_env_read)
+    return;
+  inproc_env_read = 1;
+  e = getenv("ARUU_INPROC_EXEC");
+  if (e && strcmp(e, "0") == 0)
+    inproc_enabled = 0;
+}
+#endif
+
+void
+wexec_set_inproc(int enabled)
+{
+#if FEATURE_INPROC_EXEC_OVERRIDE
+  inproc_env_read = 1;
+#endif
+  inproc_enabled = enabled;
+}
+
+int
+wexec_get_inproc(void)
+{
+#if FEATURE_INPROC_EXEC_OVERRIDE
+  inproc_read_env();
+#endif
+  return inproc_enabled;
+}
+#endif
+
+char *
+wwhich(const char *name)
+{
+  const char *path, *p, *end;
+  char       *buf;
+  size_t      dlen, nlen;
+  struct stat  st;
+
+#if FEATURE_INPROC_EXEC
+  /* when inproc dispatch is active, registered builtins have no filesystem path */
+  if (inproc_enabled && wexec_is_builtin(name))
+    return NULL;
+#endif
+
+  /* slash present: treat as a literal path */
+  if (strchr(name, '/') != NULL) {
+    if (stat(name, &st) == 0 && S_ISREG(st.st_mode) && (st.st_mode & 0111))
+      return estrdup(name);
+    return NULL;
+  }
+
+  path = getenv("PATH");
+  if (path == NULL)
+    path = "/usr/local/bin:/usr/bin:/bin";
+
+  nlen = strlen(name);
+  p    = path;
+  for (;;) {
+    end  = strchr(p, ':');
+    dlen = end ? (size_t)(end - p) : strlen(p);
+    /* skip empty components (current dir) for safety */
+    if (dlen > 0) {
+      buf           = emalloc(dlen + 1 + nlen + 1);
+      memcpy(buf, p, dlen);
+      buf[dlen]     = '/';
+      memcpy(buf + dlen + 1, name, nlen + 1);
+      if (stat(buf, &st) == 0 && S_ISREG(st.st_mode) && (st.st_mode & 0111))
+        return buf;
+      free(buf);
+    }
+    if (!end)
+      break;
+    p = end + 1;
+  }
+  return NULL;
+}
+
+#if FEATURE_INPROC_EXEC
 static int
 call_builtin(const char *name, char *const *argv)
 {
@@ -138,7 +232,7 @@ int
 wexecvp(const char *name, char *const *argv)
 {
 #if FEATURE_INPROC_EXEC
-  if (wexec_is_builtin(name)) {
+  if (inproc_enabled && wexec_is_builtin(name)) {
     fflush(stdout);
     fflush(stderr);
     return call_builtin(name, argv);
@@ -154,7 +248,7 @@ wexecv(const char *path, char *const *argv)
   {
     const char *base = strrchr(path, '/');
     base             = base ? base + 1 : path;
-    if (wexec_is_builtin(base)) {
+    if (inproc_enabled && wexec_is_builtin(base)) {
       fflush(stdout);
       fflush(stderr);
       return call_builtin(base, argv);
@@ -201,7 +295,7 @@ wpopen(const char *name, char *const *argv, const char *mode)
     }
     if (argv) {
 #if FEATURE_INPROC_EXEC
-      if (wexec_is_builtin(name)) {
+      if (inproc_enabled && wexec_is_builtin(name)) {
         int    argc;
         char **p;
         argc = 0;
@@ -221,7 +315,7 @@ wpopen(const char *name, char *const *argv, const char *mode)
       sh_argv[2] = (char *)name;
       sh_argv[3] = NULL;
 #if FEATURE_INPROC_EXEC
-      if (wexec_is_builtin("sh")) {
+      if (inproc_enabled && wexec_is_builtin("sh")) {
         call_builtin("sh", sh_argv);
         fflush(stdout);
         fflush(stderr);
@@ -279,7 +373,7 @@ int
 wsystem(const char *cmd)
 {
 #if FEATURE_INPROC_EXEC
-  if (wexec_is_builtin("sh")) {
+  if (inproc_enabled && wexec_is_builtin("sh")) {
     char *sh_argv[4];
     sh_argv[0] = "sh";
     sh_argv[1] = "-c";
@@ -304,7 +398,7 @@ void
 wexecvp_self(const char *name, char *const *argv)
 {
 #if FEATURE_INPROC_EXEC
-  if (wexec_is_builtin(name)) {
+  if (inproc_enabled && wexec_is_builtin(name)) {
     int ret;
     fflush(stdout);
     fflush(stderr);
@@ -326,7 +420,7 @@ wexecv_self(const char *path, char *const *argv)
   {
     const char *base = strrchr(path, '/');
     base             = base ? base + 1 : path;
-    if (wexec_is_builtin(base)) {
+    if (inproc_enabled && wexec_is_builtin(base)) {
       int ret;
       fflush(stdout);
       fflush(stderr);

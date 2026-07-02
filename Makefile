@@ -1,7 +1,7 @@
 .POSIX:
-include config.mk
-.SUFFIXES: .y .o .c
+include scripts/mk/config.mk
 
+.SUFFIXES: .y .o .c
 HDR =\
 	shared/arg.h\
 	shared/compat.h\
@@ -129,7 +129,6 @@ POSIX_BIN_ALL =\
 	cmd/posix/df\
 	cmd/posix/diff\
 	cmd/posix/patch\
-	cmd/posix/diff3\
 	cmd/posix/dirname\
 	cmd/posix/du\
 	cmd/posix/echo\
@@ -193,7 +192,8 @@ POSIX_BIN_ALL =\
 	cmd/posix/awk/awk\
 	cmd/posix/sh/sh\
 	cmd/posix/pax\
-	cmd/posix/make/make
+	cmd/posix/make/make\
+	cmd/posix/bc
 
 LINUX_BIN_ALL =\
 	cmd/linux/blkdiscard\
@@ -205,6 +205,7 @@ LINUX_BIN_ALL =\
 	cmd/linux/hwclock\
 	cmd/linux/insmod\
 	cmd/linux/lsmod\
+	cmd/linux/lsusb\
 	cmd/linux/modprobe\
 	cmd/linux/depmod\
 	cmd/linux/mkswap\
@@ -217,6 +218,7 @@ LINUX_BIN_ALL =\
 	cmd/linux/swapoff\
 	cmd/linux/swapon\
 	cmd/linux/switch_root\
+	cmd/linux/sysctl\
 	cmd/linux/tunctl\
 	cmd/linux/umount\
 	cmd/linux/unshare\
@@ -277,6 +279,7 @@ PSEUDO_BIN_ALL =\
 	cmd/pseudo/xinstall\
 	cmd/pseudo/yes\
 	cmd/pseudo/base64\
+	cmd/pseudo/mkpasswd\
 	cmd/extra/b3sum\
 	cmd/extra/blkid\
 	cmd/extra/lsblk\
@@ -292,7 +295,8 @@ PSEUDO_BIN_ALL =\
 	cmd/pseudo/free\
 	cmd/pseudo/pidof\
 	cmd/pseudo/pwdx\
-	cmd/pseudo/uptime
+	cmd/pseudo/uptime\
+	cmd/pseudo/diff3
 
 MAKEOBJ =\
 	cmd/posix/make/defaults.o\
@@ -393,6 +397,7 @@ BIN_fsfreeze_1 = cmd/linux/fsfreeze
 BIN_hwclock_1 = cmd/linux/hwclock
 BIN_insmod_1 = cmd/linux/insmod
 BIN_lsmod_1 = cmd/linux/lsmod
+BIN_lsusb_1 = cmd/linux/lsusb
 BIN_modprobe_1 = cmd/linux/modprobe
 BIN_depmod_1 = cmd/linux/depmod
 BIN_mkswap_1 = cmd/linux/mkswap
@@ -405,6 +410,7 @@ BIN_swaplabel_1 = cmd/linux/swaplabel
 BIN_swapoff_1 = cmd/linux/swapoff
 BIN_swapon_1 = cmd/linux/swapon
 BIN_switch_root_1 = cmd/linux/switch_root
+BIN_sysctl_1 = cmd/linux/sysctl
 BIN_tunctl_1 = cmd/linux/tunctl
 BIN_umount_1 = cmd/linux/umount
 BIN_unshare_1 = cmd/linux/unshare
@@ -462,13 +468,15 @@ BIN_whoami_1 = cmd/pseudo/whoami
 BIN_xinstall_1 = cmd/pseudo/xinstall
 BIN_yes_1 = cmd/pseudo/yes
 BIN_base64_1 = cmd/pseudo/base64
+BIN_mkpasswd_1 = cmd/pseudo/mkpasswd
+BIN_bc_1 = cmd/posix/bc
 BIN_b3sum_1 = cmd/extra/b3sum
 BIN_blkid_1 = cmd/extra/blkid
 BIN_lsblk_1 = cmd/extra/lsblk
 BIN_fdisk_1 = cmd/extra/fdisk
 BIN_sync_1 = cmd/extra/sync
 BIN_yap_1 = cmd/extra/yap/yap
-BIN_diff3_1 = cmd/posix/diff3
+BIN_diff3_1 = cmd/pseudo/diff3
 BIN_ar_1 = cmd/dev/ar/ar
 BIN_as_1 = cmd/dev/as/as
 BIN_ld_1 = cmd/dev/ld/ld
@@ -560,7 +568,8 @@ POSIX_BIN = \
 	$(BIN_awk_$(BUILD_POSIX_AWK)) \
 	$(BIN_sh_$(BUILD_POSIX_SH)) \
 	$(BIN_pax_$(BUILD_POSIX_PAX)) \
-	$(BIN_make_$(BUILD_POSIX_MAKE))
+	$(BIN_make_$(BUILD_POSIX_MAKE)) \
+	$(BIN_bc_$(BUILD_POSIX_BC))
 
 LINUX_BIN = \
 	$(BIN_blkdiscard_$(BUILD_LINUX_BLKDISCARD)) \
@@ -572,6 +581,7 @@ LINUX_BIN = \
 	$(BIN_hwclock_$(BUILD_LINUX_HWCLOCK)) \
 	$(BIN_insmod_$(BUILD_LINUX_INSMOD)) \
 	$(BIN_lsmod_$(BUILD_LINUX_LSMOD)) \
+	$(BIN_lsusb_$(BUILD_LINUX_LSUSB)) \
 	$(BIN_modprobe_$(BUILD_LINUX_MODPROBE)) \
 	$(BIN_depmod_$(BUILD_LINUX_DEPMOD)) \
 	$(BIN_mkswap_$(BUILD_LINUX_MKSWAP)) \
@@ -584,6 +594,7 @@ LINUX_BIN = \
 	$(BIN_swapoff_$(BUILD_LINUX_SWAPOFF)) \
 	$(BIN_swapon_$(BUILD_LINUX_SWAPON)) \
 	$(BIN_switch_root_$(BUILD_LINUX_SWITCH_ROOT)) \
+	$(BIN_sysctl_$(BUILD_LINUX_SYSCTL)) \
 	$(BIN_tunctl_$(BUILD_LINUX_TUNCTL)) \
 	$(BIN_umount_$(BUILD_LINUX_UMOUNT)) \
 	$(BIN_unshare_$(BUILD_LINUX_UNSHARE)) \
@@ -644,11 +655,13 @@ PSEUDO_BIN = \
 	$(BIN_xinstall_$(BUILD_PSEUDO_XINSTALL)) \
 	$(BIN_yes_$(BUILD_PSEUDO_YES)) \
 	$(BIN_base64_$(BUILD_PSEUDO_BASE64)) \
-	$(BIN_b3sum_$(BUILD_PSEUDO_B3SUM)) \
-	$(BIN_blkid_$(BUILD_PSEUDO_BLKID)) \
-	$(BIN_lsblk_$(BUILD_PSEUDO_LSBLK)) \
-	$(BIN_fdisk_$(BUILD_PSEUDO_FDISK)) \
-	$(BIN_sync_$(BUILD_PSEUDO_SYNC)) \
+	$(BIN_mkpasswd_$(BUILD_PSEUDO_MKPASSWD)) \
+	$(BIN_b3sum_$(BUILD_EXTRA_B3SUM)) \
+	$(BIN_blkid_$(BUILD_EXTRA_BLKID)) \
+	$(BIN_lsblk_$(BUILD_EXTRA_LSBLK)) \
+	$(BIN_fdisk_$(BUILD_EXTRA_FDISK)) \
+	$(BIN_sync_$(BUILD_EXTRA_SYNC)) \
+	$(BIN_yap_$(BUILD_EXTRA_YAP)) \
 	$(BIN_diff3_$(BUILD_PSEUDO_DIFF3)) \
 	$(BIN_ar_$(BUILD_DEV_AR)) \
 	$(BIN_as_$(BUILD_DEV_CC)) \
@@ -713,30 +726,71 @@ cmd/posix/getconf.h:
 
 box: $(LIB)
 	CC='$(CC)' CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' \
-	LDFLAGS='$(LDFLAGS)' LDLIBS='$(LDLIBS)' OBJCOPY='$(OBJCOPY)' \
+	LDFLAGS='$(LDFLAGS)' LDLIBS='$(LDLIBS) $(LDLIBS_TLS)' OBJCOPY='$(OBJCOPY)' \
 	scripts/mkbox
 
-.PHONY: man clean
+.PHONY: man clean install regen help
 
 scripts/mkman/mkman: scripts/mkman/main.go scripts/mkman/page.go scripts/mkman/parse.go scripts/mkman/mdoc.go
 	cd scripts/mkman && go build -o mkman .
 
 man: scripts/mkman/mkman
-	@for src in $(POSIX_BIN_ALL:=.c) $(PSEUDO_BIN_ALL:=.c); do \
+	find cmd -type f -name '*.c' | while read -r src; do \
 		if [ -f "$$src" ] && grep -qE '!man|\?man' "$$src"; then \
-			base=$$(basename $$src .c); \
-			mkdir -p man/man1; \
-			scripts/mkman/mkman -fmt mdoc -config config.mk -section 1 "$$src" > "man/man1/$$base.1"; \
-			scripts/mkman/mkman -fmt txt -config config.mk -section 1 "$$src" > "man/man1/$$base.1.txt"; \
+			sub=$${src#cmd/}; \
+			cat=$${sub%%/*}; \
+			base=$${src##*/}; \
+			base=$${base%.c}; \
+			name=$${sub#*/}; \
+			if [ "$${name}" != "$${base}.c" ]; then \
+				name=$${name%%/*}; \
+			else \
+				name=$$base; \
+			fi; \
+			u_group=$$(echo "$$cat" | tr 'a-z' 'A-Z'); \
+			u_tool=$$(echo "$$name" | tr 'a-z-' 'A-Z_'); \
+			var_name="BUILD_$${u_group}_$${u_tool}"; \
+			val=""; \
+			if [ -f scripts/mk/config.kv ]; then \
+				val=$$(grep "^$${var_name}=" scripts/mk/config.kv | cut -d= -f2 | tr -d '"'); \
+			fi; \
+			if [ "$$val" != "1" ]; then \
+				continue; \
+			fi; \
+			case "$$cat" in \
+				linux|net|xsi) sec=8 ;; \
+				*)             sec=1 ;; \
+			esac; \
+			mkdir -p "man/man$${sec}"; \
+			scripts/mkman/mkman -fmt mdoc -config scripts/mk/config.kv -section "$${sec}" "$$src" > "man/man$${sec}/$$name.$${sec}"; \
+			scripts/mkman/mkman -fmt txt -config scripts/mk/config.kv -section "$${sec}" "$$src" > "man/man$${sec}/$$name.$${sec}.txt"; \
 		fi; \
 	done
-	@for src in $(LINUX_BIN_ALL:=.c) $(NET_BIN_ALL:=.c) $(XSI_BIN_ALL:=.c); do \
-		if [ -f "$$src" ] && grep -qE '!man|\?man' "$$src"; then \
-			base=$$(basename $$src .c); \
-			mkdir -p man/man8; \
-			scripts/mkman/mkman -fmt mdoc -config config.mk -section 8 "$$src" > "man/man8/$$base.8"; \
-			scripts/mkman/mkman -fmt txt -config config.mk -section 8 "$$src" > "man/man8/$$base.8.txt"; \
-		fi; \
+
+regen:
+	sh scripts/genconfig.sh
+	$(MAKE) -f Makefile cmd/posix/getconf.h cmd/posix/bc.c cmd/posix/awk/awkgram.tab.c cmd/posix/awk/proctab.c cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/nodes.c cmd/posix/sh/builtins.c
+
+help:
+	@echo "Available targets:"
+	@echo "  all       - Build all enabled utilities"
+	@echo "  clean     - Clean build artifacts"
+	@echo "  install   - Install binaries and man pages"
+	@echo "  box       - Build the multicall binary (aruu-box)"
+	@echo "  man       - Generate manual pages"
+	@echo "  regen     - Regenerate build system files and config"
+	@echo "  help      - Show this help message"
+
+install: all man
+	@mkdir -p $(PREFIX)/bin $(MANPREFIX)/man1 $(MANPREFIX)/man8
+	@find cmd -type f ! -name '*.*' -perm -100 | while read -r bin; do \
+		printf "  INSTALL %s/bin/%s\n" "$(PREFIX)" "$${bin##*/}"; \
+		cp "$$bin" "$(PREFIX)/bin/$${bin##*/}"; \
+		chmod 755 "$(PREFIX)/bin/$${bin##*/}"; \
+	done
+	@find man/man1 man/man8 -type f -name '*.[18]' 2>/dev/null | while read -r f; do \
+		sec=$${f%/*}; sec=$${sec##*/}; \
+		cp "$$f" "$(MANPREFIX)/$${sec}/$${f##*/}"; \
 	done
 
 clean:
@@ -747,7 +801,7 @@ clean:
 	@printf "  CLEAN compiled binaries\n"
 	@rm -f $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_BIN_ALL)
 	@printf "  CLEAN generated headers\n"
-	@rm -f cmd/posix/getconf.h cmd/posix/bc.c
+	@rm -f cmd/posix/getconf.h cmd/posix/bc.c cmd/posix/bc.h
 	@rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h
 	@rm -f cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h
 	@rm -f cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
@@ -863,7 +917,7 @@ cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h: cmd/posix/sh/mksyntax
 cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h: cmd/posix/sh/mknodes cmd/posix/sh/nodetypes cmd/posix/sh/nodes.c.pat
 	cd cmd/posix/sh && ./mknodes nodetypes nodes.c.pat
 
-cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h: cmd/posix/sh/mkbuiltins cmd/posix/sh/builtins.def cmd/posix/sh/shell.h
+cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h: cmd/posix/sh/mkbuiltins cmd/posix/sh/builtins.def cmd/posix/sh/shell.h scripts/mk/config.kv
 	cd cmd/posix/sh && sh mkbuiltins .
 
 cmd/posix/sh/token.h: cmd/posix/sh/mktokens
@@ -1004,3 +1058,8 @@ cmd/dev/config.h cmd/dev/cc/config.h cmd/dev/version.h: cmd/dev/configure
 	sh cmd/dev/configure
 
 $(AS_OBJ) $(LD_OBJ) $(CC1_OBJ) $(CPP_OBJ) cmd/dev/ar/ar.o cmd/dev/cc/cpp.o: cmd/dev/config.h
+
+scripts/mk/config.mk scripts/mk/config.kv: build.cfg scripts/genconfig.sh
+	sh scripts/genconfig.sh
+
+Makefile: ;

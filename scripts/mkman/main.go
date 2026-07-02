@@ -10,17 +10,17 @@ import (
 	"time"
 )
 
-// parse config.mk variables and values
+// parse config.kv variables and values
 type Config map[string]string
 
-func parseConfigMk(path string) (Config, error) {
+func parseConfigKv(path string) (Config, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	raw := make(Config)
+	cfg := make(Config)
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		line := strings.TrimSpace(sc.Text())
@@ -33,38 +33,16 @@ func parseConfigMk(path string) (Config, error) {
 		}
 		k := strings.TrimSpace(line[:eq])
 		v := strings.TrimSpace(line[eq+1:])
-		raw[k] = v
+		if len(v) >= 2 && ((v[0] == '"' && v[len(v)-1] == '"') || (v[0] == '\'' && v[len(v)-1] == '\'')) {
+			v = v[1 : len(v)-1]
+		}
+		cfg[k] = v
 	}
 	if err := sc.Err(); err != nil {
 		return nil, err
 	}
 
-	cfg := make(Config, len(raw))
-	for k, v := range raw {
-		cfg[k] = expandVars(v, raw)
-	}
 	return cfg, nil
-}
-
-func expandVars(s string, env Config) string {
-	for {
-		start := strings.Index(s, "$(")
-		if start < 0 {
-			break
-		}
-		end := strings.Index(s[start:], ")")
-		if end < 0 {
-			break
-		}
-		end += start
-		varname := s[start+2 : end]
-		replacement := ""
-		if v, ok := env[varname]; ok {
-			replacement = v
-		}
-		s = s[:start] + replacement + s[end+1:]
-	}
-	return s
 }
 
 func (cfg Config) isEnabled(key string) bool {
@@ -154,6 +132,11 @@ func inferSection(path string) int {
 		strings.Contains(clean, "/net/"),
 		strings.Contains(clean, "/xsi/"):
 		return 8
+	case strings.Contains(clean, "/posix/"),
+		strings.Contains(clean, "/pseudo/"),
+		strings.Contains(clean, "/extra/"),
+		strings.Contains(clean, "/dev/"):
+		return 1
 	default:
 		return 1
 	}
@@ -177,19 +160,19 @@ func newRenderer(format string, page *Page) (Renderer, error) {
 
 // main entry point and flags definition
 func main() {
-	configPath := flag.String("config", "config.mk", "path to config.mk")
+	configPath := flag.String("config", "scripts/mk/config.kv", "path to config.kv")
 	sectionFlag := flag.Int("section", 0, "man section override (0 = infer from path)")
 	dateFlag := flag.String("date", "", "date string for TH line (default: current month/year)")
 	formatFlag := flag.String("fmt", "mdoc", "output format: mdoc or txt")
 	flag.Parse()
 
 	if flag.NArg() < 1 {
-		fmt.Fprintf(os.Stderr, "usage: mkman [-config config.mk] [-section N] [-fmt mdoc|txt] file.c\n")
+		fmt.Fprintf(os.Stderr, "usage: mkman [-config scripts/mk/config.kv] [-section N] [-fmt mdoc|txt] file.c\n")
 		os.Exit(1)
 	}
 	cfile := flag.Arg(0)
 
-	cfg, err := parseConfigMk(*configPath)
+	cfg, err := parseConfigKv(*configPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "mkman: config: %v\n", err)
 		os.Exit(1)

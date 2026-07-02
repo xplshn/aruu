@@ -29,6 +29,12 @@ done
 # shellcheck disable=SC1091
 . ./build.cfg
 
+# load config.kv if it exists to override and provide detected TLS settings
+if [ -f scripts/mk/config.kv ]; then
+        # shellcheck disable=SC1091
+        . scripts/mk/config.kv
+fi
+
 # cppflags derived from build.cfg; any feature_* added there is picked up automatically
 _feature_flags=""
 while IFS= read -r _line; do
@@ -44,35 +50,10 @@ done <<EOF
 $(tr ';' '\n' < build.cfg)
 EOF
 unset _line _key _val _trimmed
-CPPFLAGS="-Ishared -DPREFIX=\"$PREFIX\" -D_DEFAULT_SOURCE -D_GNU_SOURCE -D_NETBSD_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700 -D_FILE_OFFSET_BITS=64$_feature_flags"
-if [ "$FEATURE_USE_BEARSSL" = "1" ]; then
-        if pkg-config --exists libbearssl 2>/dev/null; then
-                CPPFLAGS="$CPPFLAGS $(pkg-config --cflags libbearssl)"
-                TLS_LDLIBS="$TLS_LDLIBS $(pkg-config --libs libbearssl)"
-        elif pkg-config --exists bearssl 2>/dev/null; then
-                CPPFLAGS="$CPPFLAGS $(pkg-config --cflags bearssl)"
-                TLS_LDLIBS="$TLS_LDLIBS $(pkg-config --libs bearssl)"
-        else
-                TLS_LDLIBS="$TLS_LDLIBS -LexternalRepos/BearSSL/build -lbearssl"
-        fi
-fi
-if [ "$FEATURE_USE_LIBRESSL" = "1" ]; then
-        if pkg-config --exists libtls 2>/dev/null; then
-                CPPFLAGS="$CPPFLAGS $(pkg-config --cflags libtls)"
-                TLS_LDLIBS="$TLS_LDLIBS $(pkg-config --libs libtls)"
-        else
-                TLS_LDLIBS="$TLS_LDLIBS -ltls"
-        fi
-fi
-if [ "$FEATURE_USE_OPENSSL" = "1" ]; then
-        if pkg-config --exists openssl 2>/dev/null; then
-                CPPFLAGS="$CPPFLAGS $(pkg-config --cflags openssl)"
-                TLS_LDLIBS="$TLS_LDLIBS $(pkg-config --libs openssl)"
-        else
-                TLS_LDLIBS="$TLS_LDLIBS -lssl -lcrypto"
-        fi
-fi
-unset _feature_flags
+
+CPPFLAGS="-Ishared -DPREFIX=\\\"\$PREFIX\\\" -D_DEFAULT_SOURCE -D_GNU_SOURCE -D_NETBSD_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700 -D_FILE_OFFSET_BITS=64$_feature_flags $CPPFLAGS_TLS"
+LDFLAGS="${LDFLAGS:-} $LDFLAGS_TLS"
+TLS_LDLIBS="$LDLIBS_TLS"
 
 CC=${CC:-cc}
 AR=${AR:-ar}
@@ -81,7 +62,7 @@ RANLIB=${RANLIB:-ranlib}
 PREFIX=${PREFIX:-/usr/local}
 MANPREFIX=${MANPREFIX:-$PREFIX/share/man}
 
-# shared headers; every object depends on these
+# shared headers, most objects depend on these
 HDR=$(echo shared/*.h)
 LIB="shared/libredline/libredline.a shared/libutil/libutil.a shared/libutf/libutf.a"
 
@@ -93,14 +74,12 @@ EXTRA_HDR=
 mtime() {
         stat -c '%Y' "$1" 2>/dev/null || stat -f '%m' "$1" 2>/dev/null || echo 0
 }
-
 newer_than() {
         local s t
         [ -e "$2" ] || return 0
         s=$(mtime "$1"); t=$(mtime "$2")
         [ "$s" -gt "$t" ]
 }
-
 any_newer_than() {
         local target="$1"; shift
         for src do
@@ -110,20 +89,17 @@ any_newer_than() {
 }
 
 # parallel job queue
+# objs_for must not run in a subshell, enqueue writes _qn/_queue in the current shell
 #
-# objs_for must not run in a subshell; enqueue writes _qn/_queue in the current shell
-
 _qn=0
 _queue=""
 _objs=""
-
 # wraps arg in single quotes, escaping embedded ones, for safe eval
 shquote() {
         printf "'"
         printf '%s' "$1" | sed "s/'/'\\\\''/g"
         printf "'"
 }
-
 enqueue() {
         local desc="$1" cmd="$2"
         _qn=$((_qn + 1))
@@ -135,7 +111,6 @@ enqueue() {
         } > "$s"
         _queue="$_queue $_qn"
 }
-
 # silently skipped on systems without /proc/loadavg
 _wait_for_load() {
         [ "$LOAD" -eq 0 ] && return 0
@@ -146,7 +121,6 @@ _wait_for_load() {
                 sleep 1
         done
 }
-
 drain() {
         [ -z "$_queue" ] && return 0
         local n
@@ -164,7 +138,7 @@ drain() {
         _queue=""
 }
 
-# compile and link primitives
+# compile and link routines
 #
 compile_c() {
         local src="$1" obj="$2"; shift 2
@@ -172,13 +146,12 @@ compile_c() {
         any_newer_than "$obj" "$src" $HDR $EXTRA_HDR || return 0
         enqueue "  CC  $obj" "$CC $* $CPPFLAGS $CFLAGS -o $obj -c $src"
 }
-
 link_bin() {
         local bin="$1" objs="" libs="" sep=0; shift
         for a do
                 if   [ "$a" = "--" ]; then sep=1
                 elif [ "$sep" = 0  ]; then objs="$objs $a"
-                else                        libs="$libs $a"
+                else                       libs="$libs $a"
                 fi
         done
         drain
@@ -192,7 +165,6 @@ link_bin() {
                 eval "$CC $LDFLAGS -o $bin $objs $libs $LDLIBS"
         fi
 }
-
 # writes to _objs rather than stdout so the caller avoids a subshell that
 # would discard enqueued jobs
 objs_for() {
@@ -208,8 +180,8 @@ objs_for() {
 }
 
 # static libraries
-#
 # both directories enqueued before the single drain so they compile in parallel
+#
 build_lib() {
         local utf_objs util_objs redline_objs
         objs_for shared/libutf "" ""
@@ -244,7 +216,6 @@ build_lib() {
 #
 cfgvar() {
         local cat="$1" base="$2"
-        [ "$cat" = extra ] && cat=pseudo
         printf 'BUILD_%s_%s' "$cat" "$base" | tr 'a-z-' 'A-Z_'
 }
 
@@ -355,7 +326,7 @@ build_sh() {
                 (cd "$dir" && ./mknodes nodetypes nodes.c.pat)
         }
 
-        any_newer_than "$dir/builtins.c" "$dir/mkbuiltins" "$dir/builtins.def" "$dir/shell.h" && {
+        any_newer_than "$dir/builtins.c" "$dir/mkbuiltins" "$dir/builtins.def" "$dir/shell.h" scripts/mk/config.kv && {
                 printf '  GEN   %s/builtins.c\n' "$dir"
                 (cd "$dir" && sh mkbuiltins .)
         }
@@ -375,6 +346,26 @@ build_make() {
         link_bin "$dir/make" $_objs -- $LIB
 }
 
+build_bc() {
+        cfg_enabled BUILD_POSIX_BC || return 0
+        local src=cmd/posix/bc.c
+
+        any_newer_than "$src" cmd/posix/bc.y && {
+                printf '  GEN   %s\n' "$src"
+                if command -v yacc >/dev/null 2>&1; then
+                        yacc -o "$src" cmd/posix/bc.y
+                elif command -v bison >/dev/null 2>&1; then
+                        bison -o "$src" cmd/posix/bc.y
+                else
+                        printf 'bc: no yacc/bison found\n' >&2; return 1
+                fi
+        }
+
+        compile_c "$src" "${src%.c}.o"
+        drain
+        link_bin cmd/posix/bc "${src%.c}.o" -- $LIB
+}
+
 build_posix() {
         cfg_enabled BUILD_POSIX_GETCONF && [ ! -f cmd/posix/getconf.h ] && {
                 printf '  GEN   cmd/posix/getconf.h\n'
@@ -382,6 +373,7 @@ build_posix() {
         }
         build_simple_tools posix
         build_awk
+        build_bc
         build_sh
         build_make
 }
@@ -460,42 +452,46 @@ man_section() {
 }
 
 build_man_for() {
-        local var="$1" src="$2" base sec out_mdoc out_txt
+        local var="$1" src="$2" name="$3" sec out_mdoc out_txt
         cfg_enabled "$var" || return 0
         [ -x scripts/mkman/mkman ] || { printf 'error: mkman not built\n' >&2; exit 1; }
 
         grep -qE '!man|\?man' "$src" || return 0
 
-        base=${src##*/}; base=${base%.c}
         sec=$(man_section "$src")
 
         mkdir -p "man/man${sec}"
-        out_mdoc="man/man${sec}/${base}.${sec}"
-        out_txt="man/man${sec}/${base}.${sec}.txt"
-        if any_newer_than "$out_mdoc" "$src" config.mk scripts/mkman/mkman; then
+        out_mdoc="man/man${sec}/${name}.${sec}"
+        out_txt="man/man${sec}/${name}.${sec}.txt"
+        if any_newer_than "$out_mdoc" "$src" scripts/mk/config.kv scripts/mkman/mkman; then
                 printf '  MAN   %s\n' "$out_mdoc"
-                scripts/mkman/mkman -fmt mdoc -config config.mk -section "$sec" "$src" > "$out_mdoc"
+                scripts/mkman/mkman -fmt mdoc -config scripts/mk/config.kv -section "$sec" "$src" > "$out_mdoc"
         fi
-        if any_newer_than "$out_txt" "$src" config.mk scripts/mkman/mkman; then
+        if any_newer_than "$out_txt" "$src" scripts/mk/config.kv scripts/mkman/mkman; then
                 printf '  MAN   %s\n' "$out_txt"
-                scripts/mkman/mkman -fmt txt -config config.mk -section "$sec" "$src" > "$out_txt"
+                scripts/mkman/mkman -fmt txt -config scripts/mk/config.kv -section "$sec" "$src" > "$out_txt"
         fi
 }
 
 build_man() {
-        local dir cat src base
+        local src cat base sub name var
         if [ ! -x scripts/mkman/mkman ] || any_newer_than scripts/mkman/mkman scripts/mkman/main.go scripts/mkman/page.go scripts/mkman/parse.go scripts/mkman/mdoc.go; then
                 printf '  GO    scripts/mkman/mkman\n'
                 (cd scripts/mkman && go build -o mkman .)
         fi
-        for dir in cmd/*; do
-                [ -d "$dir" ] || continue
-                cat=${dir##*/}
-                for src in "$dir"/*.c; do
-                        [ -f "$src" ] || continue
-                        base=${src##*/}; base=${base%.c}
-                        build_man_for "$(cfgvar "$cat" "$base")" "$src"
-                done
+        find cmd -type f -name '*.c' | while read -r src; do
+                sub=${src#cmd/}
+                cat=${sub%%/*}
+                base=${src##*/}
+                base=${base%.c}
+                name=${sub#*/}
+                if [ "${name}" != "${base}.c" ]; then
+                        name=${name%%/*}
+                else
+                        name=$base
+                fi
+                var=$(cfgvar "$cat" "$name")
+                build_man_for "$var" "$src" "$name"
         done
 }
 
@@ -513,6 +509,61 @@ do_install() {
                 sec=${f%/*}; sec=${sec##*/}
                 cp "$f" "$MANPREFIX/${sec}/${f##*/}"
         done
+}
+
+do_regen() {
+        # 1. regenerate config
+        sh scripts/genconfig.sh
+
+        # 2. re-read the new config.kv
+        if [ -f scripts/mk/config.kv ]; then
+                # shellcheck disable=SC1091
+                . scripts/mk/config.kv
+        fi
+
+        # 3. clean the generated files to force regeneration
+        rm -f cmd/posix/getconf.h cmd/posix/bc.c cmd/posix/bc.h
+        rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proctab.c cmd/posix/awk/maketab
+        rm -f cmd/posix/sh/mknodes cmd/posix/sh/mksyntax cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
+
+        # 4. run the generation steps
+        # for getconf.h
+        printf '  GEN   cmd/posix/getconf.h\n'
+        scripts/getconf.sh > cmd/posix/getconf.h || { rm -f cmd/posix/getconf.h; exit 1; }
+
+        # for bc.c from bc.y
+        printf '  GEN   cmd/posix/bc.c\n'
+        if command -v yacc >/dev/null 2>&1; then
+                yacc -o cmd/posix/bc.c cmd/posix/bc.y
+        elif command -v bison >/dev/null 2>&1; then
+                bison -o cmd/posix/bc.c cmd/posix/bc.y
+        fi
+
+        # for awk
+        local adir=cmd/posix/awk
+        if command -v yacc >/dev/null 2>&1; then
+                yacc -d -o "$adir/awkgram.tab.c" "$adir/awkgram.y"
+                if [ ! -f "$adir/awkgram.tab.h" ]; then
+                        if [ -f y.tab.h ]; then
+                                mv y.tab.h "$adir/awkgram.tab.h"
+                        elif [ -f "$adir/y.tab.h" ]; then
+                                mv "$adir/y.tab.h" "$adir/awkgram.tab.h"
+                        fi
+                fi
+        elif command -v bison >/dev/null 2>&1; then
+                bison -d -o "$adir/awkgram.tab.c" "$adir/awkgram.y"
+        fi
+        eval "$CC $CFLAGS -o $adir/maketab $adir/maketab.c"
+        "$adir/maketab" "$adir/awkgram.tab.h" > "$adir/proctab.c"
+
+        # for sh
+        local sdir=cmd/posix/sh
+        eval "$CC $CFLAGS -o $sdir/mknodes $sdir/mknodes.c"
+        eval "$CC $CPPFLAGS -I$sdir $CFLAGS -o $sdir/mksyntax $sdir/mksyntax.c"
+        (cd "$sdir" && sh mktokens)
+        (cd "$sdir" && ./mksyntax)
+        (cd "$sdir" && ./mknodes nodetypes nodes.c.pat)
+        (cd "$sdir" && sh mkbuiltins .)
 }
 
 do_clean() {
@@ -562,11 +613,42 @@ case "$TARGET" in
         make)            build_lib; build_make ;;
         linux|net|xsi|pseudo|extra)
                          build_lib; build_simple_tools "$TARGET" ;;
-        man)             build_man ;;
-        install)         do_install ;;
+        regen)           do_regen ;;
         clean)           do_clean ;;
+        man)             build_man ;;
+        install)
+                build_lib
+                build_posix
+                build_dev
+                build_simple_tools linux
+                build_simple_tools net
+                build_simple_tools xsi
+                build_simple_tools pseudo
+                build_simple_tools extra
+                build_man
+                do_install
+                ;;
+        help)
+                printf 'usage: sh Makefile.sh [-jN] [-lN] [all|clean|install|man|lib|posix|linux|net|xsi|pseudo|extra|dev|make|regen|help]\n'
+                printf '\nTargets:\n'
+                printf '  all       Build all enabled utilities\n'
+                printf '  clean     Clean built objects and binaries\n'
+                printf '  install   Install binaries and man pages\n'
+                printf '  man       Generate man pages\n'
+                printf '  lib       Build core libraries\n'
+                printf '  posix     Build POSIX utilities\n'
+                printf '  linux     Build Linux utilities\n'
+                printf '  net       Build Network utilities\n'
+                printf '  xsi       Build XSI utilities\n'
+                printf '  pseudo    Build Pseudo utilities\n'
+                printf '  extra     Build Extra utilities\n'
+                printf '  dev       Build Dev toolchain\n'
+                printf '  make      Build POSIX make\n'
+                printf '  regen     Regenerate configuration and all generated source files\n'
+                printf '  help      Show this help message\n'
+                ;;
         *)
-                printf 'usage: sh Makefile.sh [-jN] [-lN] [all|clean|install|man|lib|posix|linux|net|xsi|pseudo|extra|dev|make]\n' >&2
+                printf 'usage: sh Makefile.sh [-jN] [-lN] [all|clean|install|man|lib|posix|linux|net|xsi|pseudo|extra|dev|make|regen|help]\n' >&2
                 exit 1
                 ;;
 esac

@@ -46,14 +46,15 @@ feature_setvar=1
 feature_wordexp=1
 feature_easter=1
 
-if [ -f ../../config.mk ]; then
-	feature_histedit=$(grep '^[[:space:]]*FEATURE_SH_HISTEDIT[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
-	feature_local=$(grep '^[[:space:]]*FEATURE_SH_LOCAL[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
-	feature_let=$(grep '^[[:space:]]*FEATURE_SH_LET[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
-	feature_ulimit=$(grep '^[[:space:]]*FEATURE_SH_ULIMIT[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
-	feature_setvar=$(grep '^[[:space:]]*FEATURE_SH_SETVAR[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
-	feature_wordexp=$(grep '^[[:space:]]*FEATURE_SH_WORDEXP[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
-	feature_easter=$(grep '^[[:space:]]*FEATURE_SH_EASTER[[:space:]]*=' ../../config.mk | cut -d= -f2 | tr -d '[:space:]')
+if [ -f ../../../scripts/mk/config.kv ]; then
+	. ../../../scripts/mk/config.kv
+	feature_histedit=$FEATURE_SH_HISTEDIT
+	feature_local=$FEATURE_SH_LOCAL
+	feature_let=$FEATURE_SH_LET
+	feature_ulimit=$FEATURE_SH_ULIMIT
+	feature_setvar=$FEATURE_SH_SETVAR
+	feature_wordexp=$FEATURE_SH_WORDEXP
+	feature_easter=$FEATURE_SH_EASTER
 fi
 
 exec > builtins.c

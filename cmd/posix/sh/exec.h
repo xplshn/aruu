@@ -39,6 +39,7 @@
 #define CMDNORMAL   0  /* command is an executable program */
 #define CMDBUILTIN  1  /* command is a shell builtin */
 #define CMDFUNCTION 2  /* command is a shell function */
+#define CMDWEXEC    3  /* command is a registered inproc builtin */
 
 /* values for typecmd_impl's third parameter */
 enum {

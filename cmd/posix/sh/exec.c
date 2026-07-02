@@ -49,6 +49,7 @@
  */
 
 #include "../../../shared/paths.h"
+#include "../../../shared/wexec.h"
 #include "alias.h"
 #include "builtins.h"
 #include "error.h"
@@ -101,6 +102,23 @@ shellexec(char **argv, char **envp, const char *path, int idx)
   char       *cmdname;
   const char *opt;
   int         e;
+
+#if FEATURE_INPROC_EXEC
+  {
+    /* basename of argv[0] for slash-free lookup */
+    const char *base = strrchr(argv[0], '/');
+    base = base ? base + 1 : argv[0];
+    if (wexec_get_inproc() && wexec_is_builtin(base)) {
+      int ret;
+      fflush(stdout);
+      fflush(stderr);
+      ret = wexecvp(base, argv);
+      fflush(stdout);
+      fflush(stderr);
+      _exit(ret);
+    }
+  }
+#endif
 
   if (strchr(argv[0], '/') != NULL) {
     tryexec(argv[0], argv, envp);
@@ -313,6 +331,10 @@ printentry(struct tblentry *cmdp, int verbose)
       ckfree(name);
       INTON;
     }
+#if FEATURE_INPROC_EXEC
+  } else if (cmdp->cmdtype == CMDWEXEC) {
+    out1fmt("inproc %s", cmdp->cmdname);
+#endif
 #ifdef DEBUG
   } else {
     error("internal error: cmdtype %d", cmdp->cmdtype);
@@ -357,7 +379,7 @@ find_command(const char *name, struct cmdentry *entry, int act, const char *path
       goto success;
   }
 
-  /* Check for builtin next */
+  /* check for builtin next */
   if ((i = find_builtin(name, &spec)) >= 0) {
     INTOFF;
     cmdp = cmdlookup(name, 1);
@@ -369,6 +391,22 @@ find_command(const char *name, struct cmdentry *entry, int act, const char *path
     INTON;
     goto success;
   }
+
+#if FEATURE_INPROC_EXEC
+  /* when inproc dispatch is active, registered wexec builtins are available
+   * even if they are not present on the filesystem */
+  if (wexec_get_inproc() && wexec_is_builtin(name)) {
+    INTOFF;
+    cmdp = cmdlookup(name, 1);
+    if (cmdp->cmdtype == CMDFUNCTION)
+      cmdp = &loc_cmd;
+    cmdp->cmdtype     = CMDWEXEC;
+    cmdp->param.index = 0;
+    cmdp->special     = 0;
+    INTON;
+    goto success;
+  }
+#endif
 
   /* We have to search path. */
 
@@ -782,6 +820,15 @@ typecmd_impl(int argc, char **argv, int cmd, const char *path)
         else
           out1fmt("%s is a shell builtin\n", argv[i]);
         break;
+
+#if FEATURE_INPROC_EXEC
+      case CMDWEXEC:
+        if (cmd == TYPECMD_SMALLV)
+          out1fmt("%s\n", argv[i]);
+        else
+          out1fmt("%s is an inproc builtin\n", argv[i]);
+        break;
+#endif
 
       default:
         if (cmd != TYPECMD_SMALLV)

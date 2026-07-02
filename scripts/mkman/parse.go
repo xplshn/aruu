@@ -43,8 +43,18 @@ func extractManLines(path string, cfg Config) ([]string, error) {
 		trimmed := strings.TrimSpace(line)
 
 		if inBlockComment {
-			if trimmed == "*/" || trimmed == "* /" {
+			if strings.Contains(trimmed, "*/") {
 				inBlockComment = false
+				idx := strings.Index(trimmed, "*/")
+				before := strings.TrimSpace(trimmed[:idx])
+				if strings.HasPrefix(before, "* ") {
+					before = before[2:]
+				} else if before == "*" {
+					before = ""
+				}
+				if before != "" {
+					lines = append(lines, stripManPrefix(before))
+				}
 				continue
 			}
 

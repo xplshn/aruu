@@ -420,8 +420,7 @@ main(int argc, char *argv[])
       iflag = 1;
       break;
     case 'L':
-      // ?man -L:label: use label in place of file name in merge
-      // output
+      // ?man -L:label: use label in place of file name in merge output
       if (nlabels >= 3)
         usage();
       labels[nlabels++] = EARGF(usage());

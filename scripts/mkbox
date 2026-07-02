@@ -2,21 +2,51 @@
 # mkbox - build aruu-box, the aruu multi-call binary
 #
 # expects CC CPPFLAGS CFLAGS LDFLAGS LDLIBS OBJCOPY YACC from the environment
-# defaults match config.mk but can be overridden
+# defaults match config.kv but can be overridden
 #
 # run from the source root (the Makefile does this automatically)
 
 set -e
 
+ROOT=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
+
+# load key-value config if it exists
+if [ -f "${ROOT}/scripts/mk/config.kv" ]; then
+        . "${ROOT}/scripts/mk/config.kv"
+fi
+
 : "${CC:=cc}"
-: "${CPPFLAGS:=-Ishared -D_DEFAULT_SOURCE -D_GNU_SOURCE -D_NETBSD_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700 -D_FILE_OFFSET_BITS=64 -DFEATURE_INPROC_EXEC=1}"
 : "${CFLAGS:=-std=c99 -Wall -Wextra -pedantic}"
 : "${LDFLAGS:=}"
 : "${LDLIBS:=-lcrypt -lresolv}"
 : "${OBJCOPY:=objcopy}"
 : "${YACC:=yacc}"
 
-ROOT=$(CDPATH= cd "$(dirname "$0")/.." && pwd)
+# build feature flag string from loaded config.kv variables
+_feature_flags=""
+for _f in $(set | grep '^FEATURE_[A-Za-z0-9_]*=' | cut -d= -f1 | sort); do
+        eval "_v=\$$_f"
+        _feature_flags="$_feature_flags -D${_f}=${_v}"
+done
+unset _f _v
+
+CPPFLAGS="-Ishared -DPREFIX=\\\"${PREFIX:-/usr/local}\\\" -D_DEFAULT_SOURCE -D_GNU_SOURCE -D_NETBSD_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700 -D_FILE_OFFSET_BITS=64${_feature_flags} ${CPPFLAGS_TLS:-}"
+
+# -lm must be included if diff or awk is built
+if [ "${BUILD_POSIX_DIFF:-0}" = "1" ] || [ "${BUILD_POSIX_AWK:-0}" = "1" ]; then
+        case "$LDLIBS" in
+                *-lm*) ;;
+                *) LDLIBS="${LDLIBS} -lm" ;;
+        esac
+fi
+# -ltinfo must be included if yap is built
+if [ "${BUILD_EXTRA_YAP:-0}" = "1" ]; then
+        case "$LDLIBS" in
+                *-ltinfo*) ;;
+                *) LDLIBS="${LDLIBS} -ltinfo" ;;
+        esac
+fi
+
 BDIR="${ROOT}/.box"
 BOX="${ROOT}/aruu-box"
 LIBREDLINE="${ROOT}/shared/libredline/libredline.a"
@@ -114,101 +144,6 @@ compile_make() {
         printf '\t{ "make", make_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
 }
 
-compile_diff() {
-        ddir="${ROOT}/cmd/posix/diff"
-        [ -d "${ddir}" ] || return 0
-        symf="${BDIR}/diff.syms"
-        diff_objs=""
-
-        printf 'mkbox: cc diff (multi)\n'
-        for s in diff diffdir diffreg pr xmalloc; do
-                out="${BDIR}/diff_${s}.o"
-                eval "${CC} ${CPPFLAGS} -I\"\$ddir\" ${CFLAGS} -c \"\$ddir/\$s.c\" -o \"\$out\"" ||
-                        die "compile failed: diff/${s}.c"
-                diff_objs="${diff_objs} ${out}"
-        done
-
-        combined="${BDIR}/diff_combined.o"
-        ${LD:-ld} -r -o "${combined}" ${diff_objs} ||
-                die "ld -r failed: diff"
-
-        printf 'main diff_main\n' > "${symf}"
-        ${OBJCOPY} --redefine-syms="${symf}" "${combined}" ||
-                die "objcopy failed: diff"
-        ${OBJCOPY} --keep-global-symbol=diff_main "${combined}" ||
-                die "objcopy localize failed: diff"
-        rm -f "${symf}" ${diff_objs}
-
-        OBJS="${OBJS} ${combined}"
-        LDLIBS="${LDLIBS} -lm"
-        printf 'int diff_main(int, char **);\n' >> "${DECL_F}"
-        printf '\t{ "diff", diff_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
-}
-
-compile_patch() {
-        pdir="${ROOT}/cmd/posix/patch"
-        [ -d "${pdir}" ] || return 0
-        symf="${BDIR}/patch.syms"
-        patch_objs=""
-
-        printf 'mkbox: cc patch (multi)\n'
-        for s in patch pch inp util backupfile mkpath; do
-                out="${BDIR}/patch_${s}.o"
-                eval "${CC} ${CPPFLAGS} -I\"\$pdir\" ${CFLAGS} -c \"\$pdir/\$s.c\" -o \"\$out\"" ||
-                        die "compile failed: patch/${s}.c"
-                patch_objs="${patch_objs} ${out}"
-        done
-
-        combined="${BDIR}/patch_combined.o"
-        ${LD:-ld} -r -o "${combined}" ${patch_objs} ||
-                die "ld -r failed: patch"
-
-        printf 'main patch_main\n' > "${symf}"
-        ${OBJCOPY} --redefine-syms="${symf}" "${combined}" ||
-                die "objcopy failed: patch"
-        ${OBJCOPY} --keep-global-symbol=patch_main "${combined}" ||
-                die "objcopy localize failed: patch"
-        rm -f "${symf}" ${patch_objs}
-
-        OBJS="${OBJS} ${combined}"
-        printf 'int patch_main(int, char **);\n' >> "${DECL_F}"
-        printf '\t{ "patch", patch_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
-}
-
-compile_diff3() {
-        ddir="${ROOT}/cmd/extra/diff3"
-        [ -d "${ddir}" ] || return 0
-        pdir="${ROOT}/cmd/posix/diff"
-        symf="${BDIR}/diff3.syms"
-        diff3_objs=""
-
-        printf 'mkbox: cc diff3 (multi)\n'
-        for s in diff3; do
-                out="${BDIR}/diff3_${s}.o"
-                eval "${CC} ${CPPFLAGS} -I\"\$pdir\" ${CFLAGS} -c \"\$ddir/\$s.c\" -o \"\$out\"" ||
-                        die "compile failed: diff3/${s}.c"
-                diff3_objs="${diff3_objs} ${out}"
-        done
-        out="${BDIR}/diff3_xmalloc.o"
-        eval "${CC} ${CPPFLAGS} -I\"\$pdir\" ${CFLAGS} -c \"\$pdir/xmalloc.c\" -o \"\$out\"" ||
-                die "compile failed: diff/xmalloc.c"
-        diff3_objs="${diff3_objs} ${out}"
-
-        combined="${BDIR}/diff3_combined.o"
-        ${LD:-ld} -r -o "${combined}" ${diff3_objs} ||
-                die "ld -r failed: diff3"
-
-        printf 'main diff3_main\n' > "${symf}"
-        ${OBJCOPY} --redefine-syms="${symf}" "${combined}" ||
-                die "objcopy failed: diff3"
-        ${OBJCOPY} --keep-global-symbol=diff3_main "${combined}" ||
-                die "objcopy localize failed: diff3"
-        rm -f "${symf}" ${diff3_objs}
-
-        OBJS="${OBJS} ${combined}"
-        printf 'int diff3_main(int, char **);\n' >> "${DECL_F}"
-        printf '\t{ "diff3", diff3_main, "extra" },\n' >> "${BDIR}/entries_extra.inc"
-}
 
 compile_yap() {
         ydir="${ROOT}/cmd/extra/yap"
@@ -239,9 +174,32 @@ compile_yap() {
         rm -f "${symf}" ${yap_objs}
 
         OBJS="${OBJS} ${combined}"
-        LDLIBS="${LDLIBS} -ltinfo"
         printf 'int yap_main(int, char **);\n' >> "${DECL_F}"
         printf '\t{ "yap", yap_main, "extra" },\n' >> "${BDIR}/entries_extra.inc"
+}
+
+compile_bc() {
+        bdir="${ROOT}/cmd/posix"
+        symf="${BDIR}/bc.syms"
+
+        printf 'mkbox: yacc bc/bc.y\n'
+        ${YACC} -o "${bdir}/bc.c" "${bdir}/bc.y" ||
+                die "yacc failed: bc/bc.y"
+
+        out="${BDIR}/bc.o"
+        eval "${CC} ${CPPFLAGS} ${CFLAGS} -c \"${bdir}/bc.c\" -o \"${out}\"" ||
+                die "compile failed: bc/bc.c"
+
+        printf 'main bc_main\n' > "${symf}"
+        ${OBJCOPY} --redefine-syms="${symf}" "${out}" ||
+                die "objcopy failed: bc"
+        ${OBJCOPY} --keep-global-symbol=bc_main "${out}" ||
+                die "objcopy localize failed: bc"
+        rm -f "${symf}" "${bdir}/bc.c"
+
+        OBJS="${OBJS} ${out}"
+        printf 'int bc_main(int, char **);\n' >> "${DECL_F}"
+        printf '\t{ "bc", bc_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
 }
 
 compile_awk() {
@@ -285,7 +243,6 @@ compile_awk() {
         rm -f "${symf}" ${awk_objs}
 
         OBJS="${OBJS} ${combined}"
-        LDLIBS="${LDLIBS} -lm"
         printf 'int awk_main(int, char **);\n' >> "${DECL_F}"
         printf '\t{ "awk", awk_main, "posix" },\n' >> "${BDIR}/entries_posix.inc"
 }
@@ -354,6 +311,18 @@ process_dir() {
                 [ -f "${src}" ] || continue
                 name=${src##*/}
                 name=${name%.c}
+
+                # bc.c is generated by compile_bc() (see below); it lands in
+                # this same directory but must not be picked up here too, or
+                # bc_main ends up defined twice and the final link fails
+                [ "${catg}" = "posix" ] && [ "${name}" = "bc" ] && continue
+
+                u_catg=$(printf '%s' "${catg}" | tr '[:lower:]' '[:upper:]')
+                u_name=$(printf '%s' "${name}" | tr '[:lower:].-' '[:upper:]__')
+                var_name="BUILD_${u_catg}_${u_name}"
+                eval "val=\${$var_name:-0}"
+                [ "$val" = "1" ] || continue
+
                 fn=$(printf '%s' "${name}" | tr '.-' '__')
                 compile_tool "${src}" "${name}" "${fn}" "${catg}" "${extra}"
                 if [ "${name}" = "test" ]; then
@@ -365,31 +334,29 @@ process_dir() {
         done
 }
 
-[ -f "${ROOT}/cmd/posix/diff.c" ] && LDLIBS="${LDLIBS} -lm"
-
 process_dir "${ROOT}/cmd/posix" "posix"
-compile_diff
-compile_patch
-compile_awk
-compile_sh
-compile_make
+[ "${BUILD_POSIX_AWK:-0}" = "1" ] && compile_awk
+[ "${BUILD_POSIX_BC:-0}" = "1" ] && compile_bc
+[ "${BUILD_POSIX_SH:-0}" = "1" ] && compile_sh
+[ "${BUILD_POSIX_MAKE:-0}" = "1" ] && compile_make
 process_dir "${ROOT}/cmd/linux" "linux"
 process_dir "${ROOT}/cmd/net" "net"
 process_dir "${ROOT}/cmd/pseudo" "pseudo"
 process_dir "${ROOT}/cmd/xsi" "xsi"
 process_dir "${ROOT}/cmd/extra" "extra"
-compile_diff3
-compile_yap
+[ "${BUILD_EXTRA_YAP:-0}" = "1" ] && compile_yap
 
 DISP="${BDIR}/aruu-box.c"
 printf 'mkbox: generating dispatch\n'
 
-cat > "${DISP}" << 'DISPATCH_HEAD'
-/* This software is released into the public domain, or
-   registered under the ISC License, see ./LICENSE for details
-   2026 xplshn [anto@xplshn.com.ar](mailto:anto@xplshn.com.ar) */
+escaped_license=$(tr -d '\r' < "${ROOT}/LICENSE" | sed 's/\\/\\\\/g; s/"/\\"/g; s/^/\"/; s/$/\\n\"/')
 
-/* routes argv[0] to the appropriate tool main */
+cat > "${DISP}" << DISPATCH_HEAD
+/* this software is released into the public domain, or
+   registered under the isc license, see ./license for details
+   2026 xplshn anto@xplshn.com.ar */
+
+/* routes argv0 to the appropriate tool main */
 #include "wexec.h"
 #include "util.h"
 
@@ -397,6 +364,10 @@ cat > "${DISP}" << 'DISPATCH_HEAD'
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+static const char license[] =
+${escaped_license}
+;
 
 extern char *argv0;
 
@@ -436,7 +407,7 @@ usage(void)
 
         last = NULL;
         col = 0;
-        fprintf(stderr, "usage: %s [-i path] [command [args...]]\n", argv0);
+        fprintf(stderr, "usage: %s [-i path] [--license | -l] [command [args...]]\n", argv0);
         for (c = cmds; c->name; c++) {
                 if (!last || strcmp(c->cat, last) != 0) {
                         if (last)
@@ -498,6 +469,10 @@ main(int argc, char *argv[])
         if (strcmp(s, "aruu-box") == 0) {
                 if (argc < 2)
                         usage();
+                if (strcmp(argv[1], "--license") == 0 || strcmp(argv[1], "-l") == 0) {
+                        printf("%s", license);
+                        return 0;
+                }
                 argc--;
                 argv++;
                 if (strcmp(argv[0], "-i") == 0) {

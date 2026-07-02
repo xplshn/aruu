@@ -6,6 +6,11 @@ complete SBASE & UBASE., new utils partially based on toybox have
 been added, specifically, the utils under cmd/net are partially based
 on their toybox applet equivalent.
 
+The codebase has diverged a lot since the project started. And we have
+a myriad of utilities which were written specifically for ARUU.
+We also have greatly simplified ports of components from other systems
+and projects, such as FreeBSD sh, minix yap (pager), onetrueawk, etc.
+
 OVERVIEW
 ========
 
@@ -64,7 +69,6 @@ INSTALL
 SOURCE LAYOUT
 =============
 
-    config.mk              build configuration
     Makefile               pdpmake-compatible build rules
     scripts/
       mkbox                builds aruu-box from compiled tool objects
@@ -74,48 +78,53 @@ SOURCE LAYOUT
       libutil/             utility library (eprintf, ealloc, recurse, ...)
       libutf/              UTF-8/rune library
     cmd/
-      posix/               POSIX.1-2008 tools (sh, make, grep, sed, pax, ...)
-      linux/               Linux-specific tools (mount, dmesg, insmod, ...)
-      net/                 networking tools (wget, ping, nc, ifconfig, ...)
-      pseudo/              widely-used non-POSIX tools (tar, stat, seq, ...)
-      xsi/                 XSI-extension tools (mknod, su, passwd)
+      posix/          POSIX.1-2008 tools (sh, make, grep, sed, pax, ...)
+      linux/          Linux-specific tools (mount, dmesg, insmod, ...)
+      net/            networking tools (wget, ip, ping, nc, ...)
+      pseudo/         widely-used non-POSIX tools (tar, stat, seq, ...)
+      xsi/            XSI-extension tools (mknod, su, passwd)
+      extra/          third-party-flavored extras (yap, b3sum, fdisk, ...)
+      dev/            small toolchain (as, cc, ld, ar); not built by
+                      default, see PRESET_UTILS in build.cfg
 
 TOOLS
 =====
 
 posix:
-	[, awk, basename, cal, cat, chgrp, chmod, chown, cksum, cmp, comm, cp,
-	cut, date, dd, df, dirname, du, echo, ed, env, expand, expr, false,
-	find, fold, getconf, grep, head, id, join, kill, link, ln, logger,
-	logname, ls, make, mesg, mkdir, mkfifo, mv, nice, nl, nohup, od,
-	paste, pathchk, pax, printf, ps, pwd, readlink, renice, rm, rmdir,
-	sed, sh, sleep, sort, split, tail, tee, test, time, touch, tr, true,
-	tsort, tty, uname, unexpand, uniq, unlink, uudecode, uuencode, wc,
-	who, xargs
+	[, awk, basename, bc, cal, cat, chgrp, chmod, chown, cksum, cmp, comm,
+	cp, cut, date, dd, df, diff, dirname, du, echo, ed, env, expand, expr,
+	false, find, fold, getconf, grep, head, id, join, kill, link, ln,
+	logger, logname, ls, make, mesg, mkdir, mkfifo, mv, nice, nl, nohup,
+	od, paste, patch, pathchk, pax, printf, ps, pwd, readlink, renice, rm,
+	rmdir, sed, sh, sleep, sort, split, tail, tee, test, time, touch, tr,
+	true, tsort, tty, uname, unexpand, uniq, unlink, uudecode, uuencode,
+	wc, who, xargs
 
 linux:
-	blkdiscard, chvt, ctrlaltdel, dmesg, eject, fallocate, free,
-	freeramdisk, fsfreeze, hwclock, insmod, lsmod, lsusb, mkswap, mount,
-	mountpoint, pidof, pivot_root, pwdx, readahead, rmmod, swaplabel,
-	swapoff, swapon, switch_root, sysctl, umount, unshare, uptime,
-	vtallow
+	blkdiscard, chvt, ctrlaltdel, depmod, eject, freeramdisk, fsfreeze,
+	hwclock, insmod, lsmod, lsusb, mkswap, modprobe, mount, mountpoint,
+	pivot_root, readahead, rmmod, swaplabel, swapoff, swapon, switch_root,
+	sysctl, tunctl, umount, unshare, vtallow
 
 net:
-	host, httpd, ifconfig, netcat, ping, sdhcp, tftp, tunctl, wget
+	host, httpd, ifconfig, ip, netcat, ping, sdhcp, tftp, wget
 
 pseudo:
-	base64, chroot, clear, cols, cron, flock, getty, halt, hostname,
-	install, killall5, last, lastlog, login, md5sum, mktemp, nologin,
-	pagesize, printenv, respawn, rev, seq, setsid, sha1sum, sha224sum,
-	sha256sum, sha384sum, sha512-224sum, sha512-256sum, sha512sum, sponge,
-	stat, tar, truncate, watch, which, whoami, xinstall, yes
+	base64, chroot, clear, cols, cron, diff3, dmesg, fallocate, flock,
+	free, getty, halt, hostname, install, killall5, last, lastlog, login,
+	md5sum, mkpasswd, mktemp, nologin, pagesize, pidof, printenv, pwdx,
+	respawn, rev, seq, setsid, sha1sum, sha224sum, sha256sum, sha384sum,
+	sha512-224sum, sha512-256sum, sha512sum, sponge, stat, tar, truncate,
+	uptime, watch, which, whoami, xinstall, yes
 
 xsi:
 	mknod, passwd, su
 
+extra:
+	b3sum, blkid, fdisk, lsblk, sync, yap
+
 TODOs / PENDING RELEASE
 =======================
-ip - new impl partially based on toybox's applet
 init - situation/sctl rewrite
 troff - neatroff
 man - unsure
