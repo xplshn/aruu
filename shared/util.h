@@ -170,3 +170,9 @@ int net_del_route(const char *, const char *, const char *, const char *, int);
 int net_flush_addrs(const char *);
 int net_set_txqueuelen(const char *, int);
 int net_set_name(const char *, const char *);
+
+#if FEATURE_NOEXEC || FEATURE_NOFORK
+#include "wexec.h"
+#define exit(code)  wexec_exit(code)
+#define _exit(code) wexec_exit(code)
+#endif

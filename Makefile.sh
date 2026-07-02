@@ -25,14 +25,39 @@ while [ $# -gt 0 ]; do
         shift
 done
 
+# timestamp comparison
+#
+mtime() {
+        stat -c '%Y' "$1" 2>/dev/null || stat -f '%m' "$1" 2>/dev/null || echo 0
+}
+newer_than() {
+        local s t
+        [ -e "$2" ] || return 0
+        s=$(mtime "$1"); t=$(mtime "$2")
+        [ "$s" -gt "$t" ]
+}
+any_newer_than() {
+        local target="$1"; shift
+        for src do
+                newer_than "$src" "$target" && return 0
+        done
+        return 1
+}
+
 [ -f build.cfg ] || { printf 'build.cfg not found; see the repository README\n' >&2; exit 1; }
+
+# generate config files if missing or build.cfg is newer
+if [ ! -f scripts/mk/config.kv ] || newer_than build.cfg scripts/mk/config.kv; then
+        sh scripts/genconfig.sh
+fi
+
 # shellcheck disable=SC1091
 . ./build.cfg
 
 # load config.kv if it exists to override and provide detected TLS settings
 if [ -f scripts/mk/config.kv ]; then
         # shellcheck disable=SC1091
-        . scripts/mk/config.kv
+        . ./scripts/mk/config.kv
 fi
 
 # cppflags derived from build.cfg; any feature_* added there is picked up automatically
@@ -68,25 +93,6 @@ LIB="shared/libredline/libredline.a shared/libutil/libutil.a shared/libutf/libut
 
 # set by multi-file builders for generated headers, cleared after use
 EXTRA_HDR=
-
-# timestamp comparison
-#
-mtime() {
-        stat -c '%Y' "$1" 2>/dev/null || stat -f '%m' "$1" 2>/dev/null || echo 0
-}
-newer_than() {
-        local s t
-        [ -e "$2" ] || return 0
-        s=$(mtime "$1"); t=$(mtime "$2")
-        [ "$s" -gt "$t" ]
-}
-any_newer_than() {
-        local target="$1"; shift
-        for src do
-                newer_than "$src" "$target" && return 0
-        done
-        return 1
-}
 
 # parallel job queue
 # objs_for must not run in a subshell, enqueue writes _qn/_queue in the current shell
@@ -238,59 +244,28 @@ cfg_enabled() {
 }
 
 build_simple_tools() {
-        local cat="$1" src base var staged=""
+        local cat="$1" src base var
         for src in cmd/"$cat"/*.c; do
                 [ -f "$src" ] || continue
                 base=${src##*/}; base=${base%.c}
                 var=$(cfgvar "$cat" "$base")
                 cfg_enabled "$var" || continue
-                compile_c "$src" "${src%.c}.o"
-                staged="$staged ${src%.c}"
-        done
-        drain
-        local bin
-        for bin in $staged; do
-                if [ "${bin##*/}" = "diff" ]; then
-                        link_bin "$bin" "${bin}.o" -- $LIB -lm
+                local bin="cmd/$cat/$base"
+                # shellcheck disable=SC2086
+                any_newer_than "$bin" "$src" $HDR $EXTRA_HDR $LIB || continue
+                if [ "$base" = "diff" ]; then
+                        enqueue "  CC  $bin" "$CC $src $CPPFLAGS $CFLAGS $LDFLAGS -o $bin $LIB -lm $LDLIBS"
                 else
-                        link_bin "$bin" "${bin}.o" -- $LIB
+                        enqueue "  CC  $bin" "$CC $src $CPPFLAGS $CFLAGS $LDFLAGS -o $bin $LIB $LDLIBS"
                 fi
         done
+        drain
 }
 
 build_awk() {
         cfg_enabled BUILD_POSIX_AWK || return 0
         local dir=cmd/posix/awk
-
-        any_newer_than "$dir/awkgram.tab.c" "$dir/awkgram.y" && {
-                if   command -v yacc  >/dev/null 2>&1; then
-                        printf '  YACC  %s/awkgram.tab.c\n' "$dir"
-                        yacc  -d -o "$dir/awkgram.tab.c" "$dir/awkgram.y"
-                        if [ ! -f "$dir/awkgram.tab.h" ]; then
-                                if [ -f y.tab.h ]; then
-                                        mv y.tab.h "$dir/awkgram.tab.h"
-                                elif [ -f "$dir/y.tab.h" ]; then
-                                        mv "$dir/y.tab.h" "$dir/awkgram.tab.h"
-                                fi
-                        fi
-                elif command -v bison >/dev/null 2>&1; then
-                        printf '  BISON %s/awkgram.tab.c\n' "$dir"
-                        bison -d -o "$dir/awkgram.tab.c" "$dir/awkgram.y"
-                else
-                        printf 'awk: no yacc/bison; using pre-generated awkgram.tab.c\n' >&2
-                fi
-        }
-
-        any_newer_than "$dir/maketab" "$dir/maketab.c" "$dir/awkgram.tab.h" && {
-                printf '  CC    %s/maketab\n' "$dir"
-                eval "$CC $CFLAGS -o $dir/maketab $dir/maketab.c"
-        }
-
-        any_newer_than "$dir/proctab.c" "$dir/maketab" && {
-                printf '  GEN   %s/proctab.c\n' "$dir"
-                "$dir/maketab" "$dir/awkgram.tab.h" > "$dir/proctab.c"
-        }
-
+        CC="$CC" CFLAGS="$CFLAGS" YACC="$YACC" sh scripts/genconfig.sh awk
         EXTRA_HDR="$dir/awk.h $dir/awkgram.tab.h $dir/proto.h"
         objs_for "$dir" maketab.c "-I$dir"
         EXTRA_HDR=
@@ -300,37 +275,7 @@ build_awk() {
 build_sh() {
         cfg_enabled BUILD_POSIX_SH || return 0
         local dir=cmd/posix/sh
-
-        any_newer_than "$dir/mknodes" "$dir/mknodes.c" && {
-                printf '  CC    %s/mknodes\n' "$dir"
-                eval "$CC $CFLAGS -o $dir/mknodes $dir/mknodes.c"
-        }
-
-        any_newer_than "$dir/mksyntax" "$dir/mksyntax.c" && {
-                printf '  CC    %s/mksyntax\n' "$dir"
-                eval "$CC $CPPFLAGS -I$dir $CFLAGS -o $dir/mksyntax $dir/mksyntax.c"
-        }
-
-        any_newer_than "$dir/token.h" "$dir/mktokens" && {
-                printf '  GEN   %s/token.h\n' "$dir"
-                (cd "$dir" && sh mktokens)
-        }
-
-        any_newer_than "$dir/syntax.c" "$dir/mksyntax" && {
-                printf '  GEN   %s/syntax.c\n' "$dir"
-                (cd "$dir" && ./mksyntax)
-        }
-
-        any_newer_than "$dir/nodes.c" "$dir/mknodes" "$dir/nodetypes" "$dir/nodes.c.pat" && {
-                printf '  GEN   %s/nodes.c\n' "$dir"
-                (cd "$dir" && ./mknodes nodetypes nodes.c.pat)
-        }
-
-        any_newer_than "$dir/builtins.c" "$dir/mkbuiltins" "$dir/builtins.def" "$dir/shell.h" scripts/mk/config.kv && {
-                printf '  GEN   %s/builtins.c\n' "$dir"
-                (cd "$dir" && sh mkbuiltins .)
-        }
-
+        CC="$CC" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" sh scripts/genconfig.sh sh
         EXTRA_HDR="$dir/syntax.h $dir/nodes.h $dir/builtins.h $dir/token.h"
         objs_for "$dir" "mknodes.c mksyntax.c" "-DSHELL -I$dir"
         EXTRA_HDR=
@@ -349,28 +294,15 @@ build_make() {
 build_bc() {
         cfg_enabled BUILD_POSIX_BC || return 0
         local src=cmd/posix/bc.c
-
-        any_newer_than "$src" cmd/posix/bc.y && {
-                printf '  GEN   %s\n' "$src"
-                if command -v yacc >/dev/null 2>&1; then
-                        yacc -o "$src" cmd/posix/bc.y
-                elif command -v bison >/dev/null 2>&1; then
-                        bison -o "$src" cmd/posix/bc.y
-                else
-                        printf 'bc: no yacc/bison found\n' >&2; return 1
-                fi
-        }
-
-        compile_c "$src" "${src%.c}.o"
-        drain
-        link_bin cmd/posix/bc "${src%.c}.o" -- $LIB
+        YACC="$YACC" sh scripts/genconfig.sh bc
+        # shellcheck disable=SC2086
+        any_newer_than cmd/posix/bc "$src" $HDR $EXTRA_HDR $LIB || return 0
+        printf '  CC  cmd/posix/bc\n'
+        eval "$CC $src $CPPFLAGS $CFLAGS $LDFLAGS -o cmd/posix/bc $LIB $LDLIBS"
 }
 
 build_posix() {
-        cfg_enabled BUILD_POSIX_GETCONF && [ ! -f cmd/posix/getconf.h ] && {
-                printf '  GEN   cmd/posix/getconf.h\n'
-                scripts/getconf.sh > cmd/posix/getconf.h || { rm -f cmd/posix/getconf.h; exit 1; }
-        }
+        cfg_enabled BUILD_POSIX_GETCONF && sh scripts/genconfig.sh getconf
         build_simple_tools posix
         build_awk
         build_bc
@@ -521,49 +453,9 @@ do_regen() {
                 . scripts/mk/config.kv
         fi
 
-        # 3. clean the generated files to force regeneration
-        rm -f cmd/posix/getconf.h cmd/posix/bc.c cmd/posix/bc.h
-        rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proctab.c cmd/posix/awk/maketab
-        rm -f cmd/posix/sh/mknodes cmd/posix/sh/mksyntax cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
-
-        # 4. run the generation steps
-        # for getconf.h
-        printf '  GEN   cmd/posix/getconf.h\n'
-        scripts/getconf.sh > cmd/posix/getconf.h || { rm -f cmd/posix/getconf.h; exit 1; }
-
-        # for bc.c from bc.y
-        printf '  GEN   cmd/posix/bc.c\n'
-        if command -v yacc >/dev/null 2>&1; then
-                yacc -o cmd/posix/bc.c cmd/posix/bc.y
-        elif command -v bison >/dev/null 2>&1; then
-                bison -o cmd/posix/bc.c cmd/posix/bc.y
-        fi
-
-        # for awk
-        local adir=cmd/posix/awk
-        if command -v yacc >/dev/null 2>&1; then
-                yacc -d -o "$adir/awkgram.tab.c" "$adir/awkgram.y"
-                if [ ! -f "$adir/awkgram.tab.h" ]; then
-                        if [ -f y.tab.h ]; then
-                                mv y.tab.h "$adir/awkgram.tab.h"
-                        elif [ -f "$adir/y.tab.h" ]; then
-                                mv "$adir/y.tab.h" "$adir/awkgram.tab.h"
-                        fi
-                fi
-        elif command -v bison >/dev/null 2>&1; then
-                bison -d -o "$adir/awkgram.tab.c" "$adir/awkgram.y"
-        fi
-        eval "$CC $CFLAGS -o $adir/maketab $adir/maketab.c"
-        "$adir/maketab" "$adir/awkgram.tab.h" > "$adir/proctab.c"
-
-        # for sh
-        local sdir=cmd/posix/sh
-        eval "$CC $CFLAGS -o $sdir/mknodes $sdir/mknodes.c"
-        eval "$CC $CPPFLAGS -I$sdir $CFLAGS -o $sdir/mksyntax $sdir/mksyntax.c"
-        (cd "$sdir" && sh mktokens)
-        (cd "$sdir" && ./mksyntax)
-        (cd "$sdir" && ./mknodes nodetypes nodes.c.pat)
-        (cd "$sdir" && sh mkbuiltins .)
+        # 3. clean and generate files using scripts/genconfig.sh
+        CC="$CC" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" YACC="$YACC" sh scripts/genconfig.sh clean
+        CC="$CC" CFLAGS="$CFLAGS" CPPFLAGS="$CPPFLAGS" YACC="$YACC" sh scripts/genconfig.sh all
 }
 
 do_clean() {
@@ -573,18 +465,9 @@ do_clean() {
         find shared -name '*.a' -exec rm -f {} +
         printf '  CLEAN compiled binaries\n'
         find cmd -type f ! -name '*.*' -perm -100 -exec rm -f {} +
-        printf '  CLEAN generated headers\n'
-        rm -f cmd/posix/getconf.h
-        rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h
-        rm -f cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h
-        rm -f cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h
-        rm -f cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
-        printf '  CLEAN generated sources\n'
-        rm -f cmd/posix/awk/proctab.c
-        rm -f cmd/posix/bc.c
+        sh scripts/genconfig.sh clean
+        rm -f scripts/mk/config.mk scripts/mk/config.kv scripts/mk/rules.mk shared/libutil/nofork_list.h
         printf '  CLEAN build tools\n'
-        rm -f cmd/posix/awk/maketab
-        rm -f cmd/posix/sh/mknodes cmd/posix/sh/mksyntax
         rm -f scripts/mkman/mkman
         printf '  CLEAN dev artifacts\n'
         rm -f cmd/dev/cc/cc1 cmd/dev/cc/cpp cmd/dev/as/as cmd/dev/ld/ld cmd/dev/ar/ar

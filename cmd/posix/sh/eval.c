@@ -43,6 +43,7 @@
  */
 
 #include "../../../shared/paths.h"
+#include "../../../shared/wexec.h"
 #include "builtins.h"
 #include "error.h"
 #include "eval.h"
@@ -999,7 +1000,8 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
   }
 
   /* Fork off a child process if necessary. */
-  if (((cmdentry.cmdtype == CMDNORMAL || cmdentry.cmdtype == CMDUNKNOWN)
+  if (((cmdentry.cmdtype == CMDNORMAL || cmdentry.cmdtype == CMDUNKNOWN
+        || (cmdentry.cmdtype == CMDWEXEC && !(wexec_get_nofork() && wexec_is_nofork(argv[0]))))
        && ((flags & EV_EXIT) == 0 || have_traps()))
       || ((flags & EV_BACKCMD) != 0
           && (cmdentry.cmdtype != CMDBUILTIN || !safe_builtin(cmdentry.u.index, argc, argv)))) {
@@ -1094,6 +1096,52 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
     }
     if (jp)
       exitshell(exitstatus);
+  } else if (cmdentry.cmdtype == CMDWEXEC) {
+    savecmdname = commandname;
+    savetopfile = getcurrentfile();
+    cmdenviron  = &varlist;
+    e           = -1;
+    savehandler = handler;
+    if (setjmp(jmploc.loc)) {
+      e = exception;
+      if (e == EXINT)
+        exitstatus = SIGINT + 128;
+      goto cmddone_wexec;
+    }
+    handler = &jmploc;
+    mode    = REDIR_PUSH;
+    if (flags == EV_BACKCMD) {
+      memout.nextc = memout.buf;
+      mode |= REDIR_BACKQ;
+    }
+    redirect(cmd->ncmd.redirect, mode);
+    outclearerror(out1);
+    listsetvar(cmdenviron, VNOSET);
+    commandname = argv[0];
+    exitstatus  = wexecvp(argv[0], argv);
+    flushall();
+    if (outiserror(out1)) {
+      warning("write error on stdout");
+      if (exitstatus == 0 || exitstatus == 1)
+        exitstatus = 2;
+    }
+  cmddone_wexec:
+    cmdenviron = NULL;
+    out1       = &output;
+    out2       = &errout;
+    freestdout();
+    handler     = savehandler;
+    commandname = savecmdname;
+    if (jp)
+      exitshell(exitstatus);
+    if (flags == EV_BACKCMD) {
+      backcmd->buf   = memout.buf;
+      backcmd->nleft = memout.buf != NULL ? memout.nextc - memout.buf : 0;
+      memout.buf     = NULL;
+      memout.nextc   = NULL;
+      memout.bufend  = NULL;
+      memout.bufsize = 64;
+    }
   } else if (cmdentry.cmdtype == CMDBUILTIN) {
 #ifdef DEBUG
     trputs("builtin command:  ");

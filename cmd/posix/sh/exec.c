@@ -34,6 +34,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -102,17 +103,35 @@ shellexec(char **argv, char **envp, const char *path, int idx)
   char       *cmdname;
   const char *opt;
   int         e;
+#if FEATURE_NOEXEC
+  struct sigaction sa;
+  int              i;
+  int              ret;
+#endif
 
-#if FEATURE_INPROC_EXEC
+#if FEATURE_NOEXEC
   {
     /* basename of argv[0] for slash-free lookup */
-    const char *base = strrchr(argv[0], '/');
-    base = base ? base + 1 : argv[0];
-    if (wexec_get_inproc() && wexec_is_builtin(base)) {
-      int ret;
+    const char   *base = strrchr(argv[0], '/');
+    extern char **environ;
+    base    = base ? base + 1 : argv[0];
+    environ = envp;
+    if (wexec_get_noexec() && wexec_is_builtin(base)) {
+      /* reset caught signal handlers to default for inproc command */
+      for (i = 1; i < NSIG; i++) {
+        if (sigaction(i, NULL, &sa) == 0) {
+          if (sa.sa_handler != SIG_IGN && sa.sa_handler != SIG_DFL) {
+            sa.sa_handler = SIG_DFL;
+            sa.sa_flags   = 0;
+            sigemptyset(&sa.sa_mask);
+            sigaction(i, &sa, NULL);
+          }
+        }
+      }
+
       fflush(stdout);
       fflush(stderr);
-      ret = wexecvp(base, argv);
+      ret = wexec_call_builtin(base, argv);
       fflush(stdout);
       fflush(stderr);
       _exit(ret);
@@ -331,9 +350,9 @@ printentry(struct tblentry *cmdp, int verbose)
       ckfree(name);
       INTON;
     }
-#if FEATURE_INPROC_EXEC
+#if FEATURE_NOEXEC || FEATURE_NOFORK
   } else if (cmdp->cmdtype == CMDWEXEC) {
-    out1fmt("inproc %s", cmdp->cmdname);
+    out1fmt("builtin %s", cmdp->cmdname);
 #endif
 #ifdef DEBUG
   } else {
@@ -392,10 +411,10 @@ find_command(const char *name, struct cmdentry *entry, int act, const char *path
     goto success;
   }
 
-#if FEATURE_INPROC_EXEC
-  /* when inproc dispatch is active, registered wexec builtins are available
+#if FEATURE_NOEXEC || FEATURE_NOFORK
+  /* when builtin dispatch is active, registered wexec builtins are available
    * even if they are not present on the filesystem */
-  if (wexec_get_inproc() && wexec_is_builtin(name)) {
+  if ((wexec_get_noexec() || wexec_get_nofork()) && wexec_is_builtin(name)) {
     INTOFF;
     cmdp = cmdlookup(name, 1);
     if (cmdp->cmdtype == CMDFUNCTION)
@@ -821,12 +840,23 @@ typecmd_impl(int argc, char **argv, int cmd, const char *path)
           out1fmt("%s is a shell builtin\n", argv[i]);
         break;
 
-#if FEATURE_INPROC_EXEC
+#if FEATURE_NOEXEC || FEATURE_NOFORK
       case CMDWEXEC:
-        if (cmd == TYPECMD_SMALLV)
+        if (cmd == TYPECMD_SMALLV) {
           out1fmt("%s\n", argv[i]);
-        else
-          out1fmt("%s is an inproc builtin\n", argv[i]);
+        } else {
+          if (wexec_get_nofork() && wexec_is_nofork(argv[i])) {
+            out1fmt(
+                "%s is embedded via wexec and registered by mkbox & genconfig.sh as "
+                "noexec+nofork\n",
+                argv[i]
+            );
+          } else if (wexec_get_noexec()) {
+            out1fmt("%s is embedded via wexec and registered by mkbox as noexec\n", argv[i]);
+          } else {
+            out1fmt("%s is a shell builtin\n", argv[i]);
+          }
+        }
         break;
 #endif
 

@@ -38,6 +38,8 @@
 #define CTRL_U    21
 #define CTRL_W    23
 #define CTRL_Y    25
+#define CTRL_Z    26
+#define CTRL_QUIT 28
 #define BACKSPACE 127
 #define ESC       27
 
@@ -72,6 +74,8 @@ static char                **history         = NULL;
 static char                 *kill_buffer     = NULL;
 static volatile sig_atomic_t winch_received  = 0;
 static struct sigaction      orig_sigwinch;
+
+static void redlineEditStop(struct redlineState *l);
 
 static void (*completionCallback)(const char *, struct redlineCompletions *) = NULL;
 
@@ -330,7 +334,7 @@ enableRawMode(int fd)
     return -1;
 
   raw = orig_termios;
-  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+  raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP);
   raw.c_oflag &= ~(OPOST);
   raw.c_cflag |= (CS8);
   raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
@@ -1189,13 +1193,33 @@ redlineEditFeed(struct redlineState *l)
   }
 
   switch (c) {
+    case 10:
     case ENTER:
       if (mlmode)
         redlineEditMoveEnd(l);
       return strdup(l->buf);
     case CTRL_C:
+      if (write(l->ofd, "^C", 2) == -1) {}
       errno = EAGAIN;
       return NULL;
+    case CTRL_Z:
+      break;
+    case CTRL_QUIT:
+      if (write(l->ofd, "^\\", 2) == -1) {}
+      redlineEditStop(l);
+      fflush(stdout);
+      {
+        struct sigaction sa, osa;
+        sa.sa_handler = SIG_DFL;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = 0;
+        sigaction(SIGQUIT, &sa, &osa);
+        kill(getpid(), SIGQUIT);
+        sigaction(SIGQUIT, &osa, NULL);
+      }
+      enableRawMode(l->ifd);
+      refreshLine(l);
+      break;
     case BACKSPACE:
     case 8:
       redlineEditBackspace(l);
@@ -1321,6 +1345,8 @@ redlineEditFeed(struct redlineState *l)
       }
       break;
     default:
+      if (c < 32)
+        break;
       utf8len = utf8ByteLen(c);
       utf8[0] = c;
       if (utf8len > 1) {
@@ -1441,6 +1467,9 @@ redline(const char *prompt)
     free(history[history_len]);
   }
   free(l.buf);
+  if (res == NULL && errno == EAGAIN) {
+    kill(getpid(), SIGINT);
+  }
   return res;
 }
 

@@ -42,6 +42,7 @@
 #include <unistd.h>
 
 #include "../../../shared/paths.h"
+#include "../../../shared/wexec.h"
 #include "builtins.h"
 #include "cd.h"
 #include "error.h"
@@ -100,6 +101,7 @@ main(int argc, char *argv[])
   int                     login;
 
   (void)setlocale(LC_ALL, "");
+  wexec_register_env_lookup(lookupvar);
   initcharset();
   state = 0;
   if (setjmp(main_handler.loc)) {

@@ -7,24 +7,33 @@
 
 typedef int (*wexec_fn)(int argc, char **argv);
 
-int wexec_register(const char *name, wexec_fn fn);
-int wexec_is_builtin(const char *name);
+int  wexec_register(const char *name, wexec_fn fn);
+int  wexec_is_builtin(const char *name);
+void wexec_register_env_lookup(char *(*fn)(const char *name));
+#if FEATURE_NOEXEC || FEATURE_NOFORK
+int  wexec_call_builtin(const char *name, char *const *argv);
+void wexec_exit(int code) __attribute__((noreturn));
+#endif
 
-/* search PATH for name; returns emalloc'd absolute path or NULL if not found.
- * when FEATURE_INPROC_EXEC is compiled in and inproc dispatch is enabled,
- * returns NULL for registered builtins (they have no filesystem path). */
+/* search path for name, returns emallocd absolute path or null if not found
+ * when feature_noexec is compiled in and builtin dispatch is enabled,
+ * returns null for registered builtins (they have no filesystem path) */
 char *wwhich(const char *name);
 
-#if FEATURE_INPROC_EXEC
-/* runtime toggle: disable to force fork+exec even when builtins are registered.
- * when the box is also built with FEATURE_INPROC_EXEC_OVERRIDE=1,
- * wexec_get_inproc() additionally honors ARUU_INPROC_EXEC=0 from the
- * environment, read once on first use, so a builtin can be bypassed without
- * a rebuild. without that second flag, inproc dispatch is hardwired on for
- * the whole process and only an explicit wexec_set_inproc() call can
- * change it. */
-void wexec_set_inproc(int enabled);
-int  wexec_get_inproc(void);
+int wexec_is_nofork(const char *name);
+
+#if FEATURE_NOEXEC
+void wexec_set_noexec(int enabled);
+int  wexec_get_noexec(void);
+#else
+#define wexec_get_noexec() 0
+#endif
+
+#if FEATURE_NOFORK
+void wexec_set_nofork(int enabled);
+int  wexec_get_nofork(void);
+#else
+#define wexec_get_nofork() 0
 #endif
 
 int wexecvp(const char *name, char *const *argv);

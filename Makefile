@@ -519,7 +519,7 @@ $(OBJ) $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIB) $(LDLIBS)
 
 cmd/posix/bc.c: cmd/posix/bc.y
-	$(YACC) -d -o $@ cmd/posix/bc.y
+	YACC='$(YACC)' sh scripts/genconfig.sh bc
 
 cmd/posix/bc: cmd/posix/bc.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ cmd/posix/bc.c $(LIB) $(LDLIBS)
@@ -547,7 +547,7 @@ shared/libutil/libutil.a: $(LIBUTILOBJ)
 cmd/posix/getconf: cmd/posix/getconf.h
 
 cmd/posix/getconf.h:
-	scripts/getconf.sh > $@ || { rm -f $@; exit 1; }
+	sh scripts/genconfig.sh getconf
 
 box: $(LIB)
 	CC='$(CC)' CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' \
@@ -623,19 +623,13 @@ clean:
 	@rm -f $(LIB)
 	@printf "  CLEAN compiled binaries\n"
 	@rm -f $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_BIN_ALL)
-	@printf "  CLEAN generated headers\n"
-	@rm -f cmd/posix/getconf.h cmd/posix/bc.c cmd/posix/bc.h
-	@rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h
-	@rm -f cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h
-	@rm -f cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
-	@printf "  CLEAN generated sources\n"
-	@rm -f cmd/posix/awk/proctab.c
+	@sh scripts/genconfig.sh clean
 	@printf "  CLEAN build tools\n"
-	@rm -f cmd/posix/awk/maketab cmd/posix/sh/mknodes cmd/posix/sh/mksyntax
 	@rm -f scripts/mkman/mkman
 	@rm -f scripts/mk/config.kv
 	@rm -f scripts/mk/config.mk
 	@rm -f scripts/mk/rules.mk
+
 	@printf "  CLEAN dev artifacts\n"
 	@rm -f cmd/dev/cc/cc1 cmd/dev/cc/cpp cmd/dev/as/as cmd/dev/ld/ld cmd/dev/ar/ar shared/libaruuelf.so
 	@rm -f cmd/dev/config.h cmd/dev/cc/config.h cmd/dev/version.h
@@ -710,41 +704,29 @@ YAPOBJ =\
 	cmd/extra/yap/prompt.o\
 	cmd/extra/yap/term.o
 
-cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h: cmd/posix/awk/awkgram.y
-	$(YACC) -d -o cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.y
-	@if [ ! -f cmd/posix/awk/awkgram.tab.h ]; then \
-		if [ -f y.tab.h ]; then mv y.tab.h cmd/posix/awk/awkgram.tab.h; \
-		elif [ -f cmd/posix/awk/y.tab.h ]; then mv cmd/posix/awk/y.tab.h cmd/posix/awk/awkgram.tab.h; fi; \
-	fi
+cmd/posix/awk/awkgram.tab.c: cmd/posix/awk/awkgram.y cmd/posix/awk/maketab.c
+	CC='$(CC)' CFLAGS='$(CFLAGS)' YACC='$(YACC)' sh scripts/genconfig.sh awk
 
-cmd/posix/awk/maketab: cmd/posix/awk/maketab.c cmd/posix/awk/awkgram.tab.h
-	$(CC) $(CFLAGS) -o $@ cmd/posix/awk/maketab.c
-
-cmd/posix/awk/proctab.c: cmd/posix/awk/maketab
-	cmd/posix/awk/maketab cmd/posix/awk/awkgram.tab.h > $@
+cmd/posix/awk/awkgram.tab.h: cmd/posix/awk/awkgram.tab.c ;
+cmd/posix/awk/maketab: cmd/posix/awk/awkgram.tab.c ;
+cmd/posix/awk/proctab.c: cmd/posix/awk/awkgram.tab.c ;
 
 $(AWKOBJ): cmd/posix/awk/awk.h cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proto.h
 
 cmd/posix/awk/awk: $(AWKOBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(AWKOBJ) $(LIB) $(LDLIBS) -lm
 
-cmd/posix/sh/mknodes: cmd/posix/sh/mknodes.c
-	$(CC) $(CFLAGS) -o $@ cmd/posix/sh/mknodes.c
+cmd/posix/sh/builtins.c: cmd/posix/sh/mknodes.c cmd/posix/sh/mksyntax.c cmd/posix/sh/nodetypes cmd/posix/sh/nodes.c.pat cmd/posix/sh/mkbuiltins cmd/posix/sh/builtins.def cmd/posix/sh/shell.h cmd/posix/sh/mktokens
+	CC='$(CC)' CFLAGS='$(CFLAGS)' CPPFLAGS='$(CPPFLAGS)' sh scripts/genconfig.sh sh
 
-cmd/posix/sh/mksyntax: cmd/posix/sh/mksyntax.c
-	$(CC) $(CPPFLAGS) -Icmd/posix/sh $(CFLAGS) -o $@ cmd/posix/sh/mksyntax.c
-
-cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h: cmd/posix/sh/mksyntax
-	cd cmd/posix/sh && ./mksyntax
-
-cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h: cmd/posix/sh/mknodes cmd/posix/sh/nodetypes cmd/posix/sh/nodes.c.pat
-	cd cmd/posix/sh && ./mknodes nodetypes nodes.c.pat
-
-cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h: cmd/posix/sh/mkbuiltins cmd/posix/sh/builtins.def cmd/posix/sh/shell.h scripts/mk/config.kv
-	cd cmd/posix/sh && sh mkbuiltins .
-
-cmd/posix/sh/token.h: cmd/posix/sh/mktokens
-	cd cmd/posix/sh && sh mktokens
+cmd/posix/sh/syntax.c: cmd/posix/sh/builtins.c ;
+cmd/posix/sh/syntax.h: cmd/posix/sh/builtins.c ;
+cmd/posix/sh/nodes.c: cmd/posix/sh/builtins.c ;
+cmd/posix/sh/nodes.h: cmd/posix/sh/builtins.c ;
+cmd/posix/sh/builtins.h: cmd/posix/sh/builtins.c ;
+cmd/posix/sh/token.h: cmd/posix/sh/builtins.c ;
+cmd/posix/sh/mknodes: cmd/posix/sh/builtins.c ;
+cmd/posix/sh/mksyntax: cmd/posix/sh/builtins.c ;
 
 $(SHOBJ): $(SH_GENHDRS)
 
