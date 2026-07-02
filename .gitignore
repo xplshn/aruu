@@ -28,3 +28,8 @@ cmd/posix/bc.c
 cmd/dev/config.h
 cmd/dev/cc/config.h
 cmd/dev/version.h
+
+# build system generated files
+scripts/mk/config.mk
+scripts/mk/config.kv
+deps.mk
