@@ -1,5 +1,4 @@
-.POSIX:
-include scripts/mk/config.mk
+-include scripts/mk/config.mk
 
 .SUFFIXES: .y .o .c
 HDR =\
@@ -488,197 +487,23 @@ BIN_pidof_1 = cmd/pseudo/pidof
 BIN_pwdx_1 = cmd/pseudo/pwdx
 BIN_uptime_1 = cmd/pseudo/uptime
 
-POSIX_BIN = \
-	$(BIN_basename_$(BUILD_POSIX_BASENAME)) \
-	$(BIN_cal_$(BUILD_POSIX_CAL)) \
-	$(BIN_cat_$(BUILD_POSIX_CAT)) \
-	$(BIN_chgrp_$(BUILD_POSIX_CHGRP)) \
-	$(BIN_chmod_$(BUILD_POSIX_CHMOD)) \
-	$(BIN_chown_$(BUILD_POSIX_CHOWN)) \
-	$(BIN_cksum_$(BUILD_POSIX_CKSUM)) \
-	$(BIN_cmp_$(BUILD_POSIX_CMP)) \
-	$(BIN_comm_$(BUILD_POSIX_COMM)) \
-	$(BIN_cp_$(BUILD_POSIX_CP)) \
-	$(BIN_cut_$(BUILD_POSIX_CUT)) \
-	$(BIN_date_$(BUILD_POSIX_DATE)) \
-	$(BIN_dd_$(BUILD_POSIX_DD)) \
-	$(BIN_df_$(BUILD_POSIX_DF)) \
-	$(BIN_diff_$(BUILD_POSIX_DIFF)) \
-	$(BIN_patch_$(BUILD_POSIX_PATCH)) \
-	$(BIN_dirname_$(BUILD_POSIX_DIRNAME)) \
-	$(BIN_du_$(BUILD_POSIX_DU)) \
-	$(BIN_echo_$(BUILD_POSIX_ECHO)) \
-	$(BIN_ed_$(BUILD_POSIX_ED)) \
-	$(BIN_env_$(BUILD_POSIX_ENV)) \
-	$(BIN_expand_$(BUILD_POSIX_EXPAND)) \
-	$(BIN_expr_$(BUILD_POSIX_EXPR)) \
-	$(BIN_false_$(BUILD_POSIX_FALSE)) \
-	$(BIN_find_$(BUILD_POSIX_FIND)) \
-	$(BIN_fold_$(BUILD_POSIX_FOLD)) \
-	$(BIN_getconf_$(BUILD_POSIX_GETCONF)) \
-	$(BIN_grep_$(BUILD_POSIX_GREP)) \
-	$(BIN_head_$(BUILD_POSIX_HEAD)) \
-	$(BIN_id_$(BUILD_POSIX_ID)) \
-	$(BIN_join_$(BUILD_POSIX_JOIN)) \
-	$(BIN_kill_$(BUILD_POSIX_KILL)) \
-	$(BIN_link_$(BUILD_POSIX_LINK)) \
-	$(BIN_ln_$(BUILD_POSIX_LN)) \
-	$(BIN_logger_$(BUILD_POSIX_LOGGER)) \
-	$(BIN_logname_$(BUILD_POSIX_LOGNAME)) \
-	$(BIN_ls_$(BUILD_POSIX_LS)) \
-	$(BIN_mesg_$(BUILD_POSIX_MESG)) \
-	$(BIN_mkdir_$(BUILD_POSIX_MKDIR)) \
-	$(BIN_mkfifo_$(BUILD_POSIX_MKFIFO)) \
-	$(BIN_mv_$(BUILD_POSIX_MV)) \
-	$(BIN_nice_$(BUILD_POSIX_NICE)) \
-	$(BIN_nl_$(BUILD_POSIX_NL)) \
-	$(BIN_nohup_$(BUILD_POSIX_NOHUP)) \
-	$(BIN_od_$(BUILD_POSIX_OD)) \
-	$(BIN_paste_$(BUILD_POSIX_PASTE)) \
-	$(BIN_pathchk_$(BUILD_POSIX_PATHCHK)) \
-	$(BIN_printf_$(BUILD_POSIX_PRINTF)) \
-	$(BIN_ps_$(BUILD_POSIX_PS)) \
-	$(BIN_pwd_$(BUILD_POSIX_PWD)) \
-	$(BIN_readlink_$(BUILD_POSIX_READLINK)) \
-	$(BIN_renice_$(BUILD_POSIX_RENICE)) \
-	$(BIN_rm_$(BUILD_POSIX_RM)) \
-	$(BIN_rmdir_$(BUILD_POSIX_RMDIR)) \
-	$(BIN_sed_$(BUILD_POSIX_SED)) \
-	$(BIN_sleep_$(BUILD_POSIX_SLEEP)) \
-	$(BIN_sort_$(BUILD_POSIX_SORT)) \
-	$(BIN_split_$(BUILD_POSIX_SPLIT)) \
-	$(BIN_tail_$(BUILD_POSIX_TAIL)) \
-	$(BIN_tee_$(BUILD_POSIX_TEE)) \
-	$(BIN_test_$(BUILD_POSIX_TEST)) \
-	$(BIN_time_$(BUILD_POSIX_TIME)) \
-	$(BIN_touch_$(BUILD_POSIX_TOUCH)) \
-	$(BIN_tr_$(BUILD_POSIX_TR)) \
-	$(BIN_true_$(BUILD_POSIX_TRUE)) \
-	$(BIN_tsort_$(BUILD_POSIX_TSORT)) \
-	$(BIN_tty_$(BUILD_POSIX_TTY)) \
-	$(BIN_uname_$(BUILD_POSIX_UNAME)) \
-	$(BIN_unexpand_$(BUILD_POSIX_UNEXPAND)) \
-	$(BIN_uniq_$(BUILD_POSIX_UNIQ)) \
-	$(BIN_unlink_$(BUILD_POSIX_UNLINK)) \
-	$(BIN_uudecode_$(BUILD_POSIX_UUDECODE)) \
-	$(BIN_uuencode_$(BUILD_POSIX_UUENCODE)) \
-	$(BIN_wc_$(BUILD_POSIX_WC)) \
-	$(BIN_who_$(BUILD_POSIX_WHO)) \
-	$(BIN_xargs_$(BUILD_POSIX_XARGS)) \
-	$(BIN_awk_$(BUILD_POSIX_AWK)) \
-	$(BIN_sh_$(BUILD_POSIX_SH)) \
-	$(BIN_pax_$(BUILD_POSIX_PAX)) \
-	$(BIN_make_$(BUILD_POSIX_MAKE)) \
-	$(BIN_bc_$(BUILD_POSIX_BC))
+POSIX_BIN = $(POSIX_BIN_CONFIG)
 
-LINUX_BIN = \
-	$(BIN_blkdiscard_$(BUILD_LINUX_BLKDISCARD)) \
-	$(BIN_chvt_$(BUILD_LINUX_CHVT)) \
-	$(BIN_ctrlaltdel_$(BUILD_LINUX_CTRLALTDEL)) \
-	$(BIN_eject_$(BUILD_LINUX_EJECT)) \
-	$(BIN_freeramdisk_$(BUILD_LINUX_FREERAMDISK)) \
-	$(BIN_fsfreeze_$(BUILD_LINUX_FSFREEZE)) \
-	$(BIN_hwclock_$(BUILD_LINUX_HWCLOCK)) \
-	$(BIN_insmod_$(BUILD_LINUX_INSMOD)) \
-	$(BIN_lsmod_$(BUILD_LINUX_LSMOD)) \
-	$(BIN_lsusb_$(BUILD_LINUX_LSUSB)) \
-	$(BIN_modprobe_$(BUILD_LINUX_MODPROBE)) \
-	$(BIN_depmod_$(BUILD_LINUX_DEPMOD)) \
-	$(BIN_mkswap_$(BUILD_LINUX_MKSWAP)) \
-	$(BIN_mount_$(BUILD_LINUX_MOUNT)) \
-	$(BIN_mountpoint_$(BUILD_LINUX_MOUNTPOINT)) \
-	$(BIN_pivot_root_$(BUILD_LINUX_PIVOT_ROOT)) \
-	$(BIN_readahead_$(BUILD_LINUX_READAHEAD)) \
-	$(BIN_rmmod_$(BUILD_LINUX_RMMOD)) \
-	$(BIN_swaplabel_$(BUILD_LINUX_SWAPLABEL)) \
-	$(BIN_swapoff_$(BUILD_LINUX_SWAPOFF)) \
-	$(BIN_swapon_$(BUILD_LINUX_SWAPON)) \
-	$(BIN_switch_root_$(BUILD_LINUX_SWITCH_ROOT)) \
-	$(BIN_sysctl_$(BUILD_LINUX_SYSCTL)) \
-	$(BIN_tunctl_$(BUILD_LINUX_TUNCTL)) \
-	$(BIN_umount_$(BUILD_LINUX_UMOUNT)) \
-	$(BIN_unshare_$(BUILD_LINUX_UNSHARE)) \
-	$(BIN_vtallow_$(BUILD_LINUX_VTALLOW))
+LINUX_BIN = $(LINUX_BIN_CONFIG)
 
-NET_BIN = \
-	$(BIN_netcat_$(BUILD_NET_NETCAT)) \
-	$(BIN_tftp_$(BUILD_NET_TFTP)) \
-	$(BIN_wget_$(BUILD_NET_WGET)) \
-	$(BIN_ping_$(BUILD_NET_PING)) \
-	$(BIN_sdhcp_$(BUILD_NET_SDHCP)) \
-	$(BIN_ifconfig_$(BUILD_NET_IFCONFIG)) \
-	$(BIN_host_$(BUILD_NET_HOST)) \
-	$(BIN_httpd_$(BUILD_NET_HTTPD)) \
-	$(BIN_ip_$(BUILD_NET_IP))
+NET_BIN = $(NET_BIN_CONFIG)
 
-XSI_BIN = \
-	$(BIN_mknod_$(BUILD_XSI_MKNOD)) \
-	$(BIN_passwd_$(BUILD_XSI_PASSWD)) \
-	$(BIN_su_$(BUILD_XSI_SU))
+XSI_BIN = $(XSI_BIN_CONFIG)
 
-PSEUDO_BIN = \
-	$(BIN_chroot_$(BUILD_PSEUDO_CHROOT)) \
-	$(BIN_clear_$(BUILD_PSEUDO_CLEAR)) \
-	$(BIN_cols_$(BUILD_PSEUDO_COLS)) \
-	$(BIN_cron_$(BUILD_PSEUDO_CRON)) \
-	$(BIN_flock_$(BUILD_PSEUDO_FLOCK)) \
-	$(BIN_getty_$(BUILD_PSEUDO_GETTY)) \
-	$(BIN_halt_$(BUILD_PSEUDO_HALT)) \
-	$(BIN_hostname_$(BUILD_PSEUDO_HOSTNAME)) \
-	$(BIN_killall5_$(BUILD_PSEUDO_KILLALL5)) \
-	$(BIN_last_$(BUILD_PSEUDO_LAST)) \
-	$(BIN_lastlog_$(BUILD_PSEUDO_LASTLOG)) \
-	$(BIN_login_$(BUILD_PSEUDO_LOGIN)) \
-	$(BIN_md5sum_$(BUILD_PSEUDO_MD5SUM)) \
-	$(BIN_mktemp_$(BUILD_PSEUDO_MKTEMP)) \
-	$(BIN_nologin_$(BUILD_PSEUDO_NOLOGIN)) \
-	$(BIN_pagesize_$(BUILD_PSEUDO_PAGESIZE)) \
-	$(BIN_printenv_$(BUILD_PSEUDO_PRINTENV)) \
-	$(BIN_respawn_$(BUILD_PSEUDO_RESPAWN)) \
-	$(BIN_rev_$(BUILD_PSEUDO_REV)) \
-	$(BIN_seq_$(BUILD_PSEUDO_SEQ)) \
-	$(BIN_setsid_$(BUILD_PSEUDO_SETSID)) \
-	$(BIN_sha1sum_$(BUILD_PSEUDO_SHA1SUM)) \
-	$(BIN_sha224sum_$(BUILD_PSEUDO_SHA224SUM)) \
-	$(BIN_sha256sum_$(BUILD_PSEUDO_SHA256SUM)) \
-	$(BIN_sha384sum_$(BUILD_PSEUDO_SHA384SUM)) \
-	$(BIN_sha512sum_$(BUILD_PSEUDO_SHA512SUM)) \
-	$(BIN_sha512_224sum_$(BUILD_PSEUDO_SHA512_224SUM)) \
-	$(BIN_sha512_256sum_$(BUILD_PSEUDO_SHA512_256SUM)) \
-	$(BIN_sponge_$(BUILD_PSEUDO_SPONGE)) \
-	$(BIN_stat_$(BUILD_PSEUDO_STAT)) \
-	$(BIN_tar_$(BUILD_PSEUDO_TAR)) \
-	$(BIN_truncate_$(BUILD_PSEUDO_TRUNCATE)) \
-	$(BIN_watch_$(BUILD_PSEUDO_WATCH)) \
-	$(BIN_which_$(BUILD_PSEUDO_WHICH)) \
-	$(BIN_whoami_$(BUILD_PSEUDO_WHOAMI)) \
-	$(BIN_xinstall_$(BUILD_PSEUDO_XINSTALL)) \
-	$(BIN_yes_$(BUILD_PSEUDO_YES)) \
-	$(BIN_base64_$(BUILD_PSEUDO_BASE64)) \
-	$(BIN_mkpasswd_$(BUILD_PSEUDO_MKPASSWD)) \
-	$(BIN_b3sum_$(BUILD_EXTRA_B3SUM)) \
-	$(BIN_blkid_$(BUILD_EXTRA_BLKID)) \
-	$(BIN_lsblk_$(BUILD_EXTRA_LSBLK)) \
-	$(BIN_fdisk_$(BUILD_EXTRA_FDISK)) \
-	$(BIN_sync_$(BUILD_EXTRA_SYNC)) \
-	$(BIN_yap_$(BUILD_EXTRA_YAP)) \
-	$(BIN_diff3_$(BUILD_PSEUDO_DIFF3)) \
-	$(BIN_ar_$(BUILD_DEV_AR)) \
-	$(BIN_as_$(BUILD_DEV_CC)) \
-	$(BIN_ld_$(BUILD_DEV_LD)) \
-	$(BIN_cc_$(BUILD_DEV_CC)) \
-	$(BIN_dmesg_$(BUILD_PSEUDO_DMESG)) \
-	$(BIN_fallocate_$(BUILD_PSEUDO_FALLOCATE)) \
-	$(BIN_free_$(BUILD_PSEUDO_FREE)) \
-	$(BIN_pidof_$(BUILD_PSEUDO_PIDOF)) \
-	$(BIN_pwdx_$(BUILD_PSEUDO_PWDX)) \
-	$(BIN_uptime_$(BUILD_PSEUDO_UPTIME))
+PSEUDO_BIN = $(PSEUDO_BIN_CONFIG) $(EXTRA_BIN_CONFIG) $(DEV_BIN_CONFIG)
+
 
 OBJ = $(LIBUTFOBJ) $(LIBUTILOBJ) $(MAKEOBJ)
 
 all: $(LIB) $(POSIX_BIN) $(LINUX_BIN) $(NET_BIN) $(XSI_BIN) $(PSEUDO_BIN)
 
-include deps.mk
+-include deps.mk
+-include scripts/mk/rules.mk
 
 $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_BIN_ALL): $(LIB)
 
@@ -694,7 +519,7 @@ $(OBJ) $(POSIX_BIN_ALL) $(LINUX_BIN_ALL) $(NET_BIN_ALL) $(XSI_BIN_ALL) $(PSEUDO_
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LIB) $(LDLIBS)
 
 cmd/posix/bc.c: cmd/posix/bc.y
-	$(YACC) -d -o $@ $<
+	$(YACC) -d -o $@ cmd/posix/bc.y
 
 cmd/posix/bc: cmd/posix/bc.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -o $@ cmd/posix/bc.c $(LIB) $(LDLIBS)
@@ -899,9 +724,6 @@ cmd/posix/awk/proctab.c: cmd/posix/awk/maketab
 
 $(AWKOBJ): cmd/posix/awk/awk.h cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proto.h
 
-cmd/posix/awk/%.o: cmd/posix/awk/%.c
-	$(CC) $(CPPFLAGS) -Icmd/posix/awk $(CFLAGS) -o $@ -c $<
-
 cmd/posix/awk/awk: $(AWKOBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(AWKOBJ) $(LIB) $(LDLIBS) -lm
 
@@ -925,14 +747,8 @@ cmd/posix/sh/token.h: cmd/posix/sh/mktokens
 
 $(SHOBJ): $(SH_GENHDRS)
 
-cmd/posix/sh/%.o: cmd/posix/sh/%.c
-	$(CC) $(CPPFLAGS) -DSHELL -Icmd/posix/sh $(CFLAGS) -o $@ -c $<
-
 cmd/posix/sh/sh: $(SHOBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(SHOBJ) $(LIB) $(LDLIBS)
-
-cmd/extra/yap/%.o: cmd/extra/yap/%.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
 
 cmd/extra/yap/yap: $(YAPOBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(YAPOBJ) $(LIB) $(LDLIBS) -ltinfo
@@ -946,12 +762,6 @@ cmd/net/wget: cmd/net/wget.o $(LIB)
 cmd/dev/ar/ar: cmd/dev/ar/ar.o $(LIB)
 	$(CC) $(LDFLAGS) -o $@ cmd/dev/ar/ar.o $(LIB) $(LDLIBS)
 
-cmd/dev/ar/%.o: cmd/dev/ar/%.c
-	$(CC) $(CPPFLAGS) -Icmd/dev/ar $(CFLAGS) -o $@ -c $<
-
-cmd/dev/xcutil/%.o: cmd/dev/xcutil/%.c
-	$(CC) -Icmd/dev/xcutil $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
-
 LD_OBJ =\
 	cmd/dev/xcutil/util.o\
 	cmd/dev/xcutil/table.o\
@@ -959,9 +769,6 @@ LD_OBJ =\
 	cmd/dev/xcutil/archive.o\
 	cmd/dev/ld/ld.o\
 	cmd/dev/ld/elfobj.o
-
-cmd/dev/ld/%.o: cmd/dev/ld/%.c
-	$(CC) -Icmd/dev/xcutil -Icmd/dev/ld $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
 
 cmd/dev/ld/ld: $(LD_OBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(LD_OBJ) $(LIB) $(LDLIBS)
@@ -981,9 +788,6 @@ AS_OBJ =\
 	cmd/dev/as/arch/x64/ir_asm_x64.o\
 	cmd/dev/as/arch/x64/parse_x64.o
 
-# headers shared across the assembler sources. listing them as prerequisites
-# of every .o stops stale objects when a header changes (inst.h, parse_asm.h),
-# which otherwise produced silently-wrong builds
 AS_HDRS =\
 	cmd/dev/as/parse_asm.h\
 	cmd/dev/as/ir_asm.h\
@@ -991,17 +795,10 @@ AS_HDRS =\
 	cmd/dev/as/asm_code.h\
 	cmd/dev/as/arch/x64/inst.h
 
-cmd/dev/as/%.o: cmd/dev/as/%.c $(AS_HDRS) cmd/dev/config.h
-	$(CC) -Icmd/dev/xcutil -Icmd/dev/as $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
-
-cmd/dev/as/arch/x64/%.o: cmd/dev/as/arch/x64/%.c $(AS_HDRS) cmd/dev/config.h
-	$(CC) -Icmd/dev/xcutil -Icmd/dev/as -Icmd/dev/as/arch/x64 $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
-
 cmd/dev/as/as: $(AS_OBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(AS_OBJ) $(LIB) $(LDLIBS)
 
-cmd/dev/cc/driver.o: cmd/dev/cc/driver.c cmd/dev/cc/config.h
-	$(CC) -Icmd/dev/cc $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
+cmd/dev/cc/driver.o: cmd/dev/cc/config.h
 
 cmd/dev/cc/cc: cmd/dev/cc/driver.o cmd/dev/cc/util.o $(LIB) cmd/dev/cc/cc1 cmd/dev/cc/cpp cmd/dev/as/as cmd/dev/ld/ld
 	$(CC) $(LDFLAGS) -o $@ cmd/dev/cc/driver.o cmd/dev/cc/util.o $(LIB) $(LDLIBS)
@@ -1045,21 +842,24 @@ CPP_OBJ =\
 	cmd/dev/cc/utf.o\
 	cmd/dev/cc/util.o
 
-cmd/dev/cc/%.o: cmd/dev/cc/%.c
-	$(CC) -Icmd/dev/cc $(CPPFLAGS) $(CFLAGS) -o $@ -c $<
-
 cmd/dev/cc/cc1: $(CC1_OBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ $(CC1_OBJ) $(LIB) $(LDLIBS)
 
 cmd/dev/cc/cpp: cmd/dev/cc/cpp.o $(CPP_OBJ) $(LIB)
 	$(CC) $(LDFLAGS) -o $@ cmd/dev/cc/cpp.o $(CPP_OBJ) $(LIB) $(LDLIBS)
 
-cmd/dev/config.h cmd/dev/cc/config.h cmd/dev/version.h: cmd/dev/configure
+cmd/dev/config.h: cmd/dev/configure
 	sh cmd/dev/configure
+
+cmd/dev/cc/config.h: cmd/dev/config.h ;
+cmd/dev/version.h: cmd/dev/config.h ;
 
 $(AS_OBJ) $(LD_OBJ) $(CC1_OBJ) $(CPP_OBJ) cmd/dev/ar/ar.o cmd/dev/cc/cpp.o: cmd/dev/config.h
 
-scripts/mk/config.mk scripts/mk/config.kv: build.cfg scripts/genconfig.sh
+scripts/mk/config.mk: build.cfg scripts/genconfig.sh
 	sh scripts/genconfig.sh
+
+scripts/mk/config.kv: scripts/mk/config.mk ;
+scripts/mk/rules.mk: scripts/mk/config.mk ;
 
 Makefile: ;

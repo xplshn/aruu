@@ -32,4 +32,5 @@ cmd/dev/version.h
 # build system generated files
 scripts/mk/config.mk
 scripts/mk/config.kv
+scripts/mk/rules.mk
 deps.mk

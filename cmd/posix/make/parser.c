@@ -498,7 +498,7 @@ nextline(void)
 {
   int   c;
   FILE *fp;
-  char *s, *lim;
+  char *s, *lim, d[BUFSIZ];
 
   assert(input->type == FTFILE);
 
@@ -530,9 +530,10 @@ repeat:
 
   /* bmake style .include / .sinclude / .-include */
   if (input->buf[0] == '.') {
-    char  *d = input->buf + 1;
     size_t dl;
-    /* strip trailing whitespace/newline so strcmp works */
+    /* copy and strip trailing whitespace/newline so strcmp works */
+    strncpy(d, input->buf + 1, sizeof(d) - 1);
+    d[sizeof(d) - 1] = '\0';
     dl = strlen(d);
     while (dl > 0 && isspace((unsigned char)d[dl - 1]))
       d[--dl] = '\0';
