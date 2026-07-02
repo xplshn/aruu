@@ -551,7 +551,7 @@ cmd/posix/getconf.h:
 
 box: $(LIB)
 	CC='$(CC)' CPPFLAGS='$(CPPFLAGS)' CFLAGS='$(CFLAGS)' \
-	LDFLAGS='$(LDFLAGS)' LDLIBS='$(LDLIBS) $(LDLIBS_TLS)' OBJCOPY='$(OBJCOPY)' \
+	LDFLAGS='$(LDFLAGS)' LDLIBS='$(LDLIBS)' OBJCOPY='$(OBJCOPY)' \
 	scripts/mkbox
 
 .PHONY: man clean install regen help
@@ -633,6 +633,9 @@ clean:
 	@printf "  CLEAN build tools\n"
 	@rm -f cmd/posix/awk/maketab cmd/posix/sh/mknodes cmd/posix/sh/mksyntax
 	@rm -f scripts/mkman/mkman
+	@rm -f scripts/mk/config.kv
+	@rm -f scripts/mk/config.mk
+	@rm -f scripts/mk/rules.mk
 	@printf "  CLEAN dev artifacts\n"
 	@rm -f cmd/dev/cc/cc1 cmd/dev/cc/cpp cmd/dev/as/as cmd/dev/ld/ld cmd/dev/ar/ar shared/libaruuelf.so
 	@rm -f cmd/dev/config.h cmd/dev/cc/config.h cmd/dev/version.h
