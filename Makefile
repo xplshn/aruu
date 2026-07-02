@@ -592,9 +592,7 @@ man: scripts/mkman/mkman
 		fi; \
 	done
 
-regen:
-	sh scripts/genconfig.sh
-	$(MAKE) -f Makefile cmd/posix/getconf.h cmd/posix/bc.c cmd/posix/awk/awkgram.tab.c cmd/posix/awk/proctab.c cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/nodes.c cmd/posix/sh/builtins.c
+regen: scripts/mk/config.mk cmd/posix/getconf.h cmd/posix/bc.c cmd/posix/awk/awkgram.tab.c cmd/posix/awk/proctab.c cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/nodes.c cmd/posix/sh/builtins.c
 
 help:
 	@echo "Available targets:"
