@@ -1,11 +1,36 @@
 #!/bin/sh
-# genconfig.sh - generate config.mk and config.kv from build.cfg
-
+# genconfig.sh generates build configuration from build.cfg
+#
+# outputs four files:
+#
+#   scripts/mk/config.set   ninqu reads this via (set-file). flat
+#                           KEY=VAL, unquoted. per-tool BUILD_CATEGORY_TOOL
+#                           toggles get a lowercase alias here, since
+#                           (gate ...) in ninqu.rules only ever checks
+#                           the lowercase form
+#
+#   scripts/mk/config.kv    shell-quoted KEY="VAL" format. sourced by
+#                           read via the -config flag by scripts/mkman.
+#                           nothing in the ninqu build itself sources
+#                           this file: genbox.sh takes its input on argv
+#                           only, see the BOX section of ninqu.rules
+#
+#   shared/libutil/nofork_list.h
+#                           wexec.c includes this at compile time.
+#                           generated from NOFORK_LIST in build.cfg
+#
+#   scripts/mk/features.h   every resolved FEATURE_* as a #define
+#                           CPPFLAGS pulls this in with -include
+#
+# the codegen subcommands (getconf, bc, awk, sh) are also here so
+# ninqu.rules can call (exec sh scripts/genconfig.sh <step>) for
+# each one. they check mtimes internally and only regenerate when
+# their input changed
+#
 set -e
 
 target=${1:-config}
 
-# load build.cfg
 if [ -f build.cfg ]; then
         . ./build.cfg
 else
@@ -13,196 +38,275 @@ else
         exit 1
 fi
 
-# helper to check if source is newer than target
 newer_than() {
-  [ -e "$2" ] || return 0
-  local s t
-  s=$(stat -c '%Y' "$1" 2>/dev/null || stat -f '%m' "$1" 2>/dev/null || echo 0)
-  t=$(stat -c '%Y' "$2" 2>/dev/null || stat -f '%m' "$2" 2>/dev/null || echo 0)
-  [ "$s" -gt "$t" ]
+        [ -e "$2" ] || return 0
+        local s t
+        s=$(stat -c '%Y' "$1" 2>/dev/null || stat -f '%m' "$1" 2>/dev/null || echo 0)
+        t=$(stat -c '%Y' "$2" 2>/dev/null || stat -f '%m' "$2" 2>/dev/null || echo 0)
+        [ "$s" -gt "$t" ]
 }
 
 gen_getconf() {
-  if newer_than scripts/getconf.sh cmd/posix/getconf.h; then
-    printf "  GEN   cmd/posix/getconf.h\n"
-    scripts/getconf.sh > cmd/posix/getconf.h || { rm -f cmd/posix/getconf.h; exit 1; }
-  fi
+        if newer_than scripts/getconf.sh cmd/posix/getconf.h; then
+                printf "  GEN   cmd/posix/getconf.h\n"
+                scripts/getconf.sh > cmd/posix/getconf.h || { rm -f cmd/posix/getconf.h; exit 1; }
+        fi
 }
 
 gen_bc() {
-  if newer_than cmd/posix/bc.y cmd/posix/bc.c; then
-    printf "  GEN   cmd/posix/bc.c\n"
-    CC=${CC:-cc}
-    YACC=${YACC:-}
-    if [ -z "$YACC" ]; then
-      if command -v yacc >/dev/null 2>&1; then
-        YACC="yacc"
-      elif command -v bison >/dev/null 2>&1; then
-        YACC="bison -y"
-      else
-        YACC="yacc"
-      fi
-    fi
-    if [ "$YACC" = "bison -y" ]; then
-      bison -o cmd/posix/bc.c cmd/posix/bc.y
-    else
-      $YACC -o cmd/posix/bc.c cmd/posix/bc.y
-    fi
-  fi
+        if newer_than cmd/posix/bc.y cmd/posix/bc.c; then
+                printf "  GEN   cmd/posix/bc.c\n"
+                CC=${CC:-cc}
+                YACC=${YACC:-}
+                if [ -z "$YACC" ]; then
+                        if command -v yacc >/dev/null 2>&1; then
+                                YACC="yacc"
+                        elif command -v bison >/dev/null 2>&1; then
+                                YACC="bison -y"
+                        else
+                                YACC="yacc"
+                        fi
+                fi
+                if [ "$YACC" = "bison -y" ]; then
+                        bison -o cmd/posix/bc.c cmd/posix/bc.y
+                else
+                        $YACC -o cmd/posix/bc.c cmd/posix/bc.y
+                fi
+        fi
 }
 
 gen_awk() {
-  local dir="cmd/posix/awk"
-  CC=${CC:-cc}
-  YACC=${YACC:-}
-  if [ -z "$YACC" ]; then
-    if command -v yacc >/dev/null 2>&1; then
-      YACC="yacc"
-    elif command -v bison >/dev/null 2>&1; then
-      YACC="bison -y"
-    else
-      YACC="yacc"
-    fi
-  fi
-
-  if newer_than "$dir/awkgram.y" "$dir/awkgram.tab.c" || newer_than "$dir/awkgram.y" "$dir/awkgram.tab.h"; then
-    printf "  YACC  $dir/awkgram.tab.c\n"
-    if [ "$YACC" = "bison -y" ]; then
-      bison -d -o "$dir/awkgram.tab.c" "$dir/awkgram.y"
-    else
-      $YACC -d -o "$dir/awkgram.tab.c" "$dir/awkgram.y"
-      if [ ! -f "$dir/awkgram.tab.h" ]; then
-        if [ -f y.tab.h ]; then
-          mv y.tab.h "$dir/awkgram.tab.h"
-        elif [ -f "$dir/y.tab.h" ]; then
-          mv "$dir/y.tab.h" "$dir/awkgram.tab.h"
+        local dir="cmd/posix/awk"
+        CC=${CC:-cc}
+        YACC=${YACC:-}
+        if [ -z "$YACC" ]; then
+                if command -v yacc >/dev/null 2>&1; then
+                        YACC="yacc"
+                elif command -v bison >/dev/null 2>&1; then
+                        YACC="bison -y"
+                else
+                        YACC="yacc"
+                fi
         fi
-      fi
-    fi
-  fi
 
-  if newer_than "$dir/maketab.c" "$dir/maketab" || newer_than "$dir/awkgram.tab.h" "$dir/maketab"; then
-    printf "  CC    $dir/maketab\n"
-    $CC -o "$dir/maketab" "$dir/maketab.c"
-  fi
+        if newer_than "$dir/awkgram.y" "$dir/awkgram.tab.c" || newer_than "$dir/awkgram.y" "$dir/awkgram.tab.h"; then
+                printf "  YACC  $dir/awkgram.tab.c\n"
+                if [ "$YACC" = "bison -y" ]; then
+                        bison -d -o "$dir/awkgram.tab.c" "$dir/awkgram.y"
+                else
+                        $YACC -d -o "$dir/awkgram.tab.c" "$dir/awkgram.y"
+                        if [ ! -f "$dir/awkgram.tab.h" ]; then
+                                if [ -f y.tab.h ]; then
+                                        mv y.tab.h "$dir/awkgram.tab.h"
+                                elif [ -f "$dir/y.tab.h" ]; then
+                                        mv "$dir/y.tab.h" "$dir/awkgram.tab.h"
+                                fi
+                        fi
+                fi
+        fi
 
-  if newer_than "$dir/maketab" "$dir/proctab.c" || newer_than "$dir/awkgram.tab.h" "$dir/proctab.c"; then
-    printf "  GEN   $dir/proctab.c\n"
-    "$dir/maketab" "$dir/awkgram.tab.h" > "$dir/proctab.c"
-  fi
+        if newer_than "$dir/maketab.c" "$dir/maketab" || newer_than "$dir/awkgram.tab.h" "$dir/maketab"; then
+                printf "  CC    $dir/maketab\n"
+                $CC -o "$dir/maketab" "$dir/maketab.c"
+        fi
+
+        if newer_than "$dir/maketab" "$dir/proctab.c" || newer_than "$dir/awkgram.tab.h" "$dir/proctab.c"; then
+                printf "  GEN   $dir/proctab.c\n"
+                "$dir/maketab" "$dir/awkgram.tab.h" > "$dir/proctab.c"
+        fi
 }
 
 gen_sh() {
-  local dir="cmd/posix/sh"
-  CC=${CC:-cc}
+        local dir="cmd/posix/sh"
+        CC=${CC:-cc}
 
-  if newer_than "$dir/mknodes.c" "$dir/mknodes"; then
-    printf "  CC    $dir/mknodes\n"
-    $CC -o "$dir/mknodes" "$dir/mknodes.c"
-  fi
+        if newer_than "$dir/mknodes.c" "$dir/mknodes"; then
+                printf "  CC    $dir/mknodes\n"
+                $CC -o "$dir/mknodes" "$dir/mknodes.c"
+        fi
 
-  if newer_than "$dir/mksyntax.c" "$dir/mksyntax"; then
-    printf "  CC    $dir/mksyntax\n"
-    $CC -Ishared -I"$dir" -o "$dir/mksyntax" "$dir/mksyntax.c"
-  fi
+        if newer_than "$dir/mksyntax.c" "$dir/mksyntax"; then
+                printf "  CC    $dir/mksyntax\n"
+                $CC -Ishared -I"$dir" -o "$dir/mksyntax" "$dir/mksyntax.c"
+        fi
 
-  if newer_than "$dir/mktokens" "$dir/token.h"; then
-    printf "  GEN   $dir/token.h\n"
-    (cd "$dir" && sh mktokens)
-  fi
+        if newer_than "$dir/mktokens" "$dir/token.h"; then
+                printf "  GEN   $dir/token.h\n"
+                (cd "$dir" && sh mktokens)
+        fi
 
-  if newer_than "$dir/mksyntax" "$dir/syntax.c" || newer_than "$dir/mksyntax" "$dir/syntax.h"; then
-    printf "  GEN   $dir/syntax.c\n"
-    (cd "$dir" && ./mksyntax)
-  fi
+        if newer_than "$dir/mksyntax" "$dir/syntax.c" || newer_than "$dir/mksyntax" "$dir/syntax.h"; then
+                printf "  GEN   $dir/syntax.c\n"
+                (cd "$dir" && ./mksyntax)
+        fi
 
-  if newer_than "$dir/mknodes" "$dir/nodes.c" || newer_than "$dir/nodetypes" "$dir/nodes.c" || newer_than "$dir/nodes.c.pat" "$dir/nodes.c"; then
-    printf "  GEN   $dir/nodes.c\n"
-    (cd "$dir" && ./mknodes nodetypes nodes.c.pat)
-  fi
+        if newer_than "$dir/mknodes" "$dir/nodes.c" || newer_than "$dir/nodetypes" "$dir/nodes.c" || newer_than "$dir/nodes.c.pat" "$dir/nodes.c"; then
+                printf "  GEN   $dir/nodes.c\n"
+                (cd "$dir" && ./mknodes nodetypes nodes.c.pat)
+        fi
 
-  if newer_than "$dir/mkbuiltins" "$dir/builtins.c" || newer_than "$dir/builtins.def" "$dir/builtins.c" || newer_than "$dir/shell.h" "$dir/builtins.c" || [ ! -f "$dir/builtins.c" ]; then
-    printf "  GEN   $dir/builtins.c\n"
-    (cd "$dir" && sh mkbuiltins .)
-  fi
-}
-
-clean() {
-  printf "  CLEAN generated files\n"
-  rm -f cmd/posix/getconf.h
-  rm -f cmd/posix/bc.c cmd/posix/bc.h
-  rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proctab.c cmd/posix/awk/maketab
-  rm -f cmd/posix/sh/mknodes cmd/posix/sh/mksyntax cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
-  rm -f scripts/mk/config.mk scripts/mk/config.kv scripts/mk/rules.mk shared/libutil/nofork_list.h
-}
-
-# dynamic tool discovery function
-list_tools() {
-        local catg="$1" dirs="" files="" d f b
-        [ -d "cmd/$catg" ] || return 0
-        # find all subdirectories
-        for d in "cmd/$catg"/*; do
-                if [ -d "$d" ]; then
-                        dirs="$dirs ${d##*/}"
-                fi
-        done
-        # find all .c and .y files
-        for f in "cmd/$catg"/*.c "cmd/$catg"/*.y; do
-                [ -f "$f" ] || continue
-                b=${f##*/}
-                b=${b%.c}
-                b=${b%.y}
-                case "$b" in
-                        # exclude intermediate files or helper generators
-                        maketab|mknodes|mksyntax|y.tab|*gram.tab) continue ;;
-                esac
-                files="$files $b"
-        done
-
-        # output sorted unique list of tool names
-        # shellcheck disable=SC2086
-        printf '%s %s\n' $dirs $files | tr ' ' '\n' | sort -u | grep -v '^$'
-}
-
-write_subtarget() {
-        group="$1"
-        tool="$2"
-        u_group=$(echo "$group" | tr '[:lower:]' '[:upper:]')
-        u_tool=$(echo "$tool" | tr 'a-z-' 'A-Z_')
-        var_name="BUILD_${u_group}_${u_tool}"
-
-        eval "has_override=\${$var_name+yes}"
-        eval "val=\${$var_name:-}"
-
-        eval "group_val=\$BUILD_${u_group}"
-
-        if [ "$has_override" = "yes" ]; then
-                echo "${var_name} = ${val}" >> "${mk_file}"
-                echo "${var_name}=\"${val}\"" >> "${kv_file}"
-        else
-                echo "${var_name} = \$(BUILD_${u_group})" >> "${mk_file}"
-                echo "${var_name}=\"${group_val}\"" >> "${kv_file}"
+        if newer_than "$dir/mkbuiltins" "$dir/builtins.c" || newer_than "$dir/builtins.def" "$dir/builtins.c" || newer_than "$dir/shell.h" "$dir/builtins.c" || [ ! -f "$dir/builtins.c" ]; then
+                printf "  GEN   $dir/builtins.c\n"
+                (cd "$dir" && sh mkbuiltins .)
         fi
 }
 
-gen_dir_rules() {
-        local dir="$1" flags="$2" extra_files="$3" f obj files uniq_files
-        [ -d "$dir" ] || return 0
-        files=""
-        for f in "$dir"/*.c; do
-                if [ -f "$f" ]; then
-                        files="$files $f"
-                fi
+clean() {
+        printf "  CLEAN generated files\n"
+        rm -f cmd/posix/getconf.h
+        rm -f cmd/posix/bc.c cmd/posix/bc.h
+        rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proctab.c cmd/posix/awk/maketab
+        rm -f cmd/posix/sh/mknodes cmd/posix/sh/mksyntax cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
+        rm -f scripts/mk/config.set scripts/mk/config.kv scripts/mk/features.h shared/libutil/nofork_list.h
+}
+
+# config: generate config.set, config.kv, nofork_list.h
+#
+# config.set is what ninqu reads. config.kv is what mkbox and
+# genbox.sh source. both contain the same data in different formats:
+# config.kv is shell-quoted (KEY="VAL"), config.set is unquoted
+# (KEY=VAL) since ninqu's (set-file) takes the rest of the line
+# verbatim
+
+config() {
+        mkdir -p scripts/mk
+
+        kv_file="scripts/mk/config.kv"
+        set_file="scripts/mk/config.set"
+
+        : > "${kv_file}"
+        : > "${set_file}"
+
+        emit() {
+                local k="$1" v="$2"
+                echo "${k}=\"${v}\"" >> "${kv_file}"
+                echo "${k}=${v}" >> "${set_file}"
+        }
+
+        emit VERSION   "${VERSION}"
+        emit PREFIX    "${PREFIX}"
+        emit MANPREFIX "${MANPREFIX:-/usr/local/share/man}"
+        emit RANLIB    "${RANLIB:-ranlib}"
+        emit AR        "${AR:-ar}"
+        emit ARFLAGS   "${ARFLAGS:-rc}"
+        emit CC        "${CC:-cc}"
+        emit CFLAGS    "${CFLAGS:--std=c99 -Wall -Wextra -pedantic}"
+        emit LDFLAGS   "${LDFLAGS:-} ${LDFLAGS_TLS:-}"
+        emit LDLIBS    "${LDLIBS:-} ${LDLIBS_TLS:-}"
+        emit OBJCOPY   "${OBJCOPY:-objcopy}"
+        emit LD        "${LD:-ld}"
+
+        emit CPPFLAGS_TLS "${CPPFLAGS_TLS:-}"
+        emit LDFLAGS_TLS  "${LDFLAGS_TLS:-}"
+        emit LDLIBS_TLS   "${LDLIBS_TLS:-}"
+
+        # these seven are only consulted per-tool below (build_CATEGORY_TOOL,
+        # build_CATEGORY_$(BASESTEM)), the bare category toggle has no gate
+        # anywhere in ninqu.rules, (group CATEGORY ...) already does that
+        # job. config.kv still gets the uppercase copy since genbox.sh
+        # and mkbox source it directly
+        for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
+                eval "val=\${$g:-0}"
+                echo "${g}=\"${val}\"" >> "${kv_file}"
         done
-        for f in ${extra_files}; do
-                files="$files $f"
+
+        # per-tool toggles: scan cmd/<category>/ for tools. a tool is
+        # either a .c/.y file directly in the category dir (perfile)
+        # or a subdirectory (multi-file tool). emit BUILD_<CATEGORY>_<TOOL>
+        # plus lowercase alias for each
+        for category in posix xsi net pseudo extra linux dev; do
+                [ -d "cmd/$category" ] || continue
+                u_category=$(echo "$category" | tr '[:lower:]' '[:upper:]')
+
+                tools=""
+                for d in "cmd/$category"/*; do
+                        [ -d "$d" ] && tools="$tools ${d##*/}"
+                done
+                for f in "cmd/$category"/*.c "cmd/$category"/*.y; do
+                        [ -f "$f" ] || continue
+                        b=${f##*/}
+                        b=${b%.c}
+                        b=${b%.y}
+                        case "$b" in
+                                maketab|mknodes|mksyntax|y.tab|*gram.tab) continue ;;
+                        esac
+                        tools="$tools $b"
+                done
+
+                tools=$(echo "$tools" | tr ' ' '\n' | sort -u | grep -v '^$' || true)
+
+                for b in $tools; do
+                        u_tool=$(echo "$b" | tr 'a-z-' 'A-Z_')
+                        var_name="BUILD_${u_category}_${u_tool}"
+
+                        #if [ "$category" = "dev" ] && [ "$u_tool" = "AS" ]; then
+                        #        var_name="BUILD_DEV_CC"
+                        #fi
+
+                        eval "has_override=\${$var_name+yes}"
+                        if [ "$has_override" = "yes" ]; then
+                                eval "val=\${$var_name}"
+                        else
+                                eval "val=\$BUILD_${u_category}"
+                        fi
+
+                        echo "${var_name}=\"${val}\"" >> "${kv_file}"
+                        lk=$(echo "$var_name" | tr '[:upper:]' '[:lower:]')
+                        echo "${lk}=${val}" >> "${set_file}"
+                done
         done
-        uniq_files=$(echo "$files" | tr ' ' '\n' | sort -u | grep -v '^$')
-        for f in $uniq_files; do
-                obj="${f%.c}.o"
-                echo "${obj}: ${f}" >> "${rules_file}"
-                echo "	\$(CC) \$(CPPFLAGS) ${flags} \$(CFLAGS) -o \$@ -c ${f}" >> "${rules_file}"
+
+        # box's own link line has no per-tool composition the way a
+        # standalone PERFILE binary's EXTRA_LIBS map does (box links
+        # every enabled tool's object into one binary in one shot), so
+        # a tool that needs a library nothing else in the box needs
+        # (yap needs terminfo) can only get it by ninqu.rules reading
+        # a value genconfig.sh already resolved, same as every other
+        # build_* toggle. this is still data, not policy: which
+        # library to add for which tool is decided here, not what to
+        # do with that decision
+        box_extra_libs=""
+        [ "${yap_val:-0}" != "0" ] && box_extra_libs="-ltinfo"
+        emit BOX_EXTRA_LIBS "${box_extra_libs}"
+
+        features=$(set | grep '^FEATURE_[A-Za-z0-9_]*=' | cut -d= -f1 | sort)
+        for f in $features; do
+                eval "val=\$$f"
+                emit "$f" "$val"
         done
+
+        # every resolved FEATURE_* becomes a #define in one generated
+        # header. config.h's own #ifndef guards still apply to anything
+        # not here (there is nothing not here), and any file gets the
+        # real values just by being compiled with -include, whether or
+        # not it bothers to #include "config.h" itself.
+        features_h="scripts/mk/features.h"
+        {
+                echo "/* autogenerated by genconfig.sh, do not edit */"
+                for f in $features; do
+                        eval "fval=\$$f"
+                        echo "#define ${f} ${fval}"
+                done
+        } > "${features_h}"
+
+        cppflags_common="-DPREFIX=\"${PREFIX}\" -D_DEFAULT_SOURCE -D_GNU_SOURCE -D_NETBSD_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700 -D_FILE_OFFSET_BITS=64 -include ${features_h} ${CPPFLAGS_TLS:-}"
+        cppflags_set="-Ishared ${cppflags_common}"
+        echo "CPPFLAGS=\"${cppflags_set}\"" >> "${kv_file}"
+        echo "CPPFLAGS=${cppflags_set}" >> "${set_file}"
+
+        # shared/tls.h would conflict with the system's tls.h
+        # if we passed -Ishared to build libutil
+        echo "CPPFLAGS_LIBUTIL=\"${cppflags_common}\"" >> "${kv_file}"
+        echo "CPPFLAGS_LIBUTIL=${cppflags_common}" >> "${set_file}"
+
+        nofork_h="shared/libutil/nofork_list.h"
+        echo "/* autogenerated by genconfig.sh */" > "${nofork_h}"
+        echo "static const char *nofork_list[] = {" >> "${nofork_h}"
+        for app in ${NOFORK_LIST}; do
+                echo "  \"${app}\"," >> "${nofork_h}"
+        done
+        echo "  NULL" >> "${nofork_h}"
+        echo "};" >> "${nofork_h}"
 }
 
 case "$target" in
@@ -210,181 +314,17 @@ case "$target" in
         bc)      gen_bc ;;
         awk)     gen_awk ;;
         sh)      gen_sh ;;
-        clean)   clean ;;
         all)
                 gen_getconf
                 gen_bc
                 gen_awk
                 gen_sh
                 ;;
-        config)
-                mkdir -p scripts/mk
-
-                mk_file="scripts/mk/config.mk"
-                kv_file="scripts/mk/config.kv"
-
-                # clear existing files
-                : > "${mk_file}"
-                : > "${kv_file}"
-
-                # write version prefix manprefix
-                echo "VERSION = ${VERSION}" >> "${mk_file}"
-                echo "VERSION=\"${VERSION}\"" >> "${kv_file}"
-
-                echo "PREFIX = ${PREFIX}" >> "${mk_file}"
-                echo "PREFIX=\"${PREFIX}\"" >> "${kv_file}"
-
-                # default manprefix to prefix/share/man if empty
-                man_pref="${MANPREFIX:-/usr/local/share/man}"
-                echo "MANPREFIX = ${man_pref}" >> "${mk_file}"
-                echo "MANPREFIX=\"${man_pref}\"" >> "${kv_file}"
-
-                # toolchain defaults
-                echo "RANLIB = ${RANLIB:-ranlib}" >> "${mk_file}"
-                echo "RANLIB=\"${RANLIB:-ranlib}\"" >> "${kv_file}"
-
-                echo "AR = ${AR:-ar}" >> "${mk_file}"
-                echo "AR=\"${AR:-ar}\"" >> "${kv_file}"
-
-                echo "ARFLAGS = ${ARFLAGS:-rc}" >> "${mk_file}"
-                echo "ARFLAGS=\"${ARFLAGS:-rc}\"" >> "${kv_file}"
-
-                # build toggles
-                echo "" >> "${mk_file}"
-                echo "# build toggles" >> "${mk_file}"
-                for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
-                        eval "val=\${$g:-0}"
-                        echo "$g = $val" >> "${mk_file}"
-                        echo "$g=\"$val\"" >> "${kv_file}"
-                done
-
-                # write subtargets for each category dynamically
-                for catg in posix xsi net pseudo extra linux dev; do
-                        echo "" >> "${mk_file}"
-                        echo "# ${catg} subtargets" >> "${mk_file}"
-                        tools=$(list_tools "$catg")
-                        for t in $tools; do
-                                write_subtarget "$catg" "$t"
-                        done
-
-                        # build the enabled list using lowercase tools
-                        enabled=""
-                        for t in $tools; do
-                                u_group=$(echo "$catg" | tr '[:lower:]' '[:upper:]')
-                                u_tool=$(echo "$t" | tr 'a-z-' 'A-Z_')
-
-                                # special cases for dev tools mapping to different variables
-                                if [ "$catg" = "dev" ] && [ "$u_tool" = "AS" ]; then
-                                        var_name="BUILD_DEV_CC"
-                                else
-                                        var_name="BUILD_${u_group}_${u_tool}"
-                                fi
-
-                                eval "has_override=\${$var_name+yes}"
-                                eval "val=\${$var_name:-}"
-                                if [ "$has_override" != "yes" ]; then
-                                        if [ "$catg" = "dev" ] && [ "$u_tool" = "AS" ]; then
-                                                eval "val=\$BUILD_DEV"
-                                        else
-                                                eval "val=\$BUILD_${u_group}"
-                                        fi
-                                fi
-
-                                if [ "$val" = "1" ]; then
-                                        # map to the correct path
-                                        case "$catg/$t" in
-                                                posix/awk)  path="cmd/posix/awk/awk" ;;
-                                                posix/sh)   path="cmd/posix/sh/sh" ;;
-                                                posix/make) path="cmd/posix/make/make" ;;
-                                                extra/yap)  path="cmd/extra/yap/yap" ;;
-                                                dev/ar)     path="cmd/dev/ar/ar" ;;
-                                                dev/as)     path="cmd/dev/as/as" ;;
-                                                dev/ld)     path="cmd/dev/ld/ld" ;;
-                                                dev/cc)     path="cmd/dev/cc/cc" ;;
-                                                *)          path="cmd/$catg/$t" ;;
-                                        esac
-                                        enabled="$enabled $path"
-                                fi
-                        done
-                        u_catg=$(echo "$catg" | tr '[:lower:]' '[:upper:]')
-                        # write the list of enabled binaries
-                        echo "${u_catg}_BIN_CONFIG =${enabled}" >> "${mk_file}"
-                done
-
-                # write feature flags
-                echo "" >> "${mk_file}"
-                echo "# feature flags" >> "${mk_file}"
-                features=$(set | grep '^FEATURE_[A-Za-z0-9_]*=' | cut -d= -f1 | sort)
-                for f in $features; do
-                        eval "val=\$$f"
-                        echo "$f = $val" >> "${mk_file}"
-                        echo "$f=\"$val\"" >> "${kv_file}"
-                done
-
-                # write TLS variables to config files
-                echo "" >> "${mk_file}"
-                echo "CPPFLAGS_TLS = ${CPPFLAGS_TLS}" >> "${mk_file}"
-                echo "CPPFLAGS_TLS=\"${CPPFLAGS_TLS}\"" >> "${kv_file}"
-
-                echo "LDFLAGS_TLS = ${LDFLAGS_TLS}" >> "${mk_file}"
-                echo "LDFLAGS_TLS=\"${LDFLAGS_TLS}\"" >> "${kv_file}"
-
-                echo "LDLIBS_TLS = ${LDLIBS_TLS}" >> "${mk_file}"
-                echo "LDLIBS_TLS=\"${LDLIBS_TLS}\"" >> "${kv_file}"
-
-                # write CPPFLAGS with all feature macros
-                echo "" >> "${mk_file}"
-                echo "CPPFLAGS =\\" >> "${mk_file}"
-                echo "        -Ishared\\" >> "${mk_file}"
-                echo "        -DPREFIX=\\\"\\\$(PREFIX)\\\"\\" >> "${mk_file}"
-                echo "        -D_DEFAULT_SOURCE\\" >> "${mk_file}"
-                echo "        -D_GNU_SOURCE\\" >> "${mk_file}"
-                echo "        -D_NETBSD_SOURCE\\" >> "${mk_file}"
-                echo "        -D_BSD_SOURCE\\" >> "${mk_file}"
-                echo "        -D_XOPEN_SOURCE=700\\" >> "${mk_file}"
-                echo "        -D_FILE_OFFSET_BITS=64\\" >> "${mk_file}"
-                for f in $features; do
-                        if [ "$f" = "FEATURE_USE_SSL" ]; then
-                                continue
-                        fi
-                        echo "        -D$f=\$($f)\\" >> "${mk_file}"
-                done
-                echo "        \$(CPPFLAGS_TLS)" >> "${mk_file}"
-
-                # write toolchain configuration
-                echo "" >> "${mk_file}"
-                echo "CC = ${CC:-cc}" >> "${mk_file}"
-                echo "CFLAGS = ${CFLAGS:-}" >> "${mk_file}"
-                echo "LDFLAGS = ${LDFLAGS:-} \$(LDFLAGS_TLS)" >> "${mk_file}"
-                echo "LDLIBS = ${LDLIBS:-} \$(LDLIBS_TLS)" >> "${mk_file}"
-
-                # write compilation rules for subdirectories that need special flags or nested structures
-                rules_file="scripts/mk/rules.mk"
-                echo "# autogenerated compilation rules" > "${rules_file}"
-
-                echo "" >> "${rules_file}"
-                gen_dir_rules "cmd/posix/awk" "-Icmd/posix/awk" "cmd/posix/awk/awkgram.tab.c cmd/posix/awk/proctab.c"
-                gen_dir_rules "cmd/posix/sh" "-DSHELL -Icmd/posix/sh" "cmd/posix/sh/syntax.c cmd/posix/sh/nodes.c cmd/posix/sh/builtins.c"
-                gen_dir_rules "cmd/extra/yap" "" ""
-                gen_dir_rules "cmd/dev/ar" "-Icmd/dev/ar" ""
-                gen_dir_rules "cmd/dev/xcutil" "-Icmd/dev/xcutil" ""
-                gen_dir_rules "cmd/dev/ld" "-Icmd/dev/xcutil -Icmd/dev/ld" ""
-                gen_dir_rules "cmd/dev/as" "-Icmd/dev/xcutil -Icmd/dev/as" ""
-                gen_dir_rules "cmd/dev/as/arch/x64" "-Icmd/dev/xcutil -Icmd/dev/as -Icmd/dev/as/arch/x64" ""
-                gen_dir_rules "cmd/dev/cc" "-Icmd/dev/cc" ""
-
-                # generate nofork_list.h
-                nofork_h="shared/libutil/nofork_list.h"
-                echo "/* autogenerated by genconfig.sh */" > "${nofork_h}"
-                echo "static const char *nofork_list[] = {" >> "${nofork_h}"
-                for app in ${NOFORK_LIST}; do
-                        echo "  \"${app}\"," >> "${nofork_h}"
-                done
-                echo "  NULL" >> "${nofork_h}"
-                echo "};" >> "${nofork_h}"
-                ;;
+        config)  config ;;
+        clean)   clean ;;
         *)
-                printf "unknown target: %s\n" "$target" >&2
+                printf "genconfig: unknown target: %s\n" "$target" >&2
+                printf "usage: %s (config|getconf|bc|awk|sh|all|clean)\n" "$0" >&2
                 exit 1
                 ;;
 esac

@@ -10,7 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#if FEATURE_USE_LIBRESSL
+#if FEATURE_USE_LIBTLS
 #include <tls.h>
 
 struct TlsSocket {
@@ -298,12 +298,12 @@ tls_connect(int fd, const char *host, int check_cert, int is_tls)
 
   if (!is_tls)
     return s;
-#if !FEATURE_USE_LIBRESSL && !FEATURE_USE_BEARSSL && !FEATURE_USE_OPENSSL
+
+  /* not every backend below uses these */
   (void)host;
   (void)check_cert;
-#endif
 
-#if FEATURE_USE_LIBRESSL
+#if FEATURE_USE_LIBTLS
   {
     struct tls_config *cfg;
 
@@ -369,7 +369,7 @@ tls_connect(int fd, const char *host, int check_cert, int is_tls)
   }
 #else
   weprintf(
-      "TLS not supported, compile with FEATURE_USE_LIBRESSL or "
+      "TLS not supported, compile with FEATURE_USE_LIBTLS or "
       "FEATURE_USE_BEARSSL\n"
   );
   free(s);
@@ -390,7 +390,7 @@ tls_read(struct TlsSocket *s, void *buf, size_t len)
       return r;
     }
   }
-#if FEATURE_USE_LIBRESSL
+#if FEATURE_USE_LIBTLS
   for (;;) {
     ssize_t r = tls_read(s->ctx, buf, len);
     if (r == TLS_WANT_POLLIN || r == TLS_WANT_POLLOUT)
@@ -415,7 +415,7 @@ tls_write(struct TlsSocket *s, const void *buf, size_t len)
       return r;
     }
   }
-#if FEATURE_USE_LIBRESSL
+#if FEATURE_USE_LIBTLS
   for (;;) {
     ssize_t r = tls_write(s->ctx, buf, len);
     if (r == TLS_WANT_POLLIN || r == TLS_WANT_POLLOUT)
@@ -440,7 +440,7 @@ void
 tls_close(struct TlsSocket *s, int close_fd)
 {
   if (s->is_tls) {
-#if FEATURE_USE_LIBRESSL
+#if FEATURE_USE_LIBTLS
     tls_close(s->ctx);
     tls_free(s->ctx);
 #elif FEATURE_USE_BEARSSL
