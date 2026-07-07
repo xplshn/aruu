@@ -58,7 +58,7 @@ FORCE:
 	$(NINQU) $(JOBS) $@
 
 clean: $(NINQU)
-	$(NINQU) -DBACKEND="internal" clean
+	$(NINQU) clean
 	rm -f $(NINQU) build.ninja
 
 scripts/mk/config.set: build.cfg scripts/genconfig.sh
