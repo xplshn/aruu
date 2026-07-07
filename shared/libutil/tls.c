@@ -22,18 +22,18 @@ struct TlsSocket {
 #elif FEATURE_USE_BEARSSL
 #include <bearssl.h>
 
-struct my_x509_context {
+struct x509_noverify_ctx {
   const br_x509_class    *vtable;
   br_x509_minimal_context minimal;
 };
 
 struct TlsSocket {
-  int                    fd;
-  int                    is_tls;
-  br_ssl_client_context  sc;
-  struct my_x509_context my_x509;
-  unsigned char          iobuf[BR_SSL_BUFSIZE_BIDI];
-  br_sslio_context       ioc;
+  int                      fd;
+  int                      is_tls;
+  br_ssl_client_context    sc;
+  struct x509_noverify_ctx x509_noverify;
+  unsigned char            iobuf[BR_SSL_BUFSIZE_BIDI];
+  br_sslio_context         ioc;
 };
 
 struct dn_accum {
@@ -55,57 +55,57 @@ append_dn_callback(void *dn_ctx, const void *src, size_t len)
 }
 
 static void
-my_start_chain(const br_x509_class **ctx, const char *server_name)
+x509_noverify_start_chain(const br_x509_class **ctx, const char *server_name)
 {
-  struct my_x509_context *t = (struct my_x509_context *)ctx;
+  struct x509_noverify_ctx *t = (struct x509_noverify_ctx *)ctx;
   br_x509_minimal_vtable.start_chain((const br_x509_class **)&t->minimal, server_name);
 }
 
 static void
-my_start_cert(const br_x509_class **ctx, uint32_t length)
+x509_noverify_start_cert(const br_x509_class **ctx, uint32_t length)
 {
-  struct my_x509_context *t = (struct my_x509_context *)ctx;
+  struct x509_noverify_ctx *t = (struct x509_noverify_ctx *)ctx;
   br_x509_minimal_vtable.start_cert((const br_x509_class **)&t->minimal, length);
 }
 
 static void
-my_append(const br_x509_class **ctx, const unsigned char *buf, size_t len)
+x509_noverify_append(const br_x509_class **ctx, const unsigned char *buf, size_t len)
 {
-  struct my_x509_context *t = (struct my_x509_context *)ctx;
+  struct x509_noverify_ctx *t = (struct x509_noverify_ctx *)ctx;
   br_x509_minimal_vtable.append((const br_x509_class **)&t->minimal, buf, len);
 }
 
 static void
-my_end_cert(const br_x509_class **ctx)
+x509_noverify_end_cert(const br_x509_class **ctx)
 {
-  struct my_x509_context *t = (struct my_x509_context *)ctx;
+  struct x509_noverify_ctx *t = (struct x509_noverify_ctx *)ctx;
   br_x509_minimal_vtable.end_cert((const br_x509_class **)&t->minimal);
 }
 
 static unsigned
-my_end_chain(const br_x509_class **ctx)
+x509_noverify_end_chain(const br_x509_class **ctx)
 {
-  struct my_x509_context *t = (struct my_x509_context *)ctx;
+  struct x509_noverify_ctx *t = (struct x509_noverify_ctx *)ctx;
   (void)br_x509_minimal_vtable.end_chain((const br_x509_class **)&t->minimal);
   /* always succeed and accept certificate when check_cert is 0 */
   return 0;
 }
 
 static const br_x509_pkey *
-my_get_pkey(const br_x509_class *const *ctx, unsigned *usages)
+x509_noverify_get_pkey(const br_x509_class *const *ctx, unsigned *usages)
 {
-  const struct my_x509_context *t = (const struct my_x509_context *)ctx;
+  const struct x509_noverify_ctx *t = (const struct x509_noverify_ctx *)ctx;
   return br_x509_minimal_vtable.get_pkey((const br_x509_class *const *)&t->minimal, usages);
 }
 
-static const br_x509_class my_x509_vtable = {
-    sizeof(struct my_x509_context),
-    my_start_chain,
-    my_start_cert,
-    my_append,
-    my_end_cert,
-    my_end_chain,
-    my_get_pkey
+static const br_x509_class x509_noverify_vtable = {
+    sizeof(struct x509_noverify_ctx),
+    x509_noverify_start_chain,
+    x509_noverify_start_cert,
+    x509_noverify_append,
+    x509_noverify_end_cert,
+    x509_noverify_end_chain,
+    x509_noverify_get_pkey
 };
 
 static int
@@ -288,7 +288,7 @@ struct TlsSocket {
 #endif
 
 struct TlsSocket *
-tls_connect(int fd, const char *host, int check_cert, int is_tls)
+tlss_connect(int fd, const char *host, int check_cert, int is_tls)
 {
   struct TlsSocket *s;
 
@@ -298,10 +298,10 @@ tls_connect(int fd, const char *host, int check_cert, int is_tls)
 
   if (!is_tls)
     return s;
-
-  /* not every backend below uses these */
+#if !FEATURE_USE_LIBTLS && !FEATURE_USE_BEARSSL && !FEATURE_USE_OPENSSL
   (void)host;
   (void)check_cert;
+#endif
 
 #if FEATURE_USE_LIBTLS
   {
@@ -350,11 +350,11 @@ tls_connect(int fd, const char *host, int check_cert, int is_tls)
         load_ca_certs();
         ca_loaded = 1;
       }
-      br_ssl_client_init_full(&s->sc, &s->my_x509.minimal, tas, tas_num);
+      br_ssl_client_init_full(&s->sc, &s->x509_noverify.minimal, tas, tas_num);
     } else {
-      br_ssl_client_init_full(&s->sc, &s->my_x509.minimal, NULL, 0);
-      s->my_x509.vtable = &my_x509_vtable;
-      br_ssl_engine_set_x509(&s->sc.eng, &s->my_x509.vtable);
+      br_ssl_client_init_full(&s->sc, &s->x509_noverify.minimal, NULL, 0);
+      s->x509_noverify.vtable = &x509_noverify_vtable;
+      br_ssl_engine_set_x509(&s->sc.eng, &s->x509_noverify.vtable);
     }
 
     br_ssl_engine_set_buffer(&s->sc.eng, s->iobuf, sizeof(s->iobuf), 1);
@@ -380,7 +380,7 @@ tls_connect(int fd, const char *host, int check_cert, int is_tls)
 }
 
 ssize_t
-tls_read(struct TlsSocket *s, void *buf, size_t len)
+tlss_read(struct TlsSocket *s, void *buf, size_t len)
 {
   if (!s->is_tls) {
     for (;;) {
@@ -405,7 +405,7 @@ tls_read(struct TlsSocket *s, void *buf, size_t len)
 }
 
 ssize_t
-tls_write(struct TlsSocket *s, const void *buf, size_t len)
+tlss_write(struct TlsSocket *s, const void *buf, size_t len)
 {
   if (!s->is_tls) {
     for (;;) {
@@ -437,7 +437,7 @@ tls_write(struct TlsSocket *s, const void *buf, size_t len)
 }
 
 void
-tls_close(struct TlsSocket *s, int close_fd)
+tlss_close(struct TlsSocket *s, int close_fd)
 {
   if (s->is_tls) {
 #if FEATURE_USE_LIBTLS

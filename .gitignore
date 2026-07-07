@@ -34,3 +34,8 @@ scripts/mk/config.mk
 scripts/mk/config.kv
 scripts/mk/rules.mk
 deps.mk
+
+# ninja backend generator output and state
+build.ninja
+.ninja_log
+.ninja_deps

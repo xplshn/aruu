@@ -41,7 +41,6 @@ static char *whilecode(Macro *, char *, char *);
 static char *ifcode(Macro *, char *, char *);
 static char *funcode(Macro *, char *, char *, char *);
 static char *param(char *, char *), *local(char *, char *);
-static Macro *define(char *, char *);
 static char *retcode(char *);
 static char *brkcode(void);
 static Macro *macro(int);
@@ -513,8 +512,6 @@ ifcode(Macro *d, char *cmp, char *body)
 static char *
 retcode(char *expr)
 {
-	char *s;
-
 	if (nested < 2 || macros[1].op != DEF)
 		yyerror("return must be in a function");
 	return code("%s %s %dQ", expr, estrdup(unwind), nested - 1);
@@ -643,7 +640,6 @@ digits(char *bp)
 static int
 number(int ch)
 {
-	int d;
 	char *bp;
 
 	ungetc(ch, filep);
@@ -753,6 +749,7 @@ operand(int ch)
 	case '!':
 		if (getc(filep) == '=')
 			return NE;
+		/* fallthrough */
 	default:
 		yyerror("invalid operand");
 		return 0;
@@ -820,6 +817,7 @@ spawn(void)
 	switch (fork()) {
 	case -1:
 		eprintf("forking dc:");
+		/* fallthrough */
 	case 0:
 		close(1);
 		dup(fds[1]);
@@ -854,8 +852,6 @@ run(void)
 static void
 bc(char *fname)
 {
-	Macro *d;
-
 	lineno = 1;
 	nested = 0;
 

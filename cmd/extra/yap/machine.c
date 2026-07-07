@@ -1,10 +1,10 @@
 /* Copyright (c) 1985 Ceriel J.H. Jacobs */
 
-#include <ctype.h>
-#include "in_all.h"
 #include "machine.h"
-#include "getline.h"
 #include "assert.h"
+#include "getline.h"
+#include "in_all.h"
+#include <ctype.h>
 
 /*
  * Add part of finite state machine to recognize the string s.
@@ -13,59 +13,58 @@
 static int
 addtomach(char *s, int cnt, struct state **list)
 {
+  struct state *l;
+  int           i = FSM_OKE; /* Return value */
+  int           j;
 
-	struct state *l;
-	int i = FSM_OKE; /* Return value */
-	int j;
-
-	for (;;) {
-		l = *list;
-		if (!l) {
-			/*
-			 * Create new list element
-			 */
-			*list = l = (struct state *)alloc(sizeof(*l));
-			l->s_char = *s;
-			l->s_endstate = 0;
-			l->s_match = 0;
-			l->s_next = 0;
-		}
-		if (l->s_char == *s) {
-			/*
-			 * Continue with next character
-			 */
-			if (!*++s) {
-				/*
-				 * No next character
-				 */
-				j = l->s_endstate;
-				l->s_endstate = 1;
-				if (l->s_match || j) {
-					/*
-					 * If the state already was an endstate,
-					 * or has a successor, the currently
-					 * added string is a prefix of an
-					 * already recognized string
-					 */
-					return FSM_ISPREFIX;
-				}
-				l->s_cnt = cnt;
-				return i;
-			}
-			if (l->s_endstate) {
-				/*
-				 * In this case, the currently added string has
-				 * a prefix that is an already recognized
-				 * string.
-				 */
-				i = FSM_HASPREFIX;
-			}
-			list = &(l->s_match);
-			continue;
-		}
-		list = &(l->s_next);
-	}
-	/* NOTREACHED */
+  for (;;) {
+    l = *list;
+    if (!l) {
+      /*
+       * Create new list element
+       */
+      *list = l     = (struct state *)alloc(sizeof(*l));
+      l->s_char     = *s;
+      l->s_endstate = 0;
+      l->s_match    = 0;
+      l->s_next     = 0;
+    }
+    if (l->s_char == *s) {
+      /*
+       * Continue with next character
+       */
+      if (!*++s) {
+        /*
+         * No next character
+         */
+        j             = l->s_endstate;
+        l->s_endstate = 1;
+        if (l->s_match || j) {
+          /*
+           * If the state already was an endstate,
+           * or has a successor, the currently
+           * added string is a prefix of an
+           * already recognized string
+           */
+          return FSM_ISPREFIX;
+        }
+        l->s_cnt = cnt;
+        return i;
+      }
+      if (l->s_endstate) {
+        /*
+         * In this case, the currently added string has
+         * a prefix that is an already recognized
+         * string.
+         */
+        i = FSM_HASPREFIX;
+      }
+      list = &(l->s_match);
+      continue;
+    }
+    list = &(l->s_next);
+  }
+  /* NOTREACHED */
 }
 
 /*
@@ -75,11 +74,10 @@ addtomach(char *s, int cnt, struct state **list)
 int
 addstring(char *s, int cnt, struct state **machine)
 {
-
-	if (!s || !*s) {
-		return FSM_ISPREFIX;
-	}
-	return addtomach(s, cnt, machine);
+  if (!s || !*s) {
+    return FSM_ISPREFIX;
+  }
+  return addtomach(s, cnt, machine);
 }
 
 /*
@@ -93,42 +91,41 @@ addstring(char *s, int cnt, struct state **machine)
 int
 match(char *s, int *i, struct state *mach)
 {
+  char         *s1    = s; /* Walk through string */
+  struct state *mach1 = 0;
+  /* Keep track of previous state */
 
-	char *s1 = s; /* Walk through string */
-	struct state *mach1 = 0;
-	/* Keep track of previous state */
-
-	while (mach && *s1) {
-		if (mach->s_char == *s1) {
-			/*
-			 * Current character matches. Carry on with next
-			 * character and next state
-			 */
-			mach1 = mach;
-			mach = mach->s_match;
-			s1++;
-			continue;
-		}
-		mach = mach->s_next;
-	}
-	if (!mach1) {
-		/*
-		 * No characters matched
-		 */
-		return 0;
-	}
-	if (mach1->s_endstate) {
-		/*
-		 * The string matched
-		 */
-		*i = mach1->s_cnt;
-		return s1 - s;
-	}
-	if (!*s1) {
-		/*
-		 * The string matched a prefix
-		 */
-		return FSM_ISPREFIX;
-	}
-	return 0;
+  while (mach && *s1) {
+    if (mach->s_char == *s1) {
+      /*
+       * Current character matches. Carry on with next
+       * character and next state
+       */
+      mach1 = mach;
+      mach  = mach->s_match;
+      s1++;
+      continue;
+    }
+    mach = mach->s_next;
+  }
+  if (!mach1) {
+    /*
+     * No characters matched
+     */
+    return 0;
+  }
+  if (mach1->s_endstate) {
+    /*
+     * The string matched
+     */
+    *i = mach1->s_cnt;
+    return s1 - s;
+  }
+  if (!*s1) {
+    /*
+     * The string matched a prefix
+     */
+    return FSM_ISPREFIX;
+  }
+  return 0;
 }

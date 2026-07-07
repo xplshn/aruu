@@ -1,5 +1,6 @@
 #include "ninqu.h"
 
+#include <fnmatch.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -52,8 +53,7 @@ inst_stale(struct Inst *inst)
   return 0;
 }
 
-/* a pure $(NAME) splits on whitespace so $(CFLAGS) becomes many
- * flags, while -I$(INCDIR) stays one token */
+/* pure $(NAME) splits on whitespace so $(CFLAGS) becomes many flags, -I$(INCDIR) stays one token */
 static int
 is_pure_ref(const char *tok)
 {
@@ -127,9 +127,7 @@ build_cmd(struct Inst *inst, struct Rule *r)
   }
 }
 
-/* @NAME resolves to a rule ref. glob:PREFIX goes to glob_expand.
- * anything else is a path: if it does not exist, try to find a
- * producer and run it first */
+/* if path does not exist, try to find a producer and run it first */
 static void
 resolve_input_token(int inst_idx, const char *raw, int only_dep)
 {
@@ -198,8 +196,7 @@ setup_inst(struct Inst *inst, struct Rule *r)
   }
 }
 
-/* resolve deps, expand (out), populate IN/OUT on the overlay, build
- * the cmd. caller must have local_overlay set if needed */
+/* caller must have local_overlay set if needed */
 static void
 finalize_inst(int idx, struct Rule *r, struct KvStore *ov)
 {
@@ -222,6 +219,27 @@ finalize_inst(int idx, struct Rule *r, struct KvStore *ov)
   build_cmd(inst, r);
 }
 
+/* true when deps (out) matches selfs glob. glob_all() needs bytes on disk
+ * so dep must run synchronously before enumerating instances */
+static int
+dep_feeds_glob(struct Rule *self, struct Rule *dep)
+{
+  int j;
+
+  if (!dep->out[0])
+    return 0;
+  for (j = 0; j < self->globs.n; j++) {
+    char *pat = kv_expand(self->globs.v[j]);
+    char *out = kv_expand(dep->out);
+    int   hit = fnmatch(pat, out, 0) == 0;
+    free(pat);
+    free(out);
+    if (hit)
+      return 1;
+  }
+  return 0;
+}
+
 void
 expand_rule(const char *name)
 {
@@ -234,8 +252,7 @@ expand_rule(const char *name)
     return;
   r->expanded = 1;
 
-  /* a gate with $(...) is per-instance, a static gate is checked
-   * once and if false the rule produces zero instances */
+  /* static gate checked once, if false rule produces zero instances */
   if (r->gate && !gate_has_dyn(r->gate) && !gate_eval(r->gate))
     return;
 
@@ -252,9 +269,15 @@ expand_rule(const char *name)
     int            j;
     int            r_literal = rule_is_literal(r);
 
-    /* run order-only @rule producers before globbing, so a codegen
-     * step that generates sources finishes before the glob runs.
-     * skipped in summary mode since -S must not execute */
+    /* run a codegen producer before globbing only when its own
+     * output feeds this rules glob, so a step like POSIX_BC_C
+     * (produces cmd/posix/bc.c) finishes before glob_all() looks
+     * for cmd/posix/bc.c. anything else in extra_deps (a library to
+     * link, a header some other rule includes) never needs to run
+     * here, expand_rule() on it just registers its instances so
+     * the resolve_input_token() pass in finalize_inst() can wire up
+     * dep_rule_names for backend scheduling. skipped in
+     * summary mode since -S must not execute */
     if (!summary_mode) {
       for (j = 0; j < r->extra_deps.n; j++) {
         char *tok = kv_expand(r->extra_deps.v[j]);
@@ -262,7 +285,7 @@ expand_rule(const char *name)
           struct Rule *dep = rule_find(tok + 1);
           if (dep) {
             expand_rule(dep->name);
-            if (dep->n_inst > 0) {
+            if (dep_feeds_glob(r, dep) && dep->n_inst > 0) {
               int k;
               for (k = 0; k < dep->n_inst; k++)
                 run_inst_with_deps(dep->inst_idx[k]);

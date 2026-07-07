@@ -10,7 +10,7 @@
 #include "arg.h"
 #include "util.h"
 
-/* grow a struct-array when full. n/cap doubles each time */
+/* grow a struct-array when full, n/cap doubles each time */
 #define GROW(arr, n, cap, init)                                                                    \
   do {                                                                                             \
     if ((n) >= (cap)) {                                                                            \
@@ -246,6 +246,19 @@ extern struct StrList files_read;
 void expand_rule(const char *name);
 
 void schedule_and_run(void);
+void emit_ninja(const char *path, struct StrList *wanted);
+
+struct Backend {
+  const char *name;
+  const char *try_key;
+  const char *file;
+  void (*emit)(const char *path, struct StrList *wanted);
+};
+
+const struct Backend *backend_by_name(const char *name);
+const struct Backend *backend_resolve(char **bin);
+void backend_exec(const struct Backend *be, const char *bin, struct StrList *wanted)
+    __attribute__((noreturn));
 
 void do_features(void);
 void do_query(const char *sub, const char *arg);

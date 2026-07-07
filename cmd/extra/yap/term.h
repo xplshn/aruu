@@ -30,10 +30,10 @@ extern int AM;
 extern int XN;
 extern int DB;
 
-extern int erasech;
-extern int killch;
+extern int           erasech;
+extern int           killch;
 extern struct state *sppat;
-extern char *BC;
+extern char         *BC;
 
 void inittty(void);
 void resettty(void);
@@ -54,7 +54,7 @@ void mgoto(int n);
 void clrbline(void);
 void home(void);
 void bottom(void);
-int window(void);
+int  window(void);
 void ins_line(int l);
 #define insert_line(l) ins_line(l)
 

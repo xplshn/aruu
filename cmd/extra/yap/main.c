@@ -1,21 +1,21 @@
 /* Copyright (c) 1985 Ceriel J.H. Jacobs */
 
-#include "in_all.h"
 #include "main.h"
-#include "term.h"
+#include "commands.h"
+#include "display.h"
+#include "in_all.h"
 #include "options.h"
 #include "output.h"
 #include "process.h"
-#include "commands.h"
-#include "display.h"
 #include "prompt.h"
+#include "term.h"
 
-int nopipe;
+int   nopipe;
 char *progname;
-int interrupt;
-int no_tty;
+int   interrupt;
+int   no_tty;
 
-static int initialize(int x);
+static int  initialize(int x);
 static void sigquit(int signo);
 #ifdef SIGTSTP
 static void suspsig(int signo);
@@ -24,34 +24,32 @@ static void suspsig(int signo);
 int
 main(int argc, char **argv)
 {
-	char **av;
+  char **av;
 
-	(void)setlocale(LC_CTYPE, "");
-	if (!isatty(1)) {
-		no_tty = 1;
-	}
-	argv[argc] = 0;
-	progname = argv[0];
-	if ((av = readoptions(argv)) == (char **)0 ||
-	    initialize(*av ? 1 : 0)) {
-		if (no_tty) {
-			close(1);
-			(void)dup(2);
-		}
-		putline("Usage: ");
-		putline(argv[0]);
-		putline(
-		    " [-c] [-u] [-n] [-q] [-number] [+command] [file ... ]\n");
-		flush();
-		exit(1);
-	}
-	if (no_tty) {
-		*--av = "cat";
-		execve("/bin/cat", av, (char *const[]){NULL});
-	} else
-		processfiles(argc - (av - argv), av);
-	(void)quit();
-	/* NOTREACHED */
+  (void)setlocale(LC_CTYPE, "");
+  if (!isatty(1)) {
+    no_tty = 1;
+  }
+  argv[argc] = 0;
+  progname   = argv[0];
+  if ((av = readoptions(argv)) == (char **)0 || initialize(*av ? 1 : 0)) {
+    if (no_tty) {
+      close(1);
+      (void)dup(2);
+    }
+    putline("Usage: ");
+    putline(argv[0]);
+    putline(" [-c] [-u] [-n] [-q] [-number] [+command] [file ... ]\n");
+    flush();
+    exit(1);
+  }
+  if (no_tty) {
+    *--av = "cat";
+    execve("/bin/cat", av, (char *const[]){NULL});
+  } else
+    processfiles(argc - (av - argv), av);
+  (void)quit();
+  /* NOTREACHED */
 }
 
 /*
@@ -66,58 +64,57 @@ main(int argc, char **argv)
 static int
 initialize(int x)
 {
-
-	if (!(nopipe = x)) {
-		/*
-		 * Reading from pipe
-		 */
-		if (isatty(0)) {
-			return 1;
-		}
-		stdf = dup(0); /* Duplicate file descriptor of input */
-		if (no_tty)
-			return 0;
-		/*
-		 * Make sure standard input is from the terminal.
-		 */
-		(void)close(0);
-		if (open("/dev/tty", O_RDONLY, 0) != 0) {
-			putline("Couldn't open terminal\n");
-			flush();
-			exit(1);
-		}
-	}
-	if (no_tty)
-		return 0;
-	/*
-	 * Handle signals.
-	 * Catch QUIT, DELETE and ^Z
-	 */
-	(void)signal(SIGQUIT, SIG_IGN);
-	(void)signal(SIGINT, catchdel);
-	ini_terminal();
+  if (!(nopipe = x)) {
+    /*
+     * Reading from pipe
+     */
+    if (isatty(0)) {
+      return 1;
+    }
+    stdf = dup(0); /* Duplicate file descriptor of input */
+    if (no_tty)
+      return 0;
+    /*
+     * Make sure standard input is from the terminal.
+     */
+    (void)close(0);
+    if (open("/dev/tty", O_RDONLY, 0) != 0) {
+      putline("Couldn't open terminal\n");
+      flush();
+      exit(1);
+    }
+  }
+  if (no_tty)
+    return 0;
+  /*
+   * Handle signals.
+   * Catch QUIT, DELETE and ^Z
+   */
+  (void)signal(SIGQUIT, SIG_IGN);
+  (void)signal(SIGINT, catchdel);
+  ini_terminal();
 #ifdef SIGTSTP
-	if (signal(SIGTSTP, SIG_IGN) == SIG_DFL) {
-		(void)signal(SIGTSTP, suspsig);
-	}
+  if (signal(SIGTSTP, SIG_IGN) == SIG_DFL) {
+    (void)signal(SIGTSTP, suspsig);
+  }
 #endif
-	(void)signal(SIGQUIT, sigquit);
-	return 0;
+  (void)signal(SIGQUIT, sigquit);
+  return 0;
 }
 
 void
 catchdel(int signo)
 {
-	(void)signo;
-	(void)signal(SIGINT, catchdel);
-	interrupt = 1;
+  (void)signo;
+  (void)signal(SIGINT, catchdel);
+  interrupt = 1;
 }
 
 static void
 sigquit(int signo)
 {
-	(void)signo;
-	quit();
+  (void)signo;
+  quit();
 }
 
 #ifdef SIGTSTP
@@ -130,22 +127,21 @@ sigquit(int signo)
 void
 suspend()
 {
+  nflush();
+  resettty();
+  (void)signal(SIGTSTP, SIG_DFL);
+  (void)kill(0, SIGTSTP);
+  /*
+   * We are not here anymore ...
+   *
 
-	nflush();
-	resettty();
-	(void)signal(SIGTSTP, SIG_DFL);
-	(void)kill(0, SIGTSTP);
-	/*
-	 * We are not here anymore ...
-	 *
-
-	 *
-	 * But we arive here ...
-	 */
-	inittty();
-	putline(TI);
-	flush();
-	(void)signal(SIGTSTP, suspsig);
+   *
+   * But we arive here ...
+   */
+  inittty();
+  putline(TI);
+  flush();
+  (void)signal(SIGTSTP, suspsig);
 }
 
 /*
@@ -156,11 +152,11 @@ suspend()
 static void
 suspsig(int signo)
 {
-	(void)signo;
+  (void)signo;
 
-	suspend();
-	if (DoneSetJmp)
-		longjmp(SetJmpBuf, 1);
+  suspend();
+  if (DoneSetJmp)
+    longjmp(SetJmpBuf, 1);
 }
 #endif
 
@@ -172,11 +168,10 @@ suspsig(int signo)
 int
 quit()
 {
-
-	clrbline();
-	resettty();
-	flush();
-	exit(0);
+  clrbline();
+  resettty();
+  flush();
+  exit(0);
 }
 
 /*
@@ -187,9 +182,8 @@ quit()
 void
 panic(char *s)
 {
-
-	putline("\a\a\a\r\n");
-	putline(s);
-	putline("\r\n");
-	quit();
+  putline("\a\a\a\r\n");
+  putline(s);
+  putline("\r\n");
+  quit();
 }

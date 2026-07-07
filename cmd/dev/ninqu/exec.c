@@ -1,4 +1,5 @@
 #include "ninqu.h"
+#include "wexec.h"
 
 #include <errno.h>
 #include <libgen.h>
@@ -13,8 +14,7 @@ int jobs_n = 1;
 int summary_mode;
 int failed_any;
 
-/* fork, chdir, redirect, exec. the child _exit on error so the
- * parent never sees a stale pid */
+/* child _exit on error so parent never sees a stale pid */
 pid_t
 spawn_inst(struct Inst *inst, struct StrList *argv)
 {
@@ -37,9 +37,7 @@ spawn_inst(struct Inst *inst, struct StrList *argv)
   child_execvp(sl_argv(argv));
 }
 
-/* fork a supervisor that chains each stage stdout into the next
- * stdin. the parent waits on the supervisor, so the whole pipeline
- * has one exit status */
+/* parent waits on supervisor so pipeline has one exit status */
 pid_t
 spawn_pipe(struct Inst *inst)
 {
@@ -91,8 +89,8 @@ spawn_pipe(struct Inst *inst)
   }
 }
 
-/* mkdir -p the directory an instance writes into, so a rule (out)
- * can point at a path that does not exist yet */
+/* mkdir -p the directory an instance writes into, so a rule (out) can point at a path that does not
+ * exist yet */
 void
 mk_out_dir(const char *out)
 {
@@ -108,8 +106,7 @@ mk_out_dir(const char *out)
   mkdirp(dir, 0777, 0777);
 }
 
-/* print the rule line and flush before the child runs, so the
- * announcement appears before the child own output */
+/* flush before child runs so announcement appears before its output */
 void
 announce_inst(struct Inst *inst)
 {
@@ -118,8 +115,7 @@ announce_inst(struct Inst *inst)
   fflush(stdout);
 }
 
-/* run one instance synchronously. exits on failure since a missing
- * producer is unrecoverable */
+/* exits on failure since a missing producer is unrecoverable */
 void
 run_inst_sync(int idx)
 {
@@ -137,8 +133,7 @@ run_inst_sync(int idx)
     eprintf("manifest: producer failed (rule %s)\n", rules[inst->rule_idx].name);
 }
 
-/* run a batch of independent instances concurrently, at most jobs_n
- * at a time. all instances in the batch are at the same kahn level */
+/* all instances in the batch are at the same kahn level */
 void
 run_batch(int *idxs, int n)
 {
@@ -189,9 +184,7 @@ run_batch(int *idxs, int n)
   free(slot);
 }
 
-/* run an instance and all its transitive deps in order, so a
- * producer like LIBUTIL does not archive .o files that have not
- * been compiled yet */
+/* run transitive deps in order so a producer does not archive uncompiled files */
 void
 run_inst_with_deps(int idx)
 {
@@ -211,8 +204,7 @@ run_inst_with_deps(int idx)
   run_inst_sync(idx);
 }
 
-/* bootstrap: run the producer for path only if path does not exist.
- * after that the normal dependency graph takes over */
+/* run producer for path only if path does not exist */
 void
 materialize_if_missing(const char *path)
 {
@@ -233,8 +225,7 @@ materialize_if_missing(const char *path)
   }
 }
 
-/* run argv synchronously, return its stdout as a string. used by
- * (set NAME (capture (exec ...))) at parse time */
+/* used by (set NAME (capture (exec ...))) at parse time */
 char *
 capture_argv(struct StrList *argv)
 {

@@ -1,18 +1,18 @@
 /* Copyright (c) 1985 Ceriel J.H. Jacobs */
 
-#include "in_all.h"
 #include "getline.h"
-#include "options.h"
-#include "process.h"
-#include "term.h"
-#include "main.h"
-#include "display.h"
-#include "output.h"
-#include "prompt.h"
 #include "assert.h"
+#include "display.h"
+#include "in_all.h"
+#include "main.h"
+#include "options.h"
+#include "output.h"
+#include "process.h"
+#include "prompt.h"
+#include "term.h"
 
 #define BLOCKSIZE 2048 /* size of blocks */
-#define CHUNK 50       /* # of blockheaders allocated at a time */
+#define CHUNK     50   /* # of blockheaders allocated at a time */
 
 /*
  * Blocks are kept in an array in line-number order. Each block stores the raw
@@ -20,63 +20,62 @@
  */
 
 struct block {
-	int b_flags;  /* Contains the following flags: */
-#define PARTLY 02     /* block not filled completely (eof) */
-	long b_end;   /* line number of last line in block */
-	char *b_info; /* the block */
-	int *b_offs;  /* line offsets within the block */
+  int b_flags;    /* Contains the following flags: */
+#define PARTLY 02 /* block not filled completely (eof) */
+  long  b_end;    /* line number of last line in block */
+  char *b_info;   /* the block */
+  int  *b_offs;   /* line offsets within the block */
 };
 
 static struct block *blocklist, /* beginning of the list of blocks */
     *maxblocklist,              /* first free entry in the list */
     *topblocklist;              /* end of allocated core for the list */
-static long lastreadline; /* lineno of last line read */
-static int ENDseen;
+static long lastreadline;       /* lineno of last line read */
+static int  ENDseen;
 
-static void nextblock(struct block *pblock);
-static char *re_alloc(char *ptr, unsigned newsize);
+static void          nextblock(struct block *pblock);
+static char         *re_alloc(char *ptr, unsigned newsize);
 static struct block *getblock(long n, int disable_interrupt);
 
 static struct block *
 new_block()
 {
-	struct block *pblock = maxblocklist - 1;
+  struct block *pblock = maxblocklist - 1;
 
-	if (!maxblocklist || !(pblock->b_flags & PARTLY)) {
-		/*
-		 * There is no last block, or it was filled completely,
-		 * so allocate a new blockheader.
-		 */
-		int siz;
+  if (!maxblocklist || !(pblock->b_flags & PARTLY)) {
+    /*
+     * There is no last block, or it was filled completely,
+     * so allocate a new blockheader.
+     */
+    int siz;
 
-		pblock = blocklist;
-		if (maxblocklist == topblocklist) {
-			/*
-			 * No blockheaders left. Allocate new ones
-			 */
-			siz = topblocklist - pblock;
-			blocklist = pblock = (struct block *)
-			    re_alloc((char *)pblock,
-			             (unsigned)((siz + CHUNK) * sizeof(*pblock)));
-			pblock += siz;
-			topblocklist = pblock + CHUNK;
-			maxblocklist = pblock;
-			for (; pblock < topblocklist; pblock++) {
-				pblock->b_end = 0;
-				pblock->b_info = 0;
-				pblock->b_flags = 0;
-			}
-			if (!siz) {
-				/*
-				 * Create dummy header cell.
-				 */
-				maxblocklist++;
-			}
-		}
-		pblock = maxblocklist++;
-	}
-	nextblock(pblock);
-	return pblock;
+    pblock = blocklist;
+    if (maxblocklist == topblocklist) {
+      /*
+       * No blockheaders left. Allocate new ones
+       */
+      siz       = topblocklist - pblock;
+      blocklist = pblock =
+          (struct block *)re_alloc((char *)pblock, (unsigned)((siz + CHUNK) * sizeof(*pblock)));
+      pblock += siz;
+      topblocklist = pblock + CHUNK;
+      maxblocklist = pblock;
+      for (; pblock < topblocklist; pblock++) {
+        pblock->b_end   = 0;
+        pblock->b_info  = 0;
+        pblock->b_flags = 0;
+      }
+      if (!siz) {
+        /*
+         * Create dummy header cell.
+         */
+        maxblocklist++;
+      }
+    }
+    pblock = maxblocklist++;
+  }
+  nextblock(pblock);
+  return pblock;
 }
 
 /*
@@ -88,66 +87,65 @@ new_block()
 static struct block *
 getblock(long n, int disable_interrupt)
 {
-	struct block *pblock;
+  struct block *pblock;
 
-	if (stdf < 0) {
-		/*
-		 * Not file descriptor, so return end of file
-		 */
-		return 0;
-	}
-	pblock = maxblocklist - 1;
-	if (n < lastreadline ||
-	    (n == lastreadline && !(pblock->b_flags & PARTLY))) {
-		/*
-		 * The line asked for has been read already.
-		 * Perform binary search in the blocklist to find the block
-		 * where it's in.
-		 */
-		struct block *min, *mid;
+  if (stdf < 0) {
+    /*
+     * Not file descriptor, so return end of file
+     */
+    return 0;
+  }
+  pblock = maxblocklist - 1;
+  if (n < lastreadline || (n == lastreadline && !(pblock->b_flags & PARTLY))) {
+    /*
+     * The line asked for has been read already.
+     * Perform binary search in the blocklist to find the block
+     * where it's in.
+     */
+    struct block *min, *mid;
 
-		min = blocklist + 1;
-		do {
-			mid = min + (pblock - min) / 2;
-			if (n > mid->b_end) {
-				min = mid + 1;
-			} else
-				pblock = mid;
-		} while (min < pblock);
-		/* Found, pblock is now a reference to the block wanted */
-		return pblock;
-	}
+    min = blocklist + 1;
+    do {
+      mid = min + (pblock - min) / 2;
+      if (n > mid->b_end) {
+        min = mid + 1;
+      } else
+        pblock = mid;
+    } while (min < pblock);
+    /* Found, pblock is now a reference to the block wanted */
+    return pblock;
+  }
 
-	/*
-	 * The line was'nt read yet, so read blocks until found
-	 */
-	for (;;) {
-		if (interrupt && !disable_interrupt)
-			return 0;
-		pblock = new_block();
-		if (pblock->b_end >= n) {
-			return pblock;
-		}
-		if (pblock->b_flags & PARTLY) {
-			/*
-			 * We did not find it, and the last block could not be
-			 * read completely, so return 0;
-			 */
-			return 0;
-		}
-	}
-	/* NOTREACHED */
+  /*
+   * The line was'nt read yet, so read blocks until found
+   */
+  for (;;) {
+    if (interrupt && !disable_interrupt)
+      return 0;
+    pblock = new_block();
+    if (pblock->b_end >= n) {
+      return pblock;
+    }
+    if (pblock->b_flags & PARTLY) {
+      /*
+       * We did not find it, and the last block could not be
+       * read completely, so return 0;
+       */
+      return 0;
+    }
+  }
+  /* NOTREACHED */
 }
 
 char *
 getline(long n, int disable_interrupt)
 {
-	struct block *pblock;
+  struct block *pblock;
 
-	if (!(pblock = getblock(n, disable_interrupt))) {
-		return (char *)0;
-	}
-	return pblock->b_info + pblock->b_offs[n - ((pblock - 1)->b_end + 1)];
+  if (!(pblock = getblock(n, disable_interrupt))) {
+    return (char *)0;
+  }
+  return pblock->b_info + pblock->b_offs[n - ((pblock - 1)->b_end + 1)];
 }
 
 /*
@@ -157,32 +155,31 @@ getline(long n, int disable_interrupt)
 long
 to_lastline()
 {
-
-	for (;;) {
-		if (!getline(lastreadline + 1, 0)) {
-			/*
-			 * "lastreadline" always contains the linenumber of
-			 * the last line read. So, if the call to getline
-			 * succeeds, "lastreadline" is affected
-			 */
-			if (interrupt)
-				return -1L;
-			return lastreadline;
-		}
-	}
-	/* NOTREACHED */
+  for (;;) {
+    if (!getline(lastreadline + 1, 0)) {
+      /*
+       * "lastreadline" always contains the linenumber of
+       * the last line read. So, if the call to getline
+       * succeeds, "lastreadline" is affected
+       */
+      if (interrupt)
+        return -1L;
+      return lastreadline;
+    }
+  }
+  /* NOTREACHED */
 }
 
 char *
 alloc(unsigned size)
 {
-	char *pmem;
+  char *pmem;
 
-	pmem = malloc(size);
-	if (!pmem && size != 0) {
-		panic("No core");
-	}
-	return pmem;
+  pmem = malloc(size);
+  if (!pmem && size != 0) {
+    panic("No core");
+  }
+  return pmem;
 }
 
 /*
@@ -193,17 +190,17 @@ alloc(unsigned size)
 static char *
 re_alloc(char *ptr, unsigned newsize)
 {
-	char *pmem;
+  char *pmem;
 
-	pmem = realloc(ptr, newsize);
-	if (!pmem && newsize != 0) {
-		panic("No core");
-	}
-	return pmem;
+  pmem = realloc(ptr, newsize);
+  if (!pmem && newsize != 0) {
+    panic("No core");
+  }
+  return pmem;
 }
 
 static char *saved;
-static long filldegree;
+static long  filldegree;
 
 /*
  * Try to read the block indicated by pblock
@@ -212,143 +209,141 @@ static long filldegree;
 static void
 nextblock(struct block *pblock)
 {
-	char *c,         /* Run through pblock->b_info */
-	    *c1;                  /* indicate end of pblock->b_info */
-	int *poff;       /* pointer in line-offset list */
-	int cnt;         /* # of characters read */
-	unsigned siz;    /* Size of allocated line-offset list */
-	static unsigned savedsiz; /* saved "siz" */
-	static int *savedpoff;    /* saved "poff" */
-	static char *savedc1;     /* saved "c1" */
+  char *c,                   /* Run through pblock->b_info */
+      *c1;                   /* indicate end of pblock->b_info */
+  int            *poff;      /* pointer in line-offset list */
+  int             cnt;       /* # of characters read */
+  unsigned        siz;       /* Size of allocated line-offset list */
+  static unsigned savedsiz;  /* saved "siz" */
+  static int     *savedpoff; /* saved "poff" */
+  static char    *savedc1;   /* saved "c1" */
 
-	if (pblock->b_flags & PARTLY) {
-		/*
-		 * The block was already partly filled. Initialize locals
-		 * accordingly
-		 */
-		poff = savedpoff;
-		siz = savedsiz;
-		pblock->b_flags = 0;
-		c1 = savedc1;
-		if (c1 == pblock->b_info || *(c1 - 1)) {
-			/*
-			 * We had incremented "lastreadline" temporarily,
-			 * because the last line could not be completely read
-			 * last time we tried. Undo this increment
-			 */
-			poff--;
-			--lastreadline;
-		}
-	} else {
-		if (saved) {
-			/*
-			 * There were leftovers from the previous block
-			 */
-			pblock->b_info = saved;
-			c1 = savedc1;
-			saved = 0;
-		} else { /* Allocate new block */
-			pblock->b_info = c1 = alloc(BLOCKSIZE + 1);
-		}
-		/*
-		 * Allocate some space for line-offsets
-		 */
-		pblock->b_offs = poff = (int *)
-		    alloc((unsigned)(100 * sizeof(int)));
-		siz = 99;
-		*poff++ = 0;
-	}
-	c = c1;
-	for (;;) {
-		/*
-		 * Read loop
-		 */
-		cnt = read(stdf, c1, BLOCKSIZE - (c1 - pblock->b_info));
-		if (cnt < 0) {
-			/*
-			 * Interrupted read
-			 */
-			if (errno == EINTR)
-				continue;
-			error("Could not read input file");
-			cnt = 0;
-		}
-		c1 += cnt;
-		if (c1 != pblock->b_info + BLOCKSIZE) {
-			ENDseen = 1;
-			pblock->b_flags |= PARTLY;
-		}
-		break;
-	}
-	assert(c <= c1);
-	while (c < c1) {
-		/*
-		 * Now process the block
-		 */
-		if (*c == '\n') {
-			/*
-			 * Newlines are replaced by '\0', so that "getline"
-			 * can deliver one line at a time
-			 */
-			*c = 0;
-			lastreadline++;
-			/*
-			 * Remember the line-offset
-			 */
-			if (poff == pblock->b_offs + siz) {
-				/*
-				 * No space for it, allocate some more
-				 */
-				pblock->b_offs = (int *)
-				    re_alloc((char *)pblock->b_offs,
-				             (unsigned)((siz + 51) * sizeof(int)));
-				poff = pblock->b_offs + siz;
-				siz += 50;
-			}
-			*poff++ = c - pblock->b_info + 1;
-		}
-		c++;
-	}
-	assert(c == c1);
-	*c = 0;
-	if (c != pblock->b_info && *(c - 1) != 0) {
-		/*
-		 * The last line read does not end with a newline, so add one
-		 */
-		lastreadline++;
-		*poff++ = c - pblock->b_info + 1;
-		if (!(pblock->b_flags & PARTLY) && *(poff - 2) != 0) {
-			/*
-			 * Save the started line; it will be in the next block.
-			 * Remove the newline we added just now.
-			 */
-			saved = c1 = alloc(BLOCKSIZE + 1);
-			c = pblock->b_info + *(--poff - 1);
-			while (*c)
-				*c1++ = *c++;
-			c = pblock->b_info + *(poff - 1);
-			savedc1 = c1;
-			--lastreadline;
-		}
-	}
-	pblock->b_end = lastreadline;
-	if (pblock->b_flags & PARTLY) {
-		/*
-		 * Take care, that we can call "nextblock" again, to fill in
-		 * the rest of this block
-		 */
-		savedsiz = siz;
-		savedpoff = poff;
-		savedc1 = c;
-		if (c == pblock->b_info) {
-			lastreadline++;
-			pblock->b_end = 0;
-		}
-	} else {
-		cnt = pblock - blocklist;
-		filldegree = ((c - pblock->b_info) + (cnt - 1) * filldegree) / cnt;
-	}
-	assert(pblock->b_end - (pblock - 1)->b_end <= poff - pblock->b_offs);
+  if (pblock->b_flags & PARTLY) {
+    /*
+     * The block was already partly filled. Initialize locals
+     * accordingly
+     */
+    poff            = savedpoff;
+    siz             = savedsiz;
+    pblock->b_flags = 0;
+    c1              = savedc1;
+    if (c1 == pblock->b_info || *(c1 - 1)) {
+      /*
+       * We had incremented "lastreadline" temporarily,
+       * because the last line could not be completely read
+       * last time we tried. Undo this increment
+       */
+      poff--;
+      --lastreadline;
+    }
+  } else {
+    if (saved) {
+      /*
+       * There were leftovers from the previous block
+       */
+      pblock->b_info = saved;
+      c1             = savedc1;
+      saved          = 0;
+    } else { /* Allocate new block */
+      pblock->b_info = c1 = alloc(BLOCKSIZE + 1);
+    }
+    /*
+     * Allocate some space for line-offsets
+     */
+    pblock->b_offs = poff = (int *)alloc((unsigned)(100 * sizeof(int)));
+    siz                   = 99;
+    *poff++               = 0;
+  }
+  c = c1;
+  for (;;) {
+    /*
+     * Read loop
+     */
+    cnt = read(stdf, c1, BLOCKSIZE - (c1 - pblock->b_info));
+    if (cnt < 0) {
+      /*
+       * Interrupted read
+       */
+      if (errno == EINTR)
+        continue;
+      error("Could not read input file");
+      cnt = 0;
+    }
+    c1 += cnt;
+    if (c1 != pblock->b_info + BLOCKSIZE) {
+      ENDseen = 1;
+      pblock->b_flags |= PARTLY;
+    }
+    break;
+  }
+  assert(c <= c1);
+  while (c < c1) {
+    /*
+     * Now process the block
+     */
+    if (*c == '\n') {
+      /*
+       * Newlines are replaced by '\0', so that "getline"
+       * can deliver one line at a time
+       */
+      *c = 0;
+      lastreadline++;
+      /*
+       * Remember the line-offset
+       */
+      if (poff == pblock->b_offs + siz) {
+        /*
+         * No space for it, allocate some more
+         */
+        pblock->b_offs =
+            (int *)re_alloc((char *)pblock->b_offs, (unsigned)((siz + 51) * sizeof(int)));
+        poff = pblock->b_offs + siz;
+        siz += 50;
+      }
+      *poff++ = c - pblock->b_info + 1;
+    }
+    c++;
+  }
+  assert(c == c1);
+  *c = 0;
+  if (c != pblock->b_info && *(c - 1) != 0) {
+    /*
+     * The last line read does not end with a newline, so add one
+     */
+    lastreadline++;
+    *poff++ = c - pblock->b_info + 1;
+    if (!(pblock->b_flags & PARTLY) && *(poff - 2) != 0) {
+      /*
+       * Save the started line; it will be in the next block.
+       * Remove the newline we added just now.
+       */
+      saved = c1 = alloc(BLOCKSIZE + 1);
+      c          = pblock->b_info + *(--poff - 1);
+      while (*c)
+        *c1++ = *c++;
+      c       = pblock->b_info + *(poff - 1);
+      savedc1 = c1;
+      --lastreadline;
+    }
+  }
+  pblock->b_end = lastreadline;
+  if (pblock->b_flags & PARTLY) {
+    /*
+     * Take care, that we can call "nextblock" again, to fill in
+     * the rest of this block
+     */
+    savedsiz  = siz;
+    savedpoff = poff;
+    savedc1   = c;
+    if (c == pblock->b_info) {
+      lastreadline++;
+      pblock->b_end = 0;
+    }
+  } else {
+    cnt        = pblock - blocklist;
+    filldegree = ((c - pblock->b_info) + (cnt - 1) * filldegree) / cnt;
+  }
+  assert(pblock->b_end - (pblock - 1)->b_end <= poff - pblock->b_offs);
 }
 
 /*
@@ -359,28 +354,27 @@ nextblock(struct block *pblock)
 void
 do_clean()
 {
+  struct block *pblock;
+  char         *p;
 
-	struct block *pblock;
-	char *p;
-
-	for (pblock = blocklist; pblock < maxblocklist; pblock++) {
-		if ((p = pblock->b_info) != 0) {
-			free(p);
-			free((char *)pblock->b_offs);
-		}
-	}
-	if ((p = (char *)blocklist) != 0) {
-		free(p);
-	}
-	blocklist = 0;
-	maxblocklist = 0;
-	topblocklist = 0;
-	lastreadline = 0;
-	filldegree = 0;
-	ENDseen = 0;
-	if ((p = saved) != 0)
-		free(p);
-	saved = 0;
+  for (pblock = blocklist; pblock < maxblocklist; pblock++) {
+    if ((p = pblock->b_info) != 0) {
+      free(p);
+      free((char *)pblock->b_offs);
+    }
+  }
+  if ((p = (char *)blocklist) != 0) {
+    free(p);
+  }
+  blocklist    = 0;
+  maxblocklist = 0;
+  topblocklist = 0;
+  lastreadline = 0;
+  filldegree   = 0;
+  ENDseen      = 0;
+  if ((p = saved) != 0)
+    free(p);
+  saved = 0;
 }
 
 /*
@@ -390,28 +384,28 @@ do_clean()
 int
 getch()
 {
-	int flags, bytes_ready, bytes_read;
-	struct stat buf;
-	char c;
+  int         flags, bytes_ready, bytes_read;
+  struct stat buf;
+  char        c;
 
-	flush();
-	if (startcomm) {
-		/*
-		 * Command line option command
-		 */
-		if (*startcomm)
-			return *startcomm++;
-		return '\n';
-	}
-	if (stdf >= 0) {
-		/*
-		 * Make reads from the terminal non-blocking, so that
-		 * we can see if the user typed something
-		 */
-		flags = fcntl(0, F_GETFL, 0);
-		if (flags != -1 && fcntl(0, F_SETFL, flags | O_NONBLOCK) != -1) {
-			bytes_read = 0;
-			while (!ENDseen &&
+  flush();
+  if (startcomm) {
+    /*
+     * Command line option command
+     */
+    if (*startcomm)
+      return *startcomm++;
+    return '\n';
+  }
+  if (stdf >= 0) {
+    /*
+     * Make reads from the terminal non-blocking, so that
+     * we can see if the user typed something
+     */
+    flags = fcntl(0, F_GETFL, 0);
+    if (flags != -1 && fcntl(0, F_SETFL, flags | O_NONBLOCK) != -1) {
+      bytes_read = 0;
+      while (!ENDseen &&
 			       ((bytes_read = read(0, &c, 1)) == 0
 #ifdef EWOULDBLOCK
 			        || (bytes_read < 0 && errno == EWOULDBLOCK)
@@ -422,40 +416,39 @@ getch()
 			            ) &&
 			       (nopipe ||
 			        (fstat(stdf, &buf) >= 0 && buf.st_size > 0))) {
-				/*
-				 * Do some read ahead, after making sure there
-				 * is input and the user did not type a command
-				 */
-				new_block();
-			}
-			(void)fcntl(0, F_SETFL, flags);
-			if (bytes_read < 0) {
-				/*
-				 * Could this have happened?
-				 * I'm not sure, because the read is
-				 * nonblocking. Can it be interrupted then?
-				 */
-				return -1;
-			}
-			if (bytes_read > 0)
-				return c & 0x7f;
-		}
-	}
-	if (ioctl(0, FIONREAD, (char *)&bytes_ready) >= 0 && stdf >= 0) {
-		while (!ENDseen &&
-		       bytes_ready == 0 &&
-		       (nopipe || (fstat(stdf, &buf) >= 0 && buf.st_size > 0))) {
-			if (interrupt)
-				return -1;
-			new_block();
-			if (ioctl(0, FIONREAD, (char *)&bytes_ready) < 0) {
-				break;
-			}
-		}
-	}
-	if (read(0, &c, 1) <= 0)
-		return -1;
-	return c & 0x7f;
+        /*
+         * Do some read ahead, after making sure there
+         * is input and the user did not type a command
+         */
+        new_block();
+      }
+      (void)fcntl(0, F_SETFL, flags);
+      if (bytes_read < 0) {
+        /*
+         * Could this have happened?
+         * I'm not sure, because the read is
+         * nonblocking. Can it be interrupted then?
+         */
+        return -1;
+      }
+      if (bytes_read > 0)
+        return c & 0x7f;
+    }
+  }
+  if (ioctl(0, FIONREAD, (char *)&bytes_ready) >= 0 && stdf >= 0) {
+    while (!ENDseen && bytes_ready == 0
+           && (nopipe || (fstat(stdf, &buf) >= 0 && buf.st_size > 0))) {
+      if (interrupt)
+        return -1;
+      new_block();
+      if (ioctl(0, FIONREAD, (char *)&bytes_ready) < 0) {
+        break;
+      }
+    }
+  }
+  if (read(0, &c, 1) <= 0)
+    return -1;
+  return c & 0x7f;
 }
 
 /*
@@ -465,11 +458,11 @@ getch()
 long
 getpos(long ln)
 {
-	struct block *pblock;
-	long i;
+  struct block *pblock;
+  long          i;
 
-	pblock = getblock(ln, 1);
-	assert(pblock != 0);
-	i = filldegree * (pblock - blocklist);
-	return i - (filldegree - pblock->b_offs[ln - (pblock - 1)->b_end]);
+  pblock = getblock(ln, 1);
+  assert(pblock != 0);
+  i = filldegree * (pblock - blocklist);
+  return i - (filldegree - pblock->b_offs[ln - (pblock - 1)->b_end]);
 }

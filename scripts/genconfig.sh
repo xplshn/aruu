@@ -158,6 +158,7 @@ clean() {
         rm -f cmd/posix/awk/awkgram.tab.c cmd/posix/awk/awkgram.tab.h cmd/posix/awk/proctab.c cmd/posix/awk/maketab
         rm -f cmd/posix/sh/mknodes cmd/posix/sh/mksyntax cmd/posix/sh/token.h cmd/posix/sh/syntax.c cmd/posix/sh/syntax.h cmd/posix/sh/nodes.c cmd/posix/sh/nodes.h cmd/posix/sh/builtins.c cmd/posix/sh/builtins.h
         rm -f scripts/mk/config.set scripts/mk/config.kv scripts/mk/features.h shared/libutil/nofork_list.h
+        rm -f scripts/mk/ninja-bin.cache
 }
 
 # config: generate config.set, config.kv, nofork_list.h
@@ -200,14 +201,17 @@ config() {
         emit LDFLAGS_TLS  "${LDFLAGS_TLS:-}"
         emit LDLIBS_TLS   "${LDLIBS_TLS:-}"
 
+        # For when ninqu builds itself, otherwise it won't have this value
+        emit NINJA_TRY "${NINJA_TRY:-samu,ninja}"
+
+        emit BUILD_MAN "${BUILD_MAN:-0}"
+        echo "build_man=${BUILD_MAN:-0}" >> "${set_file}"
+
         # these seven are only consulted per-tool below (build_CATEGORY_TOOL,
-        # build_CATEGORY_$(BASESTEM)), the bare category toggle has no gate
-        # anywhere in ninqu.rules, (group CATEGORY ...) already does that
-        # job. config.kv still gets the uppercase copy since genbox.sh
-        # and mkbox source it directly
+        # build_CATEGORY_$(BASESTEM)).
         for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
                 eval "val=\${$g:-0}"
-                echo "${g}=\"${val}\"" >> "${kv_file}"
+                [ "${BUILD_MAN:-0}" = 1 ] && echo "${g}=\"${val}\"" >> "${kv_file}"
         done
 
         # per-tool toggles: scan cmd/<category>/ for tools. a tool is

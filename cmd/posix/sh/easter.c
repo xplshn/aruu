@@ -11,7 +11,7 @@
 #include <unistd.h>
 
 enum {
-  COMMENT_C,       /* line // and block /* */
+  COMMENT_C,       /* line // and block comments */
   COMMENT_HASH,    /* line # only */
   COMMENT_PERCENT, /* line % only */
   COMMENT_SEMI,    /* line ; only */
@@ -61,9 +61,9 @@ struct CommentSpec {
 
 static const struct CommentSpec comment_specs[] = {
     [COMMENT_C]       = {"//", "/*", "*/"},
-    [COMMENT_HASH]    = {"#",  NULL, NULL},
-    [COMMENT_PERCENT] = {"%",  NULL, NULL},
-    [COMMENT_SEMI]    = {";",  NULL, NULL},
+    [COMMENT_HASH]    = {"#", NULL, NULL},
+    [COMMENT_PERCENT] = {"%", NULL, NULL},
+    [COMMENT_SEMI]    = {";", NULL, NULL},
     [COMMENT_DASH]    = {"--", NULL, NULL},
     [COMMENT_HASKELL] = {"--", "{-", "-}"},
     [COMMENT_PAREN]   = {NULL, "(*", "*)"},
@@ -77,35 +77,35 @@ struct LangDef {
 };
 
 static const struct LangDef lang_defs[LANG_COUNT] = {
-    [LANG_C]       = {"C",       1,    COMMENT_C      },
-    [LANG_CPP]     = {"C++",     300,  COMMENT_C      },
-    [LANG_SH]      = {"Shell",   6,    COMMENT_HASH   },
-    [LANG_AWK]     = {"Awk",     6,    COMMENT_HASH   },
-    [LANG_MAKE]    = {"Make",    10,    COMMENT_HASH   },
-    [LANG_M4]      = {"M4",      25,   COMMENT_HASH   },
-    [LANG_LUA]     = {"Lua",     25,   COMMENT_DASH   },
-    [LANG_PERL]    = {"Perl",    500,  COMMENT_HASH   },
-    [LANG_PYTHON]  = {"Python",  80,   COMMENT_HASH   },
-    [LANG_RUBY]    = {"Ruby",    90,   COMMENT_HASH   },
-    [LANG_PHP]     = {"PHP",     110,  COMMENT_C      },
-    [LANG_JS]      = {"JS",      100,  COMMENT_C      },
-    [LANG_TS]      = {"TS",      140,  COMMENT_C      },
-    [LANG_JAVA]    = {"Java",    150,  COMMENT_C      },
-    [LANG_KOTLIN]  = {"Kotlin",  160,  COMMENT_C      },
-    [LANG_SCALA]   = {"Scala",   180,  COMMENT_C      },
-    [LANG_CS]      = {"C#",      140,  COMMENT_C      },
-    [LANG_GO]      = {"Go",      3,   COMMENT_C      },
-    [LANG_SWIFT]   = {"Swift",   70,   COMMENT_C      },
-    [LANG_ZIG]     = {"Zig",     65,   COMMENT_C      },
-    [LANG_DART]    = {"Dart",    55,   COMMENT_C      },
-    [LANG_ELIXIR]  = {"Elixir",  50,   COMMENT_HASH   },
-    [LANG_ERLANG]  = {"Erlang",  55,   COMMENT_PERCENT},
-    [LANG_HASKELL] = {"Haskell", 200,  COMMENT_HASKELL},
-    [LANG_OCAML]   = {"OCaml",   45,   COMMENT_PAREN  },
-    [LANG_CLOJURE] = {"Clojure", 85,   COMMENT_SEMI   },
-    [LANG_RUST]    = {"Rust",    3000, COMMENT_C      },
-    [LANG_ADA]     = {"Ada",     15,   COMMENT_DASH   },
-    [LANG_R]       = {"R",       40,   COMMENT_HASH   },
+    [LANG_C]       = {"C", 1, COMMENT_C},
+    [LANG_CPP]     = {"C++", 300, COMMENT_C},
+    [LANG_SH]      = {"Shell", 6, COMMENT_HASH},
+    [LANG_AWK]     = {"Awk", 6, COMMENT_HASH},
+    [LANG_MAKE]    = {"Make", 10, COMMENT_HASH},
+    [LANG_M4]      = {"M4", 25, COMMENT_HASH},
+    [LANG_LUA]     = {"Lua", 25, COMMENT_DASH},
+    [LANG_PERL]    = {"Perl", 500, COMMENT_HASH},
+    [LANG_PYTHON]  = {"Python", 80, COMMENT_HASH},
+    [LANG_RUBY]    = {"Ruby", 90, COMMENT_HASH},
+    [LANG_PHP]     = {"PHP", 110, COMMENT_C},
+    [LANG_JS]      = {"JS", 100, COMMENT_C},
+    [LANG_TS]      = {"TS", 140, COMMENT_C},
+    [LANG_JAVA]    = {"Java", 150, COMMENT_C},
+    [LANG_KOTLIN]  = {"Kotlin", 160, COMMENT_C},
+    [LANG_SCALA]   = {"Scala", 180, COMMENT_C},
+    [LANG_CS]      = {"C#", 140, COMMENT_C},
+    [LANG_GO]      = {"Go", 3, COMMENT_C},
+    [LANG_SWIFT]   = {"Swift", 70, COMMENT_C},
+    [LANG_ZIG]     = {"Zig", 65, COMMENT_C},
+    [LANG_DART]    = {"Dart", 55, COMMENT_C},
+    [LANG_ELIXIR]  = {"Elixir", 50, COMMENT_HASH},
+    [LANG_ERLANG]  = {"Erlang", 55, COMMENT_PERCENT},
+    [LANG_HASKELL] = {"Haskell", 200, COMMENT_HASKELL},
+    [LANG_OCAML]   = {"OCaml", 45, COMMENT_PAREN},
+    [LANG_CLOJURE] = {"Clojure", 85, COMMENT_SEMI},
+    [LANG_RUST]    = {"Rust", 3000, COMMENT_C},
+    [LANG_ADA]     = {"Ada", 15, COMMENT_DASH},
+    [LANG_R]       = {"R", 40, COMMENT_HASH},
 };
 
 struct ExtMap {
@@ -114,51 +114,18 @@ struct ExtMap {
 };
 
 static const struct ExtMap ext_map[] = {
-    {".c",     LANG_C      },
-    {".cc",    LANG_CPP    },
-    {".cpp",   LANG_CPP    },
-    {".cxx",   LANG_CPP    },
-    {".hpp",   LANG_CPP    },
-    {".sh",    LANG_SH     },
-    {".awk",   LANG_AWK    },
-    {".mk",    LANG_MAKE   },
-    {".m4",    LANG_M4     },
-    {".lua",   LANG_LUA    },
-    {".pl",    LANG_PERL   },
-    {".pm",    LANG_PERL   },
-    {".py",    LANG_PYTHON },
-    {".pyw",   LANG_PYTHON },
-    {".rb",    LANG_RUBY   },
-    {".php",   LANG_PHP    },
-    {".js",    LANG_JS     },
-    {".mjs",   LANG_JS     },
-    {".cjs",   LANG_JS     },
-    {".ts",    LANG_TS     },
-    {".tsx",   LANG_TS     },
-    {".java",  LANG_JAVA   },
-    {".kt",    LANG_KOTLIN },
-    {".kts",   LANG_KOTLIN },
-    {".scala", LANG_SCALA  },
-    {".cs",    LANG_CS     },
-    {".go",    LANG_GO     },
-    {".swift", LANG_SWIFT  },
-    {".zig",   LANG_ZIG    },
-    {".dart",  LANG_DART   },
-    {".ex",    LANG_ELIXIR },
-    {".exs",   LANG_ELIXIR },
-    {".erl",   LANG_ERLANG },
-    {".hrl",   LANG_ERLANG },
-    {".hs",    LANG_HASKELL},
-    {".lhs",   LANG_HASKELL},
-    {".ml",    LANG_OCAML  },
-    {".mli",   LANG_OCAML  },
-    {".clj",   LANG_CLOJURE},
-    {".cljs",  LANG_CLOJURE},
-    {".rs",    LANG_RUST   },
-    {".adb",   LANG_ADA    },
-    {".ads",   LANG_ADA    },
-    {".r",     LANG_R      },
-    {".R",     LANG_R      },
+    {".c", LANG_C},         {".cc", LANG_CPP},     {".cpp", LANG_CPP},     {".cxx", LANG_CPP},
+    {".hpp", LANG_CPP},     {".sh", LANG_SH},      {".awk", LANG_AWK},     {".mk", LANG_MAKE},
+    {".m4", LANG_M4},       {".lua", LANG_LUA},    {".pl", LANG_PERL},     {".pm", LANG_PERL},
+    {".py", LANG_PYTHON},   {".pyw", LANG_PYTHON}, {".rb", LANG_RUBY},     {".php", LANG_PHP},
+    {".js", LANG_JS},       {".mjs", LANG_JS},     {".cjs", LANG_JS},      {".ts", LANG_TS},
+    {".tsx", LANG_TS},      {".java", LANG_JAVA},  {".kt", LANG_KOTLIN},   {".kts", LANG_KOTLIN},
+    {".scala", LANG_SCALA}, {".cs", LANG_CS},      {".go", LANG_GO},       {".swift", LANG_SWIFT},
+    {".zig", LANG_ZIG},     {".dart", LANG_DART},  {".ex", LANG_ELIXIR},   {".exs", LANG_ELIXIR},
+    {".erl", LANG_ERLANG},  {".hrl", LANG_ERLANG}, {".hs", LANG_HASKELL},  {".lhs", LANG_HASKELL},
+    {".ml", LANG_OCAML},    {".mli", LANG_OCAML},  {".clj", LANG_CLOJURE}, {".cljs", LANG_CLOJURE},
+    {".rs", LANG_RUST},     {".adb", LANG_ADA},    {".ads", LANG_ADA},     {".r", LANG_R},
+    {".R", LANG_R},
 };
 
 struct NameMap {
@@ -167,24 +134,37 @@ struct NameMap {
 };
 
 static const struct NameMap name_map[] = {
-    {"Makefile",       LANG_MAKE},
-    {"GNUmakefile",    LANG_MAKE},
-    {".profile",       LANG_SH  },
-    {"profile",        LANG_SH  },
-    {".bashrc",        LANG_SH  },
-    {".bash_profile",  LANG_SH  },
-    {".shrc",          LANG_SH  },
-    {".kshrc",         LANG_SH  },
-    {".zshrc",         LANG_SH  },
-    {".cshrc",         LANG_SH  },
-    {".login",         LANG_SH  },
+    {"Makefile", LANG_MAKE},
+    {"GNUmakefile", LANG_MAKE},
+    {".profile", LANG_SH},
+    {"profile", LANG_SH},
+    {".bashrc", LANG_SH},
+    {".bash_profile", LANG_SH},
+    {".shrc", LANG_SH},
+    {".kshrc", LANG_SH},
+    {".zshrc", LANG_SH},
+    {".cshrc", LANG_SH},
+    {".login", LANG_SH},
 };
 
 /* not scanned for lines, but still checked against markers below */
 static const char *const skip_dirs[] = {
-    ".git", ".hg", ".svn", "node_modules", "vendor", "__pycache__",
-    ".venv", "venv", "target", "build", "dist", ".cache",
-    ".next", ".idea", ".vscode", NULL,
+    ".git",
+    ".hg",
+    ".svn",
+    "node_modules",
+    "vendor",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "target",
+    "build",
+    "dist",
+    ".cache",
+    ".next",
+    ".idea",
+    ".vscode",
+    NULL,
 };
 
 struct Marker {
@@ -195,14 +175,14 @@ struct Marker {
 };
 
 static const struct Marker markers[] = {
-    {"node_modules",   1, 150.0, "skipping bullshit / malware"                          },
-    {"Cargo.toml",     0, 80.0,  "I challenge you to bootstrapping this shitty lang"    },
-    {"package.json",   0, 60.0,  "js. Self-explanatory"                                 },
-    {"go.mod",         0, 20.0,  "Not C. But still good. Minor penalty"                 },
-    {"Dockerfile",     0, 20.0,  "containerization crutch"                              },
-    {"Gemfile",        0, 55.0,  "shitty language baseline"                             },
-    {"CMakeLists.txt", 0, 55.0,  "shitty build system"                                  },
-    {"tsconfig.json",  0, 60.0,  "a language with a configuration file. Degenerate."    },
+    {"node_modules", 1, 150.0, "skipping bullshit / malware"},
+    {"Cargo.toml", 0, 80.0, "I challenge you to bootstrapping this shitty lang"},
+    {"package.json", 0, 60.0, "js. Self-explanatory"},
+    {"go.mod", 0, 20.0, "Not C. But still good. Minor penalty"},
+    {"Dockerfile", 0, 20.0, "containerization crutch"},
+    {"Gemfile", 0, 55.0, "shitty language baseline"},
+    {"CMakeLists.txt", 0, 55.0, "shitty build system"},
+    {"tsconfig.json", 0, 60.0, "a language with a configuration file. Degenerate."},
 };
 
 struct ComboPenalty {
@@ -214,9 +194,9 @@ struct ComboPenalty {
 
 static const struct ComboPenalty combos[] = {
     {LANG_RUST, LANG_CPP, 4000.0, "MAXIMUM BOGUSNESS, rust and c++ sharing a tree"},
-    {LANG_RUST, LANG_C,   400.0,  "comical bogusness, rust apologizing to the c it links against"},
-    {LANG_JS,   LANG_TS,  150.0,  "half the codebase does not trust the other half"},
-    {LANG_C,    LANG_CPP, 120.0,  "abi boundary between two compilers of the same language"},
+    {LANG_RUST, LANG_C, 400.0, "comical bogusness, rust apologizing to the c it links against"},
+    {LANG_JS, LANG_TS, 150.0, "half the codebase does not trust the other half"},
+    {LANG_C, LANG_CPP, 120.0, "abi boundary between two compilers of the same language"},
 };
 
 struct LangStat {
@@ -314,10 +294,10 @@ static void
 scan_file(int dirfd, const char *name, int lang, struct LangStat *lp)
 {
   const struct CommentSpec *cs;
-  char                       buf[8192];
-  char                      *p, *bufend;
-  ssize_t                    nread;
-  int fd, in_block, leading_ws, checked, line_has_content, line_is_comment;
+  char                      buf[8192];
+  char                     *p, *bufend;
+  ssize_t                   nread;
+  int                       fd, in_block, leading_ws, checked, line_has_content, line_is_comment;
 
   fd = openat(dirfd, name, O_RDONLY);
   if (fd < 0)
@@ -388,7 +368,7 @@ static void
 scan(int dirfd, const char *name, struct stat *st, void *data, struct recursor *r)
 {
   struct ScanState *scanst = data;
-  int                lang;
+  int               lang;
 
   check_marker(name, S_ISDIR(st->st_mode), scanst);
 
@@ -431,9 +411,14 @@ bogometercmd(int argc, char **argv)
   for (i = 0; i < LANG_COUNT; i++) {
     if (st.stats[i].files == 0)
       continue;
-    printf("%-10s %10ld %10ld %10ld %10ld\n",
-        lang_defs[i].name, st.stats[i].files, st.stats[i].blank, st.stats[i].comment,
-        st.stats[i].code);
+    printf(
+        "%-10s %10ld %10ld %10ld %10ld\n",
+        lang_defs[i].name,
+        st.stats[i].files,
+        st.stats[i].blank,
+        st.stats[i].comment,
+        st.stats[i].code
+    );
     total_code += st.stats[i].code;
   }
 
@@ -443,41 +428,49 @@ bogometercmd(int argc, char **argv)
   }
 
   printf("---------------------------------------------------------\n");
-    modern_langs = 0;
-    for (i = 0; i < LANG_COUNT; i++) {
-      if (st.stats[i].code == 0)
-        continue;
-      pct = ((double)st.stats[i].code / total_code) * 100.0;
-      score += pct * lang_defs[i].weight;
-      printf("Distribution: %-6s is %5.2f%% of targeted language lines\n", lang_defs[i].name, pct);
-      if (!is_classic(i))
-        modern_langs++;
-    }
+  modern_langs = 0;
+  for (i = 0; i < LANG_COUNT; i++) {
+    if (st.stats[i].code == 0)
+      continue;
+    pct = ((double)st.stats[i].code / total_code) * 100.0;
+    score += pct * lang_defs[i].weight;
+    printf("Distribution: %-6s is %5.2f%% of targeted language lines\n", lang_defs[i].name, pct);
+    if (!is_classic(i))
+      modern_langs++;
+  }
 
-    if (modern_langs >= BABEL_THRESHOLD) {
+  if (modern_langs >= BABEL_THRESHOLD) {
     score *= BABEL_MULT;
-    fprintf(stderr,
-        "note: %d languages in one tree: babel tower, no two files agree on what tongue they speak\n",
-        modern_langs);
+    fprintf(
+        stderr,
+        "note: %d languages in one tree: babel tower, no two files agree on what tongue they "
+        "speak\n",
+        modern_langs
+    );
   }
 
   fflush(stdout);
-    for (i = 0; i < (int)LEN(combos); i++) {
-      if (st.stats[combos[i].lang_a].code > 0 && st.stats[combos[i].lang_b].code > 0) {
-        score += combos[i].penalty;
-        fprintf(stderr, "note: %s + %s: %s\n", lang_defs[combos[i].lang_a].name,
-            lang_defs[combos[i].lang_b].name, combos[i].remark);
-        fflush(stderr);
-      }
+  for (i = 0; i < (int)LEN(combos); i++) {
+    if (st.stats[combos[i].lang_a].code > 0 && st.stats[combos[i].lang_b].code > 0) {
+      score += combos[i].penalty;
+      fprintf(
+          stderr,
+          "note: %s + %s: %s\n",
+          lang_defs[combos[i].lang_a].name,
+          lang_defs[combos[i].lang_b].name,
+          combos[i].remark
+      );
+      fflush(stderr);
     }
+  }
 
   if (st.stats[LANG_RUST].code > 0 && st.stats[LANG_CPP].code == 0 && st.stats[LANG_C].code == 0)
     fprintf(stderr, "note: rust: enormous magnitudes of bogus\n");
 
   score += st.bonus;
 
-  if (modern_langs == 0 && st.stats[LANG_C].code > 0 && st.stats[LANG_SH].code > 0 &&
-      st.stats[LANG_AWK].code > 0)
+  if (modern_langs == 0 && st.stats[LANG_C].code > 0 && st.stats[LANG_SH].code > 0
+      && st.stats[LANG_AWK].code > 0)
     printf("note: sh + awk + c only: peak codebase\n");
 
   printf("---------------------------------------------------------\n");

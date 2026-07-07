@@ -4,22 +4,22 @@
  * Command reader, also executes shell escapes
  */
 
-#include <ctype.h>
-#include "in_all.h"
-#include "term.h"
-#include "process.h"
 #include "getcomm.h"
+#include "assert.h"
 #include "commands.h"
-#include "prompt.h"
+#include "display.h"
+#include "getline.h"
+#include "in_all.h"
+#include "keys.h"
+#include "machine.h"
 #include "main.h"
 #include "output.h"
-#include "getline.h"
-#include "machine.h"
-#include "keys.h"
-#include "display.h"
-#include "assert.h"
+#include "process.h"
+#include "prompt.h"
+#include "term.h"
+#include <ctype.h>
 
-static int killchar(int c);
+static int  killchar(int c);
 static void sigquit(int signo);
 
 /*
@@ -30,69 +30,68 @@ static void sigquit(int signo);
 char *
 readline(char *s)
 {
+  static char buf[80];
+  char       *p = buf;
+  int         ch;
+  int         pos;
 
-	static char buf[80];
-	char *p = buf;
-	int ch;
-	int pos;
-
-	clrbline();
-	putline(s);
-	pos = strlen(s);
-	while ((ch = getch()) != '\n' && ch != '\r') {
-		if (ch == -1) {
-			/*
-			 * Can only occur because of an interrupted read.
-			 */
-			ch = erasech;
-			interrupt = 0;
-		}
-		if (ch == erasech) {
-			/*
-			 * Erase last char
-			 */
-			if (p == buf) {
-				/*
-				 * There was none, so return
-				 */
-				return (char *)0;
-			}
-			pos -= killchar(*--p);
-			if (*p != '\\')
-				continue;
-		}
-		if (ch == killch) {
-			/*
-			 * Erase the whole line
-			 */
-			if (!(p > buf && *(p - 1) == '\\')) {
-				while (p > buf) {
-					pos -= killchar(*--p);
-				}
-				continue;
-			}
-			pos -= killchar(*--p);
-		}
-		if (p > &buf[78] || pos >= COLS - 2) {
-			/*
-			 * Line does not fit.
-			 * Simply refuse to make it any longer
-			 */
-			pos -= killchar(*--p);
-		}
-		*p++ = ch;
-		if (ch < ' ' || ch >= 0177) {
-			fputch('^');
-			pos++;
-			ch ^= 0100;
-		}
-		fputch(ch);
-		pos++;
-	}
-	fputch('\r');
-	*p++ = '\0';
-	flush();
-	return buf;
+  clrbline();
+  putline(s);
+  pos = strlen(s);
+  while ((ch = getch()) != '\n' && ch != '\r') {
+    if (ch == -1) {
+      /*
+       * Can only occur because of an interrupted read.
+       */
+      ch        = erasech;
+      interrupt = 0;
+    }
+    if (ch == erasech) {
+      /*
+       * Erase last char
+       */
+      if (p == buf) {
+        /*
+         * There was none, so return
+         */
+        return (char *)0;
+      }
+      pos -= killchar(*--p);
+      if (*p != '\\')
+        continue;
+    }
+    if (ch == killch) {
+      /*
+       * Erase the whole line
+       */
+      if (!(p > buf && *(p - 1) == '\\')) {
+        while (p > buf) {
+          pos -= killchar(*--p);
+        }
+        continue;
+      }
+      pos -= killchar(*--p);
+    }
+    if (p > &buf[78] || pos >= COLS - 2) {
+      /*
+       * Line does not fit.
+       * Simply refuse to make it any longer
+       */
+      pos -= killchar(*--p);
+    }
+    *p++ = ch;
+    if (ch < ' ' || ch >= 0177) {
+      fputch('^');
+      pos++;
+      ch ^= 0100;
+    }
+    fputch(ch);
+    pos++;
+  }
+  fputch('\r');
+  *p++ = '\0';
+  flush();
+  return buf;
 }
 
 /*
@@ -102,15 +101,14 @@ readline(char *s)
 static int
 killchar(int c)
 {
-
-	backspace();
-	putch(' ');
-	backspace();
-	if (c < ' ' || c >= 0177) {
-		(void)killchar(' ');
-		return 2;
-	}
-	return 1;
+  backspace();
+  putch(' ');
+  backspace();
+  if (c < ' ' || c >= 0177) {
+    (void)killchar(' ');
+    return 2;
+  }
+  return 1;
 }
 
 /*
@@ -120,129 +118,129 @@ killchar(int c)
 void
 shellescape(char *p, int esc_char)
 {
-	char *p2;      /* walks through command */
-	int id;        /* procid of child */
-	int cnt;       /* prevent array bound errors */
-	int lastc = 0; /* will contain the previous char */
+  char *p2;        /* walks through command */
+  int   id;        /* procid of child */
+  int   cnt;       /* prevent array bound errors */
+  int   lastc = 0; /* will contain the previous char */
 #ifdef SIGTSTP
-	void (*savetstp)(int);
+  void (*savetstp)(int);
 #endif
-	static char previous[256]; /* previous command */
-	char comm[256];            /* space for command */
-	int piped[2];
+  static char previous[256]; /* previous command */
+  char        comm[256];     /* space for command */
+  int         piped[2];
 
-	p2 = comm;
-	*p2++ = esc_char;
-	cnt = 253;
-	while (*p) {
-		/*
-		 * expand command
-		 */
-		switch (*p++) {
-		case '!':
-			/*
-			 * An unescaped ! expands to the previous
-			 * command, but disappears if there is none
-			 */
-			if (lastc != '\\') {
-				if (*previous) {
-					id = strlen(previous);
-					if ((cnt -= id) <= 0)
-						break;
-					(void)strcpy(p2, previous);
-					p2 += id;
-				}
-			} else {
-				*(p2 - 1) = '!';
-			}
-			continue;
-		case '%':
-			/*
-			 * An unescaped % will expand to the current
-			 * filename, but disappears is there is none
-			 */
-			if (lastc != '\\') {
-				if (nopipe) {
-					id = strlen(currentfile);
-					if ((cnt -= id) <= 0)
-						break;
-					(void)strcpy(p2, currentfile);
-					p2 += id;
-				}
-			} else {
-				*(p2 - 1) = '%';
-			}
-			continue;
-		default:
-			lastc = *(p - 1);
-			if (cnt-- <= 0)
-				break;
-			*p2++ = lastc;
-			continue;
-		}
-		break;
-	}
-	clrbline();
-	*p2 = '\0';
-	if (!stupid) {
-		/*
-		 * Display expanded command
-		 */
-		cputline(comm);
-		putline("\r\n");
-	}
-	flush();
-	(void)strcpy(previous, comm + 1);
-	resettty();
-	if (esc_char == '|' && pipe(piped) < 0) {
-		error("Cannot create pipe");
-		return;
-	}
-	if ((id = fork()) < 0) {
-		error("Cannot fork");
-		return;
-	}
-	if (id == 0) {
-		if (esc_char == '|') {
-			close(piped[1]);
-			close(0);
-			fcntl(piped[0], F_DUPFD, 0);
-			close(piped[0]);
-		}
-		execl("/bin/sh", "sh", "-c", comm + 1, (char *)0);
-		exit(1);
-	}
-	(void)signal(SIGINT, SIG_IGN);
-	(void)signal(SIGQUIT, SIG_IGN);
+  p2    = comm;
+  *p2++ = esc_char;
+  cnt   = 253;
+  while (*p) {
+    /*
+     * expand command
+     */
+    switch (*p++) {
+      case '!':
+        /*
+         * An unescaped ! expands to the previous
+         * command, but disappears if there is none
+         */
+        if (lastc != '\\') {
+          if (*previous) {
+            id = strlen(previous);
+            if ((cnt -= id) <= 0)
+              break;
+            (void)strcpy(p2, previous);
+            p2 += id;
+          }
+        } else {
+          *(p2 - 1) = '!';
+        }
+        continue;
+      case '%':
+        /*
+         * An unescaped % will expand to the current
+         * filename, but disappears is there is none
+         */
+        if (lastc != '\\') {
+          if (nopipe) {
+            id = strlen(currentfile);
+            if ((cnt -= id) <= 0)
+              break;
+            (void)strcpy(p2, currentfile);
+            p2 += id;
+          }
+        } else {
+          *(p2 - 1) = '%';
+        }
+        continue;
+      default:
+        lastc = *(p - 1);
+        if (cnt-- <= 0)
+          break;
+        *p2++ = lastc;
+        continue;
+    }
+    break;
+  }
+  clrbline();
+  *p2 = '\0';
+  if (!stupid) {
+    /*
+     * Display expanded command
+     */
+    cputline(comm);
+    putline("\r\n");
+  }
+  flush();
+  (void)strcpy(previous, comm + 1);
+  resettty();
+  if (esc_char == '|' && pipe(piped) < 0) {
+    error("Cannot create pipe");
+    return;
+  }
+  if ((id = fork()) < 0) {
+    error("Cannot fork");
+    return;
+  }
+  if (id == 0) {
+    if (esc_char == '|') {
+      close(piped[1]);
+      close(0);
+      fcntl(piped[0], F_DUPFD, 0);
+      close(piped[0]);
+    }
+    execl("/bin/sh", "sh", "-c", comm + 1, (char *)0);
+    exit(1);
+  }
+  (void)signal(SIGINT, SIG_IGN);
+  (void)signal(SIGQUIT, SIG_IGN);
 #ifdef SIGTSTP
-	if ((savetstp = signal(SIGTSTP, SIG_IGN)) != SIG_IGN) {
-		(void)signal(SIGTSTP, SIG_DFL);
-	}
+  if ((savetstp = signal(SIGTSTP, SIG_IGN)) != SIG_IGN) {
+    (void)signal(SIGTSTP, SIG_DFL);
+  }
 #endif
-	if (esc_char == '|') {
-		(void)close(piped[0]);
-		(void)signal(SIGPIPE, SIG_IGN);
-		wrt_fd(piped[1]);
-		(void)close(piped[1]);
-	}
-	while ((lastc = wait((int *)0)) != id && lastc >= 0) {
-		/*
-		 * Wait for child, making sure it is the one we expected ...
-		 */
-	}
-	(void)signal(SIGINT, catchdel);
-	(void)signal(SIGQUIT, sigquit);
+  if (esc_char == '|') {
+    (void)close(piped[0]);
+    (void)signal(SIGPIPE, SIG_IGN);
+    wrt_fd(piped[1]);
+    (void)close(piped[1]);
+  }
+  while ((lastc = wait((int *)0)) != id && lastc >= 0) {
+    /*
+     * Wait for child, making sure it is the one we expected ...
+     */
+  }
+  (void)signal(SIGINT, catchdel);
+  (void)signal(SIGQUIT, sigquit);
 #ifdef SIGTSTP
-	(void)signal(SIGTSTP, savetstp);
+  (void)signal(SIGTSTP, savetstp);
 #endif
-	inittty();
+  inittty();
 }
 
 static void
 sigquit(int signo)
 {
-	(void)signo;
-	quit();
+  (void)signo;
+  quit();
 }
 
 /*
@@ -252,52 +250,52 @@ sigquit(int signo)
 int
 getcomm(long *plong)
 {
-	int c;
-	long count;
-	char *p;
-	int i;
-	int j;
-	char buf[10];
+  int   c;
+  long  count;
+  char *p;
+  int   i;
+  int   j;
+  char  buf[10];
 
-	for (;;) {
-		count = 0;
-		give_prompt();
-		while (isdigit((c = getch()))) {
-			count = count * 10 + (c - '0');
-		}
-		*plong = count;
-		p = buf;
-		for (;;) {
-			if (c == -1) {
-				/*
-				 * This should never happen, but it does,
-				 * when the user gives a TSTP signal (^Z) or
-				 * an interrupt while the program is trying
-				 * to read a character from the terminal.
-				 * In this case, the read is interrupted, so
-				 * we end up here.
-				 * Right, we will have to read again.
-				 */
-				if (interrupt)
-					return 1;
-				break;
-			}
-			*p++ = c;
-			*p = 0;
-			if ((i = match(buf, &j, currmap->k_mach)) > 0) {
-				/*
-				 * The key sequence matched. We have a command
-				 */
-				return j;
-			}
-			if (i == 0)
-				return 0;
-			/*
-			 * We have a prefix of a command.
-			 */
-			assert(i == FSM_ISPREFIX);
-			c = getch();
-		}
-	}
-	/* NOTREACHED */
+  for (;;) {
+    count = 0;
+    give_prompt();
+    while (isdigit((c = getch()))) {
+      count = count * 10 + (c - '0');
+    }
+    *plong = count;
+    p      = buf;
+    for (;;) {
+      if (c == -1) {
+        /*
+         * This should never happen, but it does,
+         * when the user gives a TSTP signal (^Z) or
+         * an interrupt while the program is trying
+         * to read a character from the terminal.
+         * In this case, the read is interrupted, so
+         * we end up here.
+         * Right, we will have to read again.
+         */
+        if (interrupt)
+          return 1;
+        break;
+      }
+      *p++ = c;
+      *p   = 0;
+      if ((i = match(buf, &j, currmap->k_mach)) > 0) {
+        /*
+         * The key sequence matched. We have a command
+         */
+        return j;
+      }
+      if (i == 0)
+        return 0;
+      /*
+       * We have a prefix of a command.
+       */
+      assert(i == FSM_ISPREFIX);
+      c = getch();
+    }
+  }
+  /* NOTREACHED */
 }

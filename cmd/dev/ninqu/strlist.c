@@ -1,10 +1,9 @@
 #include "ninqu.h"
+#include "wexec.h"
 
 #include <ctype.h>
-#include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 void
 sl_push(struct StrList *sl, const char *s)
@@ -80,7 +79,7 @@ base_of(const char *path)
   return p ? p + 1 : path;
 }
 
-/* null-terminate the array so execvp stops scanning */
+/* null-terminate the array so wexecvp stops scanning */
 char **
 sl_argv(struct StrList *sl)
 {
@@ -92,12 +91,9 @@ sl_argv(struct StrList *sl)
   return av;
 }
 
-/* noreturn so callers do not need to guard the dead path after the
- * fork child calls this */
+/* noreturn so callers do not guard the dead path after fork */
 void
 child_execvp(char **av)
 {
-  execvp(av[0], av);
-  fprintf(stderr, "%s: exec %s: %s\n", argv0, av[0], strerror(errno));
-  _exit(127);
+  wexecvp_self(av[0], av);
 }

@@ -10,7 +10,8 @@ static void
 usage(void)
 {
   eprintf(
-      "usage: %s [-jN] [-f manifest] [-C dir] [-Dvar=val]... [-S] [-F] [target|meta.target ...]\n"
+      "usage: %s [-jN] [-f manifest] [-C dir] [-Dvar=val]... [-S] [-F] [-G ninja] "
+      "[target|meta.target ...]\n"
       "       %s query (features|groups|metas|rules|graph) [arg]\n",
       argv0,
       argv0
@@ -25,10 +26,11 @@ main(int argc, char *argv[])
   int            query_mode    = 0;
   const char    *query_sub     = NULL;
   const char    *query_arg     = NULL;
+  const char    *generator     = NULL;
   int            i;
   struct StrList wanted = {0};
 
-  /* detect `query` before ARGBEGIN so it is not parsed as a target */
+  /* detect query before ARGBEGIN so it is not parsed as a target */
   if (argc >= 2 && strcmp(argv[1], "query") == 0) {
     query_mode = 1;
     if (argc < 3)
@@ -78,6 +80,9 @@ main(int argc, char *argv[])
       case 'F':
         features_mode = 1;
         break;
+      case 'G':
+        generator = EARGF(usage());
+        break;
       default:
         usage();
     }
@@ -106,6 +111,27 @@ main(int argc, char *argv[])
       resolve_wanted(wanted.v[i]);
 
   resolve_deps();
+
+  if (generator) {
+    const struct Backend *be = backend_by_name(generator);
+    if (!be)
+      eprintf("ninqu: unknown generator '%s'\n", generator);
+    be->emit(be->file, &wanted);
+    return failed_any ? 1 : 0;
+  }
+
+  /* BACKEND=internal forces executor. otherwise generate file and exec backend binary */
+  if (strcmp(kv_get_or("BACKEND", "auto"), "internal") != 0) {
+    char                 *bin;
+    const struct Backend *be = backend_resolve(&bin);
+    if (be) {
+      be->emit(be->file, &wanted);
+      if (failed_any)
+        return 1;
+      backend_exec(be, bin, &wanted);
+    }
+  }
+
   schedule_and_run();
 
   return failed_any ? 1 : 0;

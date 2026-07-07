@@ -1,12 +1,12 @@
 /* Copyright (c) 1985 Ceriel J.H. Jacobs */
 
-#include <ctype.h>
+#include "keys.h"
+#include "assert.h"
+#include "commands.h"
 #include "in_all.h"
 #include "machine.h"
-#include "keys.h"
-#include "commands.h"
 #include "prompt.h"
-#include "assert.h"
+#include <ctype.h>
 
 struct keymap *currmap, *othermap;
 
@@ -23,11 +23,11 @@ wrf=w:qui=q:qui=Q:mar=m:pip=|";
 static char *
 kerror(char *key, char *emess)
 {
-	static char ebuf[80]; /* Room for the error message */
+  static char ebuf[80]; /* Room for the error message */
 
-	(void)strcpy(ebuf, key);
-	(void)strcat(ebuf, emess);
-	return ebuf;
+  (void)strcpy(ebuf, key);
+  (void)strcat(ebuf, emess);
+  return ebuf;
 }
 
 /*
@@ -38,87 +38,87 @@ kerror(char *key, char *emess)
 static char *
 compile(char *map, struct keymap *commtable)
 {
-	char *mark; /* Indicates start of mnemonic */
-	char *c;    /* Runs through buf */
-	int temp;
-	char *escapes = commtable->k_esc;
-	char buf[10]; /* Will hold key sequence */
+  char *mark; /* Indicates start of mnemonic */
+  char *c;    /* Runs through buf */
+  int   temp;
+  char *escapes = commtable->k_esc;
+  char  buf[10]; /* Will hold key sequence */
 
-	(void)strcpy(commtable->k_help, "Illegal command");
-	while (*map) {
-		c = buf;
-		mark = map; /* Start of mnemonic */
-		while (*map && *map != '=') {
-			map++;
-		}
-		if (!*map) {
-			/*
-			 * Mnemonic should end with '='
-			 */
-			return kerror(mark, ": Syntax error");
-		}
-		*map++ = 0;
-		while (*map) {
-			/*
-			 * Get key sequence
-			 */
-			if (*map == ':') {
-				/*
-				 * end of key sequence
-				 */
-				map++;
-				break;
-			}
-			*c = *map++ & 0x7f;
-			if (*c == '^' || *c == '\\') {
-				if (!(temp = *map++)) {
-					/*
-					 * Escape not followed by a character
-					 */
-					return kerror(mark, ": Syntax error");
-				}
-				if (*c == '^') {
-					if (temp == '?')
-						*c = 0x7f;
-					else
-						*c = temp & 0x1f;
-				} else
-					*c = temp & 0x7f;
-			}
-			setused(*c);
-			c++;
-			if (c >= &buf[9]) {
-				return kerror(mark, ": Key sequence too long");
-			}
-		}
-		*c = 0;
-		if (!(temp = lookup(mark))) {
-			return kerror(mark, ": Nonexistent function");
-		}
-		if (c == &buf[1] && (commands[temp].c_flags & ESC) &&
-		    escapes < &(commtable->k_esc[sizeof(commtable->k_esc) - 1])) {
-			*escapes++ = buf[0] & 0x7f;
-		}
-		temp = addstring(buf, temp, &(commtable->k_mach));
-		if (temp == FSM_ISPREFIX) {
-			return kerror(mark, ": Prefix of other key sequence");
-		}
-		if (temp == FSM_HASPREFIX) {
-			return kerror(mark, ": Other key sequence is prefix");
-		}
-		assert(temp == FSM_OKE);
-		if (!strcmp(mark, "hlp")) {
-			/*
-			 * Create an error message to be given when the user
-			 * types an illegal command
-			 */
-			(void)strcpy(commtable->k_help, "Type ");
-			(void)strcat(commtable->k_help, buf);
-			(void)strcat(commtable->k_help, " for help");
-		}
-	}
-	*escapes = 0;
-	return (char *)0;
+  (void)strcpy(commtable->k_help, "Illegal command");
+  while (*map) {
+    c    = buf;
+    mark = map; /* Start of mnemonic */
+    while (*map && *map != '=') {
+      map++;
+    }
+    if (!*map) {
+      /*
+       * Mnemonic should end with '='
+       */
+      return kerror(mark, ": Syntax error");
+    }
+    *map++ = 0;
+    while (*map) {
+      /*
+       * Get key sequence
+       */
+      if (*map == ':') {
+        /*
+         * end of key sequence
+         */
+        map++;
+        break;
+      }
+      *c = *map++ & 0x7f;
+      if (*c == '^' || *c == '\\') {
+        if (!(temp = *map++)) {
+          /*
+           * Escape not followed by a character
+           */
+          return kerror(mark, ": Syntax error");
+        }
+        if (*c == '^') {
+          if (temp == '?')
+            *c = 0x7f;
+          else
+            *c = temp & 0x1f;
+        } else
+          *c = temp & 0x7f;
+      }
+      setused(*c);
+      c++;
+      if (c >= &buf[9]) {
+        return kerror(mark, ": Key sequence too long");
+      }
+    }
+    *c = 0;
+    if (!(temp = lookup(mark))) {
+      return kerror(mark, ": Nonexistent function");
+    }
+    if (c == &buf[1] && (commands[temp].c_flags & ESC)
+        && escapes < &(commtable->k_esc[sizeof(commtable->k_esc) - 1])) {
+      *escapes++ = buf[0] & 0x7f;
+    }
+    temp = addstring(buf, temp, &(commtable->k_mach));
+    if (temp == FSM_ISPREFIX) {
+      return kerror(mark, ": Prefix of other key sequence");
+    }
+    if (temp == FSM_HASPREFIX) {
+      return kerror(mark, ": Other key sequence is prefix");
+    }
+    assert(temp == FSM_OKE);
+    if (!strcmp(mark, "hlp")) {
+      /*
+       * Create an error message to be given when the user
+       * types an illegal command
+       */
+      (void)strcpy(commtable->k_help, "Type ");
+      (void)strcat(commtable->k_help, buf);
+      (void)strcat(commtable->k_help, " for help");
+    }
+  }
+  *escapes = 0;
+  return (char *)0;
 }
 
 /*
@@ -128,37 +128,37 @@ compile(char *map, struct keymap *commtable)
 void
 initkeys()
 {
-	char *p;
-	static struct keymap xx[2];
+  char                *p;
+  static struct keymap xx[2];
 
-	currmap = &xx[0];
-	othermap = &xx[1];
-	p = compile(defaultmap, currmap); /* Compile default map */
-	assert(p == (char *)0);
-	p = getenv("YAPKEYS");
-	if (p) {
-		if (!(p = compile(p, othermap))) {
-			/*
-			 * No errors in user defined keymap. So, use it
-			 */
-			do_chkm(0L);
-			return;
-		}
-		error(p);
-	}
-	othermap = 0; /* No other keymap */
+  currmap  = &xx[0];
+  othermap = &xx[1];
+  p        = compile(defaultmap, currmap); /* Compile default map */
+  assert(p == (char *)0);
+  p = getenv("YAPKEYS");
+  if (p) {
+    if (!(p = compile(p, othermap))) {
+      /*
+       * No errors in user defined keymap. So, use it
+       */
+      do_chkm(0L);
+      return;
+    }
+    error(p);
+  }
+  othermap = 0; /* No other keymap */
 }
 
 int
 is_escape(int c)
 {
-	char *p = currmap->k_esc;
+  char *p = currmap->k_esc;
 
-	while (*p) {
-		if (c == *p++)
-			return 1;
-	}
-	return 0;
+  while (*p) {
+    if (c == *p++)
+      return 1;
+  }
+  return 0;
 }
 
 static char keyset[16]; /* bitset indicating which keys are
@@ -171,8 +171,7 @@ static char keyset[16]; /* bitset indicating which keys are
 void
 setused(int key)
 {
-
-	keyset[(key & 0x7f) >> 3] |= (1 << (key & 0x07));
+  keyset[(key & 0x7f) >> 3] |= (1 << (key & 0x07));
 }
 
 /*
@@ -182,6 +181,5 @@ setused(int key)
 int
 isused(int key)
 {
-
-	return keyset[(key & 0x7f) >> 3] & (1 << (key & 0x07));
+  return keyset[(key & 0x7f) >> 3] & (1 << (key & 0x07));
 }

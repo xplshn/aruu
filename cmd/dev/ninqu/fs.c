@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 long
 mtime_of(const char *path)
@@ -53,8 +54,7 @@ file_contains(const char *path, const char *needle)
   return found;
 }
 
-/* recurse_dir has no userdata slot, so the pattern and output list
- * travel through file-scope statics for the span of one call */
+/* recurse_dir lacks a userdata slot, use statics for one call */
 static const char     *rg_suffix;
 static struct StrList *rg_out;
 
@@ -81,9 +81,7 @@ recurse_glob(const char *dir, const char *suffix, struct StrList *out)
   recurse_dir(dir, rg_visit);
 }
 
-/* a double-star-slash pattern recurses from the dir before it,
- * matching the suffix against each basename. anything else goes to
- * glob(3) as-is */
+/* double-star-slash recurses, anything else goes to glob(3) */
 void
 glob_expand(const char *pattern, struct StrList *out)
 {
@@ -126,8 +124,7 @@ is_wildcard_pattern(const char *pattern)
   return strpbrk(pattern, "*?[") != NULL;
 }
 
-/* true if every glob on r is a literal path. a rule built entirely
- * from literals is the override side of path_claimed_elsewhere */
+/* true if every glob on r is a literal path */
 int
 rule_is_literal(struct Rule *r)
 {
@@ -140,8 +137,7 @@ rule_is_literal(struct Rule *r)
   return 1;
 }
 
-/* a broad wildcard rule steps aside for any file another rule names
- * outright, so a per-file override needs no (skip) on the broad rule */
+/* broad wildcard steps aside for literal paths so overrides need no (skip) */
 int
 path_claimed_elsewhere(const char *path, struct Rule *self)
 {
@@ -178,11 +174,7 @@ splitext(const char *base, char *stem, size_t stemsz, char *ext, size_t extsz)
   }
 }
 
-/* a basestem like sha512-224sum has a hyphen, but a config toggle
- * cannot. normalize so a gate keying off BASESTEM matches the form
- * genconfig writes
- * FIXME: I do not like our current genconfig.sh
- */
+/* normalize so a gate keying off BASESTEM matches genconfig output */
 void
 to_ident(const char *s, char *out, size_t outsz)
 {

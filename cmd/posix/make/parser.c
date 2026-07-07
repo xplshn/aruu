@@ -534,7 +534,7 @@ repeat:
     /* copy and strip trailing whitespace/newline so strcmp works */
     strncpy(d, input->buf + 1, sizeof(d) - 1);
     d[sizeof(d) - 1] = '\0';
-    dl = strlen(d);
+    dl               = strlen(d);
     while (dl > 0 && isspace((unsigned char)d[dl - 1]))
       d[--dl] = '\0';
     if (strncmp(d, "include", 7) == 0 && isblank(d[7])) {

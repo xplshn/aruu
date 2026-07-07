@@ -176,7 +176,7 @@ stream_getc(struct Stream *s)
     return (unsigned char)s->buf[s->idx++];
   }
   s->idx = 0;
-  r      = tls_read(s->ts, s->buf, sizeof(s->buf));
+  r      = tlss_read(s->ts, s->buf, sizeof(s->buf));
   if (r <= 0) {
     s->len = 0;
     return EOF;
@@ -201,7 +201,7 @@ stream_read(struct Stream *s, void *ptr, size_t size)
       total += n;
     } else {
       s->idx = 0;
-      r      = tls_read(s->ts, s->buf, sizeof(s->buf));
+      r      = tlss_read(s->ts, s->buf, sizeof(s->buf));
       if (r <= 0) {
         s->len = 0;
         break;
@@ -299,7 +299,7 @@ req_printf(struct TlsSocket *ts, const char *fmt, ...)
   len = vsnprintf(buf, sizeof(buf), fmt, ap);
   va_end(ap);
   if (len > 0)
-    tls_write(ts, buf, len);
+    tlss_write(ts, buf, len);
 }
 
 // ?man wget: retrieve files from the web
@@ -469,7 +469,7 @@ main(int argc, char *argv[])
     if (sock_fd < 0)
       eprintf("failed to connect to %s:%s\n", host, port);
 
-    tls_sock = tls_connect(sock_fd, host, !no_check_certificate, is_tls);
+    tls_sock = tlss_connect(sock_fd, host, !no_check_certificate, is_tls);
     if (!tls_sock) {
       close(sock_fd);
       eprintf("failed to establish TLS connection with %s\n", host);
@@ -512,12 +512,12 @@ main(int argc, char *argv[])
     req_printf(tls_sock, "\r\n");
 
     if (post_data) {
-      tls_write(tls_sock, post_data, strlen(post_data));
+      tlss_write(tls_sock, post_data, strlen(post_data));
     } else if (post_file) {
       char    io_buf[8192];
       ssize_t r;
       while ((r = read(post_fd, io_buf, sizeof(io_buf))) > 0) {
-        if (tls_write(tls_sock, io_buf, r) < 0) {
+        if (tlss_write(tls_sock, io_buf, r) < 0) {
           eprintf("failed to write post data:\n");
         }
       }
@@ -530,7 +530,7 @@ main(int argc, char *argv[])
     header_end = NULL;
     memset(s.buf, 0, sizeof(s.buf));
     while (total_read < sizeof(s.buf) - 1) {
-      n = tls_read(tls_sock, s.buf + total_read, sizeof(s.buf) - 1 - total_read);
+      n = tlss_read(tls_sock, s.buf + total_read, sizeof(s.buf) - 1 - total_read);
       if (n <= 0) {
         if (n < 0)
           eprintf("read socket:\n");
@@ -592,7 +592,7 @@ main(int argc, char *argv[])
       free(loc);
       free(url);
       url = new_url;
-      tls_close(tls_sock, 1);
+      tlss_close(tls_sock, 1);
       tls_sock = NULL;
       redirects++;
     } else if (status == 206) {
@@ -605,7 +605,7 @@ main(int argc, char *argv[])
             "file already fully retrieved or "
             "range invalid\n"
         );
-      tls_close(tls_sock, 1);
+      tlss_close(tls_sock, 1);
       free(url);
       free(host);
       free(port);
@@ -621,7 +621,7 @@ main(int argc, char *argv[])
   }
 
   if (spider) {
-    tls_close(tls_sock, 1);
+    tlss_close(tls_sock, 1);
     free(url);
     return 0;
   }
@@ -652,7 +652,7 @@ main(int argc, char *argv[])
   else
     read_non_chunked(&s, out_fd, content_len);
 
-  tls_close(tls_sock, 1);
+  tlss_close(tls_sock, 1);
   if (out_fd != 1)
     close(out_fd);
   if (Oflag != out_name && Pflag)
