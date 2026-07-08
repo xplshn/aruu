@@ -204,14 +204,11 @@ config() {
         # For when ninqu builds itself, otherwise it won't have this value
         emit NINJA_TRY "${NINJA_TRY:-samu,ninja}"
 
-        emit BUILD_MAN "${BUILD_MAN:-0}"
-        echo "build_man=${BUILD_MAN:-0}" >> "${set_file}"
-
         # these seven are only consulted per-tool below (build_CATEGORY_TOOL,
         # build_CATEGORY_$(BASESTEM)).
         for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
                 eval "val=\${$g:-0}"
-                [ "${BUILD_MAN:-0}" = 1 ] && echo "${g}=\"${val}\"" >> "${kv_file}"
+                echo "${g}=\"${val}\"" >> "${kv_file}"
         done
 
         # per-tool toggles: scan cmd/<category>/ for tools. a tool is

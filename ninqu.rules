@@ -343,11 +343,10 @@
 
 (group dev lib DEVCONF AR AS LD CC1 CPP CCDRV)
 
-; man pages: build mdoc and text pages from ?man-marked sources.
+; man pages: build mdoc and text pages from ?man-marked sources
 ;
 (rule MKMAN
   (dir "scripts/mkman")
-  (gate build_man)
   (dep "glob:scripts/mkman/*.go")
   (out "scripts/mkman/mkman")
   (exec go build -o mkman .))
@@ -355,19 +354,17 @@
 (rule MAN_MDOC
   (glob "cmd/**/*.c")
   (mark "?man")
-  (gate build_man)
   (dep (after MKMAN))
   (out "man/man$(SEC_OF:$(DIR))/$(BASESTEM).$(SEC_OF:$(DIR))")
-  (exec scripts/mkman/mkman -fmt mdoc -config scripts/mk/config.kv -src $(MATCH))
+  (exec scripts/mkman/mkman -fmt mdoc -config scripts/mk/config.kv $(MATCH))
   (redirect))
 
 (rule MAN_TXT
   (glob "cmd/**/*.c")
   (mark "?man")
-  (gate build_man)
   (dep (after MKMAN))
   (out "man/man$(SEC_OF:$(DIR))/$(BASESTEM).$(SEC_OF:$(DIR)).txt")
-  (exec scripts/mkman/mkman -fmt txt -config scripts/mk/config.kv -src $(MATCH))
+  (exec scripts/mkman/mkman -fmt txt -config scripts/mk/config.kv $(MATCH))
   (redirect))
 
 (map SEC_OF
