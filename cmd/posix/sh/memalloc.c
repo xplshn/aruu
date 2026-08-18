@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include "memalloc.h"
@@ -50,7 +50,7 @@ badalloc(const char *message)
 }
 
 /*
- * Like malloc, but returns an error when out of space.
+ * like malloc, but returns an error when out of space
  */
 
 pointer
@@ -67,7 +67,7 @@ ckmalloc(size_t nbytes)
 }
 
 /*
- * Same for realloc.
+ * same for realloc
  */
 
 pointer
@@ -90,7 +90,7 @@ ckfree(pointer p)
 }
 
 /*
- * Make a copy of a string in safe storage.
+ * make a copy of a string in safe storage
  */
 
 char *
@@ -106,19 +106,19 @@ savestr(const char *s)
 }
 
 /*
- * Parse trees for commands are allocated in lifo order, so we use a stack
+ * parse trees for commands are allocated in lifo order, so we use a stack
  * to make this more efficient, and also to avoid all sorts of exception
- * handling code to handle interrupts in the middle of a parse.
+ * handling code to handle interrupts in the middle of a parse
  *
- * The size 496 was chosen because with 16-byte alignment the total size
- * for the allocated block is 512.
+ * the size 496 was chosen because with 16-byte alignment the total size
+ * for the allocated block is 512
  */
 
-#define MINSIZE 496 /* minimum size of a block. */
+#define MINSIZE 496 /* minimum size of a block */
 
 struct stack_block {
   struct stack_block *prev;
-  /* Data follows */
+  /* data follows */
 };
 #define SPACE(sp) ((char *)(sp) + ALIGN(sizeof(struct stack_block)))
 
@@ -165,7 +165,7 @@ stalloc(int nbytes)
 void
 stunalloc(pointer p)
 {
-  if (p == NULL) { /*DEBUG */
+  if (p == NULL) { /* DEBUG */
     write(STDERR_FILENO, "stunalloc\n", 10);
     abort();
   }
@@ -191,7 +191,7 @@ setstackmark(struct stackmark *mark)
   mark->stackp     = stackp;
   mark->stacknxt   = stacknxt;
   mark->stacknleft = stacknleft;
-  /* Ensure this block stays in place. */
+  /* ensure this block stays in place */
   if (stackp != NULL && stacknxt == SPACE(stackp))
     stalloc(1);
 }
@@ -217,13 +217,13 @@ popstackmark(struct stackmark *mark)
 }
 
 /*
- * When the parser reads in a string, it wants to stick the string on the
+ * when the parser reads in a string, it wants to stick the string on the
  * stack and only adjust the stack pointer when it knows how big the
- * string is.  Stackblock (defined in stack.h) returns a pointer to a block
+ * string is. stackblock (defined in stack.h) returns a pointer to a block
  * of space on top of the stack and stackblocklen returns the length of
- * this block.  Growstackblock will grow this space by at least one byte,
- * possibly moving it (like realloc).  Grabstackblock actually allocates the
- * part of the block that has been used.
+ * this block. growstackblock will grow this space by at least one byte,
+ * possibly moving it (like realloc). grabstackblock actually allocates the
+ * part of the block that has been used
  */
 
 static void
@@ -269,21 +269,21 @@ growstackblock(int min)
 }
 
 /*
- * The following routines are somewhat easier to use than the above.
- * The user declares a variable of type STACKSTR, which may be declared
- * to be a register.  The macro STARTSTACKSTR initializes things.  Then
- * the user uses the macro STPUTC to add characters to the string.  In
- * effect, STPUTC(c, p) is the same as *p++ = c except that the stack is
- * grown as necessary.  When the user is done, she can just leave the
- * string there and refer to it using stackblock().  Or she can allocate
- * the space for it using grabstackstr().  If it is necessary to allow
+ * the following routines are somewhat easier to use than the above
+ * the user declares a variable of type STACKSTR, which may be declared
+ * to be a register. the macro STARTSTACKSTR initializes things. then
+ * the user uses the macro STPUTC to add characters to the string. in
+ * effect, stputc(c, p) is the same as *p++ = c except that the stack is
+ * grown as necessary. when the user is done, she can just leave the
+ * string there and refer to it using stackblock(). or she can allocate
+ * the space for it using grabstackstr(). if it is necessary to allow
  * someone else to use the stack temporarily and then continue to grow
  * the string, the user should use grabstack to allocate the space, and
- * then call ungrabstr(p) to return to the previous mode of operation.
+ * then call ungrabstr(p) to return to the previous mode of operation
  *
- * USTPUTC is like STPUTC except that it doesn't check for overflow.
+ * USTPUTC is like STPUTC except that it doesnt check for overflow
  * CHECKSTACKSPACE can be called before USTPUTC to ensure that there
- * is space for at least one character.
+ * is space for at least one character
  */
 
 static char *
@@ -303,7 +303,7 @@ growstackstr(void)
 }
 
 /*
- * Called from CHECKSTRSPACE.
+ * called from CHECKSTRSPACE
  */
 
 char *

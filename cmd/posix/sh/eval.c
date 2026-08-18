@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <errno.h>
@@ -39,7 +39,7 @@
 #include <unistd.h>
 
 /*
- * Evaluate a command.
+ * evaluate a command
  */
 
 #include "../../../shared/paths.h"
@@ -91,7 +91,7 @@ static void        evalcommand(union node *, int, struct backcmd *);
 static void        prehash(union node *);
 
 /*
- * Called to reset things after an exception.
+ * called to reset things after an exception
  */
 
 void
@@ -102,7 +102,7 @@ reseteval(void)
 }
 
 /*
- * The eval command.
+ * the eval command
  */
 
 int
@@ -133,7 +133,7 @@ evalcmd(int argc, char **argv)
 }
 
 /*
- * Execute a command or commands contained in a string.
+ * execute a command or commands contained in a string
  */
 
 void
@@ -171,8 +171,8 @@ evalstring(const char *s, int flags)
 }
 
 /*
- * Evaluate a parse tree.  The value is left in the global variable
- * exitstatus.
+ * evaluate a parse tree. the value is left in the global variable
+ * exitstatus
  */
 
 void
@@ -366,9 +366,9 @@ evalfor(union node *n, int flags)
 }
 
 /*
- * Evaluate a case statement, returning the selected tree.
+ * evaluate a case statement, returning the selected tree
  *
- * The exit status needs care to get right.
+ * the exit status needs care to get right
  */
 
 static union node *
@@ -399,7 +399,7 @@ evalcase(union node *n)
 }
 
 /*
- * Kick off a subshell to evaluate a tree.
+ * kick off a subshell to evaluate a tree
  */
 
 static void
@@ -425,7 +425,7 @@ evalsubshell(union node *n, int flags)
 }
 
 /*
- * Evaluate a redirected compound command.
+ * evaluate a redirected compound command
  */
 
 static void
@@ -497,7 +497,7 @@ exphere(union node *redir, struct arglist *fn)
 }
 
 /*
- * Compute the names of the files in a redirection list.
+ * compute the names of the files in a redirection list
  */
 
 static void
@@ -532,8 +532,8 @@ expredir(union node *n)
 }
 
 /*
- * Evaluate a pipeline.  All the processes in the pipeline are children
- * of the process creating the pipeline.  (This differs from some versions
+ * evaluate a pipeline. all the processes in the pipeline are children
+ * of the process creating the pipeline. (this differs from some versions
  * of the shell, which make the last process in a pipeline the parent
  * of all the rest.)
  */
@@ -603,10 +603,10 @@ is_valid_fast_cmdsubst(union node *n)
 }
 
 /*
- * Execute a command inside back quotes.  If it's a builtin command, we
- * want to save its output in a block obtained from malloc.  Otherwise
- * we fork off a subprocess and get the output of the command via a pipe.
- * Should be called with interrupts off.
+ * execute a command inside back quotes. if its a builtin command, we
+ * want to save its output in a block obtained from malloc. otherwise
+ * we fork off a subprocess and get the output of the command via a pipe
+ * should be called with interrupts off
  */
 
 void
@@ -717,11 +717,11 @@ isdeclarationcmd(struct narg *arg)
     if (arg == NULL)
       return (0);
     /*
-     * To also allow "command -p" and "command --" as part of
-     * a declaration command, add code here.
-     * We do not do this, as ksh does not do it either and it
-     * is not required by POSIX.
-     */
+ * to also allow "command -p" and "command --" as part of
+ * a declaration command, add code here
+ * we do not do this, as ksh does not do it either and it
+ * is not required by POSIX
+ */
   }
   return (
       mustexpandto(arg->text, "export") || mustexpandto(arg->text, "readonly")
@@ -763,16 +763,16 @@ xtracecommand(struct arglist *varlist, int argc, char **argv)
 }
 
 /*
- * Check if a builtin can safely be executed in the same process,
- * even though it should be in a subshell (command substitution).
- * Note that jobid, jobs, times and trap can show information not
- * available in a child process; this is deliberate.
- * The arguments should already have been expanded.
+ * check if a builtin can safely be executed in the same process,
+ * even though it should be in a subshell (command substitution)
+ * note that jobid, jobs, times and trap can show information not
+ * available in a child process; this is deliberate
+ * the arguments should already have been expanded
  */
 static int
 safe_builtin(int idx, int argc, char **argv)
 {
-  /* Generated from builtins.def. */
+  /* generated from builtins.def */
   if (safe_builtin_always(idx))
     return (1);
   if (idx == EXPORTCMD || idx == TRAPCMD || idx == ULIMITCMD || idx == UMASKCMD)
@@ -787,13 +787,13 @@ safe_builtin(int idx, int argc, char **argv)
 }
 
 /*
- * Perform redirections, then execute a simple command with vfork.
- * This cannot be used for command substitutions for two reasons:
- * - Redirections might cause the error message for later redirections or for
- *   an unknown command to be sent to the pipe (to be substituted), and this
- *   might cause a deadlock if the message is too long.
- * - The assignment of the pipe needs to come before instead of after the
- *   redirections.
+ * perform redirections, then execute a simple command with vfork
+ * this cannot be used for command substitutions for two reasons:
+ * - redirections might cause the error message for later redirections or for
+ * an unknown command to be sent to the pipe (to be substituted), and this
+ * might cause a deadlock if the message is too long
+ * - the assignment of the pipe needs to come before instead of after the
+ * redirections
  */
 static int
 redirected_vforkexecshell(
@@ -832,8 +832,8 @@ redirected_vforkexecshell(
 }
 
 /*
- * Execute a simple command.
- * Note: This may or may not return if (flags & EV_EXIT).
+ * execute a simple command
+ * note: this may or may not return if (flags & EV_EXIT)
  */
 
 static void
@@ -863,7 +863,7 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
   const char       *path = pathval();
   int               i;
 
-  /* First expand the arguments. */
+  /* first expand the arguments */
   TRACE(("evalcommand(%p, %d) called\n", (void *)cmd, flags));
   emptyarglist(&arglist);
   emptyarglist(&varlist);
@@ -872,7 +872,7 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
   do_clearcmdentry = 0;
   oexitstatus      = exitstatus;
   exitstatus       = 0;
-  /* Add one slot at the beginning for tryexec(). */
+  /* add one slot at the beginning for tryexec() */
   appendarglist(&arglist, nullstr);
   for (argp = cmd->ncmd.args; argp; argp = argp->narg.next) {
     if (varflag && isassignment(argp->narg.text)) {
@@ -892,13 +892,13 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
   if (iflag && funcnest == 0 && argc > 0)
     lastarg = argv[argc - 1];
 
-  /* Print the command if xflag is set. */
+  /* print the command if xflag is set */
   if (xflag)
     xtracecommand(&varlist, argc, argv);
 
-  /* Now locate the command. */
+  /* now locate the command */
   if (argc == 0) {
-    /* Variable assignment(s) without command */
+    /* variable assignment(s) without command */
     cmdentry.cmdtype = CMDBUILTIN;
     cmdentry.u.index = BLTINCMD;
     cmdentry.special = 0;
@@ -907,30 +907,30 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
     int               cmd_flags = 0, bltinonly = 0;
 
     /*
-     * Modify the command lookup path, if a PATH= assignment
-     * is present
-     */
+ * modify the command lookup path, if a PATH= assignment
+ * is present
+ */
     for (i = 0; i < varlist.count; i++)
       if (strncmp(varlist.args[i], PATH, sizeof(PATH) - 1) == 0) {
         path = varlist.args[i] + sizeof(PATH) - 1;
         /*
-         * On `PATH=... command`, we need to make
-         * sure that the command isn't using the
-         * non-updated hash table of the outer PATH
-         * setting and we need to make sure that
-         * the hash table isn't filled with items
-         * from the temporary setting.
-         *
-         * It would be better to forbid using and
-         * updating the table while this command
-         * runs, by the command finding mechanism
-         * is heavily integrated with hash handling,
-         * so we just delete the hash before and after
-         * the command runs. Partly deleting like
-         * changepatch() does doesn't seem worth the
-         * booking effort, since most such runs add
-         * directories in front of the new PATH.
-         */
+ * on `PATH=... command`, we need to make
+ * sure that the command isnt using the
+ * non-updated hash table of the outer PATH
+ * setting and we need to make sure that
+ * the hash table isnt filled with items
+ * from the temporary setting
+ *
+ * it would be better to forbid using and
+ * updating the table while this command
+ * runs, by the command finding mechanism
+ * is heavily integrated with hash handling,
+ * so we just delete the hash before and after
+ * the command runs. partly deleting like
+ * changepatch() does doesnt seem worth the
+ * booking effort, since most such runs add
+ * directories in front of the new PATH
+ */
         clearcmdentry();
         do_clearcmdentry = 1;
       }
@@ -992,14 +992,14 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
         break;
     }
     /*
-     * Special builtins lose their special properties when
-     * called via 'command'.
-     */
+ * special builtins lose their special properties when
+ * called via 'command'
+ */
     if (cmd_flags & DO_NOFUNC)
       cmdentry.special = 0;
   }
 
-  /* Fork off a child process if necessary. */
+  /* fork off a child process if necessary */
   if (((cmdentry.cmdtype == CMDNORMAL || cmdentry.cmdtype == CMDUNKNOWN
         || (cmdentry.cmdtype == CMDWEXEC && !(wexec_get_nofork() && wexec_is_nofork(argv[0]))))
        && ((flags & EV_EXIT) == 0 || have_traps()))
@@ -1042,8 +1042,8 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
     flags |= EV_EXIT;
   }
 
-  /* This is the child process if a fork occurred. */
-  /* Execute the command. */
+  /* this is the child process if a fork occurred */
+  /* execute the command */
   if (cmdentry.cmdtype == CMDFUNCTION) {
 #ifdef DEBUG
     trputs("Shell function:  ");
@@ -1167,9 +1167,9 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
     redirect(cmd->ncmd.redirect, mode);
     outclearerror(out1);
     /*
-     * If there is no command word, redirection errors should
-     * not be fatal but assignment errors should.
-     */
+ * if there is no command word, redirection errors should
+ * not be fatal but assignment errors should
+ */
     if (argc == 0)
       cmdentry.special = 1;
     listsetvar(cmdenviron, cmdentry.special ? 0 : VNOSET);
@@ -1224,7 +1224,7 @@ evalcommand(union node *cmd, int flags, struct backcmd *backcmd)
       setvareq(varlist.args[i], VEXPORT | VSTACK);
     envp = environment();
     shellexec(argv, envp, path, cmdentry.u.index);
-    /*NOTREACHED*/
+    /* NOTREACHED */
   }
   goto out;
 
@@ -1251,10 +1251,10 @@ out:
 }
 
 /*
- * Search for a command.  This is called before we fork so that the
+ * search for a command. this is called before we fork so that the
  * location of the command will be available in the parent as well as
- * the child.  The check for "goodname" is an overly conservative
- * check that the name will not be subject to expansion.
+ * the child. the check for "goodname" is an overly conservative
+ * check that the name will not be subject to expansion
  */
 
 static void
@@ -1268,13 +1268,13 @@ prehash(union node *n)
 }
 
 /*
- * Builtin commands.  Builtin commands whose functions are closely
- * tied to evaluation are implemented here.
+ * builtin commands. builtin commands whose functions are closely
+ * tied to evaluation are implemented here
  */
 
 /*
- * No command given, a bltin command with no arguments, or a bltin command
- * with an invalid name.
+ * no command given, a bltin command with no arguments, or a bltin command
+ * with an invalid name
  */
 
 int
@@ -1285,21 +1285,21 @@ bltincmd(int argc, char **argv)
     return 127;
   }
   /*
-   * Preserve exitstatus of a previous possible command substitution
-   * as POSIX mandates
-   */
+ * preserve exitstatus of a previous possible command substitution
+ * as POSIX mandates
+ */
   return exitstatus;
 }
 
 /*
- * Handle break and continue commands.  Break, continue, and return are
- * all handled by setting the evalskip flag.  The evaluation routines
+ * handle break and continue commands. break, continue, and return are
+ * all handled by setting the evalskip flag. the evaluation routines
  * above all check this flag, and if it is set they start skipping
- * commands rather than executing them.  The variable skipcount is
+ * commands rather than executing them. the variable skipcount is
  * the number of loops to break/continue, or the number of function
- * levels to return.  (The latter is always 1.)  It should probably
- * be an error to break out of more loops than exist, but it isn't
- * in the standard shell so we don't make it one here.
+ * levels to return. (the latter is always 1.) it should probably
+ * be an error to break out of more loops than exist, but it isnt
+ * in the standard shell so we dont make it one here
  */
 
 int
@@ -1309,7 +1309,7 @@ breakcmd(int argc, char **argv)
   char *end;
 
   if (argc > 1) {
-    /* Allow arbitrarily large numbers. */
+    /* allow arbitrarily large numbers */
     n = strtol(argv[1], &end, 10);
     if (!is_digit(argv[1][0]) || *end != '\0')
       error("Illegal number: %s", argv[1]);
@@ -1325,7 +1325,7 @@ breakcmd(int argc, char **argv)
 }
 
 /*
- * The `command' command.
+ * the `command' command
  */
 int
 commandcmd(int argc __unused, char **argv __unused)
@@ -1359,14 +1359,14 @@ commandcmd(int argc __unused, char **argv __unused)
     error("commandcmd bad call");
 
   /*
-   * Do nothing successfully if no command was specified;
-   * ksh also does this.
-   */
+ * do nothing successfully if no command was specified;
+ * ksh also does this
+ */
   return 0;
 }
 
 /*
- * The return command.
+ * the return command
  */
 
 int
@@ -1397,9 +1397,9 @@ execcmd(int argc, char **argv)
   int i;
 
   /*
-   * Because we have historically not supported any options,
-   * only treat "--" specially.
-   */
+ * because we have historically not supported any options,
+ * only treat "--" specially
+ */
   if (argc > 1 && strcmp(argv[1], "--") == 0)
     argc--, argv++;
   if (argc > 1) {

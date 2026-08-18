@@ -1,26 +1,26 @@
-/****************************************************************
-Copyright (C) Lucent Technologies 1997
-All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name Lucent Technologies or any of
-its entities not be used in advertising or publicity pertaining
-to distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
+/* ***************************************************************
+ * copyright (c) lucent technologies 1997
+ * all rights reserved
+ *
+ * permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose and without fee is hereby
+ * granted, provided that the above copyright notice appear in all
+ * copies and that both that the copyright notice and this
+ * permission notice and warranty disclaimer appear in supporting
+ * documentation, and that the name lucent technologies or any of
+ * its entities not be used in advertising or publicity pertaining
+ * to distribution of the software without specific, written prior
+ * permission
+ *
+ * LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE
+ * ************************************************************** */
 
 #ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -52,7 +52,7 @@ static char *wide_char_to_byte_str(int rune, size_t *outlen);
   do {                                                                                             \
     if (istemp(x))                                                                                 \
       tfree(x);                                                                                    \
-  } while (/*CONSTCOND*/ 0)
+  } while (/* CONSTCOND */ 0)
 #else
 void
 tempfree(Cell *p)
@@ -72,8 +72,8 @@ tempfree(Cell *p)
 /* #endif */
 /* #endif */
 
-/* #ifndef	FOPEN_MAX */
-/* #define	FOPEN_MAX	40 */ /* max number of open files */
+/* #ifndef fopen_max */
+/* #define fopen_max 40 */ /* max number of open files */
 /* #endif */
 
 jmp_buf         env;
@@ -106,14 +106,14 @@ Node *curnode = NULL; /* the node being executed, for debugging */
 /* buffer memory management */
 int
 adjbuf(char **pbuf, int *psiz, int minlen, int quantum, char **pbptr, const char *whatrtn)
-/* pbuf:    address of pointer to buffer being managed
- * psiz:    address of buffer size variable
- * minlen:  minimum length of buffer needed
+/* pbuf: address of pointer to buffer being managed
+ * psiz: address of buffer size variable
+ * minlen: minimum length of buffer needed
  * quantum: buffer size quantum
- * pbptr:   address of movable pointer into buffer, or 0 if none
+ * pbptr: address of movable pointer into buffer, or 0 if none
  * whatrtn: name of the calling routine if failure should cause fatal error
  *
- * return   0 for realloc failure, !=0 for success
+ * return 0 for realloc failure, !=0 for success
  */
 {
   if (minlen > *psiz) {
@@ -167,8 +167,8 @@ execute(Node *u) /* execute a node of the parse tree */
         recbld();
       return (x);
     }
-    if (notlegal(a->nobj)) /* probably a Cell* but too risky to
-            print */
+    if (notlegal(a->nobj)) /* probably a cell* but too risky to
+ * print */
       FATAL("illegal statement");
     proc = proctab[a->nobj - FIRSTTOKEN];
     x    = (*proc)(a->narg, a->nobj);
@@ -229,7 +229,7 @@ ex1:
 
 struct Frame {    /* stack frame for awk function calls */
   int    nargs;   /* number of arguments in this call */
-  Cell  *fcncell; /* pointer to Cell for function */
+  Cell  *fcncell; /* pointer to cell for function */
   Cell **args;    /* pointer to array of arguments after execute */
   Cell  *retval;  /* return value */
 };
@@ -241,12 +241,12 @@ int           nframe = 0;    /* number of frames allocated */
 struct Frame *frp    = NULL; /* frame pointer. bottom level unused */
 
 Cell *
-call(Node **a, int n) /* function call.  very kludgy and fragile */
+call(Node **a, int n) /* function call. very kludgy and fragile */
 {
   static const Cell newcopycell = {OCELL, CCOPY, 0, EMPTY, 0.0, NUM | STR | DONTFREE, NULL, NULL};
   int               i, ncall, ndef;
   int               freed = 0; /* handles potential double freeing when fcn & param
-                      share a tempcell */
+ * share a tempcell */
   Node *x;
   Cell *args[NARGS], *oargs[NARGS]; /* BUG: fixed size arrays */
   Cell *y, *z, *fcn;
@@ -338,7 +338,7 @@ call(Node **a, int n) /* function call.  very kludgy and fragile */
   if (isexit(y) || isnext(y))
     return y;
   if (freed == 0) {
-    tempfree(y); /* don't free twice! */
+    tempfree(y); /* dont free twice! */
   }
   z = frp->retval; /* return value */
   DPRINTF("%s returns %g |%s| %o\n", s, getfval(z), getsval(z), z->tval);
@@ -400,7 +400,7 @@ jump(Node **a, int n) /* break, continue, next, nextfile, return */
           setsval(frp->retval, getsval(y));
         else if (y->tval & NUM)
           setfval(frp->retval, getfval(y));
-        else /* can't happen */
+        else /* cant happen */
           FATAL("bad type variable %d", y->tval);
         tempfree(y);
       }
@@ -414,7 +414,7 @@ jump(Node **a, int n) /* break, continue, next, nextfile, return */
       return (jbreak);
     case CONTINUE:
       return (jcont);
-    default: /* can't happen */
+    default: /* cant happen */
       FATAL("illegal jump type %d", n);
   }
   return 0; /* not reached */
@@ -536,7 +536,7 @@ array(Node **a, int n) /* a[0] is symtab, a[1] is list of subscripts */
   Cell *x, *z;
   char *buf;
 
-  x   = execute(a[0]); /* Cell* for symbol table */
+  x   = execute(a[0]); /* cell* for symbol table */
   buf = makearraystring(a[1], __func__);
   if (!isarr(x)) {
     DPRINTF("making %s into an array\n", NN(x->nval));
@@ -559,7 +559,7 @@ awkdelete(Node **a, int n) /* a[0] is symtab, a[1] is list of subscripts */
 {
   Cell *x;
 
-  x = execute(a[0]); /* Cell* for symbol table */
+  x = execute(a[0]); /* cell* for symbol table */
   if (x == symtabloc) {
     FATAL("cannot delete SYMTAB or its elements");
   }
@@ -607,18 +607,18 @@ intest(Node **a, int n) /* a[0] is index (list), a[1] is symtab */
 /* ======== utf-8 code ========== */
 
 /*
- * Awk strings can contain ascii, random 8-bit items (eg Latin-1),
- * or utf-8.  u8_isutf tests whether a string starts with a valid
- * utf-8 sequence, and returns 0 if not (e.g., high bit set).
+ * awk strings can contain ascii, random 8-bit items (eg latin-1),
+ * or utf-8. u8_isutf tests whether a string starts with a valid
+ * utf-8 sequence, and returns 0 if not (e.g., high bit set)
  * u8_nextlen returns length of next valid sequence, which is
- * 1 for ascii, 2..4 for utf-8, or 1 for high bit non-utf.
+ * 1 for ascii, 2..4 for utf-8, or 1 for high bit non-utf
  * u8_strlen returns length of string in valid utf-8 sequences
- * and/or high-bit bytes.  Conversion functions go between byte
- * number and character number.
+ * and/or high-bit bytes. conversion functions go between byte
+ * number and character number
  *
- * In theory, this behaves the same as before for non-utf8 bytes.
+ * in theory, this behaves the same as before for non-utf8 bytes
  *
- * Limited checking! This is a potential security hole.
+ * limited checking! this is a potential security hole
  */
 
 /* is s the beginning of a valid utf-8 string? */
@@ -631,7 +631,7 @@ u8_isutf(const char *s)
 
   c = s[0];
   if (c < 128 || awk_mb_cur_max == 1)
-    return 1; /* what if it's 0? */
+    return 1; /* what if its 0? */
 
   n = strlen(s);
   if (n >= 2 && ((c >> 5) & 0x7) == 0x6 && (s[1] & 0xC0) == 0x80) {
@@ -649,9 +649,9 @@ u8_isutf(const char *s)
   return ret;
 }
 
-/* Convert (prefix of) utf8 string to utf-32 rune. */
-/* Sets *rune to the value, returns the length. */
-/* No error checking: watch out. */
+/* convert (prefix of) utf8 string to utf-32 rune */
+/* sets *rune to the value, returns the length */
+/* no error checking: watch out */
 int
 u8_rune(int *rune, const char *s)
 {
@@ -683,7 +683,7 @@ u8_rune(int *rune, const char *s)
     *rune = c;
     ret   = 1;
   }
-  return ret; /* returns one byte if sequence doesn't look like utf */
+  return ret; /* returns one byte if sequence doesnt look like utf */
 }
 
 /* return length of next sequence: 1 for ascii or random, 2..4 for valid utf8 */
@@ -756,7 +756,7 @@ u8_byte2char(const char *s, int bytenum)
   return charnum;
 }
 
-/* runetochar() adapted from rune.c in the Plan 9 distribution */
+/* runetochar() adapted from rune.c in the plan 9 distribution */
 
 enum {
   Runeerror = 128, /* from somewhere else */
@@ -795,14 +795,14 @@ runetochar(char *str, int c)
     return 1;
   }
 
-  /* two character sequence 00080-007FF => T2 Tx */
+  /* two character sequence 00080-007FF => T2 tx */
   if (c <= Rune2) {
     str[0] = T2 | (c >> 1 * Bitx);
     str[1] = Tx | (c & Maskx);
     return 2;
   }
 
-  /* three character sequence 00800-0FFFF => T3 Tx Tx */
+  /* three character sequence 00800-0FFFF => T3 tx tx */
   if (c > Runemax)
     c = Runeerror;
   if (c <= Rune3) {
@@ -812,7 +812,7 @@ runetochar(char *str, int c)
     return 3;
   }
 
-  /* four character sequence 010000-1FFFFF => T4 Tx Tx Tx */
+  /* four character sequence 010000-1FFFFF => T4 tx tx tx */
   str[0] = T4 | (c >> 3 * Bitx);
   str[1] = Tx | ((c >> 2 * Bitx) & Maskx);
   str[2] = Tx | ((c >> 1 * Bitx) & Maskx);
@@ -913,14 +913,14 @@ boolop(Node **a, int n) /* a[0] || a[1], a[0] && a[1], !a[0] */
         return (False);
       else
         return (True);
-    default: /* can't happen */
+    default: /* cant happen */
       FATAL("unknown boolean operator %d", n);
   }
-  return 0; /*NOTREACHED*/
+  return 0; /* NOTREACHED */
 }
 
 Cell *
-relop(Node **a, int n) /* a[0 < a[1], etc. */
+relop(Node **a, int n) /* a[0 < a[1], etc */
 {
   int      i;
   Cell    *x, *y;
@@ -974,10 +974,10 @@ relop(Node **a, int n) /* a[0 < a[1], etc. */
         return (True);
       else
         return (False);
-    default: /* can't happen */
+    default: /* cant happen */
       FATAL("unknown relational operator %d", n);
   }
-  return 0; /*NOTREACHED*/
+  return 0; /* NOTREACHED */
 }
 
 void
@@ -1027,7 +1027,7 @@ indirect(Node **a, int n) /* $( a[0] ) */
   m = (int)val;
   tempfree(x);
   x        = fieldadr(m);
-  x->ctype = OCELL; /* BUG?  why are these needed? */
+  x->ctype = OCELL; /* BUG? why are these needed? */
   x->csub  = CFLD;
   return (x);
 }
@@ -1078,7 +1078,7 @@ substr(Node **a, int nnn) /* substr(a[0], a[1], a[2]) */
   mb = u8_char2byte(s, m - 1);     /* byte offset of start char in s */
   nb = u8_char2byte(s, m - 1 + n); /* byte offset of end+1 char in s */
 
-  temp  = s[nb]; /* with thanks to John Linderman */
+  temp  = s[nb]; /* with thanks to john linderman */
   s[nb] = '\0';
   setsval(y, s + mb);
   s[nb] = temp;
@@ -1103,7 +1103,7 @@ sindex(Node **a, int nnn) /* index(a[0], a[1]) */
     for (q = p1, p2 = s2; *p2 != '\0' && *q == *p2; q++, p2++)
       continue;
     if (*p2 == '\0') {
-      /* v = (Awkfloat) (p1 - s1 + 1);	 origin 1 */
+      /* v = (awkfloat) (p1 - s1 + 1); origin 1 */
 
       /* should be a function: used in match() as well */
       int i, len;
@@ -1123,7 +1123,7 @@ sindex(Node **a, int nnn) /* index(a[0], a[1]) */
 
 int
 has_utf8(char *s) /* return 1 if s contains any utf-8 (2 bytes or more)
-         character */
+ * character */
 {
   int n;
 
@@ -1189,7 +1189,7 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
             "of memory",
             os
         );
-      /* Ignore size specifiers */
+      /* ignore size specifiers */
       if (strchr("hjLlqtz", *s) != NULL) { /* the ansi panoply */
         t--;
         continue;
@@ -1289,7 +1289,7 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
         t = getsval(x);
         n = strlen(t);
         /* if simple format or no utf-8 in the string, sprintf
-         * works */
+ * works */
         if (!has_utf8(t) || strcmp(fmt, "%s") == 0) {
           if (fmtwd > n)
             n = fmtwd;
@@ -1306,7 +1306,7 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
         }
 
         /* get here if string has utf-8 chars and fmt is not
-         * plain %s */
+ * plain %s */
         /* "%-w.ps", where -, w and .p are all optional */
         /* '0' before the w is a flag character */
         /* fmt points at % */
@@ -1316,7 +1316,7 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
           ljust = 1;
           f++;
         }
-        // flags '0' and '+' are recognized but skipped
+        /* flags '0' and '+' are recognized but skipped */
         if (f[0] == '0') {
           f++;
           if (f[0] == '+')
@@ -1335,27 +1335,27 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
         }
         if (prec > u8_strlen(t))
           prec = u8_strlen(t);
-        pad = wid > prec ? wid - prec : 0; // has to be >= 0
+        pad = wid > prec ? wid - prec : 0; /* has to be >= 0 */
         int i, k, n;
 
-        if (ljust) { // print prec chars from t, then pad blanks
+        if (ljust) { /* print prec chars from t, then pad blanks */
           n = u8_char2byte(t, prec);
           for (k = 0; k < n; k++) {
-            // putchar(t[k]);
+            /* putchar(t[k]); */
             *p++ = t[k];
           }
           for (i = 0; i < pad; i++) {
-            // printf(" ");
+            /* printf(" "); */
             *p++ = ' ';
           }
-        } else { // print pad blanks, then prec chars from t
+        } else { /* print pad blanks, then prec chars from t */
           for (i = 0; i < pad; i++) {
-            // printf(" ");
+            /* printf(" "); */
             *p++ = ' ';
           }
           n = u8_char2byte(t, prec);
           for (k = 0; k < n; k++) {
-            // putchar(t[k]);
+            /* putchar(t[k]); */
             *p++ = t[k];
           }
         }
@@ -1365,17 +1365,17 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
 
       case 'c': {
         /*
-         * If a numeric value is given, awk should just turn
-         * it into a character and print it:
-         *      BEGIN { printf("%c\n", 65) }
-         * prints "A".
-         *
-         * But what if the numeric value is > 128 and
-         * represents a valid Unicode code point?!? We do
-         * our best to convert it back into UTF-8. If we
-         * can't, we output the encoding of the Unicode
-         * "invalid character", 0xFFFD.
-         */
+ * if a numeric value is given, awk should just turn
+ * it into a character and print it:
+ * BEGIN { printf("%c\n", 65) }
+ * prints "a"
+ *
+ * but what if the numeric value is > 128 and
+ * represents a valid unicode code point?!? we do
+ * our best to convert it back into UTF-8. if we
+ * cant, we output the encoding of the unicode
+ * "invalid character", 0xfffd
+ */
         if (isnum(x)) {
           int charval = (int)getfval(x);
 
@@ -1383,13 +1383,13 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
             if (charval < 128 || awk_mb_cur_max == 1)
               snprintf(p, BUFSZ(p), fmt, charval);
             else {
-              // possible unicode character
+              /* possible unicode character */
               size_t count;
               char  *bs = wide_char_to_byte_str(charval, &count);
 
-              if (bs == NULL) { // invalid character
-                // use unicode invalid
-                // character, 0xFFFD
+              if (bs == NULL) { /* invalid character */
+                /* use unicode invalid
+                 * character, 0xfffd */
                 static char invalid_char[] = "\357\277"
                                              "\275";
                 bs                         = invalid_char;
@@ -1402,7 +1402,7 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
           } else {
             *p++ = '\0'; /* explicit null byte */
             *p   = '\0'; /* next output will start
-                here */
+ * here */
           }
           break;
         }
@@ -1414,14 +1414,14 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
           break;
         }
 
-        // utf8 character, almost same song and dance as for %s
+        /* utf8 character, almost same song and dance as for %s */
         int   ljust = 0, wid = 0, prec = n, pad = 0;
         char *f = fmt + 1;
         if (f[0] == '-') {
           ljust = 1;
           f++;
         }
-        // flags '0' and '+' are recognized but skipped
+        /* flags '0' and '+' are recognized but skipped */
         if (f[0] == '0') {
           f++;
           if (f[0] == '+')
@@ -1438,21 +1438,21 @@ format(char **pbuf, int *pbufsize, const char *s, Node *a) /* printf-like conver
         if (f[0] == '.') { /* there is a .prec */
           prec = strtol(++f, &f, 10);
         }
-        if (prec > 1) // %c --> only one character
+        if (prec > 1) /* %c: only one character */
           prec = 1;
-        pad = wid > prec ? wid - prec : 0; // has to be >= 0
+        pad = wid > prec ? wid - prec : 0; /* has to be >= 0 */
         int i;
 
-        if (ljust) { // print one char from t, then pad blanks
+        if (ljust) { /* print one char from t, then pad blanks */
           for (i = 0; i < n; i++)
             *p++ = t[i];
           for (i = 0; i < pad; i++) {
-            // printf(" ");
+            /* printf(" "); */
             *p++ = ' ';
           }
-        } else { // print pad blanks, then prec chars from t
+        } else { /* print pad blanks, then prec chars from t */
           for (i = 0; i < pad; i++) {
-            // printf(" ");
+            /* printf(" "); */
             *p++ = ' ';
           }
           for (i = 0; i < n; i++)
@@ -1537,7 +1537,7 @@ awkprintf(Node **a, int n) /* printf */
 }
 
 Cell *
-arith(Node **a, int n) /* a[0] + a[1], etc.  also -a[0] */
+arith(Node **a, int n) /* a[0] + a[1], etc. also -a[0] */
 {
   Awkfloat i, j = 0;
   double   v;
@@ -1584,7 +1584,7 @@ arith(Node **a, int n) /* a[0] + a[1], etc.  also -a[0] */
       else
         i = pow_errcheck(i, j);
       break;
-    default: /* can't happen */
+    default: /* cant happen */
       FATAL("illegal arithmetic operator %d", n);
   }
   setfval(z, i);
@@ -1592,7 +1592,7 @@ arith(Node **a, int n) /* a[0] + a[1], etc.  also -a[0] */
 }
 
 double
-ipow(double x, int n) /* x**n.  ought to be done by pow, but isn't always */
+ipow(double x, int n) /* x**n. ought to be done by pow, but isnt always */
 {
   double v;
 
@@ -1606,7 +1606,7 @@ ipow(double x, int n) /* x**n.  ought to be done by pow, but isn't always */
 }
 
 Cell *
-incrdecr(Node **a, int n) /* a[0]++, etc. */
+incrdecr(Node **a, int n) /* a[0]++, etc */
 {
   Cell    *x, *z;
   int      k;
@@ -1627,8 +1627,8 @@ incrdecr(Node **a, int n) /* a[0]++, etc. */
 }
 
 Cell *
-assign(Node **a, int n) /* a[0] = a[1], a[0] += a[1], etc. */
-{                       /* this is subtle; don't muck with it. */
+assign(Node **a, int n) /* a[0] = a[1], a[0] += a[1], etc */
+{                       /* this is subtle; dont muck with it */
   Cell    *x, *y;
   Awkfloat xf, yf;
   double   v;
@@ -1637,8 +1637,8 @@ assign(Node **a, int n) /* a[0] = a[1], a[0] += a[1], etc. */
   x = execute(a[0]);
   if (n == ASSIGN) { /* ordinary assignment */
     if (x == y && !(x->tval & (FLD | REC)) && x != nfloc)
-      ; /* self-assignment: leave alone unless it's a field or
-           NF */
+      ; /* self-assignment: leave alone unless its a field or
+ * NF */
     else if ((y->tval & (STR | NUM)) == (STR | NUM)) {
       yf = getfval(y);
       setsval(x, getsval(y));
@@ -1794,7 +1794,7 @@ split(Node **a, int nnn) /* split(a[0], a[1], a[2]); a[3] is type */
   }
   sep = *fs;
   ap  = execute(a[1]); /* array name */
-  /* BUG 7/26/22: this appears not to reset array: see C1/asplit */
+  /* BUG 7/26/22: this appears not to reset array: see c1/asplit */
   freesymtab(ap);
   DPRINTF("split: s=|%s|, a=%s, sep=|%s|\n", s, NN(ap->nval), fs);
   ap->tval &= ~STR;
@@ -1803,7 +1803,7 @@ split(Node **a, int nnn) /* split(a[0], a[1], a[2]); a[3] is type */
 
   n = 0;
   if (arg3type == REGEXPR && strlen((char *)((fa *)a[2])->restr) == 0) {
-    /* split(s, a, //); have to arrange that it looks like empty sep
+    /* split(s, a, // ); have to arrange that it looks like empty sep
      */
     arg3type = 0;
     fs       = "";
@@ -1811,7 +1811,7 @@ split(Node **a, int nnn) /* split(a[0], a[1], a[2]); a[3] is type */
   }
   if (*s != '\0' && (strlen(fs) > 1 || arg3type == REGEXPR)) { /* reg expr */
     fa *pfa;
-    if (arg3type == REGEXPR) { /* it's ready already */
+    if (arg3type == REGEXPR) { /* its ready already */
       pfa = (fa *)a[2];
     } else {
       pfa = makedfa(fs, 1);
@@ -1864,7 +1864,7 @@ split(Node **a, int nnn) /* split(a[0], a[1], a[2]); a[3] is type */
             *fr++ = '"';
           } else if (*s == '"' && (s[1] == '\0' || s[1] == ',')) {
             s++; /* skip over closing quote
-                  */
+ */
             break;
           } else {
             *fr++ = *s++;
@@ -2109,11 +2109,11 @@ nawk_convert(const char *s, int (*fun_c)(int), wint_t (*fun_wc)(wint_t))
 
     (void)mbtowc(NULL, NULL, 0); /* reset internal state */
     /*
-     * Reset internal state here too.
-     * Assign result to avoid a compiler warning. (Casting to void
-     * doesn't work.)
-     * Increment said variable to avoid a different warning.
-     */
+ * reset internal state here too
+ * assign result to avoid a compiler warning. (casting to void
+ * doesnt work.)
+ * increment said variable to avoid a different warning
+ */
     unused = wctomb(NULL, L'\0');
     unused++;
 
@@ -2189,7 +2189,7 @@ bltin(Node **a, int n) /* builtin functions. a[0] is type, a[1] is arg list */
   switch (t) {
     case FLENGTH:
       if (isarr(x))
-        u = ((Array *)x->sval)->nelem; /* GROT.  should be function*/
+        u = ((Array *)x->sval)->nelem; /* GROT. should be function */
       else
         u = u8_strlen(getsval(x));
       break;
@@ -2242,13 +2242,13 @@ bltin(Node **a, int n) /* builtin functions. a[0] is type, a[1] is arg list */
       break;
     case FRAND:
       /* random() returns numbers in [0..2^31-1]
-       * in order to get a number in [0, 1), divide it by 2^31
-       */
+ * in order to get a number in [0, 1), divide it by 2^31
+ */
       do {
-        /* exact if Awkfloat wide enough */
+        /* exact if awkfloat wide enough */
         u = (Awkfloat)random();
         u /= 0x80000000; /* should be exact */
-      } while (u >= 1.0); /* in case Awkfloat is narrow */
+      } while (u >= 1.0); /* in case awkfloat is narrow */
       break;
     case FSRAND:
       if (isrec(x)) /* no argument provided */
@@ -2280,7 +2280,7 @@ bltin(Node **a, int n) /* builtin functions. a[0] is type, a[1] is arg list */
       else
         u = fflush(fp);
       break;
-    default: /* can't happen */
+    default: /* cant happen */
       FATAL("illegal function type %d", t);
       break;
   }
@@ -2391,7 +2391,7 @@ openfile(int a, const char *us, bool *pnewflag)
         *pnewflag = false;
       return files[i].fp;
     }
-  if (a == FFLUSH) /* didn't find it, so don't create it! */
+  if (a == FFLUSH) /* didn't find it, so dont create it! */
     return NULL;
   for (i = 0; i < nfiles; i++)
     if (files[i].fp == NULL)
@@ -2409,7 +2409,7 @@ openfile(int a, const char *us, bool *pnewflag)
 
   fflush(stdout); /* force a semblance of order */
 
-  /* don't try to read or write a directory */
+  /* dont try to read or write a directory */
   if (a == LT || a == GT || a == APPEND)
     if (stat(s, &sbuf) == 0 && S_ISDIR(sbuf.st_mode))
       return NULL;
@@ -2426,7 +2426,7 @@ openfile(int a, const char *us, bool *pnewflag)
     fp = popen(s, "r");
   } else if (a == LT) {                               /* getline <file */
     fp = strcmp(s, "-") == 0 ? stdin : fopen(s, "r"); /* "-" is stdin */
-  } else                                              /* can't happen */
+  } else                                              /* cant happen */
     FATAL("illegal redirection %d", a);
   if (fp != NULL) {
     files[i].fname = tostring(s);
@@ -2724,18 +2724,18 @@ wide_char_to_byte_str(int rune, size_t *outlen)
   if (rune <= 0x0000007F) {
     buf[len++] = rune;
   } else if (rune <= 0x000007FF) {
-    // 110xxxxx 10xxxxxx
+    /* 110xxxxx 10xxxxxx */
     buf[len++] = 0xC0 | (rune >> 6);
     buf[len++] = 0x80 | (rune & 0x3F);
   } else if (rune <= 0x0000FFFF) {
-    // 1110xxxx 10xxxxxx 10xxxxxx
+    /* 1110xxxx 10xxxxxx 10xxxxxx */
     buf[len++] = 0xE0 | (rune >> 12);
     buf[len++] = 0x80 | ((rune >> 6) & 0x3F);
     buf[len++] = 0x80 | (rune & 0x3F);
 
   } else {
-    // 0x00010000 - 0x10FFFF
-    // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+    /* 0x00010000 - 0x10ffff
+     * 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
     buf[len++] = 0xF0 | (rune >> 18);
     buf[len++] = 0x80 | ((rune >> 12) & 0x3F);
     buf[len++] = 0x80 | ((rune >> 6) & 0x3F);

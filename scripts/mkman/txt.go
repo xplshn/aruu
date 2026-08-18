@@ -7,7 +7,7 @@ import (
 )
 
 // fixed-width ascii layout, matching the column widths a classic
-// nroff -Tascii rendering of an mdoc page would produce
+// nroff -tascii rendering of an mdoc page would produce
 const (
 	txtWidth     = 78
 	txtIndent    = 7
@@ -132,7 +132,7 @@ func (r *TxtRenderer) renderBlock(block Block, indent int) {
 	}
 }
 
-// writeIndented word-wraps text to the page width minus indent, then
+// writeindented word-wraps text to the page width minus indent, then
 // writes each line prefixed by indent spaces
 func (r *TxtRenderer) writeIndented(text string, indent int) {
 	width := txtWidth - indent
@@ -166,7 +166,7 @@ func wrapWords(text string, width int) []string {
 	return lines
 }
 
-// renderSynopsisItemsTxt mirrors renderSynopsisPhrase from mdoc.go but
+// rendersynopsisitemstxt mirrors rendersynopsisphrase from mdoc.go but
 // writes literal brackets and braces instead of mdoc macros
 func renderSynopsisItemsTxt(items []SynopsisItem) string {
 	var parts []string

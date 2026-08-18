@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <fcntl.h>
 #include <regex.h>
@@ -24,11 +24,11 @@
 #define AFTER     0
 #define BEFORE    1
 
-typedef struct {
+struct String {
   char  *str;
   size_t cap;
   size_t siz;
-} String;
+};
 
 struct hline {
   off_t seek;
@@ -48,7 +48,7 @@ struct undo {
 static char      *prompt = "*";
 static regex_t   *pattern;
 static regmatch_t matchs[10];
-static String     lastre;
+static struct String lastre;
 
 static int           optverbose, optprompt, exstatus, optdiag = 1;
 static int           marks['z' - 'a' + 1];
@@ -58,13 +58,13 @@ static jmp_buf       savesp;
 static char         *lasterr;
 static size_t        idxsize, lastidx;
 static struct hline *zero;
-static String        text;
+static struct String text;
 static char          savfname[FILENAME_MAX];
 static char          tmpname[FILENAME_MAX];
 static int           scratch;
 static int           pflag, modflag, uflag, gflag;
 static size_t        csize;
-static String        cmdline;
+static struct String cmdline;
 static char         *ocmdline;
 static int           inputidx;
 static char         *rhs;
@@ -106,8 +106,8 @@ prevln(int line)
   return (line < 0) ? lastln : line;
 }
 
-static String *
-copystring(String *s, char *from)
+static struct String *
+copystring(struct String *s, char *from)
 {
   size_t len;
   char  *t;
@@ -124,8 +124,8 @@ copystring(String *s, char *from)
   return s;
 }
 
-static String *
-string(String *s)
+static struct String *
+string(struct String *s)
 {
   free(s->str);
   s->str = NULL;
@@ -136,7 +136,7 @@ string(String *s)
 }
 
 static char *
-addchar(char c, String *s)
+addchar(char c, struct String *s)
 {
   size_t cap = s->cap, siz = s->siz;
   char  *t = s->str;
@@ -303,8 +303,8 @@ newundo(int from1, int from2)
 }
 
 /*
- * relink: to1   <- from1
- *         from2 -> to2
+ * relink: to1 <- from1
+ * from2 -> to2
  */
 static void
 relink(int to1, int from1, int from2, int to2)
@@ -464,13 +464,13 @@ rematch(int num)
     return 1;
   }
 
-  /* Zero width match was found at the end of the input, done */
+  /* zero width match was found at the end of the input, done */
   if (lastmatch[off] == '\n') {
     lastmatch += off;
     return 0;
   }
 
-  /* Zero width match at the current posiion, find the next one */
+  /* zero width match at the current posiion, find the next one */
   text.str[text.siz - 2] = '\0';
   r                      = !regexec(pattern, lastmatch + off + 1, 10, matchs, REG_NOTBOL);
   text.str[text.siz - 2] = '\n';
@@ -478,7 +478,7 @@ rematch(int num)
   if (!r)
     return 0;
 
-  /* Re-adjust matches to account for +1 in regexec */
+  /* re-adjust matches to account for +1 in regexec */
   for (m = matchs; m < &matchs[10]; m++) {
     m->rm_so += 1;
     m->rm_eo += 1;
@@ -778,7 +778,7 @@ chksignals(void)
 static const char *
 expandcmd(void)
 {
-  static String cmd;
+  static struct String cmd;
   char         *p;
   int           c, repl = 0;
 
@@ -1027,7 +1027,7 @@ static void
 append(int num)
 {
   int           ch;
-  static String line;
+  static struct String line;
 
   curln = num;
   while (moreinput()) {
@@ -1089,7 +1089,7 @@ join(void)
 {
   int           i;
   char         *t, c;
-  static String s;
+  static struct String s;
 
   string(&s);
   for (i = line1;; i = nextln(i)) {
@@ -1156,7 +1156,7 @@ static void
 getrhs(int delim)
 {
   int           c;
-  static String s;
+  static struct String s;
 
   string(&s);
   while ((c = input()) != '\0' && c != delim)
@@ -1196,7 +1196,7 @@ getnth(void)
 }
 
 static void
-addpre(String *s)
+addpre(struct String *s)
 {
   char *p;
 
@@ -1205,7 +1205,7 @@ addpre(String *s)
 }
 
 static void
-addpost(String *s)
+addpost(struct String *s)
 {
   char c, *p;
 
@@ -1215,7 +1215,7 @@ addpost(String *s)
 }
 
 static int
-addsub(String *s, int nth, int nmatch)
+addsub(struct String *s, int nth, int nmatch)
 {
   char *end, *q, *p, c;
   int   sub;
@@ -1258,7 +1258,7 @@ static void
 subline(int num, int nth)
 {
   int           i, m, changed;
-  static String s;
+  static struct String s;
 
   string(&s);
   i = changed = 0;
@@ -1288,10 +1288,10 @@ subst(int nth)
     subline(line, nth);
 
     /*
-     * The substitution command can add lines, so
-     * we have to skip lines until we find the
-     * index that we saved before the substitution
-     */
+ * the substitution command can add lines, so
+ * we have to skip lines until we find the
+ * index that we saved before the substitution
+ */
     do
       line = nextln(line);
     while (getindex(line) != next);

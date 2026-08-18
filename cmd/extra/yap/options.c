@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "options.h"
 #include "display.h"
@@ -15,8 +15,8 @@ char *startcomm;
 static int parsopt(char *s);
 
 /*
- * Read the options. Return the argv pointer following them if there were
- * no errors, otherwise return 0.
+ * read the options. return the argv pointer following them if there were
+ * no errors, otherwise return 0
  */
 
 char **
@@ -31,8 +31,8 @@ readoptions(char **argv)
   while (*av && **av == '-') {
     if (parsopt(*av)) {
       /*
-       * Error in option
-       */
+ * error in option
+ */
       putline(*av);
       putline(": illegal option\n");
       return (char **)0;
@@ -41,8 +41,8 @@ readoptions(char **argv)
   }
   if (*av && **av == '+') {
     /*
-     * Command in command line
-     */
+ * command in command line
+ */
     startcomm = *av + 1;
     av++;
   }
@@ -58,8 +58,8 @@ parsopt(char *s)
     s++;
   if (isdigit(*s)) {
     /*
-     * pagesize option
-     */
+ * pagesize option
+ */
     i = 0;
     do {
       i = i * 10 + *s++ - '0';

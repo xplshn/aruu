@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/wait.h>
 
@@ -276,7 +276,7 @@ main(int argc, char *argv[])
 
   if ((argmaxsz = sysconf(_SC_ARG_MAX)) == (size_t)-1)
     argmaxsz = _POSIX_ARG_MAX;
-  /* Leave some room for environment variables */
+  /* leave some room for environment variables */
   argmaxsz -= 4096;
   cmd = emalloc(NARGS * sizeof(*cmd));
 

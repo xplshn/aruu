@@ -1,26 +1,26 @@
-/****************************************************************
-Copyright (C) Lucent Technologies 1997
-All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name Lucent Technologies or any of
-its entities not be used in advertising or publicity pertaining
-to distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
+/* ***************************************************************
+ * copyright (c) lucent technologies 1997
+ * all rights reserved
+ *
+ * permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose and without fee is hereby
+ * granted, provided that the above copyright notice appear in all
+ * copies and that both that the copyright notice and this
+ * permission notice and warranty disclaimer appear in supporting
+ * documentation, and that the name lucent technologies or any of
+ * its entities not be used in advertising or publicity pertaining
+ * to distribution of the software without specific, written prior
+ * permission
+ *
+ * LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE
+ * ************************************************************** */
 
 const char *version = "version 20260426";
 
@@ -112,12 +112,12 @@ fpecatch(
   );
 }
 
-/* Can this work with recursive calls?  I don't think so.
-void segvcatch(int n)
-{
-  FATAL("segfault.  Do you have an unbounded recursive call?", n);
-}
-*/
+/* can this work with recursive calls? i dont think so
+ * void segvcatch(int n)
+ * {
+ * fatal("segfault. do you have an unbounded recursive call?", n);
+ * }
+ */
 
 static const char *
 setfs(char *p)
@@ -172,9 +172,9 @@ main(int argc, char *argv[])
 #else
   (void)signal(SIGFPE, fpecatch);
 #endif
-  /*signal(SIGSEGV, segvcatch); experiment */
+  /* signal(sigsegv, segvcatch); experiment */
 
-  /* Set and keep track of the random seed */
+  /* set and keep track of the random seed */
   srand_seed = 1;
   srandom((unsigned long)srand_seed);
 
@@ -217,7 +217,7 @@ main(int argc, char *argv[])
       case 'F': /* set field separator */
         fs = setfs(getarg(&argc, &argv, "no field separator"));
         break;
-      case 'v': /* -v a=1 to be done NOW.  one -v for each */
+      case 'v': /* -v a=1 to be done NOW. one -v for each */
         vn = getarg(&argc, &argv, "no variable name");
         if (isclvar(vn))
           setclvar(vn);
@@ -263,8 +263,8 @@ main(int argc, char *argv[])
     envinit(environ);
   yyparse();
 #if 0
-	// Doing this would comply with POSIX, but is not compatible with
-	// other awks and with what most users expect. So comment it out.
+	/* doing this would comply with POSIX, but is not compatible with
+	 * other awks and with what most users expect. so comment it out */
 	setlocale(LC_NUMERIC, ""); /* back to whatever it is locally */
 #endif
   if (fs)

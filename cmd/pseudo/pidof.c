@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/types.h>
 
@@ -99,7 +99,7 @@ main(int argc, char *argv[])
       cmd     = cmdline;
       cmdbase = basename(cmdline);
     }
-    /* Workaround for login shells */
+    /* workaround for login shells */
     if (cmd[0] == '-')
       cmd++;
     for (i = 0; i < argc; i++) {

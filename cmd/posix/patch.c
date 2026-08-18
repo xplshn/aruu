@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "paths.h"
 #include "util.h"
 #include "wexec.h"
@@ -2769,8 +2769,9 @@ strtolinenum(char *nptr, char **endptr)
   if (errstr != NULL)
     fatal("invalid line number at line %ld: `%s' is %s\n", p_input_line, nptr, errstr);
 
-  *p      = c;
-  *endptr = p;
+  *p = c;
+  if (endptr)
+    *endptr = p;
 
   return rv;
 }

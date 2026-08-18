@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "commands.h"
 #include "assert.h"
@@ -17,9 +17,9 @@
 #include "prompt.h"
 #include "term.h"
 
-static long lastcount; /* Save last count for '.' command */
-static int  lastcomm;  /* Save last command for '.' command */
-static int  searchdir; /* Direction of last search */
+static long lastcount; /* save last count for '.' command */
+static int  lastcomm;  /* save last command for '.' command */
+static int  searchdir; /* direction of last search */
 
 static int  do_nocomm(long cnt);
 static void do_search(char *str, long cnt, int dir);
@@ -59,14 +59,14 @@ static int  do_quit(long cnt);
 
 static int
 do_nocomm(long cnt)
-{ /* Do nothing */
+{ /* do nothing */
   (void)cnt;
   return 0;
 }
 
 int
 do_chkm(long cnt)
-{ /* Change key map */
+{ /* change key map */
   struct keymap *p;
   (void)cnt;
 
@@ -80,7 +80,7 @@ do_chkm(long cnt)
 }
 
 /*
- * Perform searches
+ * perform searches
  */
 
 static void
@@ -91,19 +91,19 @@ do_search(char *str, long cnt, int dir)
 
   if (str) {
     /*
-     * We have to get a pattern, which we have to prompt for
-     * with the string "str".
-     */
+ * we have to get a pattern, which we have to prompt for
+ * with the string "str"
+ */
     if ((p = readline(str)) == 0) {
       /*
-       * User cancelled command
-       */
+ * user cancelled command
+ */
       return;
     }
     if ((p = re_comp(p))) {
       /*
-       * There was an error in the pattern
-       */
+ * there was an error in the pattern
+ */
       error(p);
       return;
     }
@@ -119,17 +119,17 @@ do_search(char *str, long cnt, int dir)
       p = getline(lineno, 0);
     if (interrupt)
       return;
-    if (!p) { /* End of file reached */
+    if (!p) { /* end of file reached */
       error("pattern not found");
       return;
     }
     if (re_exec(p) && --cnt <= 0) {
       /*
-       * We found the pattern, and we found it often enough.
-       * Pity that we still don't know where the match is.
-       * We only know the linenumber. So, we just hope the
-       * following will at least bring it on the screen ...
-       */
+ * we found the pattern, and we found it often enough
+ * pity that we still dont know where the match is
+ * we only know the linenumber. so, we just hope the
+ * following will at least bring it on the screen ...
+ */
       (void)display(lineno, 0, pagesize, 0);
       (void)scrollb(2, 0);
       redraw(0);
@@ -141,20 +141,20 @@ do_search(char *str, long cnt, int dir)
 
 static int
 do_fsearch(long cnt)
-{ /* Forward search */
+{ /* forward search */
   do_search("/", cnt, 1);
   return 0;
 }
 
 static int
 do_bsearch(long cnt)
-{ /* Backward search */
+{ /* backward search */
   do_search("?", cnt, -1);
   return 0;
 }
 
 /*
- * Repeat last search in direction "dir"
+ * repeat last search in direction "dir"
  */
 
 static int
@@ -180,14 +180,14 @@ n_or_rn_search(long cnt, int dir)
 
 static int
 do_nsearch(long cnt)
-{ /* Repeat search in same direction */
+{ /* repeat search in same direction */
   n_or_rn_search(cnt, searchdir);
   return 0;
 }
 
 static int
 do_rnsearch(long cnt)
-{ /* Repeat search in opposite direction */
+{ /* repeat search in opposite direction */
   n_or_rn_search(cnt, -searchdir);
   return 0;
 }
@@ -209,10 +209,10 @@ shell_command(int esc_ch, long cnt)
       putline(TI);
       if (!p) {
         /*
-         * Avoid double redraw.
-         * After a "startcomm", a redraw will
-         * take place anyway.
-         */
+ * avoid double redraw
+ * after a "startcomm", a redraw will
+ * take place anyway
+ */
         redraw(1);
       }
     }
@@ -222,27 +222,27 @@ shell_command(int esc_ch, long cnt)
 
 static int
 do_shell(long cnt)
-{ /* Execute a shell escape */
+{ /* execute a shell escape */
   return shell_command('!', cnt);
 }
 
 static int
 do_pipe(long cnt)
-{ /* Execute a shell escape */
+{ /* execute a shell escape */
   return shell_command('|', cnt);
 }
 
 static int
 do_writefile(long cnt)
-{ /* Write input to a file */
+{ /* write input to a file */
   char *p;
   int   fd;
   (void)cnt;
 
   if ((p = readline("Filename: ")) == 0 || !*p) {
     /*
-     * No file name given
-     */
+ * no file name given
+ */
     return 0;
   }
   if ((fd = open(p, O_CREAT | O_EXCL | O_WRONLY, 0644)) < 0) {
@@ -283,14 +283,14 @@ wrt_fd(int fd)
 
 static int
 do_absolute(long cnt)
-{ /* Go to linenumber "cnt" */
+{ /* go to linenumber "cnt" */
 
-  if (!getline(cnt, 0)) { /* Not there or interrupt */
+  if (!getline(cnt, 0)) { /* not there or interrupt */
     if (!interrupt) {
       /*
-       * User did'nt give an interrupt, so the line number
-       * was too high. Go to the last line.
-       */
+ * user did'nt give an interrupt, so the line number
+ * was too high. go to the last line
+ */
       do_lline(cnt);
     }
     return 0;
@@ -301,9 +301,9 @@ do_absolute(long cnt)
 
 static int
 do_visit(long cnt)
-{ /* Visit a file */
+{ /* visit a file */
   char       *p;
-  static char fn[128]; /* Keep file name */
+  static char fn[128]; /* keep file name */
   (void)cnt;
 
   if ((p = readline("Filename: ")) == 0) {
@@ -314,8 +314,8 @@ do_visit(long cnt)
     visitfile(fn);
   } else {
     /*
-     * User typed a return. Visit the current file
-     */
+ * user typed a return. visit the current file
+ */
     if (!(p = filenames[filecount])) {
       error("No current file");
       return 0;
@@ -328,15 +328,15 @@ do_visit(long cnt)
 
 static int
 do_error(long cnt)
-{ /* Called when user types wrong key sequence */
+{ /* called when user types wrong key sequence */
   (void)cnt;
   error(currmap->k_help);
   return 0;
 }
 
 /*
- * Interface routine for displaying previous screen,
- * depending on cflag.
+ * interface routine for displaying previous screen,
+ * depending on cflag
  */
 
 static int
@@ -347,17 +347,17 @@ prev_screen(int sz, int really)
   retval = scrollb(sz - 1, really && cflag);
   if (really && !cflag) {
     /*
-     * The previous call did not display anything, but at least we
-     * know where to start
-     */
+ * the previous call did not display anything, but at least we
+ * know where to start
+ */
     return display(scr_info.firstline, scr_info.nf, sz, 1);
   }
   return retval;
 }
 
 /*
- * Interface routine for displaying the next screen,
- * dependent on cflag.
+ * interface routine for displaying the next screen,
+ * dependent on cflag
  */
 
 static int
@@ -399,15 +399,15 @@ page_size(unsigned cnt)
 
 static int
 do_forward(long cnt)
-{ /* Display next page */
+{ /* display next page */
   int i;
 
   i = page_size((unsigned)cnt);
   if (status & EOFILE) {
     /*
-     * May seem strange, but actually a visit to the next file
-     * has already been done here
-     */
+ * may seem strange, but actually a visit to the next file
+ * has already been done here
+ */
     (void)display(1L, 0, i, 1);
     return 0;
   }
@@ -430,11 +430,11 @@ do_backward(long cnt)
     return 0;
   }
   /*
-   * The next part is a bit clumsy.
-   * We want to display the last page of the previous file (for which
-   * a visit has already been done), but the pagesize may temporarily
-   * be different because the command had a count
-   */
+ * the next part is a bit clumsy
+ * we want to display the last page of the previous file (for which
+ * a visit has already been done), but the pagesize may temporarily
+ * be different because the command had a count
+ */
   temp     = pagesize;
   pagesize = i;
   do_lline(cnt);
@@ -444,7 +444,7 @@ do_backward(long cnt)
 
 static int
 do_firstline(long cnt)
-{ /* Go to start of input */
+{ /* go to start of input */
   (void)cnt;
   do_absolute(1L);
   return 0;
@@ -452,24 +452,24 @@ do_firstline(long cnt)
 
 static int
 do_lline(long cnt)
-{ /* Go to end of input */
+{ /* go to end of input */
   int i = 0;
   int j = pagesize - 1;
 
   if ((cnt = to_lastline()) < 0) {
     /*
-     * Interrupted by the user
-     */
+ * interrupted by the user
+ */
     return 0;
   }
   /*
-   * Display the page such that only the last line of the page is
-   * a "~", independant of the pagesize
-   */
+ * display the page such that only the last line of the page is
+ * a "~", independant of the pagesize
+ */
   while (!(display(cnt, i, j, 0) & EOFILE)) {
     /*
-     * The last line could of course be very long ...
-     */
+ * the last line could of course be very long ...
+ */
     i += j;
   }
   (void)scrollb(j - scr_info.tail->cnt, 0);
@@ -479,9 +479,9 @@ do_lline(long cnt)
 
 static int
 do_lf(long cnt)
-{ /* Display next line, or go to line */
+{ /* display next line, or go to line */
 
-  if (cnt) { /* Go to line */
+  if (cnt) { /* go to line */
     do_absolute(cnt);
     return 0;
   }
@@ -491,9 +491,9 @@ do_lf(long cnt)
 
 static int
 do_upline(long cnt)
-{ /* Display previous line, or go to line */
+{ /* display previous line, or go to line */
 
-  if (cnt) { /* Go to line */
+  if (cnt) { /* go to line */
     do_absolute(cnt);
     return 0;
   }
@@ -503,9 +503,9 @@ do_upline(long cnt)
 
 static int
 do_skiplines(long cnt)
-{ /* Skip lines forwards */
+{ /* skip lines forwards */
 
-  /* Should be interruptable ... */
+  /* should be interruptable ... */
   (void)scrollf((int)(cnt + maxpagesize - 1), 0);
   redraw(0);
   return 0;
@@ -513,9 +513,9 @@ do_skiplines(long cnt)
 
 static int
 do_bskiplines(long cnt)
-{ /* Skip lines backwards */
+{ /* skip lines backwards */
 
-  /* Should be interruptable ... */
+  /* should be interruptable ... */
   (void)scrollb((int)(cnt + pagesize - 1), 0);
   redraw(0);
   return 0;
@@ -523,7 +523,7 @@ do_bskiplines(long cnt)
 
 static int
 do_fscreens(long cnt)
-{ /* Skip screens forwards */
+{ /* skip screens forwards */
 
   do {
     if ((next_screen(pagesize, 0) & EOFILE) || interrupt)
@@ -535,7 +535,7 @@ do_fscreens(long cnt)
 
 static int
 do_bscreens(long cnt)
-{ /* Skip screens backwards */
+{ /* skip screens backwards */
 
   do {
     if ((prev_screen(pagesize, 0) & START) || interrupt)
@@ -557,7 +557,7 @@ scro_size(unsigned cnt)
 
 static int
 do_f_scroll(long cnt)
-{ /* Scroll forwards */
+{ /* scroll forwards */
 
   (void)scrollf(scro_size((unsigned)cnt), 1);
   return 0;
@@ -565,7 +565,7 @@ do_f_scroll(long cnt)
 
 static int
 do_b_scroll(long cnt)
-{ /* Scroll backwards */
+{ /* scroll backwards */
 
   (void)scrollb(scro_size((unsigned)cnt), 1);
   return 0;
@@ -573,7 +573,7 @@ do_b_scroll(long cnt)
 
 static int
 do_previousfile(long cnt)
-{ /* Visit previous file */
+{ /* visit previous file */
 
   if (nextfile(-(int)cnt)) {
     error("No (Nth) previous file");
@@ -585,7 +585,7 @@ do_previousfile(long cnt)
 
 static int
 do_nextfile(long cnt)
-{ /* Visit next file */
+{ /* visit next file */
 
   if (nextfile((int)cnt)) {
     error("No (Nth) next file");
@@ -603,7 +603,7 @@ do_quit(long cnt)
 }
 
 /*
- * The next array is initialized, sorted on the first element of the structs,
+ * the next array is initialized, sorted on the first element of the structs,
  * so that we can perform binary search
  */
 struct commands commands[] = {
@@ -658,8 +658,8 @@ struct commands commands[] = {
 };
 
 /*
- * Lookup string "s" in the commands array, and return index.
- * return 0 if not found.
+ * lookup string "s" in the commands array, and return index
+ * return 0 if not found
  */
 
 int
@@ -671,8 +671,8 @@ lookup(char *s)
   u = &commands[sizeof(commands) / sizeof(*u) - 1];
   do {
     /*
-     * Perform binary search
-     */
+ * perform binary search
+ */
     m = l + (u - l) / 2;
     if (strcmp(s, m->c_cmd) > 0)
       l = m + 1;
@@ -684,10 +684,10 @@ lookup(char *s)
   return 0;
 }
 
-/*ARGSUSED*/
+/* ARGSUSED */
 static int
 do_lcomm(long cnt)
-{ /* Repeat last command */
+{ /* repeat last command */
   (void)cnt;
 
   if (!lastcomm) {
@@ -699,7 +699,7 @@ do_lcomm(long cnt)
 }
 
 /*
- * Execute a command, with optional count "count".
+ * execute a command, with optional count "count"
  */
 
 void
@@ -713,15 +713,15 @@ do_comm(int comm, long count)
   flags = pcomm->c_flags;
 
   /*
-   * Check the command.
-   * If the last line of the file is displayed and the command goes
-   * forwards and does'nt have the ability to go to the next file, it
-   * is an error.
-   * If the first line of the file is displayed and the command goes
-   * backwards and does'nt have the ability to go to the previous file,
-   * it is an error.
-   * Also check wether we need the next or previous file. If so, get it.
-   */
+ * check the command
+ * if the last line of the file is displayed and the command goes
+ * forwards and does'nt have the ability to go to the next file, it
+ * is an error
+ * if the first line of the file is displayed and the command goes
+ * backwards and does'nt have the ability to go to the previous file,
+ * it is an error
+ * also check wether we need the next or previous file. if so, get it
+ */
   if ((status & EOFILE) && (flags & AHEAD)) {
     if (qflag || !(flags & TONEXTFILE))
       return;
@@ -735,8 +735,8 @@ do_comm(int comm, long count)
       quit();
   }
   /*
-   * Does the command stick around for LASTCOMM?
-   */
+ * does the command stick around for LASTCOMM?
+ */
   if (flags & STICKY) {
     lastcomm  = comm;
     lastcount = count;
@@ -746,8 +746,8 @@ do_comm(int comm, long count)
       count = 1;
   } else {
     /*
-     * Does the command adapt the screensize?
-     */
+ * does the command adapt the screensize?
+ */
     if (flags & SCREENSIZE_ADAPT) {
       temp = maxpagesize;
       if ((unsigned)count < (unsigned)temp) {
@@ -760,8 +760,8 @@ do_comm(int comm, long count)
       pagesize = temp;
     }
     /*
-     * Does the command adapt the scrollsize?
-     */
+ * does the command adapt the scrollsize?
+ */
     if (flags & SCROLLSIZE_ADAPT) {
       temp = maxpagesize - 1;
       if ((unsigned)count < (unsigned)temp) {
@@ -772,7 +772,7 @@ do_comm(int comm, long count)
     }
   }
   /*
-   * Now execute the command.
-   */
+ * now execute the command
+ */
   (*(pcomm->c_func))(count);
 }

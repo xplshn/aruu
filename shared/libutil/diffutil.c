@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "../diffutil.h"
 #include "../text.h"
 #include "../util.h"

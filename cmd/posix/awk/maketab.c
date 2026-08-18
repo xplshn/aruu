@@ -1,31 +1,31 @@
-/****************************************************************
-Copyright (C) Lucent Technologies 1997
-All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name Lucent Technologies or any of
-its entities not be used in advertising or publicity pertaining
-to distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
+/* ***************************************************************
+ * copyright (c) lucent technologies 1997
+ * all rights reserved
+ *
+ * permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose and without fee is hereby
+ * granted, provided that the above copyright notice appear in all
+ * copies and that both that the copyright notice and this
+ * permission notice and warranty disclaimer appear in supporting
+ * documentation, and that the name lucent technologies or any of
+ * its entities not be used in advertising or publicity pertaining
+ * to distribution of the software without specific, written prior
+ * permission
+ *
+ * LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE
+ * ************************************************************** */
 
 /*
  * this program makes the table to link function names
- * and type indices that is used by execute() in run.c.
- * it finds the indices in awkgram.tab.h, produced by bison.
+ * and type indices that is used by execute() in run.c
+ * it finds the indices in awkgram.tab.h, produced by bison
  */
 
 #define _POSIX_C_SOURCE 200809L
@@ -137,7 +137,7 @@ main(int argc, char *argv[])
   printf("static const char * const printname[%d] = {\n", SIZE);
   i = 0;
   while (fgets(buf, sizeof buf, fp) != NULL) {
-    // 199 is sizeof(def) - 1
+    /* 199 is sizeof(def) - 1 */
     if (tokentype != TOK_ENUM) {
       n = sscanf(buf, "%1c %199s %199s %d", &c, def, name, &tok);
       if (n == 4 && c == '#' && strcmp(def, "define") == 0) {
@@ -160,7 +160,7 @@ main(int argc, char *argv[])
     if (tok < FIRSTTOKEN || tok > LASTTOKEN) {
       tokentype = TOK_UNKNOWN;
       /* fprintf(stderr, "maketab funny token %d %s
-       * ignored\n", tok, buf); */
+ * ignored\n", tok, buf); */
       continue;
     }
     names[tok - FIRSTTOKEN] = strdup(name);

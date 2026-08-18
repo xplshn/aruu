@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <signal.h>
@@ -71,7 +71,7 @@ static void setparam(int, char **);
 static int  getopts(char *, char *, char **, char ***, char **);
 
 /*
- * Process the shell command line arguments.
+ * process the shell command line arguments
  */
 
 int
@@ -133,10 +133,10 @@ optschanged(void)
 }
 
 /*
- * Process shell options.  The global variable argptr contains a pointer
- * to the argument list; we advance it past the options.
- * If cmdline is true, process the shell's argv; otherwise, process arguments
- * to the set special builtin.
+ * process shell options. the global variable argptr contains a pointer
+ * to the argument list; we advance it past the options
+ * if cmdline is true, process the shell's argv; otherwise, process arguments
+ * to the set special builtin
  */
 
 static int
@@ -153,23 +153,23 @@ options(int cmdline)
     argptr++;
     if ((c = *p++) == '-') {
       val = 1;
-      /* A "-" or  "--" terminates options */
+      /* a "-" or "--" terminates options */
       if (p[0] == '\0')
         goto end_options1;
       if (p[0] == '-' && p[1] == '\0')
         goto end_options2;
-      /**
-       * For the benefit of `#!' lines in shell scripts,
-       * treat a string of '-- *#.*' the same as '--'.
-       * This is needed so that a script starting with:
-       *	#!/bin/sh -- # -*- perl -*-
-       * will continue to work after a change is made to
-       * kern/imgact_shell.c to NOT token-ize the options
-       * specified on a '#!' line.  A bit of a kludge,
-       * but that trick is recommended in documentation
-       * for some scripting languages, and we might as
-       * well continue to support it.
-       */
+      /* *
+ * for the benefit of `#!' lines in shell scripts,
+ * treat a string of '-- *#.*' the same as '--'
+ * this is needed so that a script starting with:
+ * #!/bin/sh, # -*- perl -*-
+ * will continue to work after a change is made to
+ * kern/imgact_shell.c to NOT token-ize the options
+ * specified on a '#!' line. a bit of a kludge,
+ * but that trick is recommended in documentation
+ * for some scripting languages, and we might as
+ * well continue to support it
+ */
       if (p[0] == '-') {
         kp = p + 1;
         while (*kp == ' ' || *kp == '\t')
@@ -203,7 +203,7 @@ options(int cmdline)
   }
   return (login);
 
-  /* When processing `set', a single "-" means turn off -x and -v */
+  /* when processing `set', a single "-" means turn off -x and -v */
 end_options1:
   if (!cmdline) {
     xflag = vflag = 0;
@@ -211,11 +211,11 @@ end_options1:
   }
 
   /*
-   * When processing `set', a "--" means the remaining arguments
-   * replace the positional parameters in the active shell.  If
-   * there are no remaining options, then all the positional
-   * parameters are cleared (equivalent to doing ``shift $#'').
-   */
+ * when processing `set', a "--" means the remaining arguments
+ * replace the positional parameters in the active shell. if
+ * there are no remaining options, then all the positional
+ * parameters are cleared (equivalent to doing ``shift $#'')
+ */
 end_options2:
   if (!cmdline) {
     if (*argptr == NULL)
@@ -224,19 +224,19 @@ end_options2:
   }
 
   /*
-   * At this point we are processing options given to 'sh' on a command
-   * line.  If an end-of-options marker ("-" or "--") is followed by an
-   * arg of "#", then skip over all remaining arguments.  Some scripting
-   * languages (e.g.: perl) document that /bin/sh will implement this
-   * behavior, and they recommend that users take advantage of it to
-   * solve certain issues that can come up when writing a perl script.
-   * Yes, this feature is in /bin/sh to help users write perl scripts.
-   */
+ * at this point we are processing options given to 'sh' on a command
+ * line. if an end-of-options marker ("-" or "--") is followed by an
+ * arg of "#", then skip over all remaining arguments. some scripting
+ * languages (e.g.: perl) document that /bin/sh will implement this
+ * behavior, and they recommend that users take advantage of it to
+ * solve certain issues that can come up when writing a perl script
+ * yes, this feature is in /bin/sh to help users write perl scripts
+ */
   p = *argptr;
   if (p != NULL && p[0] == '#' && p[1] == '\0') {
     while (*argptr != NULL)
       argptr++;
-    /* We need to keep the final argument */
+    /* we need to keep the final argument */
     argptr--;
   }
 
@@ -252,12 +252,12 @@ minus_o(char *name, int val)
 
   if (name == NULL) {
     if (val) {
-      /* "Pretty" output. */
+      /* "pretty" output */
       out1str("Current option settings\n");
       for (i = 0, on = optname; i < NOPTS; i++, on += *on + 1)
         out1fmt("%-16.*s%s\n", *on, on + 1, optval[i] ? "on" : "off");
     } else {
-      /* Output suitable for re-input to shell. */
+      /* output suitable for re-input to shell */
       for (i = 0, on = optname; i < NOPTS; i++, on += *on + 1)
         out1fmt(
             "%s %co %.*s%s",
@@ -312,7 +312,7 @@ setoption(int flag, int val)
 }
 
 /*
- * Set the shell parameters.
+ * set the shell parameters
  */
 
 static void
@@ -336,7 +336,7 @@ setparam(int argc, char **argv)
 }
 
 /*
- * Free the list of positional parameters.
+ * free the list of positional parameters
  */
 
 void
@@ -357,7 +357,7 @@ freeparam(struct shparam *param)
 }
 
 /*
- * The shift builtin command.
+ * the shift builtin command
  */
 
 int
@@ -382,7 +382,7 @@ shiftcmd(int argc, char **argv)
 }
 
 /*
- * The set builtin command.
+ * the set builtin command
  */
 
 int
@@ -410,10 +410,10 @@ getoptsreset(const char *value)
 }
 
 /*
- * The getopts builtin.  Shellparam.optnext points to the next argument
- * to be processed.  Shellparam.optptr points to the next character to
- * be processed in the current argument.  If shellparam.optnext is NULL,
- * then it's the first time getopts has been called.
+ * the getopts builtin. shellparam.optnext points to the next argument
+ * to be processed. shellparam.optptr points to the next character to
+ * be processed in the current argument. if shellparam.optnext is NULL,
+ * then its the first time getopts has been called
  */
 
 int
@@ -462,7 +462,7 @@ getopts(char *optstr, char *optvar, char **optfirst, char ***optnext, char **opt
   const char *newoptarg = NULL;
 
   if ((p = *optptr) == NULL || *p == '\0') {
-    /* Current word is done, advance */
+    /* current word is done, advance */
     if (*optnext == NULL)
       return 1;
     p = **optnext;
@@ -541,10 +541,10 @@ out:
 }
 
 /*
- * Standard option processing (a la getopt) for builtin routines.  The
+ * standard option processing (a la getopt) for builtin routines. the
  * only argument that is passed to nextopt is the option string; the
- * other arguments are unnecessary.  It returns the option, or '\0' on
- * end of input.
+ * other arguments are unnecessary. it returns the option, or '\0' on
+ * end of input
  */
 
 int

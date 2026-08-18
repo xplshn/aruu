@@ -1,4 +1,7 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
+#ifndef UTIL_H
+#define UTIL_H
+
 #include <sys/types.h>
 
 #include <regex.h>
@@ -82,6 +85,7 @@ int     concat(int, const char *, int, const char *);
 void   enmasse(int, char **, int (*)(const char *, const char *, int));
 void   fnck(const char *, const char *, int (*)(const char *, const char *, int), int);
 mode_t getumask(void);
+int    hexval(int);
 char  *humansize(off_t);
 mode_t parsemode(const char *, mode_t, mode_t);
 off_t  parseoffset(const char *);
@@ -175,4 +179,6 @@ int net_set_name(const char *, const char *);
 #include "wexec.h"
 #define exit(code)  wexec_exit(code)
 #define _exit(code) wexec_exit(code)
+#endif
+
 #endif

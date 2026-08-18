@@ -1,39 +1,39 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 /*
- * Miscellaneous builtins.
+ * miscellaneous builtins
  */
 
 #include <sys/resource.h>
@@ -92,12 +92,12 @@ fdctx_init(int fd, struct fdctx *fdc)
 {
   off_t cur;
 
-  /* Check if fd is seekable. */
+  /* check if fd is seekable */
   cur  = lseek(fd, 0, SEEK_CUR);
   *fdc = (struct fdctx){
       .fd     = fd,
       .buflen = (cur != -1) ? READ_BUFLEN : 1,
-      .ep     = &fdc->buf[0], /* No data */
+      .ep     = &fdc->buf[0], /* no data */
   };
 }
 
@@ -126,18 +126,18 @@ fdctx_destroy(struct fdctx *fdc)
 
   if (fdc->buflen > 1) {
     /*
-     * Reposition the file offset.  Here is the layout of buf:
-     *
-     *     | off
-     *     v
-     * |*****************|-------|
-     * buf               ep   buf+buflen
-     *     |<- residue ->|
-     *
-     * off: current character
-     * ep:  offset just after read(2)
-     * residue: length for reposition
-     */
+ * reposition the file offset. here is the layout of buf:
+ *
+ * | off
+ * v
+ * |*****************|-------|
+ * buf ep buf+buflen
+ * |<- residue ->|
+ *
+ * off: current character
+ * ep: offset just after read(2)
+ * residue: length for reposition
+ */
     residue = (fdc->ep - fdc->buf) - fdc->off;
     if (residue > 0)
       (void)lseek(fdc->fd, -residue, SEEK_CUR);
@@ -145,18 +145,18 @@ fdctx_destroy(struct fdctx *fdc)
 }
 
 /*
- * The read builtin.  The -r option causes backslashes to be treated like
- * ordinary characters.
+ * the read builtin. the -r option causes backslashes to be treated like
+ * ordinary characters
  *
- * Note that if IFS=' :' then read x y should work so that:
- * 'a b'	x='a', y='b'
- * ' a b '	x='a', y='b'
- * ':b'		x='',  y='b'
- * ':'		x='',  y=''
- * '::'		x='',  y=''
- * ': :'	x='',  y=''
- * ':::'	x='',  y='::'
- * ':b c:'	x='',  y='b c:'
+ * note that if IFS=' :' then read x y should work so that:
+ * 'a b' x='a', y='b'
+ * ' a b ' x='a', y='b'
+ * ':b' x='', y='b'
+ * ':' x='', y=''
+ * '::' x='', y=''
+ * ': :' x='', y=''
+ * ':::' x='', y='::'
+ * ':b c:' x='', y='b c:'
  */
 
 int
@@ -263,8 +263,8 @@ readcmd(int argc __unused, char **argv __unused)
 
   if (timeout >= 0) {
     /*
-     * Wait for something to become available.
-     */
+ * wait for something to become available
+ */
     pfd.fd     = STDIN_FILENO;
     pfd.events = POLLIN;
     status = sig = 0;
@@ -289,8 +289,8 @@ readcmd(int argc __unused, char **argv __unused)
     }
     sigprocmask(SIG_SETMASK, &oset, NULL);
     /*
-     * If there's nothing ready, return an error.
-     */
+ * if there's nothing ready, return an error
+ */
     if (status <= 0) {
       while (*ap != NULL)
         setvar(*ap++, "", 0);
@@ -363,13 +363,13 @@ readcmd(int argc __unused, char **argv __unused)
 
     if (startword != 0) {
       if (is_ifs == 1) {
-        /* Ignore leading IFS whitespace */
+        /* ignore leading IFS whitespace */
         if (saveall)
           USTPUTC(c, p);
         continue;
       }
       if (is_ifs == 2 && startword == 1) {
-        /* Only one non-whitespace IFS per word */
+        /* only one non-whitespace IFS per word */
         startword = 2;
         if (saveall) {
           lastnonifsws = p - stackblock();
@@ -383,7 +383,7 @@ readcmd(int argc __unused, char **argv __unused)
       /* append this character to the current variable */
       startword = 0;
       if (saveall)
-        /* Not just a spare terminator */
+        /* not just a spare terminator */
         saveall++;
       lastnonifs = lastnonifsws = p - stackblock();
       USTPUTC(c, p);
@@ -394,7 +394,7 @@ readcmd(int argc __unused, char **argv __unused)
     startword = is_ifs;
 
     if (ap[1] == NULL) {
-      /* Last variable needs all IFS chars */
+      /* last variable needs all IFS chars */
       saveall++;
       if (is_ifs == 2)
         lastnonifsws = p - stackblock();
@@ -412,15 +412,15 @@ readcmd(int argc __unused, char **argv __unused)
   STACKSTRNUL(p);
 
   /*
-   * Remove trailing IFS chars: always remove whitespace, don't remove
-   * non-whitespace unless it was naked
-   */
+ * remove trailing IFS chars: always remove whitespace, dont remove
+ * non-whitespace unless it was naked
+ */
   if (saveall <= 1)
     lastnonifsws = lastnonifs;
   stackblock()[lastnonifsws + 1] = '\0';
   setvar(*ap, stackblock(), 0);
 
-  /* Set any remaining args to "" */
+  /* set any remaining args to "" */
   while (*++ap != NULL)
     setvar(*ap, "", 0);
 #if FEATURE_SH_HISTEDIT
@@ -504,11 +504,11 @@ umaskcmd(int argc __unused, char **argv __unused)
 /*
  * ulimit builtin
  *
- * This code, originally by Doug Gwyn, Doug Kingston, Eric Gisin, and
- * Michael Rendell was ripped from pdksh 5.0.8 and hacked for use with
- * ash by J.T. Conklin.
+ * this code, originally by doug gwyn, doug kingston, eric gisin, and
+ * michael rendell was ripped from pdksh 5.0.8 and hacked for use with
+ * ash by J.T. conklin
  *
- * Public domain.
+ * public domain
  */
 
 struct limits {

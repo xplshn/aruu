@@ -70,7 +70,7 @@ func extractManLines(path string, cfg Config) ([]string, error) {
 
 		if strings.HasPrefix(trimmed, "#") {
 			directive := trimmed[1:]
-			if ci := strings.Index(directive, "//"); ci >= 0 {
+			if ci := strings.Index(directive, "// "); ci >= 0 {
 				directive = directive[:ci]
 			}
 			directive = strings.TrimSpace(directive)
@@ -120,7 +120,7 @@ func extractManLines(path string, cfg Config) ([]string, error) {
 		if strings.Contains(trimmed, "/* ?man") {
 			startIdx := strings.Index(trimmed, "/* ?man")
 			rest := strings.TrimSpace(trimmed[startIdx+7:])
-			if strings.HasSuffix(rest, "*/") {
+			if strings.HasSuffix(rest, " */") {
 				lines = append(lines, strings.TrimSpace(rest[:len(rest)-2]))
 			} else {
 				lines = append(lines, rest)
@@ -318,7 +318,7 @@ func parseOption(line string) (Option, bool) {
 	}, true
 }
 
-// splitOptionSpec peels the required marker (!) and the mutual exclusion
+// splitoptionspec peels the required marker (!) and the mutual exclusion
 // group marker ({name}) off a raw option spec, leaving the bare flag and
 // its optional colon-delimited type suffix
 func splitOptionSpec(raw string) (flag, typ, group string, required bool) {
@@ -947,8 +947,8 @@ func parseSynopsisSeq(tokens []string, start int, explicit bool, topLevel bool) 
 }
 
 func splitGroupedFlags(tok string) ([]SynopsisItem, bool) {
-	// we expand compacted synopsis tokens like some -abcDef into separate
-	// semantic flags so the renderer can emit a separate Fl for each one
+	// we expand compacted synopsis tokens like some -abcdef into separate
+	// semantic flags so the renderer can emit a separate fl for each one
 	if len(tok) < 3 || tok[0] != '-' {
 		return nil, false
 	}

@@ -1,7 +1,7 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 /*
- * Terminal handling routines, mostly initializing.
+ * terminal handling routines, mostly initializing
  */
 
 #include "term.h"
@@ -53,8 +53,8 @@ handle(cc_t *c)
 }
 
 /*
- * Set terminal in cbreak mode.
- * Also check if tabs need expanding.
+ * set terminal in cbreak mode
+ * also check if tabs need expanding
  */
 
 void
@@ -72,7 +72,7 @@ inittty()
   handle(&p->c_cc[VQUIT]);
   erasech        = p->c_cc[VERASE];
   killch         = p->c_cc[VKILL];
-  p->c_cc[VMIN]  = 1; /* Just wait for one character */
+  p->c_cc[VMIN]  = 1; /* just wait for one character */
   p->c_cc[VTIME] = 0;
   tcsetattr(0, TCSANOW, p);
 }
@@ -150,7 +150,7 @@ givetab()
 }
 
 /*
- * Reset the terminal to its original state
+ * reset the terminal to its original state
  */
 
 void
@@ -162,8 +162,8 @@ resettty()
 }
 
 /*
- * Get string terminal capability "cap".
- * If not present, return an empty string.
+ * get string terminal capability "cap"
+ * if not present, return an empty string
  */
 
 static char *
@@ -196,7 +196,7 @@ getnumcap(char *cap)
 }
 
 /*
- * Initialize some terminal-dependent stuff.
+ * initialize some terminal-dependent stuff
  */
 
 void
@@ -225,11 +225,11 @@ ini_terminal()
     panic("No terminfo entry");
   }
   stupid   = 0;
-  hardcopy = getflag("hc"); /* Hard copy terminal?*/
+  hardcopy = getflag("hc"); /* hard copy terminal? */
   if (*(s = getcap("cub1"))) {
     /*
-     * Backspace if not ^H
-     */
+ * backspace if not ^h
+ */
     BC = s;
   }
   UP = getcap("cuu1");  /* move up a line */
@@ -237,11 +237,11 @@ ini_terminal()
   CL = getcap("clear"); /* clear screen */
   if (!*CL)
     cflag = 1;
-  TI = getcap("smcup");  /* Initialization for CM */
+  TI = getcap("smcup");  /* initialization for CM */
   TE = getcap("rmcup");  /* end for CM */
   CM = getcap("cup");    /* cursor addressing */
   SR = getcap("ri");     /* scroll reverse */
-  AL = getcap("il");     /* Insert line */
+  AL = getcap("il");     /* insert line */
   SO = getcap("smso");   /* standout */
   SE = getcap("rmso");   /* standend */
   SG = getnumcap("xmc"); /* blanks left by attributes */
@@ -260,8 +260,8 @@ ini_terminal()
   mr = getcap("rev");   /* reversed video attribute */
   if (!nflag) {
     /*
-     * Recognize special strings
-     */
+ * recognize special strings
+ */
     (void)addstring(SO, SG, &sppat);
     (void)addstring(SE, SG, &sppat);
     (void)addstring(US, UG, &sppat);
@@ -284,27 +284,27 @@ ini_terminal()
   if (*US || uflag)
     UC = "";
   COLS = getnumcap("cols");  /* columns on page */
-  i    = getnumcap("lines"); /* Lines on page */
+  i    = getnumcap("lines"); /* lines on page */
   AM   = getflag("am");      /* terminal wraps automatically? */
   XN   = getflag("xenl");    /* and then ignores next newline? */
   DB   = getflag("db");      /* terminal retains lines below */
   HO   = getcap("home");
   if (!*HO && *CM) {
-    HO = tiparm(CM, 0, 0); /* Another way of getting home */
+    HO = tiparm(CM, 0, 0); /* another way of getting home */
   }
   if ((!*CE && !*AL) || !*HO || hardcopy) {
     cflag = stupid = 1;
   }
   if (*(s = getcap("ht"))) {
     /*
-     * Tab (other than ^I or padding)
-     */
+ * tab (other than ^i or padding)
+ */
     TA = s;
   }
   if (!*(ll = getcap("ll")) && *CM && i > 0) {
     /*
-     * Lower left hand corner
-     */
+ * lower left hand corner
+ */
     BO = tiparm(CM, i - 1, 0);
   } else
     BO = ll;
@@ -331,16 +331,16 @@ ini_terminal()
   }
 
   /*
-   * The next part does not really belong here, but there it is ...
-   * Initialize a circular list for the screenlines.
-   */
+ * the next part does not really belong here, but there it is ...
+ * initialize a circular list for the screenlines
+ */
 
   scr_info.tail = lp = _X;
   lp1                = lp + (100 - 1);
   for (; lp <= lp1; lp++) {
     /*
-     * Circular doubly linked list
-     */
+ * circular doubly linked list
+ */
     lp->next = lp + 1;
     lp->prev = lp - 1;
   }
@@ -354,7 +354,7 @@ ini_terminal()
 }
 
 /*
- * Place cursor at start of line n.
+ * place cursor at start of line n
  */
 
 void
@@ -366,17 +366,17 @@ mgoto(int n)
     bottom();
   else if (*CM) {
     /*
-     * Cursor addressing
-     */
+ * cursor addressing
+ */
     tputs(tiparm(CM, n, 0), 1, fputch);
   } else if (*BO && *UP && n >= (maxpagesize >> 1)) {
     /*
-     * Bottom and then up
-     */
+ * bottom and then up
+ */
     bottom();
     while (n++ < maxpagesize)
       putline(UP);
-  } else { /* Home, and then down */
+  } else { /* home, and then down */
     home();
     while (n--)
       putline("\r\n");
@@ -384,7 +384,7 @@ mgoto(int n)
 }
 
 /*
- * Clear bottom line
+ * clear bottom line
  */
 
 void
@@ -397,8 +397,8 @@ clrbline()
   bottom();
   if (*CE) {
     /*
-     * We can clear to end of line
-     */
+ * we can clear to end of line
+ */
     clrtoeol();
     return;
   }

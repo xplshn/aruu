@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "process.h"
 #include "commands.h"
@@ -19,10 +19,10 @@ char  **filenames;
 char   *currentfile;
 long    maxpos;
 
-static int nfiles; /* Number of filenames on command line */
+static int nfiles; /* number of filenames on command line */
 
 /*
- * Visit a file, file name is "fn".
+ * visit a file, file name is "fn"
  */
 
 void
@@ -32,15 +32,15 @@ visitfile(char *fn)
 
   if (stdf > 0) {
     /*
-     * Close old input file
-     */
+ * close old input file
+ */
     (void)close(stdf);
   }
   currentfile = fn;
   if ((stdf = open(fn, O_RDONLY, 0)) < 0) {
     error(": could not open");
     maxpos = 0;
-  } else { /* Get size for percentage in prompt */
+  } else { /* get size for percentage in prompt */
     (void)fstat(stdf, &statbuf);
     maxpos = statbuf.st_size;
   }
@@ -49,8 +49,8 @@ visitfile(char *fn)
 }
 
 /*
- * process the input files, one by one.
- * If there is none, input is from a pipe.
+ * process the input files, one by one
+ * if there is none, input is from a pipe
  */
 
 void
@@ -61,12 +61,12 @@ processfiles(int n, char **argv)
 
   if (!(nfiles = n)) {
     /*
-     * Input from pipe
-     */
+ * input from pipe
+ */
     currentfile = "standard-input";
     /*
-     * Take care that *(filenames - 1) and *(filenames + 1) are 0
-     */
+ * take care that *(filenames - 1) and *(filenames + 1) are 0
+ */
     filenames = &dummies[1];
     d_clean();
     do_clean();
@@ -97,7 +97,7 @@ processfiles(int n, char **argv)
 }
 
 /*
- * Get the next file the user asks for.
+ * get the next file the user asks for
  */
 
 int

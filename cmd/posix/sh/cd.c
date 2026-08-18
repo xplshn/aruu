@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <errno.h>
@@ -41,7 +41,7 @@
 #include <unistd.h>
 
 /*
- * The cd and pwd commands.
+ * the cd and pwd commands
  */
 
 #include "builtins.h"
@@ -120,8 +120,8 @@ cdcmd(int argc __unused, char **argv __unused)
     else {
       if (!print) {
         /*
-         * XXX - rethink
-         */
+ * XXX - rethink
+ */
         if (p[0] == '.' && p[1] == '/' && p[2] != '\0')
           print = strcmp(p + 2, dest);
         else
@@ -135,13 +135,13 @@ cdcmd(int argc __unused, char **argv __unused)
     }
   }
   error("%s: %s", dest, strerror(errno1));
-  /*NOTREACHED*/
+  /* NOTREACHED */
   return 0;
 }
 
 /*
- * Actually change the directory.  In an interactive shell, print the
- * directory name if "print" is nonzero.
+ * actually change the directory. in an interactive shell, print the
+ * directory name if "print" is nonzero
  */
 static int
 docd(char *dest, int print, int phys)
@@ -150,18 +150,18 @@ docd(char *dest, int print, int phys)
 
   TRACE(("docd(\"%s\", %d, %d) called\n", dest, print, phys));
 
-  /* If logical cd fails, fall back to physical. */
+  /* if logical cd fails, fall back to physical */
   if ((phys || (rc = cdlogical(dest)) < 0) && (rc = cdphysical(dest)) < 0)
     return (-1);
 
   if (print && iflag && curdir) {
     out1fmt("%s\n", curdir);
     /*
-     * Ignore write errors to preserve the invariant that the
-     * current directory is changed iff the exit status is 0
-     * (or 1 if -e was given and the full pathname could not be
-     * determined).
-     */
+ * ignore write errors to preserve the invariant that the
+ * current directory is changed iff the exit status is 0
+ * (or 1 if -e was given and the full pathname could not be
+ * determined)
+ */
     flushout(out1);
     outclearerror(out1);
   }
@@ -181,10 +181,10 @@ cdlogical(char *dest)
   int         badstat;
 
   /*
-   *  Check each component of the path. If we find a symlink or
-   *  something we can't stat, clear curdir to force a getcwd()
-   *  next time we get the value of the current directory.
-   */
+ * check each component of the path. if we find a symlink or
+ * something we cant stat, clear curdir to force a getcwd()
+ * next time we get the value of the current directory
+ */
   badstat = 0;
   path    = stsavestr(dest);
   STARTSTACKSTR(p);
@@ -242,8 +242,8 @@ cdphysical(char *dest)
 }
 
 /*
- * Get the next component of the path name pointed to by *path.
- * This routine overwrites *path and the string pointed to by it.
+ * get the next component of the path name pointed to by *path
+ * this routine overwrites *path and the string pointed to by it
  */
 static char *
 getcomponent(char **path)
@@ -273,10 +273,10 @@ findcwd(char *dir)
   char *path;
 
   /*
-   * If our argument is NULL, we don't know the current directory
-   * any more because we traversed a symbolic link or something
-   * we couldn't stat().
-   */
+ * if our argument is NULL, we dont know the current directory
+ * any more because we traversed a symbolic link or something
+ * we couldnt stat()
+ */
   if (dir == NULL || curdir == NULL)
     return getpwd2();
   path = stsavestr(dir);
@@ -302,9 +302,9 @@ findcwd(char *dir)
 }
 
 /*
- * Update curdir (the name of the current directory) in response to a
- * cd command.  We also call hashcd to let the routines in exec.c know
- * that the current directory has changed.
+ * update curdir (the name of the current directory) in response to a
+ * cd command. we also call hashcd to let the routines in exec.c know
+ * that the current directory has changed
  */
 static void
 updatepwd(char *dir)
@@ -353,7 +353,7 @@ pwdcmd(int argc __unused, char **argv __unused)
 }
 
 /*
- * Get the current directory and cache the result in curdir.
+ * get the current directory and cache the result in curdir
  */
 static char *
 getpwd(void)
@@ -376,7 +376,7 @@ getpwd(void)
 #define MAXPWD 256
 
 /*
- * Return the current directory.
+ * return the current directory
  */
 static char *
 getpwd2(void)
@@ -397,8 +397,8 @@ getpwd2(void)
 }
 
 /*
- * Initialize PWD in a new shell.
- * If the shell is interactive, we need to warn if this fails.
+ * initialize PWD in a new shell
+ * if the shell is interactive, we need to warn if this fails
  */
 void
 pwd_init(int warn)

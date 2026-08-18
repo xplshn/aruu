@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include "config.h"
 #include "util.h"
@@ -26,32 +26,32 @@ union extra {
   intmax_t i;
 };
 
-/* Argument passed into a primary's function */
+/* argument passed into a primary's function */
 struct arg {
   char        *path;
   struct stat *st;
   union extra  extra;
 };
 
-/* Information about each primary, for lookup table */
+/* information about each primary, for lookup table */
 struct pri_info {
   char *name;
   int (*func)(struct arg *arg);
   char **(*getarg)(char **argv, union extra *extra);
   void (*freearg)(union extra extra);
-  char narg; /* -xdev, -depth, -print don't take args but have getarg() */
+  char narg; /* -xdev, -depth, -print dont take args but have getarg() */
 };
 
-/* Information about operators, for lookup table */
+/* information about operators, for lookup table */
 struct op_info {
-  char *name;   /* string representation of op           */
-  char  type;   /* from tok.type                         */
-  char  prec;   /* precedence                            */
+  char *name;   /* string representation of op */
+  char  type;   /* from tok.type */
+  char  prec;   /* precedence */
   char  nargs;  /* number of arguments (unary or binary) */
-  char  lassoc; /* left associative                      */
+  char  lassoc; /* left associative */
 };
 
-/* Token when lexing/parsing
+/* token when lexing/parsing
  * (although also used for the expression tree) */
 struct tok {
   struct tok *left, *right; /* if (type == NOT) left = NULL */
@@ -90,21 +90,21 @@ struct execarg {
   union {
     struct {
       char ***braces; /* NULL terminated list of pointers into
-             argv where {} were */
+ * argv where {} were */
     } s;              /* semicolon */
     struct {
       size_t arglen;  /* number of bytes in argv before files
-             are added */
+ * are added */
       size_t filelen; /* numer of bytes in file names added to
-             argv     */
+ * argv */
       size_t first;   /* index one past last arg, where first
-               file goes */
-      size_t next;    /* index where next file goes    */
-      size_t cap;     /* capacity of argv     */
+ * file goes */
+      size_t next;    /* index where next file goes */
+      size_t cap;     /* capacity of argv */
     } p;              /* plus */
   } u;
   char **argv; /* NULL terminated list of arguments (allocated if isplus)
-                */
+ */
   char isplus; /* -exec + instead of -exec ; */
 };
 
@@ -116,11 +116,11 @@ struct findhist {
   ino_t            ino;
 };
 
-/* Utility */
+/* utility */
 static int spawn(char *argv[]);
 static int do_stat(char *path, struct stat *sb, struct findhist *hist);
 
-/* Primaries */
+/* primaries */
 static int pri_name(struct arg *arg);
 #if FEATURE_FIND_INAME
 static int pri_iname(struct arg *arg);
@@ -192,7 +192,7 @@ static int pri_print0(struct arg *arg);
 static int pri_newer(struct arg *arg);
 static int pri_depth(struct arg *arg);
 
-/* Getargs */
+/* getargs */
 static char **get_name_arg(char *argv[], union extra *extra);
 static char **get_path_arg(char *argv[], union extra *extra);
 static char **get_xdev_arg(char *argv[], union extra *extra);
@@ -208,12 +208,12 @@ static char **get_print_arg(char *argv[], union extra *extra);
 static char **get_newer_arg(char *argv[], union extra *extra);
 static char **get_depth_arg(char *argv[], union extra *extra);
 
-/* Freeargs */
+/* freeargs */
 static void free_extra(union extra extra);
 static void free_exec_arg(union extra extra);
 static void free_ok_arg(union extra extra);
 
-/* Parsing/Building/Running */
+/* parsing/building/running */
 static void             fill_narg(char *s, struct narg *n);
 static struct pri_info *find_primary(char *name);
 static struct op_info  *find_op(char *name);
@@ -325,24 +325,24 @@ static struct tok *root; /* points to root of expression tree, inside toks array
 static struct timespec start; /* time find was started, used for -[acm]time */
 
 static size_t envlen; /* number of bytes in environ, used to calculate against
-       ARG_MAX */
+ * ARG_MAX */
 static size_t argmax; /* value of ARG_MAX retrieved using sysconf(3p) */
 
 static struct {
-  char ret;      /* return value from main                             */
+  char ret;      /* return value from main */
   char depth;    /* -depth, directory contents before directory itself */
-  char h;        /* -H, follow symlinks on command line                */
-  char l;        /* -L, follow all symlinks (command line and search)  */
-  char prune;    /* hit -prune                                         */
-  char xdev;     /* -xdev, prune directories on different devices      */
-  char print;    /* whether we will need -print when parsing           */
-  char quit;     /* quit execution immediately                         */
-  long maxdepth; /* max depth of recursion                          */
-  long mindepth; /* min depth of recursion                          */
+  char h;        /* -H, follow symlinks on command line */
+  char l;        /* -L, follow all symlinks (command line and search) */
+  char prune;    /* hit -prune */
+  char xdev;     /* -xdev, prune directories on different devices */
+  char print;    /* whether we will need -print when parsing */
+  char quit;     /* quit execution immediately */
+  long maxdepth; /* max depth of recursion */
+  long mindepth; /* min depth of recursion */
 } gflags;
 
 /*
- * Utility
+ * utility
  */
 static int
 spawn(char *argv[])
@@ -351,8 +351,8 @@ spawn(char *argv[])
   int   status;
 
   /* flush stdout so that -print output always appears before
-   * any output from the command and does not get cut-off in
-   * the middle of a line. */
+ * any output from the command and does not get cut-off in
+ * the middle of a line */
   fflush(stdout);
 
   switch ((pid = fork())) {
@@ -389,7 +389,7 @@ do_stat(char *path, struct stat *sb, struct findhist *hist)
 }
 
 /*
- * Primaries
+ * primaries
  */
 static int
 pri_name(struct arg *arg)
@@ -534,7 +534,7 @@ pri_exec(struct arg *arg)
     len = strlen(arg->path) + 1;
 
     /* if we reached ARG_MAX, fork, exec, wait, free file names,
-     * reset list */
+ * reset list */
     if (len + e->u.p.arglen + e->u.p.filelen + envlen > argmax) {
       e->argv[e->u.p.next] = NULL;
 
@@ -549,7 +549,7 @@ pri_exec(struct arg *arg)
     }
 
     /* if we have too many files, realloc (with space for NULL
-     * termination) */
+ * termination) */
     if (e->u.p.next + 1 == e->u.p.cap)
       e->argv = ereallocarray(e->argv, e->u.p.cap *= 2, sizeof(*e->argv));
 
@@ -580,7 +580,7 @@ pri_ok(struct arg *arg)
   /* throw away rest of line */
   while ((c = fgetc(stdin)) != '\n' && c != EOF)
     /* FIXME: what if the first character of the rest of the line is
-     * a null byte? */
+ * a null byte? */
     ;
 
   if (feof(stdin) || ferror(stdin))
@@ -630,7 +630,7 @@ pri_depth(struct arg *arg)
 }
 
 /*
- * Getargs
+ * getargs
  * consume any arguments for given primary and fill extra
  * return pointer to last argument, the pointer will be incremented in parse()
  */
@@ -760,7 +760,7 @@ get_exec_arg(char *argv[], union extra *extra)
   *arg      = NULL;
 
   if (e->isplus) {
-    *(arg - 1)    = NULL; /* don't need the {} in there now */
+    *(arg - 1)    = NULL; /* dont need the {} in there now */
     e->u.p.arglen = e->u.p.filelen = 0;
     e->u.p.first = e->u.p.next = arg - argv - 1;
     e->u.p.cap                 = (arg - argv) * 2;
@@ -843,7 +843,7 @@ get_depth_arg(char *argv[], union extra *extra)
 }
 
 /*
- * Freeargs
+ * freeargs
  */
 static void
 free_extra(union extra extra)
@@ -885,7 +885,7 @@ free_ok_arg(union extra extra)
 }
 
 /*
- * Parsing/Building/Running
+ * parsing/building/running
  */
 static void
 fill_narg(char *s, struct narg *n)
@@ -934,12 +934,12 @@ find_op(char *name)
 
 /* given the expression from the command line
  * 1) convert arguments from strings to tok and place in an array duplicating
- *    the infix expression given, inserting "-a" where it was omitted
+ * the infix expression given, inserting "-a" where it was omitted
  * 2) allocate an array to hold the correct number of tok, and convert from
- *    infix to rpn (using shunting-yard), add -a and -print if necessary
+ * infix to rpn (using shunting-yard), add -a and -print if necessary
  * 3) evaluate the rpn filling in left and right pointers to create an
- *    expression tree (tok are still all contained in the rpn array, just
- *    pointing at eachother)
+ * expression tree (tok are still all contained in the rpn array, just
+ * pointing at eachother)
  */
 static void
 parse(int argc, char **argv)
@@ -960,7 +960,7 @@ parse(int argc, char **argv)
     pri = find_primary(*arg);
 
     if (pri) { /* token is a primary, fill out tok and get arguments
-                */
+ */
       if (lasttype == PRIM || lasttype == RPAR) {
         *tok++ = and;
         ntok++;
@@ -990,7 +990,7 @@ parse(int argc, char **argv)
         eprintf("paths must precede expression: %s\n", *arg);
     }
     if (tok->type != LPAR && tok->type != RPAR)
-      ntok++; /* won't have parens in rpn */
+      ntok++; /* wont have parens in rpn */
     lasttype = tok->type;
   }
   tok->type = END;
@@ -1000,9 +1000,9 @@ parse(int argc, char **argv)
     gflags.print++;
 
   /* use shunting-yard to convert from infix to rpn
-   * https://en.wikipedia.org/wiki/Shunting-yard_algorithm
-   * read from infix, resulting rpn ends up in rpn, next position in rpn
-   * is out push operators onto stack, next position in stack is top */
+   * https:// en.wikipedia.org/wiki/shunting-yard_algorithm
+ * read from infix, resulting rpn ends up in rpn, next position in rpn
+ * is out push operators onto stack, next position in stack is top */
   rpn   = ereallocarray(NULL, ntok + gflags.print, sizeof(*rpn));
   stack = ereallocarray(NULL, argc + gflags.print, sizeof(*stack));
   for (tok = infix, out = rpn, top = stack; tok->type != END; tok++) {
@@ -1020,18 +1020,18 @@ parse(int argc, char **argv)
           eprintf("extra )\n");
         break;
       default:
-        /* this expression can be simplified, but I decided copy
-         * the verbage from the wikipedia page in order to more
-         * clearly explain what's going on */
+        /* this expression can be simplified, but i decided copy
+ * the verbage from the wikipedia page in order to more
+ * clearly explain what's going on */
         while (top-- > stack
                && ((tok->u.oinfo->lassoc && tok->u.oinfo->prec <= (*top)->u.oinfo->prec)
                    || (!tok->u.oinfo->lassoc && tok->u.oinfo->prec < (*top)->u.oinfo->prec)))
           *out++ = **top;
 
         /* top now points to either an operator we didn't pop,
-         * or stack[-1] either way we need to increment it
-         * before using it, then increment again so the stack
-         * works */
+ * or stack[-1] either way we need to increment it
+ * before using it, then increment again so the stack
+ * works */
         top++;
         *top++ = tok;
         break;
@@ -1044,8 +1044,8 @@ parse(int argc, char **argv)
   }
 
   /* if there was no expression, use -print
-   * if there was an expression but no -print, -exec, or -ok, add -a
-   * -print in rpn, not infix */
+ * if there was an expression but no -print, -exec, or -ok, add -a
+ * -print in rpn, not infix */
   if (gflags.print)
     *out++ = (struct tok){.u.pinfo = find_primary("-print"), .type = PRIM};
   if (gflags.print == 2)
@@ -1054,10 +1054,10 @@ parse(int argc, char **argv)
   out->type = END;
 
   /* rpn now holds all operators and arguments in reverse polish notation
-   * values are pushed onto stack, operators pop values off stack into
-   * left and right pointers, pushing operator node back onto stack could
-   * probably just do this during shunting-yard, but this is simpler code
-   * IMO */
+ * values are pushed onto stack, operators pop values off stack into
+ * left and right pointers, pushing operator node back onto stack could
+ * probably just do this during shunting-yard, but this is simpler code
+ * IMO */
   for (tok = rpn, top = stack; tok->type != END; tok++) {
     if (tok->type == PRIM) {
       *top++ = tok;
@@ -1109,7 +1109,7 @@ eval(struct tok *tok, struct arg *arg)
   return ret ^ (tok->type == NOT);
 }
 
-/* evaluate path, if it's a directory iterate through directory entries and
+/* evaluate path, if its a directory iterate through directory entries and
  * recurse
  */
 #if FEATURE_FIND_INAME
@@ -1385,11 +1385,11 @@ find(char *path, struct findhist *hist)
     return;
 
   if (gflags.mindepth < 0 || depth >= gflags.mindepth) {
-    /* don't eval now iff we will hit the eval at the bottom which
-     * means
-     * 1. we are a directory 2. we have -depth 3. we don't have
-     * -xdev or we are on same device (so most of the time we eval
-     * here) */
+    /* dont eval now iff we will hit the eval at the bottom which
+ * means
+ * 1. we are a directory 2. we have -depth 3. we dont have
+ * -xdev or we are on same device (so most of the time we eval
+ * here) */
     if (!S_ISDIR(st.st_mode) || !gflags.depth || (gflags.xdev && hist && st.st_dev != hist->dev))
       eval(root, &arg);
   }
@@ -1502,8 +1502,8 @@ main(int argc, char **argv)
   parse(argc - npaths, argv);
 
   /* calculate number of bytes in environ for -exec {} + ARG_MAX avoidance
-   * libc implementation defined whether null bytes, pointers, and
-   * alignment are counted, so count them */
+ * libc implementation defined whether null bytes, pointers, and
+ * alignment are counted, so count them */
   for (argv = environ; *argv; argv++)
     envlen += strlen(*argv) + 1 + sizeof(*argv);
 

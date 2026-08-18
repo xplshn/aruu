@@ -116,7 +116,7 @@ gate_eval(struct Gate *g)
   return 0;
 }
 
-/* expand every $(...) so a gate like build_$(BASESTEM) resolves
+/* expand every $(...) so a gate like build_$(basestem) resolves
  * against the active overlay before evaluation */
 struct Gate *
 gate_materialize(struct Gate *g)

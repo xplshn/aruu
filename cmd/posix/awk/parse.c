@@ -1,26 +1,26 @@
-/****************************************************************
-Copyright (C) Lucent Technologies 1997
-All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name Lucent Technologies or any of
-its entities not be used in advertising or publicity pertaining
-to distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
+/* ***************************************************************
+ * copyright (c) lucent technologies 1997
+ * all rights reserved
+ *
+ * permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose and without fee is hereby
+ * granted, provided that the above copyright notice appear in all
+ * copies and that both that the copyright notice and this
+ * permission notice and warranty disclaimer appear in supporting
+ * documentation, and that the name lucent technologies or any of
+ * its entities not be used in advertising or publicity pertaining
+ * to distribution of the software without specific, written prior
+ * permission
+ *
+ * LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE
+ * ************************************************************** */
 
 #define DEBUG
 #include "awk.h"
@@ -192,7 +192,7 @@ celltonode(Cell *a, int b)
 }
 
 Node *
-rectonode(void) /* make $0 into a Node */
+rectonode(void) /* make $0 into a node */
 {
   extern Cell *literal0;
   return op1(INDIRECT, celltonode(literal0, CUNK));
@@ -237,7 +237,7 @@ linkum(Node *a, Node *b)
 {
   Node *c;
 
-  if (errorflag) /* don't link things that are wrong */
+  if (errorflag) /* dont link things that are wrong */
     return a;
   if (a == NULL)
     return (b);
@@ -251,7 +251,7 @@ linkum(Node *a, Node *b)
 
 void
 defn(Cell *v, Node *vl, Node *st) /* turn on FCN bit in definition, */
-{                                 /*   body of function, arglist */
+{                                 /* body of function, arglist */
   Node *p;
   int   n;
 

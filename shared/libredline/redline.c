@@ -768,7 +768,7 @@ completeLine(struct redlineState *ls, int keypressed)
       /* prefix cannot be expanded further */
       if (ls->in_completion == 0) {
         /* first tab: beep and wait for the second tab
-         */
+ */
         redlineBeep();
         ls->in_completion = 1;
         c                 = 0;

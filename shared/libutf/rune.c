@@ -1,22 +1,22 @@
-/* MIT/X Consortium Copyright (c) 2012 Connor Lane Smith <cls@lubutu.com>
+/* MIT/X consortium copyright (c) 2012 connor lane smith <cls@lubutu.com>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
+ * permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "software"),
+ * to deal in the software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * and/or sell copies of the software, and to permit persons to whom the
+ * software is furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * the above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the software
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * FITNESS FOR a PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * DEALINGS IN THE SOFTWARE
  */
 #include "../utf.h"
 
@@ -77,7 +77,7 @@ charntorune(Rune *p, const char *s, size_t len)
   unsigned int i, n;
   Rune         r;
 
-  if (len == 0) /* can't even look at s[0] */
+  if (len == 0) /* cant even look at s[0] */
     return 0;
 
   switch ((n = UTFSEQ(s[0]))) {
@@ -107,7 +107,7 @@ charntorune(Rune *p, const char *s, size_t len)
   for (i = 1; i < MIN(n, len); i++)
     if ((s[i] & 0xC0) == 0x80) {
       /* add bits from continuation byte to rune value
-       * cannot overflow: 6 byte sequences contain 31 bits */
+ * cannot overflow: 6 byte sequences contain 31 bits */
       r = (r << 6) | (s[i] & 0x3F); /* 10xxxxxx */
     } else {                        /* expected continuation */
       *p = Runeerror;

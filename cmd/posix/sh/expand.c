@@ -1,39 +1,39 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
- * Copyright (c) 1997-2005
- *	Herbert Xu <herbert@gondor.apana.org.au>.  All rights reserved.
- * Copyright (c) 2010-2015
- *	Jilles Tjoelker <jilles@stack.nl>.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
+ * copyright (c) 1997-2005
+ * herbert xu <herbert@gondor.apana.org.au>. all rights reserved
+ * copyright (c) 2010-2015
+ * jilles tjoelker <jilles@stack.nl>. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <dirent.h>
@@ -52,8 +52,8 @@
 #include <wctype.h>
 
 /*
- * Routines to expand arguments to commands.  We have to deal with
- * backquotes, shell variables, and file metacharacters.
+ * routines to expand arguments to commands. we have to deal with
+ * backquotes, shell variables, and file metacharacters
  */
 
 #include "arith.h"
@@ -172,7 +172,7 @@ nextword(char c, int flag, char *p, struct worddest *dst)
     dst->state = is_ws ? WORD_WS_DELIMITED : WORD_IDLE;
   } else if (!is_ws && dst->state == WORD_WS_DELIMITED)
     dst->state = WORD_IDLE;
-  /* Reserve space while the stack string is empty. */
+  /* reserve space while the stack string is empty */
   appendarglist(dst->list, NULL);
   dst->list->count--;
   STARTSTACKSTR(p);
@@ -203,16 +203,16 @@ stputs_split(const char *data, const char *syntax, int flag, char *p, struct wor
 #define STPUTS_SPLIT(data, syntax, flag, p, dst) p = stputs_split((data), syntax, flag, p, dst)
 
 /*
- * Perform expansions on an argument, placing the resulting list of arguments
- * in arglist.  Parameter expansion, command substitution and arithmetic
+ * perform expansions on an argument, placing the resulting list of arguments
+ * in arglist. parameter expansion, command substitution and arithmetic
  * expansion are always performed; additional expansions can be requested
- * via flag (EXP_*).
- * The result is left in the stack string.
- * When arglist is NULL, perform here document expansion.
+ * via flag (EXP_*)
+ * the result is left in the stack string
+ * when arglist is NULL, perform here document expansion
  *
- * When doing something that may cause this to be re-entered, make sure
+ * when doing something that may cause this to be re-entered, make sure
  * the stack string is empty via grabstackstr() and do not assume expdest
- * remains valid.
+ * remains valid
  */
 void
 expandarg(union node *arg, struct arglist *arglist, int flag)
@@ -245,14 +245,14 @@ expandarg(union node *arg, struct arglist *arglist, int flag)
 }
 
 /*
- * Perform parameter expansion, command substitution and arithmetic
- * expansion, and tilde expansion if requested via EXP_TILDE/EXP_VARTILDE.
- * Processing ends at a CTLENDVAR or CTLENDARI character as well as '\0'.
- * This is used to expand word in ${var+word} etc.
- * If EXP_GLOB or EXP_CASE are set, keep and/or generate CTLESC
- * characters to allow for further processing.
+ * perform parameter expansion, command substitution and arithmetic
+ * expansion, and tilde expansion if requested via EXP_TILDE/EXP_VARTILDE
+ * processing ends at a CTLENDVAR or CTLENDARI character as well as '\0'
+ * this is used to expand word in ${var+word} etc
+ * if EXP_GLOB or EXP_CASE are set, keep and/or generate CTLESC
+ * characters to allow for further processing
  *
- * If EXP_SPLIT is set, dst receives any complete words produced.
+ * if EXP_SPLIT is set, dst receives any complete words produced
  */
 static const char *
 argstr(const char *p, struct nodelist **restrict argbackq, int flag, struct worddest *dst)
@@ -311,9 +311,9 @@ argstr(const char *p, struct nodelist **restrict argbackq, int flag, struct word
       case ':':
       case '=':
         /*
-         * sort of a hack - expand tildes in variable
-         * assignments (after the first '=' and after ':'s).
-         */
+ * sort of a hack - expand tildes in variable
+ * assignments (after the first '=' and after ':'s)
+ */
         if (split_lit && !lit_quoted && strchr(ifsset() ? ifsval() : " \t\n", c) != NULL) {
           NEXTWORD(c, flag, expdest, dst);
           break;
@@ -336,8 +336,8 @@ argstr(const char *p, struct nodelist **restrict argbackq, int flag, struct word
 }
 
 /*
- * Perform tilde expansion, placing the result in the stack string and
- * returning the next position in the input string to process.
+ * perform tilde expansion, placing the result in the stack string and
+ * returning the next position in the input string to process
  */
 static const char *
 exptilde(const char *p, int flag)
@@ -352,7 +352,7 @@ exptilde(const char *p, int flag)
   for (;;) {
     c = *p;
     switch (c) {
-      case CTLESC: /* This means CTL* are always considered quoted. */
+      case CTLESC: /* this means CTL* are always considered quoted */
       case CTLVAR:
       case CTLBACKQ:
       case CTLBACKQ | CTLQUOTE:
@@ -388,7 +388,7 @@ exptilde(const char *p, int flag)
 }
 
 /*
- * Expand arithmetic expression.
+ * expand arithmetic expression
  */
 static const char *
 expari(const char *p, struct nodelist **restrict argbackq, int flag, struct worddest *dst)
@@ -418,16 +418,16 @@ expari(const char *p, struct nodelist **restrict argbackq, int flag, struct word
   adj = strlen(expdest);
   STADJUST(adj, expdest);
   /*
-   * If this is quoted, a '-' must not indicate a range in [...].
-   * If this is not quoted, splitting may occur.
-   */
+ * if this is quoted, a '-' must not indicate a range in [...]
+ * if this is not quoted, splitting may occur
+ */
   if (quoted ? result < 0 && begoff > 1 && flag & (EXP_GLOB | EXP_CASE) : flag & EXP_SPLIT)
     reprocess(expdest - adj - stackblock(), flag, VSNORMAL, quoted, dst);
   return p;
 }
 
 /*
- * Perform command substitution.
+ * perform command substitution
  */
 static void
 expbackq(union node *cmd, int quoted, int flag, struct worddest *dst)
@@ -456,7 +456,7 @@ expbackq(union node *cmd, int quoted, int flag, struct worddest *dst)
     ifs = ifsset() ? ifsval() : " \t\n";
   else
     ifs = "";
-  /* Remove trailing newlines */
+  /* remove trailing newlines */
   for (;;) {
     if (--in.nleft < 0) {
       if (in.fd < 0)
@@ -629,8 +629,8 @@ subevalvar_misc(
 }
 
 /*
- * Expand a variable, and return a pointer to the next character in the
- * input string.
+ * expand a variable, and return a pointer to the next character in the
+ * input string
  */
 
 static const char *
@@ -748,9 +748,9 @@ evalvar(const char *p, struct nodelist **restrict argbackq, int flag, struct wor
       if (!set)
         break;
       /*
-       * Terminate the string and start recording the pattern
-       * right after it
-       */
+ * terminate the string and start recording the pattern
+ * right after it
+ */
       STPUTC('\0', expdest);
       patloc = expdest - stackblock();
       p      = subevalvar_trim(p, argbackq, patloc, subtype, startloc);
@@ -798,7 +798,7 @@ evalvar(const char *p, struct nodelist **restrict argbackq, int flag, struct wor
 }
 
 /*
- * Test whether a special or positional parameter is set.
+ * test whether a special or positional parameter is set
  */
 
 static int
@@ -891,7 +891,7 @@ reprocess(int startloc, int flag, int subtype, int quoted, struct worddest *dst)
 }
 
 /*
- * Add the value of a special or positional parameter to the stack string.
+ * add the value of a special or positional parameter to the stack string
  */
 
 static void
@@ -989,9 +989,9 @@ static char expdir[PATH_MAX];
 #define expdir_end (expdir + sizeof(expdir))
 
 /*
- * Perform pathname generation and remove control characters.
- * At this point, the only control characters should be CTLESC.
- * The results are stored in the list dstlist.
+ * perform pathname generation and remove control characters
+ * at this point, the only control characters should be CTLESC
+ * the results are stored in the list dstlist
  */
 static void
 expandmeta(char *pattern, struct arglist *dstlist)
@@ -1013,8 +1013,8 @@ expandmeta(char *pattern, struct arglist *dstlist)
   }
   if (dstlist->count == firstmatch) {
     /*
-     * no matches
-     */
+ * no matches
+ */
     rmescapes(pattern);
     appendarglist(dstlist, pattern);
   } else {
@@ -1028,7 +1028,7 @@ expandmeta(char *pattern, struct arglist *dstlist)
 }
 
 /*
- * Do metacharacter (i.e. *, ?, [...]) expansion.
+ * do metacharacter (i.e. *, ?, [...]) expansion
  */
 
 static void
@@ -1182,11 +1182,11 @@ get_wc(const char **p)
 }
 
 /*
- * See if a character matches a character class, starting at the first colon
- * of "[:class:]".
- * If a valid character class is recognized, a pointer to the next character
+ * see if a character matches a character class, starting at the first colon
+ * of "[:class:]"
+ * if a valid character class is recognized, a pointer to the next character
  * after the final closing bracket is stored into *end, otherwise a null
- * pointer is stored into *end.
+ * pointer is stored into *end
  */
 static int
 match_charclass(const char *p, wchar_t chr, const char **end)
@@ -1204,14 +1204,14 @@ match_charclass(const char *p, wchar_t chr, const char **end)
   name[nameend - p] = '\0';
   *end              = nameend + 2;
   cclass            = wctype(name);
-  /* An unknown class matches nothing but is valid nevertheless. */
+  /* an unknown class matches nothing but is valid nevertheless */
   if (cclass == 0)
     return 0;
   return iswctype(chr, cclass);
 }
 
 /*
- * Returns true if the pattern matches the string.
+ * returns true if the pattern matches the string
  */
 
 static int
@@ -1242,9 +1242,9 @@ patmatch(const char *pattern, const char *string)
         if (localeisutf8) {
           wc = get_wc(&q);
           /*
-           * A '?' does not match invalid UTF-8 but a
-           * '*' does, so backtrack.
-           */
+ * a '?' does not match invalid UTF-8 but a
+ * '*' does, so backtrack
+ */
           if (wc == 0)
             goto backtrack;
         } else
@@ -1255,17 +1255,17 @@ patmatch(const char *pattern, const char *string)
         while (c == '*')
           c = *++p;
         /*
-         * If the pattern ends here, we know the string
-         * matches without needing to look at the rest of it.
-         */
+ * if the pattern ends here, we know the string
+ * matches without needing to look at the rest of it
+ */
         if (c == '\0')
           return 1;
         /*
-         * First try the shortest match for the '*' that
-         * could work. We can forget any earlier '*' since
-         * there is no way having it match more characters
-         * can help us, given that we are already here.
-         */
+ * first try the shortest match for the '*' that
+ * could work. we can forget any earlier '*' since
+ * there is no way having it match more characters
+ * can help us, given that we are already here
+ */
         bt_p = p;
         bt_q = q;
         break;
@@ -1341,10 +1341,10 @@ patmatch(const char *pattern, const char *string)
           break;
       backtrack:
         /*
-         * If we have a mismatch (other than hitting the end
-         * of the string), go back to the last '*' seen and
-         * have it match one additional character.
-         */
+ * if we have a mismatch (other than hitting the end
+ * of the string), go back to the last '*' seen and
+ * have it match one additional character
+ */
         if (bt_p == NULL)
           return 0;
         if (*bt_q == '\0')
@@ -1358,7 +1358,7 @@ patmatch(const char *pattern, const char *string)
 }
 
 /*
- * Remove any CTLESC and CTLQUOTEMARK characters from a string.
+ * remove any CTLESC and CTLQUOTEMARK characters from a string
  */
 
 void
@@ -1385,7 +1385,7 @@ rmescapes(char *str)
 }
 
 /*
- * See if a pattern matches in a case statement.
+ * see if a pattern matches in a case statement
  */
 
 int
@@ -1408,7 +1408,7 @@ casematch(union node *pattern, const char *val)
 }
 
 /*
- * Our own itoa().
+ * our own itoa()
  */
 
 static void
@@ -1431,7 +1431,7 @@ cvtnum(int num, char *buf)
 }
 
 /*
- * Do most of the work for wordexp(3).
+ * do most of the work for wordexp(3)
  */
 
 int
@@ -1450,7 +1450,7 @@ wordexpcmd(int argc, char **argv)
 }
 
 /*
- * Do most of the work for wordexp(3), new version.
+ * do most of the work for wordexp(3), new version
  */
 
 int

@@ -142,7 +142,7 @@ func inferSection(path string) int {
 	}
 }
 
-// a Renderer turns a parsed Page into one output format on os.Stdout
+// a renderer turns a parsed page into one output format on os.stdout
 type Renderer interface {
 	Render() error
 }

@@ -3,7 +3,7 @@
 #include "sha512.h"
 #include <stdint.h>
 
-#define sha512_256 sha512 /*struct*/
+#define sha512_256 sha512 /* struct */
 
 enum { SHA512_256_DIGEST_LENGTH = 32 };
 

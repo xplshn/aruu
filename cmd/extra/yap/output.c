@@ -1,7 +1,7 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 /*
- * Handle output to screen
+ * handle output to screen
  */
 
 #include "output.h"
@@ -17,7 +17,7 @@ static char _outbuf[OBUFSIZ];
 
 void
 flush()
-{ /* Flush output buffer, by writing it */
+{ /* flush output buffer, by writing it */
   char *p = _outbuf;
 
   _ocnt = OBUFSIZ;
@@ -28,7 +28,7 @@ flush()
 
 void
 nflush()
-{ /* Flush output buffer, ignoring it */
+{ /* flush output buffer, ignoring it */
 
   _ocnt = OBUFSIZ;
   _optr = _outbuf;
@@ -43,7 +43,7 @@ fputch(int ch)
 
 void
 putline(char *s)
-{ /* Print string s */
+{ /* print string s */
 
   if (!s)
     return;
@@ -53,7 +53,7 @@ putline(char *s)
 }
 
 /*
- * A safe version of putline. All control characters are echoed as ^X
+ * a safe version of putline. all control characters are echoed as ^x
  */
 
 void
@@ -71,7 +71,7 @@ cputline(char *s)
 }
 
 /*
- * Simple minded routine to print a number
+ * simple minded routine to print a number
  */
 
 void

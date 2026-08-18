@@ -1,17 +1,17 @@
-/*	$NetBSD: test.c,v 1.21 1999/04/05 09:48:38 kleink Exp $	*/
+/* $netbsd: test.c,v 1.21 1999/04/05 09:48:38 kleink exp $ */
 
-/*-
- * test(1); version 7-like  --  author Erik Baalbergen
- * modified by Eric Gisin to be used as built-in.
- * modified by Arnold Robbins to add SVR3 compatibility
- * (-x -c -b -p -u -g -k) plus Korn's -L -nt -ot -ef and new -S (socket).
- * modified by J.T. Conklin for NetBSD.
+/* -
+ * test(1); version 7-like, author erik baalbergen
+ * modified by eric gisin to be used as built-in
+ * modified by arnold robbins to add SVR3 compatibility
+ * (-x -c -b -p -u -g -k) plus korn's -L -nt -ot -ef and new -S (socket)
+ * modified by J.T. conklin for netbsd
  *
- * This program is in the Public Domain.
+ * this program is in the public domain
  */
 /*
- * Important: This file is used both as a standalone program /bin/test and
- * as a builtin for /bin/sh (#define SHELL).
+ * important: this file is used both as a standalone program /bin/test and
+ * as a builtin for /bin/sh (#define SHELL)
  */
 
 #ifndef SHELL
@@ -68,27 +68,27 @@ error(const char *msg, ...)
   va_list ap;
   va_start(ap, msg);
   verrx(2, msg, ap);
-  /*NOTREACHED*/
+  /* NOTREACHED */
   va_end(ap);
 }
 #endif
 
 /* test(1) accepts the following grammar:
-  oexpr	::= aexpr | aexpr "-o" oexpr ;
-  aexpr	::= nexpr | nexpr "-a" aexpr ;
-  nexpr	::= primary | "!" primary
-  primary	::= unary-operator operand
-    | operand binary-operator operand
-    | operand
-    | "(" oexpr ")"
-    ;
-  unary-operator ::= "-r"|"-w"|"-x"|"-f"|"-d"|"-c"|"-b"|"-p"|
-    "-u"|"-g"|"-k"|"-s"|"-t"|"-z"|"-n"|"-o"|"-O"|"-G"|"-L"|"-S";
-
-  binary-operator ::= "="|"!="|"-eq"|"-ne"|"-ge"|"-gt"|"-le"|"-lt"|
-      "-nt"|"-ot"|"-ef";
-  operand ::= <any legal UNIX file name>
-*/
+ * oexpr ::= aexpr | aexpr "-o" oexpr ;
+ * aexpr ::= nexpr | nexpr "-a" aexpr ;
+ * nexpr ::= primary | "!" primary
+ * primary ::= unary-operator operand
+ * | operand binary-operator operand
+ * | operand
+ * | "(" oexpr ")"
+ * ;
+ * unary-operator ::= "-r"|"-w"|"-x"|"-f"|"-d"|"-c"|"-b"|"-p"|
+ * "-u"|"-g"|"-k"|"-s"|"-t"|"-z"|"-n"|"-o"|"-o"|"-g"|"-l"|"-s";
+ *
+ * binary-operator ::= "="|"!="|"-eq"|"-ne"|"-ge"|"-gt"|"-le"|"-lt"|
+ * "-nt"|"-ot"|"-ef";
+ * operand ::= <any legal UNIX file name>
+ */
 
 enum token_types { UNOP = 0x100, BINOP = 0x200, BUNOP = 0x300, BBINOP = 0x400, PAREN = 0x500 };
 
@@ -224,7 +224,7 @@ main(int argc, char **argv)
   t_wp       = &argv[1];
   parenlevel = 0;
   if (nargc == 4 && strcmp(*t_wp, "!") == 0) {
-    /* Things like ! "" -o x do not fit in the normal grammar. */
+    /* things like ! "" -o x do not fit in the normal grammar */
     --nargc;
     ++t_wp;
     res = oexpr(t_lex(*t_wp));

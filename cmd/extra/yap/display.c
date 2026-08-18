@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "display.h"
 #include "assert.h"
@@ -28,7 +28,7 @@ static int   decode_cell(const char *s, const char **next, int *width, int *is_u
 int          wcwidth(wchar_t wc);
 
 /*
- * Fill n lines of the screen, each with "str".
+ * fill n lines of the screen, each with "str"
  */
 
 static void
@@ -40,7 +40,7 @@ fillscr(char *str, int n)
 }
 
 /*
- * Skip "n" screenlines of line "p", and return what's left of it.
+ * skip "n" screenlines of line "p", and return what's left of it
  */
 
 static char *
@@ -54,9 +54,9 @@ skiplines(char *p, int n)
 }
 
 /*
- * Redraw screen.
- * "n" = 1 if it is a real redraw, 0 if one page must be displayed.
- * It is also called when yap receives a stop signal.
+ * redraw screen
+ * "n" = 1 if it is a real redraw, 0 if one page must be displayed
+ * it is also called when yap receives a stop signal
  */
 
 void
@@ -73,10 +73,10 @@ redraw(int n)
 }
 
 /*
- * Compute return value for the routines "display" and "scrollf".
- * This return value indicates wether we are at the end of file
- * or at the start, or both.
- * "s" contains that part of the last line that was not displayed.
+ * compute return value for the routines "display" and "scrollf"
+ * this return value indicates wether we are at the end of file
+ * or at the start, or both
+ * "s" contains that part of the last line that was not displayed
  */
 
 static int
@@ -97,10 +97,10 @@ compretval(const char *s)
 }
 
 /*
- * Display nlines, starting at line n, not displaying the first
- * nd screenlines of n.
- * If reallydispl = 0, the actual displaying is not performed,
- * only the computing associated with it is done.
+ * display nlines, starting at line n, not displaying the first
+ * nd screenlines of n
+ * if reallydispl = 0, the actual displaying is not performed,
+ * only the computing associated with it is done
  */
 
 int
@@ -109,11 +109,11 @@ display(long n, int nd, int nlines, int reallydispl)
   struct scr_info *s = &scr_info;
   char            *p; /* pointer to line to be displayed */
 
-  if (startcomm) { /* No displaying on a command from the
-                    * yap command line. In this case, displaying
-                    * will be done after executing the command,
-                    * by a redraw.
-                    */
+  if (startcomm) { /* no displaying on a command from the
+ * yap command line. in this case, displaying
+ * will be done after executing the command,
+ * by a redraw
+ */
     reallydispl = 0;
   }
   if (!n) {
@@ -135,8 +135,8 @@ display(long n, int nd, int nlines, int reallydispl)
     }
   }
   /*
-   * Now, do computations and display
-   */
+ * now, do computations and display
+ */
   s->currentpos = 0;
   s->nf         = nd;
   s->head       = s->tail;
@@ -145,15 +145,15 @@ display(long n, int nd, int nlines, int reallydispl)
   p             = skiplines(getline(n, 1), nd);
   while (nlines && p) {
     /*
-     * While there is room,
-     * and there is something left to display ...
-     */
+ * while there is room,
+ * and there is something left to display ...
+ */
     (s->tail->cnt)++;
     nlines--;
     if (*(p = do_line(p, reallydispl)) == '\0') {
       /*
-       * File-line finished, get next one ...
-       */
+ * file-line finished, get next one ...
+ */
       p = getline(++n, 1);
       if (nlines && p) {
         s->tail       = s->tail->next;
@@ -173,7 +173,7 @@ display(long n, int nd, int nlines, int reallydispl)
 }
 
 /*
- * Scroll forwards n lines.
+ * scroll forwards n lines
  */
 
 int
@@ -185,37 +185,37 @@ scrollf(int n, int reallydispl)
   int              i;
 
   /*
-   * First, find out how many screenlines of the last line were already
-   * on the screen, and possibly above it.
-   */
+ * first, find out how many screenlines of the last line were already
+ * on the screen, and possibly above it
+ */
 
   if (n <= 0 || (status & EOFILE))
     return status;
   if (startcomm)
     reallydispl = 0;
   /*
-   * Find out where to begin displaying
-   */
+ * find out where to begin displaying
+ */
   i = s->tail->cnt;
   if ((ll = s->lastline) == s->firstline)
     i += s->nf;
   p = skiplines(getline(ll, 1), i);
   /*
-   * Now, place the cursor at the first free line
-   */
+ * now, place the cursor at the first free line
+ */
   if (reallydispl && !stupid) {
     clrbline();
     mgoto(s->currentpos);
   }
   /*
-   * Now display lines, keeping track of which lines are on the screen.
-   */
-  while (n-- > 0) { /* There are still rows to be displayed */
-    if (!*p) {      /* End of line, get next one */
+ * now display lines, keeping track of which lines are on the screen
+ */
+  while (n-- > 0) { /* there are still rows to be displayed */
+    if (!*p) {      /* end of line, get next one */
       if (!(p = getline(++ll, 1))) {
         /*
-         * No lines left. At end of file
-         */
+ * no lines left. at end of file
+ */
         break;
       }
       s->tail       = s->tail->next;
@@ -224,16 +224,16 @@ scrollf(int n, int reallydispl)
     }
     if (s->currentpos >= maxpagesize) {
       /*
-       * No room, delete first screen-line
-       */
+ * no room, delete first screen-line
+ */
       s->currentpos--;
       s->nf++;
       if (--(s->head->cnt) == 0) {
         /*
-         * The first file-line on the screen is wiped
-         * out completely; update administration
-         * accordingly.
-         */
+ * the first file-line on the screen is wiped
+ * out completely; update administration
+ * accordingly
+ */
         s->nf   = 0;
         s->head = s->head->next;
         assert(s->head->cnt > 0);
@@ -246,14 +246,14 @@ scrollf(int n, int reallydispl)
 }
 
 /*
- * Scroll back n lines
+ * scroll back n lines
  */
 
 int
 scrollb(int n, int reallydispl)
 {
   struct scr_info *s = &scr_info;
-  char            *p; /* Holds string to be displayed */
+  char            *p; /* holds string to be displayed */
   int              i;
   int              count;
   long             ln; /* a line number */
@@ -261,8 +261,8 @@ scrollb(int n, int reallydispl)
   int              cannotscroll; /* stupid or no insert-line */
 
   /*
-   * First, find out where to start
-   */
+ * first, find out where to start
+ */
   if ((count = n) <= 0 || (status & START))
     return status;
   if (startcomm)
@@ -270,31 +270,31 @@ scrollb(int n, int reallydispl)
   cannotscroll = stupid || (!*AL && !*SR);
   ln           = s->firstline;
   nodispl      = s->nf;
-  while (count) { /* While scrolling back ... */
+  while (count) { /* while scrolling back ... */
     i = nodispl;
     if (i) {
       /*
-       * There were screen-lines of s->firstline that were not
-       * displayed.
-       * We can use them now, but only "count" of them.
-       */
+ * there were screen-lines of s->firstline that were not
+ * displayed
+ * we can use them now, but only "count" of them
+ */
       if (i > count)
         i = count;
       s->currentpos += i;
       nodispl -= i;
       count -= i;
-    } else { /* Get previous line */
+    } else { /* get previous line */
       if (ln == 1)
-        break; /* isn't there ... */
+        break; /* isnt there ... */
       p = getline(--ln, 1);
       /*
-       * Make it the first line of the screen and compute
-       * how many screenlines it takes. These lines are not
-       * displayed, but nodispl is set to this count, so
-       * that it will be nonzero next time around
-       */
+ * make it the first line of the screen and compute
+ * how many screenlines it takes. these lines are not
+ * displayed, but nodispl is set to this count, so
+ * that it will be nonzero next time around
+ */
       nodispl = 0;
-      do { /* Find out how many screenlines */
+      do { /* find out how many screenlines */
         nodispl++;
         p = skiplines(p, 1);
       } while (*p);
@@ -306,33 +306,33 @@ scrollb(int n, int reallydispl)
   if (reallydispl && hardcopy)
     i = n;
   /*
-   * Now that we know where to start, we can use "display" to do the
-   * rest of the computing for us, and maybe even the displaying ...
-   */
+ * now that we know where to start, we can use "display" to do the
+ * rest of the computing for us, and maybe even the displaying ...
+ */
   i = display(ln, nodispl, i, reallydispl && cannotscroll);
   if (cannotscroll || !reallydispl) {
     /*
-     * Yes, "display" did the displaying, or we did'nt have to
-     * display at all.
-     * I like it, but the user obviously does not.
-     * Let him buy another (smarter) terminal ...
-     */
+ * yes, "display" did the displaying, or we did'nt have to
+ * display at all
+ * i like it, but the user obviously does not
+ * let him buy another (smarter) terminal ...
+ */
     return i;
   }
   /*
-   * Now, all we have to do is the displaying. And we are dealing with
-   * a smart terminal (it can insert lines or scroll back).
-   */
+ * now, all we have to do is the displaying. and we are dealing with
+ * a smart terminal (it can insert lines or scroll back)
+ */
   home();
   /*
-   * Insert lines all at once
-   */
+ * insert lines all at once
+ */
   for (i = n; i; i--) {
     if (DB && *CE) {
       /*
-       * Grumble..., terminal retains lines below, so we have
-       * to clear the lines that we push off the screen
-       */
+ * grumble..., terminal retains lines below, so we have
+ * to clear the lines that we push off the screen
+ */
       clrbline();
       home();
     }
@@ -354,8 +354,8 @@ scrollb(int n, int reallydispl)
 }
 
 /*
- * Process a line.
- * If reallydispl > 0 then display it.
+ * process a line
+ * if reallydispl > 0 then display it
  */
 
 static char *
@@ -397,13 +397,13 @@ do_line(char *str, int reallydispl)
     }
     if (uc < ' ' && (cell_len = match(str, &c2, sppat)) > 0) {
       /*
-       * We found a string that matches, and thus must be
-       * echoed literally
-       */
+ * we found a string that matches, and thus must be
+ * echoed literally
+ */
       if ((pos - c2) <= 0) {
         /*
-         * It did not fit
-         */
+ * it did not fit
+ */
         break;
       }
       pos -= c2;
@@ -438,8 +438,8 @@ do_line(char *str, int reallydispl)
     }
     do_ul = 1;
     /*
-     * Find underline sequences ...
-     */
+ * find underline sequences ...
+ */
     if (is_underscore && *cursor == '\b' && *(cursor + 1) != '\0') {
       cell_start = cursor + 1;
       cell_len   = decode_cell(cell_start, &next, &cell_width, &is_underscore);
@@ -519,9 +519,9 @@ do_line(char *str, int reallydispl)
       pos -= cell_width;
       if (reallydispl && do_ul && *UC && cell_width == 1 && pos > 0) {
         /*
-         * Underlining apparently is done one
-         * character at a time.
-         */
+ * underlining apparently is done one
+ * character at a time
+ */
         flush_display_buffer(buf, &p);
         backspace();
         underchar();
@@ -537,13 +537,13 @@ do_line(char *str, int reallydispl)
       putline("\r\n");
     }
     /*
-     * The next should be here! I.e. it may not be before printing
-     * the newline. This has to do with XN. We don't know exactly
-     * WHEN the terminal will stop ignoring the newline.
-     * I have for example a terminal (Ampex a230) that will
-     * continue to ignore the newline after a clear to end of line
-     * sequence, but not after an end_underline sequence.
-     */
+ * the next should be here! i.e. it may not be before printing
+ * the newline. this has to do with XN. we dont know exactly
+ * WHEN the terminal will stop ignoring the newline
+ * i have for example a terminal (ampex a230) that will
+ * continue to ignore the newline after a clear to end of line
+ * sequence, but not after an end_underline sequence
+ */
     if (lastmode) {
       end_underline();
     }
@@ -628,7 +628,7 @@ decode_cell(const char *s, const char **next, int *width, int *is_underscore)
 /* ARGSUSED */
 int
 setmark(long cnt)
-{ /* Set a mark on the current page */
+{ /* set a mark on the current page */
   struct scr_info *p = &scr_info;
   (void)cnt;
 
@@ -640,7 +640,7 @@ setmark(long cnt)
 /* ARGSUSED */
 int
 tomark(long cnt)
-{ /* Go to the mark */
+{ /* go to the mark */
   struct scr_info *p = &scr_info;
   (void)cnt;
 
@@ -651,7 +651,7 @@ tomark(long cnt)
 /* ARGSUSED */
 int
 exgmark(long cnt)
-{ /* Exchange mark and current page */
+{ /* exchange mark and current page */
   struct scr_info *p = &scr_info;
   long             svfirst;
   int              svnf;
@@ -667,7 +667,7 @@ exgmark(long cnt)
 
 void
 d_clean()
-{ /* Clean up */
+{ /* clean up */
   struct scr_info *p = &scr_info;
 
   p->savnf      = 0;

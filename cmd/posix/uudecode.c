@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/stat.h>
 
@@ -109,7 +109,7 @@ uudecodeb64(FILE *fp, FILE *outfp)
         switch (b) {
           case 0:
             /* expected '=' remaining
-             * including footer */
+ * including footer */
             if (--t) {
               fwrite(out, 1, (po - out), outfp);
               return;

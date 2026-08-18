@@ -270,14 +270,14 @@ expand_rule(const char *name)
     int            r_literal = rule_is_literal(r);
 
     /* run a codegen producer before globbing only when its own
-     * output feeds this rules glob, so a step like POSIX_BC_C
-     * (produces cmd/posix/bc.c) finishes before glob_all() looks
-     * for cmd/posix/bc.c. anything else in extra_deps (a library to
-     * link, a header some other rule includes) never needs to run
-     * here, expand_rule() on it just registers its instances so
-     * the resolve_input_token() pass in finalize_inst() can wire up
-     * dep_rule_names for backend scheduling. skipped in
-     * summary mode since -S must not execute */
+ * output feeds this rules glob, so a step like POSIX_BC_C
+ * (produces cmd/posix/bc.c) finishes before glob_all() looks
+ * for cmd/posix/bc.c. anything else in extra_deps (a library to
+ * link, a header some other rule includes) never needs to run
+ * here, expand_rule() on it just registers its instances so
+ * the resolve_input_token() pass in finalize_inst() can wire up
+ * dep_rule_names for backend scheduling. skipped in
+ * summary mode since -S must not execute */
     if (!summary_mode) {
       for (j = 0; j < r->extra_deps.n; j++) {
         char *tok = kv_expand(r->extra_deps.v[j]);
@@ -368,7 +368,7 @@ expand_rule(const char *name)
     struct KvStore ov;
 
     /* non-glob rules have no MATCH/DIR/BASE to expose, so the
-     * overlay only carries IN/OUT for build_cmd */
+ * overlay only carries IN/OUT for build_cmd */
     setup_inst(inst, r);
     memset(&ov, 0, sizeof ov);
     local_overlay = &ov;

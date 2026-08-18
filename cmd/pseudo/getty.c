@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -96,7 +96,7 @@ main(int argc, char *argv[])
   sigemptyset(&sa.sa_mask);
   sigaction(SIGHUP, &sa, NULL);
 
-  /* Clear all utmp entries for this tty */
+  /* clear all utmp entries for this tty */
   fp = fopen(UTMP_PATH, "r+");
   if (fp) {
     do {
@@ -129,7 +129,7 @@ main(int argc, char *argv[])
   printf("login: ");
   fflush(stdout);
 
-  /* Flush pending input */
+  /* flush pending input */
   ioctl(0, TCFLSH, (void *)0);
   memset(logname, 0, sizeof(logname));
   while (1) {

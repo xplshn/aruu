@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <errno.h>
 #include <pwd.h>
@@ -39,7 +39,7 @@ lastlog(char *user)
     eprintf("%s: read error:", ARUU_PATH_LASTLOG);
 
   /* on glibc `ll_time' can be an int32_t with compat32
-   * avoid compiler warning when calling ctime() */
+ * avoid compiler warning when calling ctime() */
   lltime = ll.ll_time;
   printf("%-8.8s %-8.8s %-16.16s %s", user, ll.ll_line, ll.ll_host, ctime(&lltime));
 }

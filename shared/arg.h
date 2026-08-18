@@ -1,5 +1,5 @@
 /*
- * Copy me if you can.
+ * copy me if you can
  * by 20h
  */
 
@@ -26,7 +26,7 @@ extern char *argv0;
       argc_ = argv[0][0];                                                                          \
       switch (argc_)
 
-/* Handles obsolete -NUM syntax */
+/* handles obsolete -NUM syntax */
 #define ARGNUM                                                                                     \
   case '0':                                                                                        \
   case '1':                                                                                        \

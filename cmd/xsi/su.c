@@ -1,121 +1,128 @@
-/* See LICENSE file for copyright and license details. */
-#include "config.h"
+/* see LICENSE file for copyright and license details */
 #include "passwd.h"
 #include "util.h"
+#include "wexec.h"
 
-#include <errno.h>
 #include <grp.h>
+#include <limits.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
+#include <termios.h>
 #include <unistd.h>
-
-extern char **environ;
-
-#ifndef ENV_PATH_SHELL
-#define ENV_PATH_SHELL "/bin/sh"
-#endif
-
-static int lflag = 0;
-static int pflag = 0;
 
 static void
 usage(void)
 {
-  eprintf("usage: %s [-lp] [username]\n", argv0);
+  eprintf("usage: %s [-l] [name]\n", argv0);
 }
 
-// ?man su: run a command with substitute user and group id
-// ?man arguments: [username]
-// ?man run a shell or command as the named user. defaults to root
+/* reads one line with echo off into a reusable static buffer */
+static char *
+readpass(const char *prompt)
+{
+  static char    buf[128];
+  struct termios old, raw;
+  int            have_old;
+  size_t         n;
+
+  fputs(prompt, stdout);
+  fflush(stdout);
+
+  have_old = tcgetattr(STDIN_FILENO, &old) == 0;
+  if (have_old) {
+    raw = old;
+    raw.c_lflag &= ~ECHO;
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+  }
+
+  if (!fgets(buf, sizeof(buf), stdin)) {
+    if (have_old)
+      tcsetattr(STDIN_FILENO, TCSAFLUSH, &old);
+    return NULL;
+  }
+
+  if (have_old) {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &old);
+    fputc('\n', stdout);
+  }
+
+  n = strlen(buf);
+  if (n && buf[n - 1] == '\n')
+    buf[--n] = '\0';
+
+  return buf;
+}
+
+// ?man su: become another user
+// ?man arguments: [-l] [name]
+// ?man authenticate as name (default: root) and start a shell as them
+// ?man with -l, also chdir to their home directory and run a login shell,
+// ?man same as login would
 int
 main(int argc, char *argv[])
 {
-  char          *usr, *pass;
-  char          *shell, *envshell, *term;
   struct passwd *pw;
-  char          *newargv[3];
+  char           shellbuf[PATH_MAX];
+  char          *name, *pass, *base;
+  char          *shargv[2];
+  int            lflag = 0;
   uid_t          uid;
 
   ARGBEGIN
   {
+    // ?man -l: start a login shell, chdir home like login does
     case 'l':
-      // ?man -l: make the shell a login shell
       lflag = 1;
-      break;
-    case 'p':
-      // ?man -p: preserve the current environment
-      pflag = 1;
       break;
     default:
       usage();
   }
   ARGEND
 
-  if (argc > 1)
-    usage();
-  usr = argc > 0 ? argv[0] : "root";
-
-  errno = 0;
-  pw    = getpwnam(usr);
-  if (!pw) {
-    if (errno)
-      eprintf("getpwnam: %s:", usr);
-    else
-      eprintf("who are you?\n");
-  }
+  name = argc > 0 ? argv[0] : "root";
+  pw   = getpwnam(name);
+  if (!pw)
+    eprintf("su: unknown user: %s\n", name);
 
   uid = getuid();
-  if (uid) {
-    pass = getpass("Password: ");
-    if (!pass)
-      eprintf("getpass:");
-    if (pw_check(pw, pass) <= 0)
-      exit(1);
-    explicit_bzero(pass, strlen(pass));
+  if (uid != 0) {
+    pass = readpass("Password: ");
+    if (!pass || pw_check(pw, pass) != 1)
+      eprintf("su: incorrect password\n");
   }
 
-  if (initgroups(usr, pw->pw_gid) < 0)
-    eprintf("initgroups:");
+  if (initgroups(pw->pw_name, pw->pw_gid) < 0)
+    weprintf("initgroups:");
   if (setgid(pw->pw_gid) < 0)
     eprintf("setgid:");
   if (setuid(pw->pw_uid) < 0)
     eprintf("setuid:");
 
-  shell = pw->pw_shell[0] == '\0' ? ENV_PATH_SHELL : pw->pw_shell;
+  strlcpy(shellbuf, pw->pw_shell[0] ? pw->pw_shell : "/bin/sh", sizeof(shellbuf));
+
   if (lflag) {
-    term = getenv("TERM");
-    clearenv();
-    setenv("HOME", pw->pw_dir, 1);
-    setenv("SHELL", shell, 1);
-    setenv("USER", pw->pw_name, 1);
-    setenv("LOGNAME", pw->pw_name, 1);
-    setenv("TERM", term ? term : "dumb", 1);
-    setenv("PATH", ENV_PATH, 1);
     if (chdir(pw->pw_dir) < 0)
-      eprintf("chdir %s:", pw->pw_dir);
-    newargv[0] = shell;
-    newargv[1] = "-l";
-    newargv[2] = NULL;
-  } else {
-    if (pflag) {
-      envshell = getenv("SHELL");
-      if (envshell && envshell[0] != '\0')
-        shell = envshell;
-    } else {
-      setenv("HOME", pw->pw_dir, 1);
-      setenv("SHELL", shell, 1);
-      if (strcmp(pw->pw_name, "root") != 0) {
-        setenv("USER", pw->pw_name, 1);
-        setenv("LOGNAME", pw->pw_name, 1);
-      }
-    }
-    newargv[0] = shell;
-    newargv[1] = NULL;
+      weprintf("chdir %s:", pw->pw_dir);
+    setenv("HOME", pw->pw_dir, 1);
   }
-  execve(shell, newargv, environ);
-  weprintf("execve %s:", shell);
-  return (errno == ENOENT) ? 127 : 126;
+  setenv("USER", pw->pw_name, 1);
+  setenv("LOGNAME", pw->pw_name, 1);
+  setenv("SHELL", shellbuf, 1);
+
+  base = strrchr(shellbuf, '/');
+  base = base ? base + 1 : shellbuf;
+
+  if (lflag) {
+    shargv[0]    = emalloc(strlen(base) + 2);
+    shargv[0][0] = '-';
+    strcpy(shargv[0] + 1, base);
+  } else {
+    shargv[0] = estrdup(base);
+  }
+  shargv[1] = NULL;
+
+  wexecv_self(shellbuf, shargv);
+  return 1;
 }

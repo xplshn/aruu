@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "main.h"
 #include "commands.h"
@@ -53,12 +53,12 @@ main(int argc, char **argv)
 }
 
 /*
- * Open temporary file for reading and writing.
- * Panic if it fails
+ * open temporary file for reading and writing
+ * panic if it fails
  */
 
 /*
- * Collect initializing stuff here.
+ * collect initializing stuff here
  */
 
 static int
@@ -66,17 +66,17 @@ initialize(int x)
 {
   if (!(nopipe = x)) {
     /*
-     * Reading from pipe
-     */
+ * reading from pipe
+ */
     if (isatty(0)) {
       return 1;
     }
-    stdf = dup(0); /* Duplicate file descriptor of input */
+    stdf = dup(0); /* duplicate file descriptor of input */
     if (no_tty)
       return 0;
     /*
-     * Make sure standard input is from the terminal.
-     */
+ * make sure standard input is from the terminal
+ */
     (void)close(0);
     if (open("/dev/tty", O_RDONLY, 0) != 0) {
       putline("Couldn't open terminal\n");
@@ -87,9 +87,9 @@ initialize(int x)
   if (no_tty)
     return 0;
   /*
-   * Handle signals.
-   * Catch QUIT, DELETE and ^Z
-   */
+ * handle signals
+ * catch QUIT, DELETE and ^z
+ */
   (void)signal(SIGQUIT, SIG_IGN);
   (void)signal(SIGINT, catchdel);
   ini_terminal();
@@ -120,8 +120,8 @@ sigquit(int signo)
 #ifdef SIGTSTP
 
 /*
- * We had a SIGTSTP signal.
- * Suspend, by a call to this routine.
+ * we had a SIGTSTP signal
+ * suspend, by a call to this routine
  */
 
 void
@@ -132,12 +132,12 @@ suspend()
   (void)signal(SIGTSTP, SIG_DFL);
   (void)kill(0, SIGTSTP);
   /*
-   * We are not here anymore ...
-   *
-
-   *
-   * But we arive here ...
-   */
+ * we are not here anymore ...
+ *
+ *
+ *
+ * but we arive here ...
+ */
   inittty();
   putline(TI);
   flush();
@@ -145,8 +145,8 @@ suspend()
 }
 
 /*
- * SIGTSTP signal handler.
- * Just indicate that we had one, ignore further ones and return.
+ * SIGTSTP signal handler
+ * just indicate that we had one, ignore further ones and return
  */
 
 static void
@@ -161,8 +161,8 @@ suspsig(int signo)
 #endif
 
 /*
- * quit : called on exit.
- * I bet you guessed that much.
+ * quit : called on exit
+ * i bet you guessed that much
  */
 
 int
@@ -175,8 +175,8 @@ quit()
 }
 
 /*
- * Exit, but nonvoluntarily.
- * At least tell the user why.
+ * exit, but nonvoluntarily
+ * at least tell the user why
  */
 
 void

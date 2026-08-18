@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "help.h"
 #include "commands.h"
@@ -12,14 +12,14 @@
 #include "prompt.h"
 #include "term.h"
 
-static int           h_cnt;  /* Count # of lines */
-static struct state *origin; /* Keep track of startstate */
+static int           h_cnt;  /* count # of lines */
+static struct state *origin; /* keep track of startstate */
 
 /*
- * Print a key sequence.
- * We arrived at an endstate. The s_next link in the state structure now
+ * print a key sequence
+ * we arrived at an endstate. the s_next link in the state structure now
  * leads us from "origin" to the current state, so that we can print the key
- * sequence easily.
+ * sequence easily
  */
 
 static void
@@ -29,15 +29,15 @@ pr_comm()
   char         *pb;
   int           c;
   char          buf[30];
-  int           i = 0; /* How many characters printed? */
+  int           i = 0; /* how many characters printed? */
 
   pb = buf;
   for (;;) {
     c = p->s_char & 0177;
     if (c < ' ' || c == 0177) {
       /*
-       * Will take an extra position
-       */
+ * will take an extra position
+ */
       i++;
     }
     *pb++ = c;
@@ -54,9 +54,9 @@ pr_comm()
 }
 
 /*
- * Print out a description of the keymap. This is done, by temporarily using
+ * print out a description of the keymap. this is done, by temporarily using
  * the s_next field in the state structure indicate the state matching the
- * next character, so that we can walk from "origin" to an endstate.
+ * next character, so that we can walk from "origin" to an endstate
  */
 
 static void
@@ -68,13 +68,13 @@ pr_mach(struct state *currstate, struct state *back)
     if (interrupt)
       break;
     if (back) {
-      save         = back->s_next; /* Save original link */
+      save         = back->s_next; /* save original link */
       back->s_next = currstate;
     }
     if (!currstate->s_match) {
       /*
-       * End state, print command
-       */
+ * end state, print command
+ */
       pr_comm();
       putline(commands[currstate->s_cnt].c_descr);
       putline("\r\n");
@@ -92,10 +92,10 @@ pr_mach(struct state *currstate, struct state *back)
   }
 }
 
-/*ARGSUSED*/
+/* ARGSUSED */
 int
 do_help(long i)
-{ /* The help command */
+{ /* the help command */
   (void)i;
 
   startcomm = 0;

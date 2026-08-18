@@ -1,5 +1,5 @@
 /*
- * Magic values required to use _reboot() system call.
+ * magic values required to use _reboot() system call
  */
 
 #define LINUX_REBOOT_MAGIC1  0xfee1dead
@@ -9,16 +9,16 @@
 #define LINUX_REBOOT_MAGIC2C 537993216
 
 /*
- * Commands accepted by the _reboot() system call.
+ * commands accepted by the _reboot() system call
  *
- * RESTART     Restart system using default command and mode.
- * HALT        Stop OS and give system control to ROM monitor, if any.
- * CAD_ON      Ctrl-Alt-Del sequence causes RESTART command.
- * CAD_OFF     Ctrl-Alt-Del sequence sends SIGINT to init task.
- * POWER_OFF   Stop OS and remove all power from system, if possible.
- * RESTART2    Restart system using given command string.
- * SW_SUSPEND  Suspend system using software suspend if compiled in.
- * KEXEC       Restart system using a previously loaded Linux kernel
+ * RESTART restart system using default command and mode
+ * HALT stop OS and give system control to ROM monitor, if any
+ * CAD_ON ctrl-alt-del sequence causes RESTART command
+ * CAD_OFF ctrl-alt-del sequence sends SIGINT to init task
+ * POWER_OFF stop OS and remove all power from system, if possible
+ * RESTART2 restart system using given command string
+ * SW_SUSPEND suspend system using software suspend if compiled in
+ * KEXEC restart system using a previously loaded linux kernel
  */
 
 #define LINUX_REBOOT_CMD_RESTART    0x01234567

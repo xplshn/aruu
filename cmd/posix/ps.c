@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/ioctl.h>
 #include <sys/sysinfo.h>
@@ -39,7 +39,7 @@ psout(struct procstat *ps)
   struct passwd    *pw;
   struct winsize    w;
 
-  /* Ignore session leaders */
+  /* ignore session leaders */
   if (flags & PS_dflag)
     if (ps->pid == ps->sid)
       return;
@@ -47,8 +47,8 @@ psout(struct procstat *ps)
   devtotty(ps->tty_nr, &tty_maj, &tty_min);
   ttytostr(tty_maj, tty_min, ttystr, sizeof(ttystr));
 
-  /* Only print processes that are associated with
-   * a terminal and they are not session leaders */
+  /* only print processes that are associated with
+ * a terminal and they are not session leaders */
   if (flags & PS_aflag)
     if (ps->pid == ps->sid || ttystr[0] == '?')
       return;
@@ -56,17 +56,17 @@ psout(struct procstat *ps)
   if (parsestatus(ps->pid, &pstatus) < 0)
     return;
 
-  /* This is the default case, only print processes that have
-   * the same controlling terminal as the invoker and the same
-   * euid as the current user */
+  /* this is the default case, only print processes that have
+ * the same controlling terminal as the invoker and the same
+ * euid as the current user */
   if (!(flags & (PS_aflag | PS_Aflag | PS_dflag))) {
     myttystr = ttyname(0);
     if (myttystr) {
       if (strcmp(myttystr + strlen("/dev/"), ttystr))
         return;
     } else {
-      /* The invoker has no controlling terminal - just
-       * go ahead and print the processes anyway */
+      /* the invoker has no controlling terminal - just
+ * go ahead and print the processes anyway */
       ttystr[0] = '?';
       ttystr[1] = '\0';
     }
@@ -107,8 +107,8 @@ psout(struct procstat *ps)
     start += (ps->starttime / sysconf(_SC_CLK_TCK));
     strftime(stimestr, sizeof(stimestr), "%H:%M", localtime(&start));
 
-    /* For kthreads/zombies /proc/<pid>/cmdline will be
-     * empty so use ps->comm in that case */
+    /* for kthreads/zombies /proc/<pid>/cmdline will be
+ * empty so use ps->comm in that case */
     if (parsecmdline(ps->pid, cmdline, sizeof(cmdline)) < 0)
       cmd = ps->comm;
     else

@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 struct procstat {
   int                pid;
   char               comm[PATH_MAX + 2]; /* + 2 for '(' and ')' */

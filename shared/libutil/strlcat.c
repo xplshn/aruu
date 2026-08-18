@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
+ * copyright (c) 1998 todd c. miller <todd.miller@courtesan.com>
  *
- * Permission to use, copy, modify, and distribute this software for any
+ * permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * copyright notice and this permission notice appear in all copies
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
  * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
@@ -11,7 +11,7 @@
  * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
  * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE
  */
 
 #include <string.h>
@@ -20,11 +20,11 @@
 #include "../util.h"
 
 /*
- * Appends src to string dst of size siz (unlike strncat, siz is the
- * full size of dst, not space left). At most siz-1 characters
- * will be copied. Always NUL terminates (unless siz <= strlen(dst)).
- * Returns strlen(src) + MIN(siz, strlen(initial dst)).
- * If retval >= siz, truncation occurred.
+ * appends src to string dst of size siz (unlike strncat, siz is the
+ * full size of dst, not space left). at most siz-1 characters
+ * will be copied. always NUL terminates (unless siz <= strlen(dst))
+ * returns strlen(src) + min(siz, strlen(initial dst))
+ * if retval >= siz, truncation occurred
  */
 size_t
 strlcat(char *dst, const char *src, size_t siz)
@@ -33,7 +33,7 @@ strlcat(char *dst, const char *src, size_t siz)
   const char *s = src;
   size_t      n = siz;
   size_t      dlen;
-  /* Find the end of dst and adjust bytes left but don't go past end */
+  /* find the end of dst and adjust bytes left but dont go past end */
   while (n-- != 0 && *d != '\0')
     d++;
   dlen = d - dst;

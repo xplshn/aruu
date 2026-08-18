@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/mount.h>
 #include <sys/stat.h>
@@ -25,7 +25,7 @@ delete_content(const char *dir, dev_t curdevice)
   struct stat    st;
   struct dirent *dent;
 
-  /* don't dive into other filesystems */
+  /* dont dive into other filesystems */
   if (lstat(dir, &st) < 0 || st.st_dev != curdevice)
     return;
   if (!(d = opendir(dir)))
@@ -90,7 +90,7 @@ main(int argc, char *argv[])
   if (argc != 2 || getpid() != 1)
     usage();
 
-  /* chdir to newroot and make sure it's a different fs */
+  /* chdir to newroot and make sure its a different fs */
   if (chdir(argv[0]))
     eprintf("chdir %s:", argv[0]);
 

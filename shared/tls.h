@@ -7,8 +7,8 @@
 struct TlsSocket;
 
 /* tls_connect takes an already connected socket fd and upgrades it to tls
-   if check_cert is 0 certificate validation is bypassed
-   returns a new tls socket or null on error */
+ * if check_cert is 0 certificate validation is bypassed
+ * returns a new tls socket or null on error */
 struct TlsSocket *tlss_connect(int fd, const char *host, int check_cert, int is_tls);
 
 /* standard read and write wrapping either libtls, bearssl or plain fallback */

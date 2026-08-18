@@ -1,26 +1,26 @@
-/****************************************************************
-Copyright (C) Lucent Technologies 1997
-All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name Lucent Technologies or any of
-its entities not be used in advertising or publicity pertaining
-to distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
+/* ***************************************************************
+ * copyright (c) lucent technologies 1997
+ * all rights reserved
+ *
+ * permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose and without fee is hereby
+ * granted, provided that the above copyright notice appear in all
+ * copies and that both that the copyright notice and this
+ * permission notice and warranty disclaimer appear in supporting
+ * documentation, and that the name lucent technologies or any of
+ * its entities not be used in advertising or publicity pertaining
+ * to distribution of the software without specific, written prior
+ * permission
+ *
+ * LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE
+ * ************************************************************** */
 
 #define DEBUG
 #include "awk.h"
@@ -45,7 +45,7 @@ int   recsize = RECSIZE;
 char *fields;
 int   fieldssize = RECSIZE;
 
-Cell        **fldtab; /* pointers to Cells */
+Cell        **fldtab; /* pointers to cells */
 static size_t len_inputFS = 0;
 static char  *inputFS     = NULL; /* FS at time of input, for field splitting */
 
@@ -118,11 +118,11 @@ initgetrec(void)
 /*
  * POSIX specifies that fields are supposed to be evaluated as if they were
  * split using the value of FS at the time that the record's value ($0) was
- * read.
+ * read
  *
- * Since field-splitting is done lazily, we save the current value of FS
+ * since field-splitting is done lazily, we save the current value of FS
  * whenever a new record is read in (implicitly or via getline), or when
- * a new value is assigned to $0.
+ * a new value is assigned to $0
  */
 void
 savefs(void)
@@ -230,7 +230,7 @@ extern int readcsvrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag);
 int
 readrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag) /* read one record into buf */
 {
-  int   sep, c, isrec; // POTENTIAL BUG? isrec is a macro in awk.h
+  int   sep, c, isrec; /* potential bug? isrec is a macro in awk.h */
   char *rr = *pbuf, *buf = *pbuf;
   int   bufsize = *pbufsize;
   char *rs      = getsval(rsloc);
@@ -294,11 +294,11 @@ readrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag) /* read one record 
   return isrec;
 }
 
-/*******************
+/* ******************
  * loose ends here:
- *   \r\n should become \n
- *   what about bare \r?  Excel uses that for embedded newlines
- *   can't have "" in unquoted fields, according to RFC 4180
+ * \r\n should become \n
+ * what about bare \r? excel uses that for embedded newlines
+ * cant have "" in unquoted fields, according to RFC 4180
  */
 
 int
@@ -312,13 +312,13 @@ readcsvrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag) /* csv can have 
   bool  in_quote = false;
 
   sep = '\n'; /* the only separator; have to skip over \n embedded in
-           "..." */
+ * "..." */
   rr = buf;
   while ((c = getc(inf)) != EOF) {
     if (c == sep) {
       if (!in_quote)
         break;
-      if (rr > buf && rr[-1] == '\r') // remove \r if was \r\n
+      if (rr > buf && rr[-1] == '\r') /* remove \r if was \r\n */
         rr--;
     }
 
@@ -329,7 +329,7 @@ readcsvrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag) /* csv can have 
     if (c == '"')
       in_quote = !in_quote;
   }
-  if (c == '\n' && rr > buf && rr[-1] == '\r') // remove \r if was \r\n
+  if (c == '\n' && rr > buf && rr[-1] == '\r') /* remove \r if was \r\n */
     rr--;
 
   if (!adjbuf(&buf, &bufsize, 1 + rr - buf, recsize, &rr, "readcsvrec 4"))
@@ -342,7 +342,7 @@ readcsvrec(char **pbuf, int *pbufsize, FILE *inf, bool newflag) /* csv can have 
 }
 
 char *
-getargv(int n) /* get ARGV[n] */
+getargv(int n) /* get argv[n] */
 {
   Array       *ap;
   Cell        *x;
@@ -366,8 +366,8 @@ setclvar(char *s) /* set var=value from s */
   Cell  *q;
   double result;
 
-  /* commit f3d9187d4e0f02294fb1b0e31152070506314e67 broke T.argv test */
-  /* I don't understand why it was changed. */
+  /* commit f3d9187d4e0f02294fb1b0e31152070506314e67 broke t.argv test */
+  /* i dont understand why it was changed */
 
   for (p = s; *p != '='; p++)
     ;
@@ -411,7 +411,7 @@ fldbld(void) /* create fields from current record */
   i  = 0;              /* number of fields accumulated here */
   if (inputFS == NULL) /* make sure we have a copy of FS */
     savefs();
-  if (!CSV && strlen(inputFS) > 1) { /* it's a regular expression */
+  if (!CSV && strlen(inputFS) > 1) { /* its a regular expression */
     i = refldbld(r, inputFS);
   } else if (!CSV && (sep = *inputFS) == ' ') { /* default whitespace */
     for (i = 0;;) {
@@ -432,7 +432,7 @@ fldbld(void) /* create fields from current record */
       *fr++ = 0;
     }
     *fr = 0;
-  } else if (CSV) { /* CSV processing.  no error handling */
+  } else if (CSV) { /* CSV processing. no error handling */
     if (*r != 0) {
       for (;;) {
         i++;
@@ -446,11 +446,11 @@ fldbld(void) /* create fields from current record */
           for (r++; *r != '\0';) {
             if (*r == '"' && r[1] != '\0' && r[1] == '"') {
               r += 2; /* doubled quote
-                       */
+ */
               *fr++ = '"';
             } else if (*r == '"' && (r[1] == '\0' || r[1] == ',')) {
               r++; /* skip over
-                closing quote */
+ * closing quote */
               break;
             } else {
               *fr++ = *r++;
@@ -483,11 +483,11 @@ fldbld(void) /* create fields from current record */
       fldtab[i]->tval = FLD | STR;
     }
     *fr = 0;
-  } else if (*r != 0) { /* if 0, it's a null field */
-    /* subtle case: if length(FS) == 1 && length(RS > 0)
-     * \n is NOT a field separator (cf awk book 61,84).
-     * this variable is tested in the inner while loop.
-     */
+  } else if (*r != 0) { /* if 0, its a null field */
+    /* subtle case: if length(fs) == 1 && length(rs > 0)
+ * \n is NOT a field separator (cf awk book 61,84)
+ * this variable is tested in the inner while loop
+ */
     int rtest = '\n'; /* normal case */
     if (strlen(*RS) > 0)
       rtest = '\0';
@@ -590,7 +590,7 @@ growfldtab(int n) /* make new fields up to at least $n */
   if (n > nf)
     nf = n;
   s = (nf + 1) * (sizeof(struct Cell *));          /* freebsd: how much do we need? */
-  if (s / sizeof(struct Cell *) - 1 == (size_t)nf) /* didn't overflow */
+  if (s / sizeof(struct Cell *) - 1 == (size_t)nf) /* didnt overflow */
     fldtab = (Cell **)realloc(fldtab, s);
   else             /* overflow sizeof int */
     xfree(fldtab); /* make it null */
@@ -882,20 +882,20 @@ isclvar(const char *s) /* is s of form var=something ? */
 
 /* strtod is supposed to be a proper test of what's a valid number */
 /* appears to be broken in gcc on linux: thinks 0x123 is a valid FP number */
-/* wrong: violates 4.10.1.4 of ansi C standard */
+/* wrong: violates 4.10.1.4 of ansi c standard */
 
-/* well, not quite. As of C99, hex floating point is allowed. so this is
- * a bit of a mess. We work around the mess by checking for a hexadecimal
- * value and disallowing it. Similarly, we now follow gawk and allow only
- * +nan, -nan, +inf, and -inf for NaN and infinity values.
+/* well, not quite. as of C99, hex floating point is allowed. so this is
+ * a bit of a mess. we work around the mess by checking for a hexadecimal
+ * value and disallowing it. similarly, we now follow gawk and allow only
+ * +nan, -nan, +inf, and -inf for nan and infinity values
  */
 
 /*
- * This routine now has a more complicated interface, the main point
+ * this routine now has a more complicated interface, the main point
  * being to avoid the double conversion of a string to double, and
  * also to convey out, if requested, the information that the numeric
- * value was a leading string or is all of the string. The latter bit
- * is used in getfval().
+ * value was a leading string or is all of the string. the latter bit
+ * is used in getfval()
  */
 
 bool
@@ -941,8 +941,8 @@ convert:
     *result = r;
 
   /*
-   * check for trailing stuff
-   */
+ * check for trailing stuff
+ */
   while (isspace((int)*ep))
     ep++;
 

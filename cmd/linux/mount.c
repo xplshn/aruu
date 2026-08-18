@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/mount.h>
 #include <sys/stat.h>
@@ -322,8 +322,8 @@ mountall:
     }
     parseopts(fsopts, &flags, data, sizeof(data));
     /* if -t types specified:
-     * if non-match, skip
-     * if match and prefixed with "no", skip */
+ * if non-match, skip
+ * if match and prefixed with "no", skip */
     if (types
         && ((types[0] == 'n' && types[1] == 'o' && findtype(types + 2, me->mnt_type))
             || (!findtype(types, me->mnt_type))))

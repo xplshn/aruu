@@ -1,28 +1,28 @@
-/****************************************************************
-Copyright (C) Lucent Technologies 1997
-All Rights Reserved
+/* ***************************************************************
+ * copyright (c) lucent technologies 1997
+ * all rights reserved
+ *
+ * permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose and without fee is hereby
+ * granted, provided that the above copyright notice appear in all
+ * copies and that both that the copyright notice and this
+ * permission notice and warranty disclaimer appear in supporting
+ * documentation, and that the name lucent technologies or any of
+ * its entities not be used in advertising or publicity pertaining
+ * to distribution of the software without specific, written prior
+ * permission
+ *
+ * LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE
+ * ************************************************************** */
 
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name Lucent Technologies or any of
-its entities not be used in advertising or publicity pertaining
-to distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
-
-/* lasciate ogne speranza, voi ch'intrate. */
+/* lasciate ogne speranza, voi ch'intrate */
 
 #define DEBUG
 
@@ -55,13 +55,13 @@ THIS SOFTWARE.
   case PLUS:                                                                                       \
   case QUEST:
 
-/* encoding in tree Nodes:
-  leaf (CCL, NCCL, CHAR, DOT, FINAL, ALL, EMPTYRE):
-    left is index, right contains value or pointer to value
-  unary (STAR, PLUS, QUEST): left is child, right is null
-  binary (CAT, OR): left and right are children
-  parent contains pointer to parent
-*/
+/* encoding in tree nodes:
+ * leaf (CCL, NCCL, CHAR, DOT, FINAL, ALL, EMPTYRE):
+ * left is index, right contains value or pointer to value
+ * unary (STAR, PLUS, QUEST): left is child, right is null
+ * binary (CAT, OR): left and right are children
+ * parent contains pointer to parent
+ */
 
 int *setvec;
 int *tmpset;
@@ -72,10 +72,10 @@ int                  rlxval;
 static const uschar *rlxstr;
 static const uschar *prestr;   /* current position in current re */
 static const uschar *lastre;   /* origin of last re */
-static const uschar *lastatom; /* origin of last Atom */
+static const uschar *lastatom; /* origin of last atom */
 static const uschar *starttok;
 static const uschar *basestr; /* starts with original, replaced during
-       repetition processing */
+ * repetition processing */
 static const uschar *firstbasestr;
 
 static int setcnt;
@@ -91,32 +91,32 @@ int nfatab = 0; /* entries in fatab */
 extern int u8_nextlen(const char *s);
 
 /* utf-8 mechanism:
-
-   For most of Awk, utf-8 strings just "work", since they look like
-   null-terminated sequences of 8-bit bytes.
-
-   Functions like length(), index(), and substr() have to operate
-   in units of utf-8 characters.  The u8_* functions in run.c
-   handle this.
-
-   Regular expressions are more complicated, since the basic
-   mechanism of the goto table used 8-bit byte indices into the
-   gototab entries to compute the next state.  Unicode is a lot
-   bigger, so the gototab entries are now structs with a character
-   and a next state. These are sorted by code point and binary
-   searched.
-
-   Throughout the RE mechanism in b.c, utf-8 characters are
-   converted to their utf-32 value.  This mostly shows up in
-   cclenter, which expands character class ranges like a-z and now
-   alpha-omega.  The size of a gototab array is still about 256.
-   This should be dynamic, but for now things work ok for a single
-   code page of Unicode, which is the most likely case.
-
-   The code changes are localized in run.c and b.c.  I have added a
-   handful of functions to somewhat better hide the implementation,
-   but a lot more could be done.
-
+ *
+ * for most of awk, utf-8 strings just "work", since they look like
+ * null-terminated sequences of 8-bit bytes
+ *
+ * functions like length(), index(), and substr() have to operate
+ * in units of utf-8 characters. the u8_* functions in run.c
+ * handle this
+ *
+ * regular expressions are more complicated, since the basic
+ * mechanism of the goto table used 8-bit byte indices into the
+ * gototab entries to compute the next state. unicode is a lot
+ * bigger, so the gototab entries are now structs with a character
+ * and a next state. these are sorted by code point and binary
+ * searched
+ *
+ * throughout the RE mechanism in b.c, utf-8 characters are
+ * converted to their utf-32 value. this mostly shows up in
+ * cclenter, which expands character class ranges like a-z and now
+ * alpha-omega. the size of a gototab array is still about 256
+ * this should be dynamic, but for now things work ok for a single
+ * code page of unicode, which is the most likely case
+ *
+ * the code changes are localized in run.c and b.c. i have added a
+ * handful of functions to somewhat better hide the implementation,
+ * but a lot more could be done
+ *
  */
 
 static int  entry_cmp(const void *l, const void *r);
@@ -240,9 +240,9 @@ mkdfa(const char *s, bool anchor) /* does the real work of making a dfa */
   basestr      = firstbasestr;
   p            = reparse(s);
   p1           = op2(CAT, op2(STAR, op2(ALL, NIL, NIL), NIL), p);
-  /* put ALL STAR in front of reg.  exp. */
+  /* put ALL STAR in front of reg. exp */
   p1 = op2(CAT, p1, op2(FINAL, NIL, NIL));
-  /* put FINAL after reg.  exp. */
+  /* put FINAL after reg. exp */
 
   poscnt = 0;
   penter(p1); /* enter parent pointers and leaf indices */
@@ -316,7 +316,7 @@ penter(Node *p) /* set up parent pointers and leaf indices */
       break;
     case ZERO:
       break;
-    default: /* can't happen */
+    default: /* cant happen */
       FATAL("can't happen: unknown type %d in penter", type(p));
       break;
   }
@@ -340,14 +340,14 @@ freetr(Node *p) /* free parse tree */
       freetr(right(p));
       xfree(p);
       break;
-    default: /* can't happen */
+    default: /* cant happen */
       FATAL("can't happen: unknown type %d in freetr", type(p));
       break;
   }
 }
 
 /* in the parsing of regular expressions, metacharacters like . have */
-/* to be seen literally;  \056 is not a metacharacter. */
+/* to be seen literally; \056 is not a metacharacter */
 
 int
 hexstr(const uschar **pp, int max) /* find and eval hex string at pp, return new p */
@@ -452,7 +452,7 @@ cclenter(const char *argp) /* add a character class */
         p += n;
         if (c2 == '\\')
           c2 = quoted(&p); /* BUG: sets p, has to
-                  be u8 size */
+ * be u8 size */
         if (c > c2) {      /* empty; ignore */
           bp--;
           i--;
@@ -493,9 +493,9 @@ cclenter(const char *argp) /* add a character class */
     i++;
   }
   *bp = 0;
-  /* DPRINTF("cclenter: in = |%s|, out = |%s|\n", op, buf); BUG: can't
-   * print array of int */
-  /* xfree(op);  BUG: what are we freeing here? */
+  /* dprintf("cclenter: in = |%s|, out = |%s|\n", op, buf); BUG: cant
+ * print array of int */
+  /* xfree(op); BUG: what are we freeing here? */
   retp = (int *)calloc(bp - buf + 1, sizeof(int));
   for (i = 0; i < bp - buf + 1; i++)
     retp[i] = buf[i];
@@ -510,7 +510,7 @@ overflo(const char *s)
 
 void
 cfoll(fa *f, Node *v) /* enter follow set of each leaf of vertex v into
-       lfollow[leaf] */
+ * lfollow[leaf] */
 {
   int  i;
   int *p;
@@ -543,7 +543,7 @@ cfoll(fa *f, Node *v) /* enter follow set of each leaf of vertex v into
       break;
     case ZERO:
       break;
-    default: /* can't happen */
+    default: /* cant happen */
       FATAL("can't happen: unknown type %d in cfoll", type(v));
   }
 }
@@ -591,7 +591,7 @@ first(Node *p) /* collects initially active leaves of p into setvec */
     case ZERO:
       return 0;
   }
-  FATAL("can't happen: unknown type %d in first", type(p)); /* can't happen */
+  FATAL("can't happen: unknown type %d in first", type(p)); /* cant happen */
   return (-1);
 }
 
@@ -646,11 +646,11 @@ resize_gototab(fa *f, int state)
   if (p == NULL)
     overflo(__func__);
 
-  // need to initialize the new memory to zero
-  size_t orig_size = f->gototab[state].allocated;     // 2nd half of new mem is this size
-  memset(p + orig_size, 0, orig_size * sizeof(gtte)); // clean it out
+  /* need to initialize the new memory to zero */
+  size_t orig_size = f->gototab[state].allocated;     /* 2nd half of new mem is this size */
+  memset(p + orig_size, 0, orig_size * sizeof(gtte)); /* clean it out */
 
-  f->gototab[state].allocated = new_size; // update gototab info
+  f->gototab[state].allocated = new_size; /* update gototab info */
   f->gototab[state].entries   = p;
 }
 
@@ -700,7 +700,7 @@ set_gototab(fa *f, int state, int ch, int val) /* hide gototab implementation */
     f->gototab[state].inuse++;
     return val;
   } else if ((unsigned)ch > f->gototab[state].entries[f->gototab[state].inuse - 1].ch) {
-    // not seen yet, insert and return
+    /* not seen yet, insert and return */
     gtt *tab = &f->gototab[state];
     if (tab->inuse + 1 >= tab->allocated)
       resize_gototab(f, state);
@@ -710,7 +710,7 @@ set_gototab(fa *f, int state, int ch, int val) /* hide gototab implementation */
     f->gototab[state].inuse++;
     return val;
   } else {
-    // maybe we have it, maybe we don't
+    /* maybe we have it, maybe we dont */
     gtte  key;
     gtte *item;
 
@@ -721,11 +721,11 @@ set_gototab(fa *f, int state, int ch, int val) /* hide gototab implementation */
     );
 
     if (item != NULL) {
-      // we have it, update state and return
+      /* we have it, update state and return */
       item->state = val;
       return item->state;
     }
-    // otherwise, fall through to insert and reallocate.
+    /* otherwise, fall through to insert and reallocate */
   }
 
   gtt *tab = &f->gototab[state];
@@ -820,7 +820,7 @@ pmatch(fa *f, const char *p0) /* longest match, for sub */
     } while (1);
     q++; /* was *q++ */
     if (f->out[s])
-      patlen = q - p - 1; /* don't count $ */
+      patlen = q - p - 1; /* dont count $ */
     if (patlen >= 0) {
       patbeg = (const char *)p;
       return (1);
@@ -873,7 +873,7 @@ nematch(fa *f, const char *p0) /* non-empty match, for sub */
     } while (1);
     q++;
     if (f->out[s])
-      patlen = q - p - 1; /* don't count $ */
+      patlen = q - p - 1; /* dont count $ */
     if (patlen > 0) {
       patbeg = (const char *)p;
       return (1);
@@ -887,17 +887,17 @@ nematch(fa *f, const char *p0) /* non-empty match, for sub */
 
 /*
  * NAME
- *     fnematch
+ * fnematch
  *
  * DESCRIPTION
- *     A stream-fed version of nematch which transfers characters to a
- *     null-terminated buffer. All characters up to and including the last
- *     character of the matching text or EOF are placed in the buffer. If
- *     a match is found, patbeg and patlen are set appropriately.
+ * a stream-fed version of nematch which transfers characters to a
+ * null-terminated buffer. all characters up to and including the last
+ * character of the matching text or EOF are placed in the buffer. if
+ * a match is found, patbeg and patlen are set appropriately
  *
  * RETURN VALUES
- *     false    No match found.
- *     true     Match found.
+ * false no match found
+ * true match found
  */
 
 bool
@@ -911,20 +911,20 @@ fnematch(fa *pfa, FILE *f, char **pbuf, int *pbufsize, int quantum)
   patlen = 0;
 
   /*
-   * buf <= i <= j <= k <= buf+bufsize
-   *
-   * i: origin of active substring
-   * j: current character
-   * k: destination of the next getc
-   */
+ * buf <= i <= j <= k <= buf+bufsize
+ *
+ * i: origin of active substring
+ * j: current character
+ * k: destination of the next getc
+ */
 
   i = j = k = buf;
 
   do {
     /*
-     * Call u8_rune with at least awk_mb_cur_max ahead in
-     * the buffer until EOF interferes.
-     */
+ * call u8_rune with at least awk_mb_cur_max ahead in
+ * the buffer until EOF interferes
+ */
     if (k - j < (int)awk_mb_cur_max) {
       if (k + awk_mb_cur_max > buf + bufsize) {
         char *obuf = buf;
@@ -961,7 +961,7 @@ fnematch(fa *pfa, FILE *f, char **pbuf, int *pbufsize, int quantum)
     if (pfa->out[s]) { /* final state */
       patbeg = i;
       patlen = j - i;
-      if (c == 0) /* don't count $ */
+      if (c == 0) /* dont count $ */
         patlen--;
     }
 
@@ -980,16 +980,16 @@ fnematch(fa *pfa, FILE *f, char **pbuf, int *pbufsize, int quantum)
 
   if (patlen) {
     /*
-     * Under no circumstances is the last character fed to
-     * the automaton part of the match. It is EOF's nullbyte,
-     * or it sent the automaton into a state with no further
-     * transitions available (s==1), or both. Room for a
-     * terminating nullbyte is guaranteed.
-     *
-     * ungetc any chars after the end of matching text
-     * (except for EOF's nullbyte, if present) and null
-     * terminate the buffer.
-     */
+ * under no circumstances is the last character fed to
+ * the automaton part of the match. it is eof's nullbyte,
+ * or it sent the automaton into a state with no further
+ * transitions available (s==1), or both. room for a
+ * terminating nullbyte is guaranteed
+ *
+ * ungetc any chars after the end of matching text
+ * (except for eof's nullbyte, if present) and null
+ * terminate the buffer
+ */
     do
       if (*--k && ungetc(*k, f) == EOF)
         FATAL("unable to ungetc '%c'", *k);
@@ -1010,7 +1010,7 @@ reparse(const char *p) /* parses regular expression pointed to by p */
   rtok            = relex();
   /* GNU compatibility: an empty regexp matches anything */
   if (rtok == '\0') {
-    /* FATAL("empty regular expression"); previous */
+    /* fatal("empty regular expression"); previous */
     return (op2(EMPTYRE, NIL, NIL));
   }
   np = regexp();
@@ -1065,7 +1065,7 @@ primary(void)
       return (unary(op2(CHAR, NIL, NIL)));
     case '(':
       lastatom     = starttok;
-      savelastatom = starttok - basestr; /* Retain over recursion */
+      savelastatom = starttok - basestr; /* retain over recursion */
       rtok         = relex();
       if (rtok == ')') { /* special pleading for () */
         rtok = relex();
@@ -1073,7 +1073,7 @@ primary(void)
       }
       np = regexp();
       if (rtok == ')') {
-        lastatom = basestr + savelastatom; /* Restore */
+        lastatom = basestr + savelastatom; /* restore */
         rtok     = relex();
         return (unary(np));
       } else {
@@ -1083,7 +1083,7 @@ primary(void)
     default:
       FATAL("illegal primary in regular expression %s at %s", lastre, prestr);
   }
-  return 0; /*NOTREACHED*/
+  return 0; /* NOTREACHED */
 }
 
 Node *
@@ -1137,23 +1137,23 @@ unary(Node *np)
 }
 
 /*
- * Character class definitions conformant to the POSIX locale as
- * defined in IEEE P1003.1 draft 7 of June 2001, assuming the source
+ * character class definitions conformant to the POSIX locale as
+ * defined in IEEE P1003.1 draft 7 of june 2001, assuming the source
  * and operating character sets are both ASCII (ISO646) or supersets
- * thereof.
+ * thereof
  *
- * Note that to avoid overflowing the temporary buffer used in
+ * note that to avoid overflowing the temporary buffer used in
  * relex(), the expanded character class (prior to range expansion)
- * must be less than twice the size of their full name.
+ * must be less than twice the size of their full name
  */
 
-/* Because isblank doesn't show up in any of the header files on any
- * system i use, it's defined here.  if some other locale has a richer
+/* because isblank doesnt show up in any of the header files on any
+ * system i use, its defined here. if some other locale has a richer
  * definition of "blank", define HAS_ISBLANK and provide your own
- * version.
+ * version
  * the parentheses here are an attempt to find a path through the maze
- * of macro definition and/or function and/or version provided.  thanks
- * to nelson beebe for the suggestion; let's see if it works everywhere.
+ * of macro definition and/or function and/or version provided. thanks
+ * to nelson beebe for the suggestion; let's see if it works everywhere
  */
 
 /* #define HAS_ISBLANK */
@@ -1210,17 +1210,17 @@ replace_repeat(
   uschar *buf           = 0;
   int     ret           = 1;
   int     init_q        = (firstnum == 0);      /* first added char will be ? */
-  int     n_q_reps      = secondnum - firstnum; /* m>n, so reduce until {1,m-n} left  */
+  int     n_q_reps      = secondnum - firstnum; /* m>n, so reduce until {1,m-n} left */
   int     prefix_length = reptok - basestr;     /* prefix includes first rep
-                                                 */
-  int suffix_length = strlen((const char *)reptok) - reptoklen; /* string after rep specifier	*/
+ */
+  int suffix_length = strlen((const char *)reptok) - reptoklen; /* string after rep specifier */
   int size          = prefix_length + suffix_length;
 
   if (firstnum > 1) { /* add room for reps 2 through firstnum */
     size += atomlen * (firstnum - 1);
   }
 
-  /* Adjust size of buffer for special cases */
+  /* adjust size of buffer for special cases */
   if (special_case == REPEAT_PLUS_APPENDED) {
     size++; /* for the final + */
   } else if (special_case == REPEAT_WITH_Q) {
@@ -1230,14 +1230,14 @@ replace_repeat(
   }
   if ((buf = (uschar *)malloc(size + 1)) == NULL)
     FATAL("out of space in reg expr %.10s..", lastre);
-  memcpy(buf, basestr, prefix_length); /* copy prefix	*/
+  memcpy(buf, basestr, prefix_length); /* copy prefix */
   j = prefix_length;
   if (special_case == REPEAT_ZERO) {
     j -= atomlen;
     buf[j++] = '(';
     buf[j++] = ')';
   }
-  for (i = 1; i < firstnum; i++) { /* copy x reps 	*/
+  for (i = 1; i < firstnum; i++) { /* copy x reps */
     memcpy(&buf[j], atom, atomlen);
     j += atomlen;
   }
@@ -1283,12 +1283,12 @@ repeat(
     return 0;
 
   /*
-     In general, the repetition specifier or "bound" is replaced here
-     by an equivalent ERE string, repeating the immediately previous atom
-     and appending ? and + as needed. Note that the first copy of the
-     atom is left in place, except in the special_case of a zero-repeat
-     (i.e., {0}).
-   */
+ * in general, the repetition specifier or "bound" is replaced here
+ * by an equivalent ERE string, repeating the immediately previous atom
+ * and appending ? and + as needed. note that the first copy of the
+ * atom is left in place, except in the special_case of a zero-repeat
+ * (i.e., {0})
+ */
   if (secondnum < 0) { /* means {n,} -> repeat n-1 times followed by PLUS */
     if (firstnum < 2) {
       /* 0 or 1: should be handled before you get here */
@@ -1300,17 +1300,17 @@ repeat(
     }
   } else if (firstnum == secondnum) { /* {n} or {n,n} -> simply repeat n-1 times */
     if (firstnum == 0) {              /* {0} or {0,0} */
-      /* This case is unusual because the resulting
-         replacement string might actually be SMALLER than
-         the original ERE */
+      /* this case is unusual because the resulting
+ * replacement string might actually be SMALLER than
+ * the original ERE */
       return replace_repeat(reptok, reptoklen, atom, atomlen, firstnum, secondnum, REPEAT_ZERO);
     } else { /* (firstnum >= 1) */
       return replace_repeat(reptok, reptoklen, atom, atomlen, firstnum, secondnum, REPEAT_SIMPLE);
     }
-  } else if (firstnum < secondnum) { /* {n,m} -> repeat n-1 times then alternate  */
-    /*  x{n,m}  =>  xx...x{1, m-n+1}  =>  xx...x?x?x?..x?	*/
+  } else if (firstnum < secondnum) { /* {n,m} -> repeat n-1 times then alternate */
+    /* x{n,m} => xx...x{1, m-n+1} => xx...x?x?x?..x? */
     return replace_repeat(reptok, reptoklen, atom, atomlen, firstnum, secondnum, REPEAT_WITH_Q);
-  } else { /* Error - shouldn't be here (n>m) */
+  } else { /* error - shouldnt be here (n>m) */
     FATAL("internal error");
   }
   return 0;
@@ -1383,7 +1383,7 @@ rescan:
         prestr++;
       } else
         cflag = 0;
-      n = 5 * strlen((const char *)prestr) + 1; /* BUG: was 2.  what value? */
+      n = 5 * strlen((const char *)prestr) + 1; /* BUG: was 2. what value? */
       if (!adjbuf((char **)&buf, &bufsz, n, n, (char **)&bp, "relex1"))
         FATAL("out of space for reg expr %.10s...", lastre);
       for (;;) {
@@ -1402,11 +1402,11 @@ rescan:
             );
           *bp++ = c;
           /* } else if (c == '\n') { */
-          /* 	FATAL("newline in character class
-           * %.20s...", lastre); */
+          /* fatal("newline in character class
+ * %.20s...", lastre); */
         } else if (c == '[' && *prestr == ':') {
-          /* POSIX char class names, Dag-Erling Smorgrav,
-           * des@ofug.org */
+          /* POSIX char class names, dag-erling smorgrav,
+ * des@ofug.org */
           for (cc = charclasses; cc->cc_name; cc++)
             if (strncmp((const char *)prestr + 1, (const char *)cc->cc_name, cc->cc_namelen) == 0)
               break;
@@ -1414,14 +1414,14 @@ rescan:
               && prestr[2 + cc->cc_namelen] == ']') {
             prestr += cc->cc_namelen + 3;
             /*
-             * BUG: We begin at 1, instead of 0,
-             * since we would otherwise prematurely
-             * terminate the string for classes like
-             * [[:cntrl:]]. This means that we can't
-             * match the NUL character, not without
-             * first adapting the entire program to
-             * track each string's length.
-             */
+ * BUG: we begin at 1, instead of 0,
+ * since we would otherwise prematurely
+ * terminate the string for classes like
+ * [[:cntrl:]]. this means that we cant
+ * match the NUL character, not without
+ * first adapting the entire program to
+ * track each string's length
+ */
             for (i = 1; i <= UCHAR_MAX; i++) {
               if (!adjbuf((char **)&buf, &bufsz, bp - buf + 2, 100, (char **)&bp, "relex2"))
                 FATAL(
@@ -1449,11 +1449,11 @@ rescan:
           collate_char = *prestr++;
           if (*prestr == '.' && prestr[1] == ']') {
             prestr += 2;
-            /* Found it: map via locale TBD: for
-               now, simply return this char.  This
-               is sufficient to pass conformance
-               test awk.ex 156
-             */
+            /* found it: map via locale TBD: for
+ * now, simply return this char. this
+ * is sufficient to pass conformance
+ * test awk.ex 156
+ */
             if (*prestr == ']') {
               prestr++;
               rlxval = collate_char;
@@ -1466,11 +1466,11 @@ rescan:
           equiv_char = *prestr++;
           if (*prestr == '=' && prestr[1] == ']') {
             prestr += 2;
-            /* Found it: map via locale TBD: for now
-               simply return this char. This is
-               sufficient to pass conformance test
-               awk.ex 156
-             */
+            /* found it: map via locale TBD: for now
+ * simply return this char. this is
+ * sufficient to pass conformance test
+ * awk.ex 156
+ */
             if (*prestr == ']') {
               prestr++;
               rlxval = equiv_char;
@@ -1494,13 +1494,13 @@ rescan:
       break;
     case '{':
       if (isdigit((int)*(prestr))) {
-        num         = 0; /* Process as a repetition */
+        num         = 0; /* process as a repetition */
         n           = -1;
         m           = -1;
         commafound  = false;
         digitfound  = false;
         startreptok = prestr - 1;
-        /* Remember start of previous atom here ? */
+        /* remember start of previous atom here ? */
       } else { /* just a { char, not a repetition */
         rlxval = c;
         return CHAR;
@@ -1529,7 +1529,7 @@ rescan:
             }
           } else {
             if (digitfound) { /* {n} same as {n,n}
-                               */
+ */
               n = num;
               m = num;
             } else { /* {} */
@@ -1547,8 +1547,8 @@ rescan:
             /* must rescan input for next token */
             goto rescan;
           }
-          /* Failed to replace: eat up {...} characters
-             and treat like just PLUS */
+          /* failed to replace: eat up {...} characters
+ * and treat like just PLUS */
           return PLUS;
         } else if (c == '\0') {
           FATAL("nonterminated character class %.20s", lastre);
@@ -1591,7 +1591,7 @@ cgoto(fa *f, int s, int c)
   int *p, *q;
   int  i, j, k;
 
-  /* assert(c == HAT || c < NCHARS);  BUG: seg fault if disable test */
+  /* assert(c == HAT || c < NCHARS); BUG: seg fault if disable test */
   while (f->accept >= maxsetvec) { /* guessing here! */
     resizesetvec(__func__);
   }

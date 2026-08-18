@@ -101,8 +101,8 @@ resolve_member_path(const char *w)
   return r;
 }
 
-/* META.TARGET applies META overrides then resolves TARGET.
- * META alone applies META then falls back to (group default).
+/* META.TARGET applies META overrides then resolves TARGET
+ * META alone applies META then falls back to (group default)
  * anything else is a plain group or rule name */
 void
 resolve_wanted(const char *w)
@@ -140,8 +140,8 @@ resolve_wanted(const char *w)
   }
 
   /* a rule that declared (member ...) does not resolve by bare name
-   * from the command line, only through GROUP/ALIAS or transitively
-   * via its owning group ref list */
+ * from the command line, only through GROUP/ALIAS or transitively
+ * via its owning group ref list */
   {
     struct Rule *br = rule_find(w);
     if (br && br->member_of[0])

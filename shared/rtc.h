@@ -1,7 +1,7 @@
 /*
- * The struct used to pass data via the following ioctl. Similar to the
+ * the struct used to pass data via the following ioctl. similar to the
  * struct tm in <time.h>, but it needs to be here so that the kernel
- * source is self contained, allowing cross-compiles, etc. etc.
+ * source is self contained, allowing cross-compiles, etc. etc
  */
 
 struct rtc_time {
@@ -16,5 +16,5 @@ struct rtc_time {
   int tm_isdst;
 };
 
-#define RTC_RD_TIME  _IOR('p', 0x09, struct rtc_time) /* Read RTC time   */
-#define RTC_SET_TIME _IOW('p', 0x0a, struct rtc_time) /* Set RTC time    */
+#define RTC_RD_TIME  _IOR('p', 0x09, struct rtc_time) /* read RTC time */
+#define RTC_SET_TIME _IOW('p', 0x0a, struct rtc_time) /* set RTC time */

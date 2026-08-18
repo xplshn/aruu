@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <stdlib.h>
 
@@ -137,7 +137,7 @@ makeset(char *str, struct range **set, unsigned *checks)
         eprintf("Invalid character class.\n");
       }
 
-      /* REPEAT  [_*n] (only allowed in set2) */
+      /* REPEAT [_*n] (only allowed in set2) */
       if (j - i > 2 && rstr[i + 2] == '*') {
         /* check if right side of '*' is a number */
         q      = 0;

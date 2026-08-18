@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <ctype.h>
 #include <fcntl.h>
@@ -71,9 +71,17 @@ ucase(unsigned char *buf, size_t len)
     buf[0] = toupper(buf[0]);
 }
 
+enum Status {
+  STATUS_DEFAULT,
+  STATUS_NOXFER,
+  STATUS_NONE,
+};
+
 static void
-summary(void)
+summary(enum Status status)
 {
+  if (status == STATUS_NONE)
+    return;
   fprintf(stderr, "%" PRIdMAX "+%" PRIdMAX " records in\n", (intmax_t)ifull, (intmax_t)ipart);
   fprintf(stderr, "%" PRIdMAX "+%" PRIdMAX " records out\n", (intmax_t)ofull, (intmax_t)opart);
 }
@@ -92,6 +100,7 @@ main(int argc, char *argv[])
     NOTRUNC = 1 << 4,
     SYNC    = 1 << 5,
   } conv = 0;
+  enum Status    status = STATUS_DEFAULT;
   char          *arg, *val, *end;
   const char    *iname = "-", *oname = "-";
   int            ifd = 0, ofd = 1, eof = 0;
@@ -123,6 +132,13 @@ main(int argc, char *argv[])
       seek = estrtonum(val, 0, LLONG_MAX);
     } else if (strcmp(arg, "count") == 0) {
       count = estrtonum(val, 0, LLONG_MAX);
+    } else if (strcmp(arg, "status") == 0) {
+      if (strcmp(val, "none") == 0)
+        status = STATUS_NONE;
+      else if (strcmp(val, "noxfer") == 0)
+        status = STATUS_NOXFER;
+      else
+        eprintf("unknown status level '%s'\n", val);
     } else if (strcmp(arg, "conv") == 0) {
       do {
         end = strchr(val, ',');
@@ -198,7 +214,7 @@ main(int argc, char *argv[])
         weprintf("read:");
         if (!(conv & NOERROR))
           return 1;
-        summary();
+        summary(status);
         if (!(conv & SYNC))
           continue;
         ret = 0;
@@ -241,7 +257,7 @@ main(int argc, char *argv[])
     ipos -= opos;
     opos = 0;
   }
-  summary();
+  summary(status);
 
   return 0;
 }

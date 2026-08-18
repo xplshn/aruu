@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #ifndef ARUU_DIFFUTIL_H
 #define ARUU_DIFFUTIL_H
 

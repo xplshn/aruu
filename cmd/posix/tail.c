@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/stat.h>
 
@@ -49,9 +49,9 @@ dropinit(int fd, const char *fname, size_t count)
         for (p = buf; count && n > 0; p += nr, n -= nr, count--) {
           nr = charntorune(&r, p, n);
           if (!nr) {
-            /* we don't have a full rune, move
-             * remaining data to beginning and read
-             * again */
+            /* we dont have a full rune, move
+ * remaining data to beginning and read
+ * again */
             memmove(buf, p, n);
             break;
           }
@@ -109,7 +109,7 @@ taketail(int fd, const char *fname, size_t count)
         // ?man -n: print line numbers or counts
       case 'n': /* lines */
         /* ignore the last character; if it is a newline, it
-         * ends the last line */
+ * ends the last line */
         for (p = buf + len - 2, left = count; p >= buf; p--) {
           if (*p != '\n')
             continue;

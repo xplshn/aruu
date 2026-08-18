@@ -1,39 +1,39 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright 2018 Staysail Systems, Inc. <info@staysail.tech>
- * Copyright 2014 Garrett D'Amore <garrett@damore.org>
- * Copyright 2010 Nexenta Systems, Inc.  All rights reserved.
- * Copyright (c) 1989, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright 2018 staysail systems, inc. <info@staysail.tech>
+ * copyright 2014 garrett d'amore <garrett@damore.org>
+ * copyright 2010 nexenta systems, inc. all rights reserved
+ * copyright (c) 1989, 1993
+ * the regents of the university of california. all rights reserved
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 /*
- * Important: This file is used both as a standalone program /usr/bin/printf
- * and as a builtin for /bin/sh (#define SHELL).
+ * important: this file is used both as a standalone program /usr/bin/printf
+ * and as a builtin for /bin/sh (#define SHELL)
  */
 
 #include <sys/types.h>
@@ -126,13 +126,13 @@ main(int argc, char *argv[])
   INTOFF;
 #endif
   /*
-   * Basic algorithm is to scan the format string for conversion
-   * specifications -- once one is found, find out if the field
-   * width or precision is a '*'; if it is, gather up value.  Note,
-   * format strings are reused as necessary to use up the provided
-   * arguments, arguments of zero/null string are provided to use
-   * up the format string.
-   */
+ * basic algorithm is to scan the format string for conversion
+ * specifications, once one is found, find out if the field
+ * width or precision is a '*'; if it is, gather up value. note,
+ * format strings are reused as necessary to use up the provided
+ * arguments, arguments of zero/null string are provided to use
+ * up the format string
+ */
   fmt = format = *argv;
   escape(fmt, 1, &len); /* backslash interpretation */
   rval = end = 0;
@@ -184,7 +184,7 @@ main(int argc, char *argv[])
 #endif
       return (rval);
     }
-    /* Restart at the beginning of the format string. */
+    /* restart at the beginning of the format string */
     fmt = format;
     end = 1;
   }
@@ -322,15 +322,15 @@ printf_doformat(char *fmt, int *rval)
   *dptr   = 0;
 
   /*
-   * Look for a length modifier.  POSIX doesn't have these, so
-   * we only support them for floating-point conversions, which
-   * are extensions.  This is useful because the L modifier can
-   * be used to gain extra range and precision, while omitting
-   * it is more likely to produce consistent results on different
-   * architectures.  This is not so important for integers
-   * because overflow is the only bad thing that can happen to
-   * them, but consider the command  printf %a 1.1
-   */
+ * look for a length modifier. POSIX doesnt have these, so
+ * we only support them for floating-point conversions, which
+ * are extensions. this is useful because the l modifier can
+ * be used to gain extra range and precision, while omitting
+ * it is more likely to produce consistent results on different
+ * architectures. this is not so important for integers
+ * because overflow is the only bad thing that can happen to
+ * them, but consider the command printf %a 1.1
+ */
   if (*fmt == 'L') {
     mod_ldbl = 1;
     fmt++;
@@ -357,7 +357,7 @@ printf_doformat(char *fmt, int *rval)
       char  *p;
       int    getout;
 
-      /* Convert "b" to "s" for output. */
+      /* convert "b" to "s" for output */
       start[strlen(start) - 1] = 's';
       if ((p = strdup(getstr())) == NULL) {
         warnx("%s", strerror(ENOMEM));
@@ -365,7 +365,7 @@ printf_doformat(char *fmt, int *rval)
       }
       getout = escape(p, 0, &len);
       PF(start, p);
-      /* Restore format for next loop. */
+      /* restore format for next loop */
 
       free(p);
       if (getout)

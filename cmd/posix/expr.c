@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <limits.h>
 #include <stdio.h>
@@ -238,7 +238,7 @@ parse(char *expr[], int numexpr)
     switch ((type = lex(*expr, &v))) {
       case VAL:
         /* treatment of *expr is not known until
-         * doop(); treat as a string for now */
+ * doop(); treat as a string for now */
         valp->str = *expr;
         valp++;
         break;

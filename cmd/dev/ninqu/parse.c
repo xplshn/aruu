@@ -27,7 +27,7 @@ sole_atom(struct SNode *node, const char *msg)
 }
 
 /* a dep operand is a bare atom, a (rule NAME) stored as @NAME, or
- * an (after X...) whose operands are order-only */
+ * an (after x...) whose operands are order-only */
 static void
 parse_dep_item(struct SNode *item, struct StrList *hard, struct StrList *ord, int allow_after)
 {
@@ -158,10 +158,10 @@ process_rule_body(struct Rule *r, const char *name, struct SNode *form, int star
     apply_rule_clause(r, name, form->kids[i]);
 }
 
-/* (if EXPR clause...) splices its clauses in when EXPR is true.
- * reuses the gate grammar so there is one condition language.
+/* (if EXPR clause...) splices its clauses in when EXPR is true
+ * reuses the gate grammar so there is one condition language
  * a $(...) in the condition is rejected: splicing per glob match
- * would mean deferring cmd/dep construction, which no rule needs.
+ * would mean deferring cmd/dep construction, which no rule needs
  * use (gate ...) on a separate rule for a per-instance condition */
 static void
 apply_if_clause(struct Rule *r, const char *name, struct SNode *clause)
@@ -247,13 +247,13 @@ apply_rule_clause(struct Rule *r, const char *name, struct SNode *clause)
     );
   } else if (strcmp(h, "group") == 0) {
     /* display-only: shows up in (query rules) output, no effect on
-     * resolution. (member ...) below is the enforcing one. the two
-     * are separate because several rules used (group ...) this way
-     * before namespacing existed */
+ * resolution. (member ...) below is the enforcing one. the two
+ * are separate because several rules used (group ...) this way
+ * before namespacing existed */
     strlcpy(r->group_name, sole_atom(clause, "(group NAME) takes one name"), sizeof r->group_name);
   } else if (strcmp(h, "member") == 0) {
     /* (member GROUP [ALIAS]) hides the bare name from the command
-     * line. ALIAS defaults to the rule own name */
+ * line. ALIAS defaults to the rule own name */
     if (clause->nkids < 2 || clause->nkids > 3 || clause->kids[1]->kind != S_ATOM)
       eprintf("manifest: rule %s: (member GROUP [ALIAS]) needs a group name\n", name);
     strlcpy(r->member_of, clause->kids[1]->atom, sizeof r->member_of);
@@ -384,7 +384,7 @@ parse_set(struct SNode *form)
   kv_set_manifest(form->kids[1]->atom, form->kids[2]->atom);
 }
 
-/* (list) and (append) keep a space-joined string in the kv store.
+/* (list) and (append) keep a space-joined string in the kv store
  * a $(NAME) alone in a command splits back into argv entries */
 static void
 parse_list_or_append(struct SNode *form, int append)

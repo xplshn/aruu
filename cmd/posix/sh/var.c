@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include "var.h"
@@ -58,7 +58,7 @@
 #include <unistd.h>
 
 /*
- * Shell variables.
+ * shell variables
  */
 
 #ifndef VTABSIZE
@@ -98,8 +98,8 @@ static const struct varinit varinit[] = {
     {&vmpath, VUNSET, "MAILPATH=", NULL},
     {&vpath, 0, "PATH=" ARUU_PATH_DEFPATH, changepath},
     /*
-     * vps1 depends on uid
-     */
+ * vps1 depends on uid
+ */
     {&vps2, 0, "PS2=> ", NULL},
     {&vps4, 0, "PS4=+ ", NULL},
 #ifndef NO_HISTORY
@@ -127,8 +127,8 @@ static void        setvareq_const(const char *s, int flags);
 extern char **environ;
 
 /*
- * This routine initializes the builtin variables and imports the environment.
- * It is called when the shell is initialized.
+ * this routine initializes the builtin variables and imports the environment
+ * it is called when the shell is initialized
  */
 
 void
@@ -150,8 +150,8 @@ initvar(void)
     vp->func  = ip->func;
   }
   /*
-   * PS1 depends on uid
-   */
+ * PS1 depends on uid
+ */
   if (find_var("PS1", &vpp, &vps1.name_len) == NULL) {
     vps1.next  = *vpp;
     *vpp       = &vps1;
@@ -170,7 +170,7 @@ initvar(void)
 }
 
 /*
- * Safe version of setvar, returns 1 on success 0 on failure.
+ * safe version of setvar, returns 1 on success 0 on failure
  */
 
 int
@@ -194,8 +194,8 @@ setvarsafe(const char *name, const char *val, int flags)
 }
 
 /*
- * Set the value of a variable.  The flags argument is stored with the
- * flags of the variable.  If val is NULL, the variable is unset.
+ * set the value of a variable. the flags argument is stored with the
+ * flags of the variable. if val is NULL, the variable is unset
  */
 
 void
@@ -264,8 +264,8 @@ localevar(const char *s)
 }
 
 /*
- * Sets/unsets an environment variable from a pointer that may actually be a
- * pointer into environ where the string should not be manipulated.
+ * sets/unsets an environment variable from a pointer that may actually be a
+ * pointer into environ where the string should not be manipulated
  */
 static void
 change_env(const char *s, int set)
@@ -288,10 +288,10 @@ change_env(const char *s, int set)
 }
 
 /*
- * Same as setvar except that the variable and value are passed in
- * the first argument as name=value.  Since the first argument will
+ * same as setvar except that the variable and value are passed in
+ * the first argument as name=value. since the first argument will
  * be actually stored in the table, it should not be a string that
- * will go away.
+ * will go away
  */
 
 void
@@ -329,13 +329,13 @@ setvareq(char *s, int flags)
     vp->text = s;
 
     /*
-     * We could roll this to a function, to handle it as
-     * a regular variable function callback, but why bother?
-     *
-     * Note: this assumes iflag is not set to 1 initially.
-     * As part of initvar(), this is called before arguments
-     * are looked at.
-     */
+ * we could roll this to a function, to handle it as
+ * a regular variable function callback, but why bother?
+ *
+ * note: this assumes iflag is not set to 1 initially
+ * as part of initvar(), this is called before arguments
+ * are looked at
+ */
     if ((vp == &vmpath || (vp == &vmail && !mpathset())) && iflag == 1)
       chkmail(1);
     if ((vp->flags & VEXPORT) && localevar(s)) {
@@ -375,7 +375,7 @@ setvareq_const(const char *s, int flags)
 }
 
 /*
- * Process a linked list of variable assignments.
+ * process a linked list of variable assignments
  */
 
 void
@@ -390,7 +390,7 @@ listsetvar(struct arglist *list, int flags)
 }
 
 /*
- * Find the value of a variable.  Returns NULL if not set.
+ * find the value of a variable. returns NULL if not set
  */
 
 char *
@@ -405,9 +405,9 @@ lookupvar(const char *name)
 }
 
 /*
- * Search the environment of a builtin command.  If the second argument
- * is nonzero, return the value of a variable even if it hasn't been
- * exported.
+ * search the environment of a builtin command. if the second argument
+ * is nonzero, return the value of a variable even if it hasnt been
+ * exported
  */
 
 char *
@@ -433,7 +433,7 @@ bltinlookup(const char *name, int doall)
 }
 
 /*
- * Set up locale for a builtin (LANG/LC_* assignments).
+ * set up locale for a builtin (LANG/LC_* assignments)
  */
 void
 bltinsetlocale(void)
@@ -472,7 +472,7 @@ bltinsetlocale(void)
 }
 
 /*
- * Undo the effect of bltinlocaleset().
+ * undo the effect of bltinlocaleset()
  */
 void
 bltinunsetlocale(void)
@@ -492,7 +492,7 @@ bltinunsetlocale(void)
 }
 
 /*
- * Update the localeisutf8 flag.
+ * update the localeisutf8 flag
  */
 void
 updatecharset(void)
@@ -511,8 +511,8 @@ initcharset(void)
 }
 
 /*
- * Generate a list of exported variables.  This routine is used to construct
- * the third argument to execve when executing a program.
+ * generate a list of exported variables. this routine is used to construct
+ * the third argument to execve when executing a program
  */
 
 char **
@@ -547,16 +547,16 @@ var_compare(const void *a, const void *b)
   sa = a;
   sb = b;
   /*
-   * This compares two var=value strings which creates a different
-   * order from what you would probably expect.  POSIX is somewhat
-   * ambiguous on what should be sorted exactly.
-   */
+ * this compares two var=value strings which creates a different
+ * order from what you would probably expect. POSIX is somewhat
+ * ambiguous on what should be sorted exactly
+ */
   return strcoll(*sa, *sb);
 }
 
 /*
- * Command to list all variables which are set.  This is invoked from the
- * set command when it is called without any options or operands.
+ * command to list all variables which are set. this is invoked from the
+ * set command when it is called without any options or operands
  */
 
 int
@@ -569,8 +569,8 @@ showvarscmd(int argc __unused, char **argv __unused)
   int          i, n;
 
   /*
-   * POSIX requires us to sort the variables.
-   */
+ * POSIX requires us to sort the variables
+ */
   n = 0;
   for (vpp = vartab; vpp < vartab + VTABSIZE; vpp++) {
     for (vp = *vpp; vp; vp = vp->next) {
@@ -592,9 +592,9 @@ showvarscmd(int argc __unused, char **argv __unused)
   qsort(vars, n, sizeof(*vars), var_compare);
   for (i = 0; i < n; i++) {
     /*
-     * Skip improper variable names so the output remains usable as
-     * shell input.
-     */
+ * skip improper variable names so the output remains usable as
+ * shell input
+ */
     if (!isassignment(vars[i]))
       continue;
     s = strchr(vars[i], '=');
@@ -610,7 +610,7 @@ showvarscmd(int argc __unused, char **argv __unused)
 }
 
 /*
- * The export and readonly commands.
+ * the export and readonly commands
  */
 
 int
@@ -661,10 +661,10 @@ exportcmd(int argc __unused, char **argv)
         if (vp->flags & flag) {
           if (values) {
             /*
-             * Skip improper variable names
-             * so the output remains usable
-             * as shell input.
-             */
+ * skip improper variable names
+ * so the output remains usable
+ * as shell input
+ */
             if (!isassignment(vp->text))
               continue;
             out1str(cmdname);
@@ -684,7 +684,7 @@ exportcmd(int argc __unused, char **argv)
 }
 
 /*
- * The "local" command.
+ * the "local" command
  */
 
 int
@@ -702,10 +702,10 @@ localcmd(int argc __unused, char **argv __unused)
 }
 
 /*
- * Make a variable a local variable.  When a variable is made local, it's
- * value and flags are saved in a localvar structure.  The saved values
- * will be restored when the shell function returns.  We handle the name
- * "-" as a special case.
+ * make a variable a local variable. when a variable is made local, its
+ * value and flags are saved in a localvar structure. the saved values
+ * will be restored when the shell function returns. we handle the name
+ * "-" as a special case
  */
 
 void
@@ -746,7 +746,7 @@ mklocal(char *name)
 }
 
 /*
- * Called after a function returns.
+ * called after a function returns
  */
 
 void
@@ -799,7 +799,7 @@ setvarcmd(int argc, char **argv)
 }
 
 /*
- * The unset builtin command.
+ * the unset builtin command
  */
 
 int
@@ -832,8 +832,8 @@ unsetcmd(int argc __unused, char **argv __unused)
 }
 
 /*
- * Unset the specified variable.
- * Called with interrupts off.
+ * unset the specified variable
+ * called with interrupts off
  */
 
 int
@@ -866,9 +866,9 @@ unsetvar(const char *s)
 }
 
 /*
- * Returns true if the two strings specify the same variable.  The first
+ * returns true if the two strings specify the same variable. the first
  * variable name is terminated by '='; the second may be terminated by
- * either '=' or '\0'.
+ * either '=' or '\0'
  */
 
 static int
@@ -884,9 +884,9 @@ varequal(const char *p, const char *q)
 }
 
 /*
- * Search for a variable.
- * 'name' may be terminated by '=' or a NUL.
- * vppp is set to the pointer to vp, or the list head if vp isn't found
+ * search for a variable
+ * 'name' may be terminated by '=' or a NUL
+ * vppp is set to the pointer to vp, or the list head if vp isnt found
  * lenp is set to the number of characters in 'name'
  */
 

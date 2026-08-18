@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "../wexec.h"
 #include "../config.h"
 #include "../paths.h"
@@ -199,7 +199,7 @@ wwhich(const char *name)
 
   path = wexec_getenv("PATH");
   if (path == NULL)
-    path = "/usr/local/bin:/usr/bin:/bin";
+    path = ARUU_PATH_DEFPATH;
 
   nlen = strlen(name);
   p    = path;
@@ -327,7 +327,8 @@ fork_exec(const char *path, char *const *argv, int use_path)
       execvp(path, argv);
     else
       execv(path, argv);
-    _exit(127);
+    weprintf(use_path ? "execvp %s:" : "execv %s:", path);
+    _exit((errno == ENOENT) ? 127 : 126);
   }
   if (waitpid(pid, &st, 0) < 0) {
     weprintf("waitpid:");
@@ -435,7 +436,8 @@ wpopen(const char *name, char *const *argv, const char *mode)
       }
 #endif
       execvp(name, argv);
-      _exit(127);
+      weprintf("execvp %s:", name);
+      _exit((errno == ENOENT) ? 127 : 126);
     } else {
       sh_argv[0] = "sh";
       sh_argv[1] = "-c";
@@ -462,7 +464,8 @@ wpopen(const char *name, char *const *argv, const char *mode)
       }
 #endif
       execvp("sh", sh_argv);
-      _exit(127);
+      weprintf("execvp sh:");
+      _exit((errno == ENOENT) ? 127 : 126);
     }
   }
 

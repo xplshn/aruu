@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <errno.h>
@@ -40,7 +40,7 @@
 #include <unistd.h>
 
 /*
- * This file implements the input routines used by the parser.
+ * this file implements the input routines used by the parser
  */
 
 #include "alias.h"
@@ -69,8 +69,8 @@ struct strpush {
 };
 
 /*
- * The parsefile structure pointed to by the global variable parsefile
- * contains information about the current file being read.
+ * the parsefile structure pointed to by the global variable parsefile
+ * contains information about the current file being read
  */
 
 struct parsefile {
@@ -112,8 +112,8 @@ resetinput(void)
 }
 
 /*
- * Read a character from the script, returning PEOF on end of file.
- * Nul characters in the input are silently discarded.
+ * read a character from the script, returning PEOF on end of file
+ * nul characters in the input are silently discarded
  */
 
 int
@@ -189,13 +189,13 @@ retry:
 }
 
 /*
- * Refill the input buffer and return the next input character:
+ * refill the input buffer and return the next input character:
  *
- * 1) If a string was pushed back on the input, pop it;
- * 2) If an EOF was pushed back (parsenleft == EOF_NLEFT) or we are reading
- *    from a string so we can't refill the buffer, return EOF.
- * 3) If there is more in this buffer, use it else call read to fill it.
- * 4) Process input up to the next newline, deleting nul characters.
+ * 1) if a string was pushed back on the input, pop it;
+ * 2) if an EOF was pushed back (parsenleft == EOF_NLEFT) or we are reading
+ * from a string so we cant refill the buffer, return EOF
+ * 3) if there is more in this buffer, use it else call read to fill it
+ * 4) process input up to the next newline, deleting nul characters
  */
 
 int
@@ -207,10 +207,10 @@ preadbuffer(void)
 
   while (parsefile->strpush) {
     /*
-     * Add a space to the end of an alias to ensure that the
-     * alias remains in use while parsing its last word.
-     * This avoids alias recursions.
-     */
+ * add a space to the end of an alias to ensure that the
+ * alias remains in use while parsing its last word
+ * this avoids alias recursions
+ */
     if (parsenleft == -1 && parsefile->strpush->ap != NULL)
       return ' ';
     popstring();
@@ -275,8 +275,8 @@ again:
 }
 
 /*
- * Returns if we are certain we are at EOF. Does not cause any more input
- * to be read from the outside world.
+ * returns if we are certain we are at EOF. does not cause any more input
+ * to be read from the outside world
  */
 
 int
@@ -292,8 +292,8 @@ preadateof(void)
 }
 
 /*
- * Undo the last call to pgetc.  Only one character may be pushed back.
- * PEOF may be pushed back.
+ * undo the last call to pgetc. only one character may be pushed back
+ * PEOF may be pushed back
  */
 
 void
@@ -304,8 +304,8 @@ pungetc(void)
 }
 
 /*
- * Push a string back onto the input at this current parsefile level.
- * We handle aliases this way.
+ * push a string back onto the input at this current parsefile level
+ * we handle aliases this way
  */
 void
 pushstring(const char *s, int len, struct alias *ap)
@@ -313,7 +313,7 @@ pushstring(const char *s, int len, struct alias *ap)
   struct strpush *sp;
 
   INTOFF;
-  /*out2fmt_flush("*** calling pushstring: %s, %d\n", s, len);*/
+  /* out2fmt_flush("*** calling pushstring: %s, %d\n", s, len); */
   if (parsefile->strpush) {
     sp                 = ckmalloc(sizeof(struct strpush));
     sp->prev           = parsefile->strpush;
@@ -345,8 +345,8 @@ popstring(void)
   parsenextc = sp->prevstring;
   parsenleft = sp->prevnleft;
   parselleft = sp->prevlleft;
-  /*out2fmt_flush("*** calling popstring: restoring to '%s'\n",
-   * parsenextc);*/
+  /* out2fmt_flush("*** calling popstring: restoring to '%s'\n",
+ * parsenextc); */
   parsefile->strpush = sp->prev;
   if (sp != &(parsefile->basestrpush))
     ckfree(sp);
@@ -354,12 +354,12 @@ popstring(void)
 }
 
 /*
- * Set the input to take input from a file.  If push is set, push the
- * old input onto the stack first.
- * About verify:
- *   -1: Obey verifyflag
- *    0: Do not verify
- *    1: Do verify
+ * set the input to take input from a file. if push is set, push the
+ * old input onto the stack first
+ * about verify:
+ * -1: obey verifyflag
+ * 0: do not verify
+ * 1: do verify
  */
 
 void
@@ -392,8 +392,8 @@ setinputfile(const char *fname, int push, int verify)
 }
 
 /*
- * Like setinputfile, but takes an open file descriptor (which should have
- * its FD_CLOEXEC flag already set).  Call this with interrupts off.
+ * like setinputfile, but takes an open file descriptor (which should have
+ * its FD_CLOEXEC flag already set). call this with interrupts off
  */
 
 void
@@ -413,7 +413,7 @@ setinputfd(int fd, int push)
 }
 
 /*
- * Like setinputfile, but takes input from a string.
+ * like setinputfile, but takes input from a string
  */
 
 void
@@ -428,8 +428,8 @@ setinputstring(const char *string)
 }
 
 /*
- * To handle the "." command, a stack of input files is used.  Pushfile
- * adds a new entry to the stack and popfile restores the previous level.
+ * to handle the "." command, a stack of input files is used. pushfile
+ * adds a new entry to the stack and popfile restores the previous level
  */
 
 static void
@@ -468,7 +468,7 @@ popfile(void)
 }
 
 /*
- * Return current file (to go back to it later using popfilesupto()).
+ * return current file (to go back to it later using popfilesupto())
  */
 
 struct parsefile *
@@ -478,9 +478,9 @@ getcurrentfile(void)
 }
 
 /*
- * Pop files until the given file is on top again. Useful for regular
- * builtins that read shell commands from files or strings.
- * If the given file is not an active file, an error is raised.
+ * pop files until the given file is on top again. useful for regular
+ * builtins that read shell commands from files or strings
+ * if the given file is not an active file, an error is raised
  */
 
 void
@@ -493,7 +493,7 @@ popfilesupto(struct parsefile *file)
 }
 
 /*
- * Return to top level.
+ * return to top level
  */
 
 void
@@ -504,8 +504,8 @@ popallfiles(void)
 }
 
 /*
- * Close the file(s) that the shell is reading commands from.  Called
- * after a fork is done.
+ * close the file(s) that the shell is reading commands from. called
+ * after a fork is done
  */
 
 void

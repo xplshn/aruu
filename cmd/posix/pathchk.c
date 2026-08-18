@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/stat.h>
 
@@ -12,8 +12,8 @@
 #include "util.h"
 
 #define PORTABLE_CHARACTER_SET "0123456789._-qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
-/* If your system supports more other characters, but not all non-NUL
- * characters, define SYSTEM_CHARACTER_SET. */
+/* if your system supports more other characters, but not all non-nul
+ * characters, define SYSTEM_CHARACTER_SET */
 
 static int most  = 0;
 static int extra = 0;
@@ -26,15 +26,15 @@ pathchk(char *filename)
   size_t      len, maxlen;
   struct stat st;
 
-  /* Empty? */
+  /* empty? */
   if (extra && !*filename)
     eprintf("empty filename\n");
 
-  /* Leading hyphen? */
+  /* leading hyphen? */
   if (extra && ((*filename == '-') || strstr(filename, "/-")))
     eprintf("%s: leading '-' in component of filename\n", filename);
 
-  /* Nonportable character? */
+  /* nonportable character? */
 #ifdef SYSTEM_CHARACTER_SET
   character_set = "/" SYSTEM_CHARACTER_SET;
 #else
@@ -50,19 +50,19 @@ pathchk(char *filename)
     eprintf("%s: nonportable character '%s'\n", p, invalid);
   }
 
-  /* Symlink error? Non-searchable directory? */
+  /* symlink error? non-searchable directory? */
   if (lstat(filename, &st) && errno != ENOENT) {
     /* lstat rather than stat, so that if filename is a bad symlink,
-     * but all parents are OK, no error will be detected. */
+ * but all parents are OK, no error will be detected */
     eprintf("%s:", filename);
   }
 
-  /* Too long pathname? */
+  /* too long pathname? */
   maxlen = most ? _POSIX_PATH_MAX : PATH_MAX;
   if (strlen(filename) >= maxlen)
     eprintf("%s: is longer than %zu bytes\n", filename, maxlen);
 
-  /* Too long component? */
+  /* too long component? */
   maxlen = most ? _POSIX_NAME_MAX : NAME_MAX;
   for (p = filename; p; p = q) {
     q   = strchr(p, '/');

@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "../passwd.h"
 #include "../paths.h"
 #include "../text.h"
@@ -77,6 +77,17 @@ pw_check(const struct passwd *pw, const char *pass)
     if (stored[0] == '!' || stored[0] == '*') {
       weprintf("denied\n");
       return -1;
+    }
+    /* same empty-hash fast path as above, re-checked here: stored was
+     * just reassigned from the shadow entry's own field, and an empty
+     * shadow hash means "passwordless account", not "match nothing"
+     * (falling through to crypt() with an empty salt does the latter,
+     * since crypt("", "") is never itself the empty string) */
+    if (stored[0] == '\0') {
+      if (pass[0] == '\0')
+        return 1;
+      weprintf("incorrect password\n");
+      return 0;
     }
   }
 #endif
@@ -260,7 +271,12 @@ update_shadow(const char *name, const char *newhash)
     return -1;
   }
 
-  while ((spw = getspent())) {
+  /* fgetspent(fp) reads from the stream we already opened above;
+ * getspent() reads an implicit global shadow stream that musl
+ * never actually backs with this (or any) file and always
+ * returns null for, silently turning every update into a
+ * "no matching entry" failure */
+  while ((spw = fgetspent(fp))) {
     cur = *spw;
     if (strcmp(cur.sp_namp, name) == 0) {
       cur.sp_pwdp = (char *)newhash;

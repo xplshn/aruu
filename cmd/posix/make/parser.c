@@ -136,12 +136,12 @@ setmacro(char *name, char *val, int where, int export)
   s = macroinfo(name, &owhere, &mp);
 
   /*
-   *  Default values are defined before anything else, and marked
-   *  as INTERNAL because they are injected as parseable text, and
-   *  MAKEFILE and INTERNAL variables are always overriden. ENVIRON
-   *  macros are generated in macroinfo() and this is why this function
-   *  should not receive a where == ENVIRON ever.
-   */
+ * default values are defined before anything else, and marked
+ * as INTERNAL because they are injected as parseable text, and
+ * MAKEFILE and INTERNAL variables are always overriden. ENVIRON
+ * macros are generated in macroinfo() and this is why this function
+ * should not receive a where == ENVIRON ever
+ */
   switch (owhere) {
     case UNDEF:
     case INTERNAL:
@@ -683,10 +683,10 @@ nextc(void)
 }
 
 /*
- * This function only can be called after a call to nextc
- * that didn't return EOF. It can return '\0', but as
+ * this function only can be called after a call to nextc
+ * that didn't return EOF. it can return '\0', but as
  * it is used only to check against '$' then it is not
- * a problem.
+ * a problem
  */
 static int
 ahead(void)
@@ -993,11 +993,11 @@ no_replace:
 }
 
 /*
- * Horrible hack to do string expansion.
- * We cannot use normal push and nextc because that
- * would consume characters of the current file too.
- * For that reason it cleans the input and it recovers
- * it later.
+ * horrible hack to do string expansion
+ * we cannot use normal push and nextc because that
+ * would consume characters of the current file too
+ * for that reason it cleans the input and it recovers
+ * it later
  */
 char *
 expandstring(char *line, Target *tp, struct loc *loc)
@@ -1071,10 +1071,10 @@ next(void)
 
 repeat:
   /*
-   * It is better to avoid skipspaces() here, because
-   * it can generate the need for 2 calls to back(),
-   * and we need the character anyway.
-   */
+ * it is better to avoid skipspaces() here, because
+ * it can generate the need for 2 calls to back(),
+ * and we need the character anyway
+ */
   c = nextc();
   if (c == ' ' || c == '\t')
     goto repeat;

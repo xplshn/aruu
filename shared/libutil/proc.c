@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include <sys/stat.h>
 
 #include <errno.h>
@@ -85,7 +85,7 @@ parsestat(pid_t pid, struct procstat *ps)
       &ps->rss,
       &ps->rsslim
   );
-  /* Filter out '(' and ')' from comm */
+  /* filter out '(' and ')' from comm */
   if ((len = strlen(ps->comm)) > 0)
     len--;
   ps->comm[len] = '\0';

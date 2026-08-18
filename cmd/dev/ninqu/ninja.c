@@ -52,11 +52,11 @@ fprint_shell_word_plain(FILE *f, const char *s)
  * so neither lets a real newline survive inside the value. POSIX
  * single quotes cannot help either, there is no escape processing
  * inside them, so a backslash-n written between quotes stays two
- * literal characters, not a newline, once the shell reads it back.
+ * literal characters, not a newline, once the shell reads it back
  *
  * the fix is to not carry the newline in quoted text at all: emit
  * a command substitution that runs the word through `printf '%b'`,
- * whose %b directive is POSIX-specified to expand backslash escapes
+ * whose %b directive is posix-specified to expand backslash escapes
  * (including \n) in its argument at runtime. the argument to printf
  * is itself single-quoted using the same rules as the plain case,
  * plus doubling any backslash so it survives as data rather than
@@ -82,9 +82,9 @@ fprint_shell_word(FILE *f, const char *s)
   }
 
   /* wrapped in double quotes so the shell treats the substitutions
-   * result as one word instead of splitting it on whitespace, which
-   * is exactly what an unquoted $(...) would do to a multi-line
-   * result */
+ * result as one word instead of splitting it on whitespace, which
+ * is exactly what an unquoted $(...) would do to a multi-line
+ * result */
   fputs("\"$$(printf '%b' '", f);
   for (; *s; s++) {
     if (*s == '\'')
@@ -220,17 +220,17 @@ emit_command(FILE *f, struct Inst *inst)
  * inst_stale() never consults dep_inst for staleness either, only
  * (in)/(stale_extra), so mirroring that as a plain (not order-only)
  * prerequisite list is what makes ninjas own mtime check agree
- * with ninqus.
+ * with ninqus
  *
  * ninja only knows build outputs, never ninqus rule/group/meta
- * names, so `ninja LIBUTIL` (what the Makefile forwards $@ as) has
+ * names, so `ninja LIBUTIL` (what the makefile forwards $@ as) has
  * nothing to resolve against on its own. wanted carries the literal
  * command-line words ninqu itself was invoked with, one phony alias
  * per word makes that name buildable too. when more than one target
  * was requested in the same invocation every alias points at the
  * whole combined closure rather than just its own slice, since
  * insts[] no longer remembers which instance came from which wanted
- * name, thats fine for the Makefiles own use (always one target
+ * name, thats fine for the makefiles own use (always one target
  * per invocation), just slightly conservative for a multi-target
  * `ninqu -G ninja a b` run */
 void
@@ -292,8 +292,8 @@ emit_ninja(const char *path, struct StrList *wanted)
         char         depbuf[1024];
         const char  *depout = inst_target(dep, inst->dep_inst[k], depbuf, sizeof depbuf);
         /* a rule ref that is also a real (dep ...) input already
-         * forces both order and staleness, listing it again as
-         * order-only is pure noise */
+ * forces both order and staleness, listing it again as
+ * order-only is pure noise */
         if (sl_has(&inst->in, depout) || sl_has(&inst->stale_extra, depout))
           continue;
         if (!printed_bar) {

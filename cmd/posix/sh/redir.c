@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <errno.h>
@@ -42,7 +42,7 @@
 #include <unistd.h>
 
 /*
- * Code for dealing with input/output redirection.
+ * code for dealing with input/output redirection
  */
 
 #include "error.h"
@@ -68,31 +68,31 @@ struct redirtab {
 static struct redirtab *redirlist;
 
 /*
- * We keep track of whether or not fd0 has been redirected.  This is for
+ * we keep track of whether or not fd0 has been redirected. this is for
  * background commands, where we want to redirect fd0 to /dev/null only
- * if it hasn't already been redirected.
+ * if it hasnt already been redirected
  */
 static int fd0_redirected = 0;
 
-/* Number of redirtabs that have not been allocated. */
+/* number of redirtabs that have not been allocated */
 static unsigned int empty_redirs = 0;
 
 static void openredirect(union node *, char[10]);
 static int  openhere(union node *);
 
 /*
- * Process a list of redirection commands.  If the REDIR_PUSH flag is set,
+ * process a list of redirection commands. if the REDIR_PUSH flag is set,
  * old file descriptors are stashed away so that the redirection can be
- * undone by calling popredir.  If the REDIR_BACKQ flag is set, then the
+ * undone by calling popredir. if the REDIR_BACKQ flag is set, then the
  * standard output, and the standard error if it becomes a duplicate of
- * stdout, is saved in memory.
+ * stdout, is saved in memory
  *
- * We suppress interrupts so that we won't leave open file
- * descriptors around.  Because the signal handler remains
+ * we suppress interrupts so that we wont leave open file
+ * descriptors around. because the signal handler remains
  * installed and we do not use system call restart, interrupts
  * will still abort blocking opens such as fifos (they will fail
- * with EINTR). There is, however, a race condition if an interrupt
- * arrives after INTOFF and before open blocks.
+ * with EINTR). there is, however, a race condition if an interrupt
+ * arrives after INTOFF and before open blocks
  */
 
 void
@@ -235,9 +235,9 @@ openredirect(union node *redir, char memory[10])
 }
 
 /*
- * Handle here documents.  Normally we fork off a process to write the
- * data to a pipe.  If the document is short, we can stuff the data in
- * the pipe without forking.
+ * handle here documents. normally we fork off a process to write the
+ * data to a pipe. if the document is short, we can stuff the data in
+ * the pipe without forking
  */
 
 static int
@@ -285,7 +285,7 @@ out:
 }
 
 /*
- * Undo the effects of the last redirection.
+ * undo the effects of the last redirection
  */
 
 void
@@ -317,7 +317,7 @@ popredir(void)
   INTON;
 }
 
-/* Return true if fd 0 has already been redirected at least once.  */
+/* return true if fd 0 has already been redirected at least once */
 int
 fd0_redirected_p(void)
 {
@@ -325,7 +325,7 @@ fd0_redirected_p(void)
 }
 
 /*
- * Discard all saved file descriptors.
+ * discard all saved file descriptors
  */
 
 void

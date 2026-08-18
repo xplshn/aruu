@@ -2,7 +2,7 @@
 
 ifdef() {
 	printf 'static const struct var %s[] = {\n' "$1"
-	awk '{printf("#ifdef %s\n\t{\"%s\",\t%s},\n#endif\n", $2, $1, $2)}'
+	awk '{printf("# ifdef %s\n\t{\"%s\",\t%s},\n#endif\n", $2, $1, $2)}'
 	echo '};'
 }
 

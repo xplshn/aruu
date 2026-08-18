@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include "sig.h"
 #include "util.h"
@@ -97,7 +97,7 @@ main(int argc, char *argv[])
         break;
       default:
       longopt:
-        /* XSI-extensions -argnum and -argname*/
+        /* xsi-extensions -argnum and -argname */
         if (isdigit((*argv)[1])) {
           sig = estrtonum((*argv) + 1, 0, INT_MAX);
           sig2name(sig);

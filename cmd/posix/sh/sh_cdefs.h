@@ -1,13 +1,13 @@
-/*-
- * Compat defs for non-BSDs
+/* -
+ * compat defs for non-bsds
  *
- *  __unused and __nonstring are intentionally NOT defined here
- * They collide with struct field names in some libc's <bits/stat.h>
+ * __unused and __nonstring are intentionally NOT defined here
+ * they collide with struct field names in some libc's <bits/stat.h>
  * (`long __unused[3]`) and similar system headers when defined as
- * macros before those headers are included. They remain defined in
+ * macros before those headers are included. they remain defined in
  * shell.h, which includes <sys/stat.h> before defining them
  *
- * All definitions are guarded with #ifndef so they do not conflict
+ * all definitions are guarded with #ifndef so they do not conflict
  * with each other or with system-provided definitions
  */
 
@@ -29,9 +29,9 @@
 #ifndef _SH_POINTER_TYPEDEF
 #define _SH_POINTER_TYPEDEF
 typedef void *pointer; /* used in our memalloc.h and bltin.h
-                          canonical home is shell.h, but we
-                          want memalloc to be self-contained
-                          and not pull all of shell.h */
+ * canonical home is shell.h, but we
+ * want memalloc to be self-contained
+ * and not pull all of shell.h */
 #endif
 
 #endif /* SH_CDEFS_H */

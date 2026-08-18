@@ -1,7 +1,7 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 /*
- * Command reader, also executes shell escapes
+ * command reader, also executes shell escapes
  */
 
 #include "getcomm.h"
@@ -23,8 +23,8 @@ static int  killchar(int c);
 static void sigquit(int signo);
 
 /*
- * Read a line from the terminal, doing line editing.
- * The parameter s contains the prompt for the line.
+ * read a line from the terminal, doing line editing
+ * the parameter s contains the prompt for the line
  */
 
 char *
@@ -41,19 +41,19 @@ readline(char *s)
   while ((ch = getch()) != '\n' && ch != '\r') {
     if (ch == -1) {
       /*
-       * Can only occur because of an interrupted read.
-       */
+ * can only occur because of an interrupted read
+ */
       ch        = erasech;
       interrupt = 0;
     }
     if (ch == erasech) {
       /*
-       * Erase last char
-       */
+ * erase last char
+ */
       if (p == buf) {
         /*
-         * There was none, so return
-         */
+ * there was none, so return
+ */
         return (char *)0;
       }
       pos -= killchar(*--p);
@@ -62,8 +62,8 @@ readline(char *s)
     }
     if (ch == killch) {
       /*
-       * Erase the whole line
-       */
+ * erase the whole line
+ */
       if (!(p > buf && *(p - 1) == '\\')) {
         while (p > buf) {
           pos -= killchar(*--p);
@@ -74,9 +74,9 @@ readline(char *s)
     }
     if (p > &buf[78] || pos >= COLS - 2) {
       /*
-       * Line does not fit.
-       * Simply refuse to make it any longer
-       */
+ * line does not fit
+ * simply refuse to make it any longer
+ */
       pos -= killchar(*--p);
     }
     *p++ = ch;
@@ -95,7 +95,7 @@ readline(char *s)
 }
 
 /*
- * Erase a character from the command line.
+ * erase a character from the command line
  */
 
 static int
@@ -112,7 +112,7 @@ killchar(int c)
 }
 
 /*
- * Do a shell escape, after expanding '%' and '!'.
+ * do a shell escape, after expanding '%' and '!'
  */
 
 void
@@ -134,14 +134,14 @@ shellescape(char *p, int esc_char)
   cnt   = 253;
   while (*p) {
     /*
-     * expand command
-     */
+ * expand command
+ */
     switch (*p++) {
       case '!':
         /*
-         * An unescaped ! expands to the previous
-         * command, but disappears if there is none
-         */
+ * an unescaped ! expands to the previous
+ * command, but disappears if there is none
+ */
         if (lastc != '\\') {
           if (*previous) {
             id = strlen(previous);
@@ -156,9 +156,9 @@ shellescape(char *p, int esc_char)
         continue;
       case '%':
         /*
-         * An unescaped % will expand to the current
-         * filename, but disappears is there is none
-         */
+ * an unescaped % will expand to the current
+ * filename, but disappears is there is none
+ */
         if (lastc != '\\') {
           if (nopipe) {
             id = strlen(currentfile);
@@ -184,8 +184,8 @@ shellescape(char *p, int esc_char)
   *p2 = '\0';
   if (!stupid) {
     /*
-     * Display expanded command
-     */
+ * display expanded command
+ */
     cputline(comm);
     putline("\r\n");
   }
@@ -225,8 +225,8 @@ shellescape(char *p, int esc_char)
   }
   while ((lastc = wait((int *)0)) != id && lastc >= 0) {
     /*
-     * Wait for child, making sure it is the one we expected ...
-     */
+ * wait for child, making sure it is the one we expected ...
+ */
   }
   (void)signal(SIGINT, catchdel);
   (void)signal(SIGQUIT, sigquit);
@@ -244,7 +244,7 @@ sigquit(int signo)
 }
 
 /*
- * Get all those commands ...
+ * get all those commands ...
  */
 
 int
@@ -268,14 +268,14 @@ getcomm(long *plong)
     for (;;) {
       if (c == -1) {
         /*
-         * This should never happen, but it does,
-         * when the user gives a TSTP signal (^Z) or
-         * an interrupt while the program is trying
-         * to read a character from the terminal.
-         * In this case, the read is interrupted, so
-         * we end up here.
-         * Right, we will have to read again.
-         */
+ * this should never happen, but it does,
+ * when the user gives a TSTP signal (^z) or
+ * an interrupt while the program is trying
+ * to read a character from the terminal
+ * in this case, the read is interrupted, so
+ * we end up here
+ * right, we will have to read again
+ */
         if (interrupt)
           return 1;
         break;
@@ -284,15 +284,15 @@ getcomm(long *plong)
       *p   = 0;
       if ((i = match(buf, &j, currmap->k_mach)) > 0) {
         /*
-         * The key sequence matched. We have a command
-         */
+ * the key sequence matched. we have a command
+ */
         return j;
       }
       if (i == 0)
         return 0;
       /*
-       * We have a prefix of a command.
-       */
+ * we have a prefix of a command
+ */
       assert(i == FSM_ISPREFIX);
       c = getch();
     }

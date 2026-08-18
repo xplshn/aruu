@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,11 +9,11 @@ fshut(FILE *fp, const char *fname)
 {
   int ret = 0;
 
-  /* fflush() is undefined for input streams by ISO C,
-   * but not POSIX 2008 if you ignore ISO C overrides.
-   * Leave it unchecked and rely on the following
-   * functions to detect errors.
-   */
+  /* fflush() is undefined for input streams by ISO c,
+ * but not POSIX 2008 if you ignore ISO c overrides
+ * leave it unchecked and rely on the following
+ * functions to detect errors
+ */
   fflush(fp);
 
   if (ferror(fp) && !ret) {

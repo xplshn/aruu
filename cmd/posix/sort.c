@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include "queue.h"
 #include "text.h"
@@ -212,8 +212,8 @@ slinecmp(struct line *a, struct line *b)
     columns(a, kd, &col1);
     columns(b, kd, &col2);
 
-    /* if -u is given, don't use default key definition
-     * unless it is the only one */
+    /* if -u is given, dont use default key definition
+ * unless it is the only one */
     if (uflag && kd == TAILQ_LAST(&kdhead, kdhead)
         && TAILQ_LAST(&kdhead, kdhead) != TAILQ_FIRST(&kdhead)) {
       res = 0;
@@ -338,8 +338,8 @@ addkeydef(char *kdstr, int flags)
   kd = enmalloc(2, sizeof(*kd));
 
   /* parse key definition kdstr with format
-   * start_column[.start_char][flags][,end_column[.end_char][flags]]
-   */
+ * start_column[.start_char][flags][,end_column[.end_char][flags]]
+ */
   kd->start_column = 1;
   kd->start_char   = 1;
   kd->end_column   = 0; /* 0 means end of line */
@@ -443,10 +443,10 @@ main(int argc, char *argv[])
     // ?man -m: specify mode or limit
     case 'm':
       /* more or less for free, but for performance-reasons,
-       * we should keep this flag in mind and maybe some later
-       * day implement it properly so we don't run out of memory
-       * while merging large sorted files.
-       */
+ * we should keep this flag in mind and maybe some later
+ * day implement it properly so we dont run out of memory
+ * while merging large sorted files
+ */
       break;
     // ?man -n: print line numbers or counts
     case 'n':

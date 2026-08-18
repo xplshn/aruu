@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include "queue.h"
 #include "util.h"
@@ -93,9 +93,21 @@ printchunk(const unsigned char *s, unsigned char format, size_t len)
           basefac <<= 8;
         }
       }
-      fmt[2] = big_endian ? '-' : ' ';
+      /* x/o print a fixed-width, zero-padded field: 2 hex digits per
+       * byte, or ceil(8*len/3) octal digits, the exact digit count
+       * needed for len bytes' worth of bits, not the old 4*len-1
+       * estimate (right for octal/decimal at len==1 only by
+       * coincidence, and short for hex at every len). d/u stay right-
+       * justified with spaces at that same estimate, same as every
+       * other od: an oversized width there is just extra leading
+       * whitespace, harmless under a space fill */
+      fmt[2] = (format == 'x' || format == 'o') ? '0' : ' ';
       fmt[6] = format;
-      printf(fmt, (int)(3 * len + len - 1), res);
+      switch (format) {
+        case 'x': printf(fmt, (int)(2 * len), res); break;
+        case 'o': printf(fmt, (int)((8 * len + 2) / 3), res); break;
+        default: printf(fmt, (int)(3 * len + len - 1), res); break;
+      }
   }
 }
 
@@ -174,7 +186,11 @@ od(int fd, char *fname, int last)
   }
   if (lineoff && last)
     printline(line, lineoff, addr - lineoff);
-  if (last)
+  /* the trailing all-data-consumed line exists to show the final
+   * address (the file's total size); with -an there is no address to
+   * show, so it degrades to a content-free, address-column-only blank
+   * line nothing after it can use, unlike every other od */
+  if (last && addr_format != 'n')
     printline((unsigned char *)"", 0, addr);
   return 0;
 }

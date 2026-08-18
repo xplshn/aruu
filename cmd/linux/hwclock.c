@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -155,7 +155,7 @@ main(int argc, char *argv[])
   if ((rflag ^ sflag ^ wflag) == 0)
     eprintf("missing or incompatible function\n");
 
-  /* Only UTC support at the moment */
+  /* only UTC support at the moment */
   setenv("TZ", "UTC0", 1);
   tzset();
 

@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "getline.h"
 #include "assert.h"
@@ -15,12 +15,12 @@
 #define CHUNK     50   /* # of blockheaders allocated at a time */
 
 /*
- * Blocks are kept in an array in line-number order. Each block stores the raw
- * text and the offsets of the lines parsed from it.
+ * blocks are kept in an array in line-number order. each block stores the raw
+ * text and the offsets of the lines parsed from it
  */
 
 struct block {
-  int b_flags;    /* Contains the following flags: */
+  int b_flags;    /* contains the following flags: */
 #define PARTLY 02 /* block not filled completely (eof) */
   long  b_end;    /* line number of last line in block */
   char *b_info;   /* the block */
@@ -44,16 +44,16 @@ new_block()
 
   if (!maxblocklist || !(pblock->b_flags & PARTLY)) {
     /*
-     * There is no last block, or it was filled completely,
-     * so allocate a new blockheader.
-     */
+ * there is no last block, or it was filled completely,
+ * so allocate a new blockheader
+ */
     int siz;
 
     pblock = blocklist;
     if (maxblocklist == topblocklist) {
       /*
-       * No blockheaders left. Allocate new ones
-       */
+ * no blockheaders left. allocate new ones
+ */
       siz       = topblocklist - pblock;
       blocklist = pblock =
           (struct block *)re_alloc((char *)pblock, (unsigned)((siz + CHUNK) * sizeof(*pblock)));
@@ -67,8 +67,8 @@ new_block()
       }
       if (!siz) {
         /*
-         * Create dummy header cell.
-         */
+ * create dummy header cell
+ */
         maxblocklist++;
       }
     }
@@ -79,9 +79,9 @@ new_block()
 }
 
 /*
- * Return the block in which line 'n' of the current file can be found.
- * If "disable_interrupt" = 0, the call may be interrupted, in which
- * case it returns 0.
+ * return the block in which line 'n' of the current file can be found
+ * if "disable_interrupt" = 0, the call may be interrupted, in which
+ * case it returns 0
  */
 
 static struct block *
@@ -91,17 +91,17 @@ getblock(long n, int disable_interrupt)
 
   if (stdf < 0) {
     /*
-     * Not file descriptor, so return end of file
-     */
+ * not file descriptor, so return end of file
+ */
     return 0;
   }
   pblock = maxblocklist - 1;
   if (n < lastreadline || (n == lastreadline && !(pblock->b_flags & PARTLY))) {
     /*
-     * The line asked for has been read already.
-     * Perform binary search in the blocklist to find the block
-     * where it's in.
-     */
+ * the line asked for has been read already
+ * perform binary search in the blocklist to find the block
+ * where its in
+ */
     struct block *min, *mid;
 
     min = blocklist + 1;
@@ -112,13 +112,13 @@ getblock(long n, int disable_interrupt)
       } else
         pblock = mid;
     } while (min < pblock);
-    /* Found, pblock is now a reference to the block wanted */
+    /* found, pblock is now a reference to the block wanted */
     return pblock;
   }
 
   /*
-   * The line was'nt read yet, so read blocks until found
-   */
+ * the line was'nt read yet, so read blocks until found
+ */
   for (;;) {
     if (interrupt && !disable_interrupt)
       return 0;
@@ -128,9 +128,9 @@ getblock(long n, int disable_interrupt)
     }
     if (pblock->b_flags & PARTLY) {
       /*
-       * We did not find it, and the last block could not be
-       * read completely, so return 0;
-       */
+ * we did not find it, and the last block could not be
+ * read completely, so return 0;
+ */
       return 0;
     }
   }
@@ -149,7 +149,7 @@ getline(long n, int disable_interrupt)
 }
 
 /*
- * Find the last line of the input, and return its number
+ * find the last line of the input, and return its number
  */
 
 long
@@ -158,10 +158,10 @@ to_lastline()
   for (;;) {
     if (!getline(lastreadline + 1, 0)) {
       /*
-       * "lastreadline" always contains the linenumber of
-       * the last line read. So, if the call to getline
-       * succeeds, "lastreadline" is affected
-       */
+ * "lastreadline" always contains the linenumber of
+ * the last line read. so, if the call to getline
+ * succeeds, "lastreadline" is affected
+ */
       if (interrupt)
         return -1L;
       return lastreadline;
@@ -183,8 +183,8 @@ alloc(unsigned size)
 }
 
 /*
- * Re-allocate the memorychunk pointed to by ptr, to let it
- * grow or shrink.
+ * re-allocate the memorychunk pointed to by ptr, to let it
+ * grow or shrink
  */
 
 static char *
@@ -203,53 +203,53 @@ static char *saved;
 static long  filldegree;
 
 /*
- * Try to read the block indicated by pblock
+ * try to read the block indicated by pblock
  */
 
 static void
 nextblock(struct block *pblock)
 {
-  char *c,                   /* Run through pblock->b_info */
+  char *c,                   /* run through pblock->b_info */
       *c1;                   /* indicate end of pblock->b_info */
   int            *poff;      /* pointer in line-offset list */
   int             cnt;       /* # of characters read */
-  unsigned        siz;       /* Size of allocated line-offset list */
+  unsigned        siz;       /* size of allocated line-offset list */
   static unsigned savedsiz;  /* saved "siz" */
   static int     *savedpoff; /* saved "poff" */
   static char    *savedc1;   /* saved "c1" */
 
   if (pblock->b_flags & PARTLY) {
     /*
-     * The block was already partly filled. Initialize locals
-     * accordingly
-     */
+ * the block was already partly filled. initialize locals
+ * accordingly
+ */
     poff            = savedpoff;
     siz             = savedsiz;
     pblock->b_flags = 0;
     c1              = savedc1;
     if (c1 == pblock->b_info || *(c1 - 1)) {
       /*
-       * We had incremented "lastreadline" temporarily,
-       * because the last line could not be completely read
-       * last time we tried. Undo this increment
-       */
+ * we had incremented "lastreadline" temporarily,
+ * because the last line could not be completely read
+ * last time we tried. undo this increment
+ */
       poff--;
       --lastreadline;
     }
   } else {
     if (saved) {
       /*
-       * There were leftovers from the previous block
-       */
+ * there were leftovers from the previous block
+ */
       pblock->b_info = saved;
       c1             = savedc1;
       saved          = 0;
-    } else { /* Allocate new block */
+    } else { /* allocate new block */
       pblock->b_info = c1 = alloc(BLOCKSIZE + 1);
     }
     /*
-     * Allocate some space for line-offsets
-     */
+ * allocate some space for line-offsets
+ */
     pblock->b_offs = poff = (int *)alloc((unsigned)(100 * sizeof(int)));
     siz                   = 99;
     *poff++               = 0;
@@ -257,13 +257,13 @@ nextblock(struct block *pblock)
   c = c1;
   for (;;) {
     /*
-     * Read loop
-     */
+ * read loop
+ */
     cnt = read(stdf, c1, BLOCKSIZE - (c1 - pblock->b_info));
     if (cnt < 0) {
       /*
-       * Interrupted read
-       */
+ * interrupted read
+ */
       if (errno == EINTR)
         continue;
       error("Could not read input file");
@@ -279,22 +279,22 @@ nextblock(struct block *pblock)
   assert(c <= c1);
   while (c < c1) {
     /*
-     * Now process the block
-     */
+ * now process the block
+ */
     if (*c == '\n') {
       /*
-       * Newlines are replaced by '\0', so that "getline"
-       * can deliver one line at a time
-       */
+ * newlines are replaced by '\0', so that "getline"
+ * can deliver one line at a time
+ */
       *c = 0;
       lastreadline++;
       /*
-       * Remember the line-offset
-       */
+ * remember the line-offset
+ */
       if (poff == pblock->b_offs + siz) {
         /*
-         * No space for it, allocate some more
-         */
+ * no space for it, allocate some more
+ */
         pblock->b_offs =
             (int *)re_alloc((char *)pblock->b_offs, (unsigned)((siz + 51) * sizeof(int)));
         poff = pblock->b_offs + siz;
@@ -308,15 +308,15 @@ nextblock(struct block *pblock)
   *c = 0;
   if (c != pblock->b_info && *(c - 1) != 0) {
     /*
-     * The last line read does not end with a newline, so add one
-     */
+ * the last line read does not end with a newline, so add one
+ */
     lastreadline++;
     *poff++ = c - pblock->b_info + 1;
     if (!(pblock->b_flags & PARTLY) && *(poff - 2) != 0) {
       /*
-       * Save the started line; it will be in the next block.
-       * Remove the newline we added just now.
-       */
+ * save the started line; it will be in the next block
+ * remove the newline we added just now
+ */
       saved = c1 = alloc(BLOCKSIZE + 1);
       c          = pblock->b_info + *(--poff - 1);
       while (*c)
@@ -329,9 +329,9 @@ nextblock(struct block *pblock)
   pblock->b_end = lastreadline;
   if (pblock->b_flags & PARTLY) {
     /*
-     * Take care, that we can call "nextblock" again, to fill in
-     * the rest of this block
-     */
+ * take care, that we can call "nextblock" again, to fill in
+ * the rest of this block
+ */
     savedsiz  = siz;
     savedpoff = poff;
     savedc1   = c;
@@ -347,8 +347,8 @@ nextblock(struct block *pblock)
 }
 
 /*
- * Called after processing a file.
- * Free all core.
+ * called after processing a file
+ * free all core
  */
 
 void
@@ -378,7 +378,7 @@ do_clean()
 }
 
 /*
- * Get a character. If possible, do some workahead.
+ * get a character. if possible, do some workahead
  */
 
 int
@@ -391,17 +391,17 @@ getch()
   flush();
   if (startcomm) {
     /*
-     * Command line option command
-     */
+ * command line option command
+ */
     if (*startcomm)
       return *startcomm++;
     return '\n';
   }
   if (stdf >= 0) {
     /*
-     * Make reads from the terminal non-blocking, so that
-     * we can see if the user typed something
-     */
+ * make reads from the terminal non-blocking, so that
+ * we can see if the user typed something
+ */
     flags = fcntl(0, F_GETFL, 0);
     if (flags != -1 && fcntl(0, F_SETFL, flags | O_NONBLOCK) != -1) {
       bytes_read = 0;
@@ -417,18 +417,18 @@ getch()
 			       (nopipe ||
 			        (fstat(stdf, &buf) >= 0 && buf.st_size > 0))) {
         /*
-         * Do some read ahead, after making sure there
-         * is input and the user did not type a command
-         */
+ * do some read ahead, after making sure there
+ * is input and the user did not type a command
+ */
         new_block();
       }
       (void)fcntl(0, F_SETFL, flags);
       if (bytes_read < 0) {
         /*
-         * Could this have happened?
-         * I'm not sure, because the read is
-         * nonblocking. Can it be interrupted then?
-         */
+ * could this have happened?
+ * i'm not sure, because the read is
+ * nonblocking. can it be interrupted then?
+ */
         return -1;
       }
       if (bytes_read > 0)
@@ -452,7 +452,7 @@ getch()
 }
 
 /*
- * Get the position of line "ln" in the file.
+ * get the position of line "ln" in the file
  */
 
 long

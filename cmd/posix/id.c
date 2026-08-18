@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/types.h>
 
@@ -172,7 +172,7 @@ main(int argc, char *argv[])
       userid(getuid());
       break;
     case 1:
-      /* user names can't begin [0-9] */
+      /* user names cant begin [0-9] */
       if (isdigit(argv[0][0]))
         userid(estrtol(argv[0], 0));
       else

@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -31,6 +32,7 @@ static int    cflag                = 0;
 static int    spider               = 0;
 static int    no_check_certificate = 0;
 static int    timeout_sec          = 900;
+static int    tries                = 20;
 static char  *Pflag                = NULL;
 static char  *Oflag                = NULL;
 static char  *user_agent           = "wget/aruu";
@@ -43,7 +45,7 @@ static void
 usage(void)
 {
   eprintf(
-      "usage: %s [-cqS] [-O file] [-P dir] [-T timeout] [-U "
+      "usage: %s [-cqS] [-O file] [-P dir] [-T timeout] [-t tries] [-U "
       "user_agent] "
       "[-post-data data] [-post-file file] [-header header] "
       "[-no-check-certificate] [-spider] url\n",
@@ -102,9 +104,9 @@ parse_url(char *url, char **host, char **port, char **path, int *is_tls)
   char *p, *ss;
 
   *is_tls = 0;
-  if (strncasecmp(url, "http://", 7) == 0) {
+  if (strncasecmp(url, "http:// ", 7) == 0) {
     url += 7;
-  } else if (strncasecmp(url, "https://", 8) == 0) {
+  } else if (strncasecmp(url, "https:// ", 8) == 0) {
     url += 8;
     *is_tls = 1;
   } else {
@@ -334,6 +336,8 @@ main(int argc, char *argv[])
   long long         post_len      = 0;
   int               post_fd       = -1;
   size_t            i;
+  int               attempt;
+  int               max_tries;
 
   ARGBEGIN
   {
@@ -348,6 +352,10 @@ main(int argc, char *argv[])
     // ?man -T:num: set network read and connect timeout
     case 'T':
       timeout_sec = estrtonum(EARGF(usage()), 0, 100000);
+      break;
+    // ?man -t:num: set number of connection retries, 0 retries forever
+    case 't':
+      tries = estrtonum(EARGF(usage()), 0, 1000000);
       break;
     // ?man -U:str: set User-Agent header
     case 'U':
@@ -454,6 +462,9 @@ main(int argc, char *argv[])
     post_len = st.st_size;
   }
 
+  /* wgets own -t: 0 means retry forever */
+  max_tries = tries == 0 ? INT_MAX : tries;
+
   while (!tls_sock) {
     if (redirects > max_redirects)
       eprintf("too many redirects\n");
@@ -465,14 +476,23 @@ main(int argc, char *argv[])
     port = estrdup(curr_port);
     path = estrdup(curr_path);
 
-    sock_fd = dial(host, port);
-    if (sock_fd < 0)
-      eprintf("failed to connect to %s:%s\n", host, port);
+    for (attempt = 1; attempt <= max_tries; attempt++) {
+      sock_fd = dial(host, port);
+      if (sock_fd < 0) {
+        if (attempt == max_tries)
+          eprintf("failed to connect to %s:%s\n", host, port);
+        continue;
+      }
 
-    tls_sock = tlss_connect(sock_fd, host, !no_check_certificate, is_tls);
-    if (!tls_sock) {
-      close(sock_fd);
-      eprintf("failed to establish TLS connection with %s\n", host);
+      tls_sock = tlss_connect(sock_fd, host, !no_check_certificate, is_tls);
+      if (!tls_sock) {
+        close(sock_fd);
+        if (attempt == max_tries)
+          eprintf("failed to establish TLS connection with %s\n", host);
+        continue;
+      }
+
+      break;
     }
 
     /* send http request */
@@ -572,18 +592,18 @@ main(int argc, char *argv[])
             "header\n"
         );
 
-      if (strncasecmp(loc, "http://", 7) == 0 || strncasecmp(loc, "https://", 8) == 0) {
+      if (strncasecmp(loc, "http:// ", 7) == 0 || strncasecmp(loc, "https://", 8) == 0) {
         new_url = estrdup(loc);
       } else if (loc[0] == '/') {
         new_url = emalloc(8 + strlen(host) + strlen(port) + strlen(loc) + 2);
-        sprintf(new_url, "%s://%s:%s%s", is_tls ? "https" : "http", host, port, loc);
+        sprintf(new_url, "%s:// %s:%s%s", is_tls ? "https" : "http", host, port, loc);
       } else {
         last_slash = strrchr(path, '/');
         dir_len    = 0;
         if (last_slash)
           dir_len = last_slash - path + 1;
         new_url = emalloc(8 + strlen(host) + strlen(port) + 1 + dir_len + strlen(loc) + 2);
-        sprintf(new_url, "%s://%s:%s/", is_tls ? "https" : "http", host, port);
+        sprintf(new_url, "%s:// %s:%s/", is_tls ? "https" : "http", host, port);
         if (dir_len > 0)
           strncat(new_url, path, dir_len);
         strcat(new_url, loc);

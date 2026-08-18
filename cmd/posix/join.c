@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <ctype.h>
 #include <stdint.h>
@@ -378,8 +378,8 @@ join(FILE *fa, FILE *fb, size_t jfa, size_t jfb)
       if (unpairsa)
         prline(spa.lines[0]);
       if (!addtospan(&spa, fa, RESET)) {
-        if (unpairsb) { /* a is EOF'd; print the rest of
-               b */
+        if (unpairsb) { /* a is eof'd; print the rest of
+ * b */
           do
             prline(spb.lines[0]);
           while (addtospan(&spb, fb, RESET));
@@ -392,8 +392,8 @@ join(FILE *fa, FILE *fb, size_t jfa, size_t jfb)
       if (unpairsb)
         prline(spb.lines[0]);
       if (!addtospan(&spb, fb, RESET)) {
-        if (unpairsa) { /* b is EOF'd; print the rest of
-               a */
+        if (unpairsa) { /* b is eof'd; print the rest of
+ * a */
           do
             prline(spa.lines[0]);
           while (addtospan(&spa, fa, RESET));

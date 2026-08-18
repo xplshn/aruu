@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -57,12 +57,12 @@ main(int argc, char *argv[])
         case 'X':
         case 's':
         case 't':
-          /* -[rwxXst] are valid modes, so we're done */
+          /* -[rwxxst] are valid modes, so we're done */
           if (i == 1)
             goto done;
           /* fallthrough */
         case '-':
-          /* -- terminator */
+          /* "--" option terminator */
           if (i == 1 && !(*argv)[i + 1]) {
             argv++;
             argc--;

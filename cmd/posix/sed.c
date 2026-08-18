@@ -1,12 +1,12 @@
 
 
 /* FIXME: summary
- * decide whether we enforce valid UTF-8, right now it's enforced in certain
- *     parts of the script, but not the input...
+ * decide whether we enforce valid UTF-8, right now its enforced in certain
+ * parts of the script, but not the input...
  * nul bytes cause explosions due to use of libc string functions. thoughts?
  * lack of newline at end of file, currently we add one. what should we do?
  * allow "\\t" for "\t" etc. in regex? in replacement text?
- * POSIX says don't flush on N when out of input, but GNU and busybox do.
+ * POSIX says dont flush on n when out of input, but GNU and busybox do
  */
 
 #include "config.h"
@@ -22,7 +22,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-/* Types */
+/* types */
 
 /* used as queue for writes and stack for {,:,b,t */
 typedef struct {
@@ -31,9 +31,9 @@ typedef struct {
   size_t cap;
 } Vec;
 
-/* used for arbitrary growth, str is a C string
+/* used for arbitrary growth, str is a c string
  * FIXME: does it make sense to keep track of length? or just rely on libc
- *        string functions? If we want to support nul bytes everything changes
+ * string functions? if we want to support nul bytes everything changes
  */
 typedef struct {
   char  *str;
@@ -54,17 +54,17 @@ typedef struct {
     regex_t *re;
   } u;
   enum {
-    IGNORE, /* empty address, ignore        */
-    EVERY,  /* every line                   */
-    LINE,   /* line number                  */
-    LAST,   /* last line ($)                */
-    REGEX,  /* use included regex           */
+    IGNORE, /* empty address, ignore */
+    EVERY,  /* every line */
+    LINE,   /* line number */
+    LAST,   /* last line ($) */
+    REGEX,  /* use included regex */
     LASTRE, /* use most recently used regex */
   } type;
 } Addr;
 
 /* DISCUSS: naddr is not strictly necessary, but very helpful
- * naddr == 0 iff beg.type == EVERY  && end.type == IGNORE
+ * naddr == 0 iff beg.type == EVERY && end.type == IGNORE
  * naddr == 1 iff beg.type != IGNORE && end.type == IGNORE
  * naddr == 2 iff beg.type != IGNORE && end.type != IGNORE
  */
@@ -91,39 +91,39 @@ typedef struct {
 typedef struct {
   String str;                    /* a,c,i text. r file path */
   void (*print)(char *, FILE *); /* check_puts for a, write_file for r,
-            unused for c,i */
+ * unused for c,i */
 } ACIRarg;
 
 struct Cmd {
   Range   range;
   Fninfo *fninfo;
   union {
-    Cmd      *jump;   /* used for   b,t when running  */
+    Cmd      *jump;   /* used for b,t when running */
     char     *label;  /* used for :,b,t when building */
     ptrdiff_t offset; /* used for { (pointers break during realloc) */
     FILE     *file;   /* used for w */
 
-    /* FIXME: Should the following be in the union? or pointers and
-     * malloc? */
+    /* FIXME: should the following be in the union? or pointers and
+ * malloc? */
     Sarg    s;
     Yarg    y;
     ACIRarg acir;
-  } u; /* I find your lack of anonymous unions disturbing */
+  } u; /* i find your lack of anonymous unions disturbing */
   unsigned int in_match : 1;
   unsigned int negate : 1;
 };
 
-/* Files for w command (and s' w flag) */
+/* files for w command (and s' w flag) */
 typedef struct {
   char *path;
   FILE *file;
 } Wfile;
 
 /*
- * Function Declarations
+ * function declarations
  */
 
-/* Dynamically allocated arrays and strings */
+/* dynamically allocated arrays and strings */
 static void  resize(void **ptr, size_t *nmemb, size_t size, size_t new_nmemb, void **next);
 static void *pop(Vec *v);
 static void  push(Vec *v, void *p);
@@ -131,10 +131,10 @@ static void  stracat(String *dst, char *src);
 static void  strnacat(String *dst, char *src, size_t n);
 static void  stracpy(String *dst, char *src);
 
-/* Cleanup and errors */
+/* cleanup and errors */
 static void usage(void);
 
-/* Parsing functions and related utilities */
+/* parsing functions and related utilities */
 static void   compile(char *s, int isfile);
 static int    read_line(FILE *f, String *s);
 static char  *make_range(Range *range, char *s);
@@ -148,7 +148,7 @@ static size_t escapes(char *beg, char *end, Rune delim, int n_newline);
 static size_t echarntorune(Rune *r, char *s, size_t n);
 static void   insert_labels(void);
 
-/* Get and Free arg and related utilities */
+/* get and free arg and related utilities */
 static char *get_aci_arg(Cmd *c, char *s);
 static void  aci_append(Cmd *c, char *s);
 static void  free_acir_arg(Cmd *c);
@@ -164,7 +164,7 @@ static char *get_lbrace_arg(Cmd *c, char *s);
 static char *get_rbrace_arg(Cmd *c, char *s);
 static char *semicolon_arg(char *s);
 
-/* Running */
+/* running */
 static void run(void);
 static int  in_range(Cmd *c);
 static int  match_addr(Addr *a);
@@ -176,7 +176,7 @@ static void check_puts(char *s, FILE *f);
 static void write_patt(char *s, FILE *f);
 static void update_ranges(Cmd *beg, Cmd *end);
 
-/* Sed functions */
+/* sed functions */
 static void cmd_y(Cmd *c);
 static void cmd_x(Cmd *c);
 static void cmd_w(Cmd *c);
@@ -205,20 +205,20 @@ static void cmd_lbrace(Cmd *c);
 static void cmd_rbrace(Cmd *c);
 static void cmd_last(Cmd *c);
 
-/* Actions */
+/* actions */
 static void new_line(void);
 static void app_line(void);
 static void new_next(void);
 static void old_next(void);
 
 /*
- * Globals
+ * globals
  */
 static Vec braces, labels, branches; /* holds ptrdiff_t. addrs of {, :, bt */
 static Vec writes;                   /* holds cmd*. writes scheduled by a and r commands */
-static Vec wfiles;                   /* holds Wfile*. files for w and s///w commands */
+static Vec wfiles;                   /* holds Wfile*. files for w and s// /w commands */
 
-static Cmd   *prog, *pc; /* Program, program counter */
+static Cmd   *prog, *pc; /* program, program counter */
 static size_t pcap;
 static size_t lineno;
 #if FEATURE_SED_PRESERVE_NEWLINE
@@ -235,23 +235,23 @@ static String patt, hold, genbuf;
 static struct {
   unsigned int n : 1;        /* -n (no print) */
   unsigned int E : 1;        /* -E (extended re) */
-  unsigned int s : 1;        /* s/// replacement happened */
+  unsigned int s : 1;        /* s// / replacement happened */
   unsigned int aci_cont : 1; /* a,c,i text continuation */
-  unsigned int s_cont : 1;   /* s/// replacement text continuation */
+  unsigned int s_cont : 1;   /* s// / replacement text continuation */
   unsigned int halt : 1;     /* halt execution */
 } gflags;
 
-/* FIXME: move character inside Fninfo and only use 26*sizeof(Fninfo) instead of
- * 127*sizeof(Fninfo) bytes */
+/* FIXME: move character inside fninfo and only use 26*sizeof(fninfo) instead of
+ * 127*sizeof(fninfo) bytes */
 static Fninfo fns[] = {
     ['a'] = {cmd_a, get_aci_arg, free_acir_arg, 1}, /* schedule write of text for later */
-    ['b'] = {cmd_b, get_bt_arg, NULL, 2}, /* branch to label char *label when building, Cmd *jump
-                                       when running                     */
+    ['b'] = {cmd_b, get_bt_arg, NULL, 2}, /* branch to label char *label when building, cmd *jump
+ * when running */
     ['c'] = {cmd_c, get_aci_arg, free_acir_arg, 2}, /* delete pattern space. at 0 or 1 addr or end
-                                                 of 2 addr, write text                     */
+ * of 2 addr, write text */
     ['d'] = {cmd_d, NULL, NULL, 2},                 /* delete pattern space */
     ['D'] = {cmd_D, NULL, NULL, 2}, /* delete to first newline and start new cycle without
-                                 reading (if no newline, d)        */
+ * reading (if no newline, d) */
     ['g'] = {cmd_g, NULL, NULL, 2}, /* replace pattern space with hold space */
     ['G'] = {cmd_G, NULL, NULL, 2}, /* append newline and hold space to pattern space */
     ['h'] = {cmd_h, NULL, NULL, 2}, /* replace hold space with pattern space */
@@ -259,16 +259,16 @@ static Fninfo fns[] = {
     ['i'] = {cmd_i, get_aci_arg, free_acir_arg, 1}, /* write text */
     ['l'] = {cmd_l, NULL, NULL, 2}, /* write pattern space in 'visually unambiguous form' */
     ['n'] = {cmd_n, NULL, NULL, 2}, /* write pattern space (unless -n) read to replace pattern
-                                 space (if no input, quit)     */
+ * space (if no input, quit) */
     ['N'] = {cmd_N, NULL, NULL, 2}, /* append to pattern space separated by newline, line
-                                 number changes (if no input, quit) */
+ * number changes (if no input, quit) */
     ['p'] = {cmd_p, NULL, NULL, 2}, /* write pattern space */
     ['P'] = {cmd_P, NULL, NULL, 2}, /* write pattern space up to first newline */
     ['q'] = {cmd_q, NULL, NULL, 1}, /* quit */
     ['r'] = {cmd_r, get_r_arg, free_acir_arg, 1}, /* write contents of file (unable to open/read
-                                               treated as empty file)                    */
+ * treated as empty file) */
     ['s'] = {cmd_s, get_s_arg, free_s_arg, 2},    /* find/replace/all that crazy s stuff */
-    ['t'] = {cmd_t, get_bt_arg, NULL, 2}, /* if s/// succeeded (since input or last t) branch to
+    ['t'] = {cmd_t, get_bt_arg, NULL, 2}, /* if s// / succeeded (since input or last t) branch to
                                        label (branch to end if no label) */
     ['w'] = {cmd_w, get_w_arg, NULL, 2},  /* append pattern space to file */
     ['x'] = {cmd_x, NULL, NULL, 2},       /* exchange pattern and hold spaces */
@@ -276,16 +276,16 @@ static Fninfo fns[] = {
     [':'] = {cmd_colon, get_colon_arg, NULL, 0},   /* defines label for later b and t commands */
     ['='] = {cmd_equal, NULL, NULL, 1},            /* printf("%d\n", line_number); */
     ['{'] = {cmd_lbrace, get_lbrace_arg, NULL, 2}, /* if we match, run commands, otherwise jump to
-                                                      close */
+ * close */
     ['}'] = {cmd_rbrace, get_rbrace_arg, NULL, 0}, /* noop, hold onto open for ease of building
-                                                      scripts */
+ * scripts */
 
-    [0x7f] = {NULL, NULL, NULL, 0}, /* index is checked with isascii(3p).
-               fill out rest of array */
+    [0x7f] = {NULL, NULL, NULL, 0}, /* index is checked with isascii(3p)
+ * fill out rest of array */
 };
 
 /*
- * Function Definitions
+ * function definitions
  */
 
 /* given memory pointed to by *ptr that currently holds *nmemb members of size
@@ -414,7 +414,7 @@ usage(void)
   );
 }
 
-/* Differences from POSIX
+/* differences from POSIX
  * we allows semicolons and trailing blanks inside {}
  * we allow spaces after ! (and in between !s)
  * we allow extended regular expressions (-E)
@@ -436,12 +436,12 @@ compile(char *s, int isfile)
       eprintf("fmemopen:");
   }
 
-  /* NOTE: get arg functions can't use genbuf */
+  /* NOTE: get arg functions cant use genbuf */
   while (read_line(f, &genbuf) != EOF) {
     s = genbuf.str;
 
     /* if the first two characters of the script are "#n" default
-     * output shall be suppressed */
+ * output shall be suppressed */
     if (++lineno == 1 && *s == '#' && s[1] == 'n') {
       gflags.n = 1;
       continue;
@@ -594,17 +594,17 @@ find_delim(char *s, Rune delim, int do_brackets)
   enum {
     OUTSIDE,          /* not in brackets */
     BRACKETS_OPENING, /* last char was first [ or last two were
-             first [^ */
+ * first [^ */
     BRACKETS_INSIDE,  /* inside [] */
     INSIDE_OPENING,   /* inside [] and last char was [ */
     CLASS_INSIDE,     /* inside class [::], or colating element [..] or
-             [==], inside [] */
+ * [==], inside [] */
     CLASS_CLOSING,    /* inside class [::], or colating element [..] or
-             [==], and last character was the respective :
-             . or = */
+ * [==], and last character was the respective :
+ * . or = */
   } state = OUTSIDE;
 
-  Rune   r, c = 0; /* no c won't be used uninitialized, shutup -Wall */
+  Rune   r, c = 0; /* no c wont be used uninitialized, shutup -wall */
   size_t rlen;
   int    escape = 0;
   char  *end    = s + strlen(s);
@@ -670,7 +670,7 @@ chompr(char *s, Rune rune)
   return s;
 }
 
-/* convert first nrunes Runes from UTF-8 string s in allocated Rune*
+/* convert first nrunes runes from UTF-8 string s in allocated rune*
  * NOTE: sequence must be valid UTF-8, check first */
 static Rune *
 strtorunes(char *s, size_t nrunes)
@@ -717,8 +717,8 @@ escapes(char *beg, char *end, Rune delim, int n_newline)
   char  *src = beg, *dst = beg;
 
   while (src < end) {
-    /* handle escaped backslash specially so we don't think the
-     * second backslash is escaping something */
+    /* handle escaped backslash specially so we dont think the
+ * second backslash is escaping something */
     if (*src == '\\' && src[1] == '\\') {
       *dst++ = *src++;
       if (delim)
@@ -736,7 +736,7 @@ escapes(char *beg, char *end, Rune delim, int n_newline)
 
       if (r == 'n' && delim == 'n') {
         *src = n_newline ? '\n' : 'n'; /* src so we can still
-                                    memmove() */
+ * memmove() */
       } else if (r == 'n') {
         *src = '\n';
       } else if (r != delim) {
@@ -790,8 +790,8 @@ insert_labels(void)
 }
 
 /*
- * Getargs / Freeargs
- * Read argument from s, return pointer to one past last character of argument
+ * getargs / freeargs
+ * read argument from s, return pointer to one past last character of argument
  */
 
 /* POSIX compliant
@@ -799,16 +799,16 @@ insert_labels(void)
  * foobar
  *
  * also allow the following non POSIX compliant
- * i        # empty line
+ * i # empty line
  * ifoobar
  * ifoobar\
  * baz
  *
  * FIXME: GNU and busybox discard leading spaces
- * i  foobar
+ * i foobar
  * i foobar
  * ifoobar
- * are equivalent in GNU and busybox. We don't. Should we?
+ * are equivalent in GNU and busybox. we dont. should we?
  */
 static char *
 get_aci_arg(Cmd *c, char *s)
@@ -850,12 +850,12 @@ free_acir_arg(Cmd *c)
 /* POSIX dictates that label is rest of line, including semicolons, trailing
  * whitespace, closing braces, etc. and can be limited to 8 bytes
  *
- * I allow a semicolon or closing brace to terminate a label name, it's not
- * POSIX compliant, but it's useful and every sed version I've tried to date
- * does the same.
+ * i allow a semicolon or closing brace to terminate a label name, its not
+ * POSIX compliant, but its useful and every sed version i've tried to date
+ * does the same
  *
  * FIXME: POSIX dictates that leading whitespace is ignored but trailing
- * whitespace is not. This is annoying and we should probably get rid of it.
+ * whitespace is not. this is annoying and we should probably get rid of it
  */
 static char *
 get_bt_arg(Cmd *c, char *s)
@@ -876,8 +876,8 @@ get_bt_arg(Cmd *c, char *s)
 /* POSIX dictates file name is rest of line including semicolons, trailing
  * whitespace, closing braces, etc. and file name must be preceded by a space
  *
- * I allow a semicolon or closing brace to terminate a file name and don't
- * enforce leading space.
+ * i allow a semicolon or closing brace to terminate a file name and dont
+ * enforce leading space
  *
  * FIXME: decide whether trailing whitespace should be included and fix
  * accordingly
@@ -908,11 +908,11 @@ get_s_arg(Cmd *c, char *s)
   char *p;
   int   esc, lastre;
 
-  /* s/Find/Replace/Flags */
+  /* s/find/replace/flags */
 
-  /* Find */
+  /* find */
   if (!gflags.s_cont) { /* NOT continuing from literal newline in
-         replacement text */
+ * replacement text */
     lastre            = 0;
     c->u.s.repl       = (String){NULL, 0};
     c->u.s.occurrence = 1;
@@ -946,7 +946,7 @@ get_s_arg(Cmd *c, char *s)
     s = p + runelen(delim);
   }
 
-  /* Replace */
+  /* replace */
   delim = c->u.s.delim;
 
   p = find_delim(s, delim, 0);
@@ -985,11 +985,11 @@ get_s_arg(Cmd *c, char *s)
 
   s = p + runelen(delim);
 
-  /* Flags */
+  /* flags */
   p = semicolon_arg(s = chomp(s));
 
   /* FIXME: currently for simplicity take last of g or occurrence flags
-   * and ignore multiple p flags. need to fix that */
+ * and ignore multiple p flags. need to fix that */
   for (; s < p; s++) {
     if (isdigit(*s)) {
       c->u.s.occurrence = stol(s, &s);
@@ -1004,7 +1004,7 @@ get_s_arg(Cmd *c, char *s)
           break;
         case 'w':
           /* must be last flag, take everything up to
-           * newline/semicolon s == p after this */
+ * newline/semicolon s == p after this */
           s           = get_w_arg(&buf, chomp(s + 1));
           c->u.s.file = buf.u.file;
           break;
@@ -1126,10 +1126,10 @@ get_rbrace_arg(Cmd *c, char *s)
  * return pointer to semicolon or nul byte after string
  * or closing brace as to not force ; before }
  * FIXME: decide whether or not to eat trailing whitespace for arguments that
- *        we allow semicolon/brace termination that POSIX doesn't
- *        b, r, t, w, :
- *        POSIX says trailing whitespace is part of label name, file name, etc.
- *        we should probably eat it
+ * we allow semicolon/brace termination that POSIX doesnt
+ * b, r, t, w, :
+ * POSIX says trailing whitespace is part of label name, file name, etc
+ * we should probably eat it
  */
 static char *
 semicolon_arg(char *s)
@@ -1148,7 +1148,7 @@ run(void)
     leprintf("extra {");
 
   /* genbuf has already been initialized, patt will be in new_line
-   * (or we'll halt) */
+ * (or we'll halt) */
   stracpy(&hold, "");
 
   insert_labels();
@@ -1311,7 +1311,7 @@ write_patt(char *s, FILE *f)
 #endif
 }
 
-/* iterate from beg to end updating ranges so we don't miss any commands
+/* iterate from beg to end updating ranges so we dont miss any commands
  * e.g. sed -n '1d;1,3p' should still print lines 2 and 3
  */
 static void
@@ -1322,7 +1322,7 @@ update_ranges(Cmd *beg, Cmd *end)
 }
 
 /*
- * Sed functions
+ * sed functions
  */
 static void
 cmd_a(Cmd *c)
@@ -1338,7 +1338,7 @@ cmd_b(Cmd *c)
     return;
 
   /* if we jump backwards update to end, otherwise update to destination
-   */
+ */
   update_ranges(c + 1, c->u.jump > c ? c->u.jump : prog + pcap);
   pc = c->u.jump;
 }
@@ -1353,7 +1353,7 @@ cmd_c(Cmd *c)
   if (!c->in_match)
     check_puts(c->u.acir.str.str, stdout);
   /* otherwise start the next cycle without printing pattern space
-   * effectively deleting the text */
+ * effectively deleting the text */
   new_next();
 }
 
@@ -1424,7 +1424,7 @@ cmd_i(Cmd *c)
     check_puts(c->u.acir.str.str, stdout);
 }
 
-/* I think it makes sense to print invalid UTF-8 sequences in octal to satisfy
+/* i think it makes sense to print invalid UTF-8 sequences in octal to satisfy
  * the "visually unambiguous form" sed(1p)
  */
 static void
@@ -1450,16 +1450,16 @@ cmd_l(Cmd *c)
     return;
 
   /* FIXME: line wrapping. sed(1p) says "length at which folding occurs is
-   * unspecified, but should be appropraite for the output device"
-   * just wrap at 80 Runes?
-   */
+ * unspecified, but should be appropraite for the output device"
+ * just wrap at 80 runes?
+ */
   for (p = patt.str, end = p + strlen(p); p < end; p += rlen) {
     if (isascii(*p) && escapes[(unsigned int)*p]) {
       fputs(escapes[(unsigned int)*p], stdout);
       rlen = 1;
     } else if (!(rlen = charntorune(&r, p, end - p))) {
       /* ran out of chars, print the bytes of the short
-       * sequence */
+ * sequence */
       for (; p < end; p++)
         printf("\\%03hho", (unsigned char)*p);
       break;
@@ -1568,21 +1568,21 @@ cmd_s(Cmd *c)
 
   while (!qflag && !regexec(re, s, plen, pmatch, cflags)) {
     cflags = REG_NOTBOL; /* match against beginning of line first
-          time, but not again */
+ * time, but not again */
     if (!*s)             /* match against empty string first time, but not again
-                          */
+ */
       qflag = 1;
 
-    /* don't substitute if last match was not empty but this one is.
-     * s_a*_._g
-     * foobar -> .f.o.o.b.r.
-     */
+    /* dont substitute if last match was not empty but this one is
+ * s_a*_._g
+ * foobar -> .f.o.o.b.r
+ */
     if ((last_empty || pmatch[0].rm_eo) && (++matches == c->u.s.occurrence || !c->u.s.occurrence)) {
       /* copy over everything before the match */
       strnacat(&genbuf, s, pmatch[0].rm_so);
 
       /* copy over replacement text, taking into account &,
-       * backreferences, and \ escapes */
+ * backreferences, and \ escapes */
       for (p = c->u.s.repl.str, len = strcspn(p, "\\&"); *p; len = strcspn(++p, "\\&")) {
         strnacat(&genbuf, p, len);
         p += len;
@@ -1592,8 +1592,8 @@ cmd_s(Cmd *c)
             break;
           case '\0':
             /* we're at the end, back up one so the
-             * ++p will put us on the null byte to
-             * break out of the loop */
+ * ++p will put us on the null byte to
+ * break out of the loop */
             --p;
             break;
           case '&':
@@ -1602,8 +1602,8 @@ cmd_s(Cmd *c)
           case '\\':
             if (isdigit(*++p)) { /* backreference */
               /* only need to check here if
-               * using lastre, otherwise we
-               * checked when building */
+ * using lastre, otherwise we
+ * checked when building */
               if (!c->u.s.re && (size_t)(*p - '0') > re->re_nsub)
                 leprintf(
                     "back "
@@ -1616,8 +1616,8 @@ cmd_s(Cmd *c)
               rm = &pmatch[*p - '0'];
               strnacat(&genbuf, s + rm->rm_so, rm->rm_eo - rm->rm_so);
             } else { /* character after backslash
-                  taken literally (well one
-                  byte, but it works) */
+ * taken literally (well one
+ * byte, but it works) */
               strnacat(&genbuf, p, 1);
             }
             break;
@@ -1625,19 +1625,19 @@ cmd_s(Cmd *c)
       }
     } else {
       /* not replacing, copy over everything up to and
-       * including the match */
+ * including the match */
       strnacat(&genbuf, s, pmatch[0].rm_eo);
     }
 
     if (!pmatch[0].rm_eo) { /* empty match, advance one rune and add
-             it to output */
+ * it to output */
       end  = s + strlen(s);
       rlen = charntorune(&r, s, end - s);
 
       if (!rlen) { /* ran out of bytes, copy short sequence */
         stracat(&genbuf, s);
         s = end;
-      } else { /* copy whether or not it's a good rune */
+      } else { /* copy whether or not its a good rune */
         strnacat(&genbuf, s, rlen);
         s += rlen;
       }
@@ -1671,7 +1671,7 @@ cmd_t(Cmd *c)
     return;
 
   /* if we jump backwards update to end, otherwise update to destination
-   */
+ */
   update_ranges(c + 1, c->u.jump > c ? c->u.jump : prog + pcap);
   pc       = c->u.jump;
   gflags.s = 0;
@@ -1719,8 +1719,8 @@ cmd_y(Cmd *c)
       for (rp = c->u.y.set1; *rp; rp++)
         if (*rp == r)
           break;
-      if (*rp) { /* found r in set1, replace with Rune from
-              set2 */
+      if (*rp) { /* found r in set1, replace with rune from
+ * set2 */
         n = runetochar(buf, c->u.y.set2 + (rp - c->u.y.set1));
         strnacat(&genbuf, buf, n);
       } else {
@@ -1778,7 +1778,7 @@ cmd_last(Cmd *c)
 }
 
 /*
- * Actions
+ * actions
  */
 
 /* read new line, continue current cycle */
@@ -1796,9 +1796,9 @@ new_line(void)
 }
 
 /* append new line, continue current cycle
- * FIXME: used for N, POSIX specifies do not print pattern space when out of
- *        input, but GNU does so busybox does as well. Currently we don't.
- *        Should we?
+ * FIXME: used for n, POSIX specifies do not print pattern space when out of
+ * input, but GNU does so busybox does as well. currently we dont
+ * should we?
  */
 static void
 app_line(void)

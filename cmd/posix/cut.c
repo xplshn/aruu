@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,22 +8,22 @@
 #include "utf.h"
 #include "util.h"
 
-typedef struct Range {
+struct Range {
   size_t        min, max;
   struct Range *next;
-} Range;
+};
 
-static Range *list     = NULL;
-static char   mode     = 0;
-static char  *delim    = "\t";
-static size_t delimlen = 1;
-static int    nflag    = 0;
-static int    sflag    = 0;
+static struct Range *list     = NULL;
+static char          mode     = 0;
+static char         *delim    = "\t";
+static size_t        delimlen = 1;
+static int           nflag    = 0;
+static int           sflag    = 0;
 
 static void
-insert(Range *r)
+insert(struct Range *r)
 {
-  Range *l, *p, *t;
+  struct Range *l, *p, *t;
 
   for (p = NULL, l = list; l; p = l, l = l->next) {
     if (r->max && r->max + 1 < l->min) {
@@ -48,9 +48,9 @@ insert(Range *r)
 static void
 parselist(char *str)
 {
-  char  *s;
-  size_t n = 1;
-  Range *r;
+  char         *s;
+  size_t        n = 1;
+  struct Range *r;
 
   if (!*str)
     eprintf("empty list\n");
@@ -109,7 +109,8 @@ seek(struct line *s, size_t pos, size_t *prev, size_t count)
 static void
 cut(FILE *fp, const char *fname)
 {
-  Range             *r;
+  struct Range       *r;
+
   struct line        s;
   static struct line line;
   static size_t      size;

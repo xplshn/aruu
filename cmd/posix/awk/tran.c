@@ -1,26 +1,26 @@
-/****************************************************************
-Copyright (C) Lucent Technologies 1997
-All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name Lucent Technologies or any of
-its entities not be used in advertising or publicity pertaining
-to distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
+/* ***************************************************************
+ * copyright (c) lucent technologies 1997
+ * all rights reserved
+ *
+ * permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose and without fee is hereby
+ * granted, provided that the above copyright notice appear in all
+ * copies and that both that the copyright notice and this
+ * permission notice and warranty disclaimer appear in supporting
+ * documentation, and that the name lucent technologies or any of
+ * its entities not be used in advertising or publicity pertaining
+ * to distribution of the software without specific, written prior
+ * permission
+ *
+ * LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE
+ * ************************************************************** */
 
 #define DEBUG
 #include "awk.h"
@@ -283,8 +283,8 @@ rehash(Array *tp) /* rehash items in small table into big one */
 
   nsz = GROWTAB * tp->size;
   np  = (Cell **)calloc(nsz, sizeof(*np));
-  if (np == NULL) /* can't do it, but can keep running. */
-    return;       /* someone else will run out later. */
+  if (np == NULL) /* cant do it, but can keep running */
+    return;       /* someone else will run out later */
   for (i = 0; i < tp->size; i++) {
     for (cp = tp->tab[i]; cp; cp = op) {
       op        = cp->cnext;
@@ -312,7 +312,7 @@ lookup(const char *s, Array *tp) /* look for s in tp */
 }
 
 Awkfloat
-setfval(Cell *vp, Awkfloat f) /* set float val of a Cell */
+setfval(Cell *vp, Awkfloat f) /* set float val of a cell */
 {
   int fldno;
 
@@ -366,7 +366,7 @@ funnyvar(Cell *vp, const char *rw)
 }
 
 char *
-setsval(Cell *vp, const char *s) /* set string val of a Cell */
+setsval(Cell *vp, const char *s) /* set string val of a cell */
 {
   char    *t;
   int      fldno;
@@ -401,7 +401,7 @@ setsval(Cell *vp, const char *s) /* set string val of a Cell */
     if (!donerec)
       recbld();
   }
-  t = s ? tostring(s) : tostring(""); /* in case it's self-assign */
+  t = s ? tostring(s) : tostring(""); /* in case its self-assign */
   if (freeable(vp))
     xfree(vp->sval);
   vp->tval &= ~(NUM | DONTFREE | CONVC | CONVO);
@@ -429,7 +429,7 @@ setsval(Cell *vp, const char *s) /* set string val of a Cell */
 }
 
 Awkfloat
-getfval(Cell *vp) /* get float val of a Cell */
+getfval(Cell *vp) /* get float val of a cell */
 {
   if ((vp->tval & (NUM | STR)) == 0)
     funnyvar(vp, "read value of");
@@ -464,7 +464,7 @@ get_inf_nan(double d)
 }
 
 static char *
-get_str_val(Cell *vp, char **fmt) /* get string val of a Cell */
+get_str_val(Cell *vp, char **fmt) /* get string val of a cell */
 {
   char        s[256];
   double      dtemp;
@@ -478,36 +478,36 @@ get_str_val(Cell *vp, char **fmt) /* get string val of a Cell */
     recbld();
 
   /*
-   * ADR: This is complicated and more fragile than is desirable.
-   * Retrieving a string value for a number associates the string
-   * value with the scalar.  Previously, the string value was
-   * sticky, meaning if converted via OFMT that became the value
-   * (even though POSIX wants it to be via CONVFMT). Or if CONVFMT
-   * changed after a string value was retrieved, the original value
-   * was maintained and used.  Also not per POSIX.
-   *
-   * We work around this design by adding two additional flags,
-   * CONVC and CONVO, indicating how the string value was
-   * obtained (via CONVFMT or OFMT) and _also_ maintaining a copy
-   * of the pointer to the xFMT format string used for the
-   * conversion.  This pointer is only read, **never** dereferenced.
-   * The next time we do a conversion, if it's coming from the same
-   * xFMT as last time, and the pointer value is different, we
-   * know that the xFMT format string changed, and we need to
-   * redo the conversion. If it's the same, we don't have to.
-   *
-   * There are also several cases where we don't do a conversion,
-   * such as for a field (see the checks below).
-   */
+ * ADR: this is complicated and more fragile than is desirable
+ * retrieving a string value for a number associates the string
+ * value with the scalar. previously, the string value was
+ * sticky, meaning if converted via OFMT that became the value
+ * (even though POSIX wants it to be via CONVFMT). or if CONVFMT
+ * changed after a string value was retrieved, the original value
+ * was maintained and used. also not per POSIX
+ *
+ * we work around this design by adding two additional flags,
+ * CONVC and CONVO, indicating how the string value was
+ * obtained (via CONVFMT or OFMT) and _also_ maintaining a copy
+ * of the pointer to the xfmt format string used for the
+ * conversion. this pointer is only read, **never** dereferenced
+ * the next time we do a conversion, if its coming from the same
+ * xfmt as last time, and the pointer value is different, we
+ * know that the xfmt format string changed, and we need to
+ * redo the conversion. if its the same, we dont have to
+ *
+ * there are also several cases where we dont do a conversion,
+ * such as for a field (see the checks below)
+ */
 
-  /* Don't duplicate the code for actually updating the value */
+  /* dont duplicate the code for actually updating the value */
 #define update_str_val(vp)                                                                         \
   {                                                                                                \
     if (freeable(vp))                                                                              \
       xfree(vp->sval);                                                                             \
     if ((p = get_inf_nan(vp->fval)) != NULL)                                                       \
       strcpy(s, p);                                                                                \
-    else if (modf(vp->fval, &dtemp) == 0) /* it's integral */                                      \
+    else if (modf(vp->fval, &dtemp) == 0) /* its integral */                                      \
       snprintf(s, sizeof(s), "%.30g", vp->fval);                                                   \
     else                                                                                           \
       snprintf(s, sizeof(s), *fmt, vp->fval);                                                      \
@@ -560,13 +560,13 @@ done:
 }
 
 char *
-getsval(Cell *vp) /* get string val of a Cell */
+getsval(Cell *vp) /* get string val of a cell */
 {
   return get_str_val(vp, CONVFMT);
 }
 
 char *
-getpssval(Cell *vp) /* get string val of a Cell for print */
+getpssval(Cell *vp) /* get string val of a cell for print */
 {
   return get_str_val(vp, OFMT);
 }
@@ -605,12 +605,12 @@ catstr(Cell *a, Cell *b) /* concatenate a and b */
     FATAL("out of space concatenating %s and %s", sa, sb);
   snprintf(p, l, "%s%s", sa, sb);
 
-  l++; // add room for ' '
+  l++; /* add room for ' ' */
   char *newbuf = (char *)malloc(l);
   if (newbuf == NULL)
     FATAL("out of space concatenating %s and %s", sa, sb);
-  // See string() in lex.c; a string "xx" is stored in the symbol
-  // table as "xx ".
+  /* see string() in lex.c; a string "xx" is stored in the symbol
+   * table as "xx " */
   snprintf(newbuf, l, "%s ", p);
   c = setsymtab(newbuf, p, 0.0, CON | STR | DONTFREE, symtab);
   free(p);

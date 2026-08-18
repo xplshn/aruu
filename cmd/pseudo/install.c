@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <dirent.h>
 #include <errno.h>
@@ -87,7 +87,7 @@ usage(void)
   );
 }
 
-// ?man xinstall: copy files and set attributes
+// ?man install: copy files and set attributes
 // ?man arguments: (-d dir ... | (-t dest source ... | source ... dest))
 // ?man copy files and set their permissions and ownership
 int

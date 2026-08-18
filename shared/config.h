@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "paths.h"
 
 #define ENV_PATH  ARUU_PATH_BIN

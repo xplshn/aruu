@@ -125,14 +125,14 @@ parseflag(int flag, char **args, char ***argv)
   switch (flag) {
     case 'j':
       /* ?man -j:jobs: number of parallel jobs (accepted, runs
-       * serially) */
+ * serially) */
     case 'f':
       /* ?man -f:file: read rules from file instead of makefile or
-       * Makefile */
+ * makefile */
       break;
     case 'e':
       /* ?man -e: environment variables override makefile assignments
-       */
+ */
       eflag = 1;
       appendmakeflags("-e");
       break;
@@ -157,7 +157,7 @@ parseflag(int flag, char **args, char ***argv)
       break;
     case 'q':
       /* ?man -q: question mode, return zero if up to date, one
-       * otherwise */
+ * otherwise */
       qflag = 1;
       appendmakeflags("-q");
       break;
@@ -302,9 +302,9 @@ parsemakefiles(char **argv)
 }
 
 /*
- * We want to enable debug as earlier as possible,
- * if we wait until we read the Makefiles then
- * we are going to lose to much debug information.
+ * we want to enable debug as earlier as possible,
+ * if we wait until we read the makefiles then
+ * we are going to lose to much debug information
  */
 static void
 enadebug(char *argv[])
@@ -325,9 +325,9 @@ enadebug(char *argv[])
 
 // ?man make: maintain program dependencies
 // ?man arguments: [name=value ...] [target ...]
-// ?man update files based on dependency rules in a makefile.
-// ?man if no -f is given, make tries makefile then Makefile.
-// ?man if no target is given the first non-dot target in the makefile is built.
+// ?man update files based on dependency rules in a makefile
+// ?man if no -f is given, make tries makefile then Makefile
+// ?man if no target is given the first non-dot target in the makefile is built
 int
 main(int argc, char *argv[])
 {

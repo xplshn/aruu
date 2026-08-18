@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "../diskutil.h"
 #include "../util.h"
 
@@ -158,7 +158,7 @@ blockdev_get_list(void)
     info->minor = minor;
 
     /* search tree topology to link partition node under proper
-     * target parent disk */
+ * target parent disk */
     is_part = 0;
     for (curr = head; curr; curr = curr->next) {
       size_t len = strlen(curr->name);
@@ -499,6 +499,8 @@ static const struct FsType fstypes[] = {
     {"vfat", 54, 4, 0x31544146, 0, 39, 4, 43, 11},
     /* ntfs */
     {"ntfs", 3, 4, 0x5346544e, 0, 72, 8, 0, 0},
+    /* iso9660: "CD001" at the primary volume descriptor, LBA 16 */
+    {"iso9660", 32769, 5, 0x3130304443ULL, 0, 0, 0, 32808, 32},
     /* xfs */
     {"xfs", 0, 4, 0x42534658, 0x58465342, 32, 16, 108, 12},
     /* btrfs */

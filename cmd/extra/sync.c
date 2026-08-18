@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include <unistd.h>
 
 #include "arg.h"
@@ -6,8 +6,8 @@
 
 // ?man sync: flush disk cache
 // ?man synopsis:
-// ?man The sync utility invokes sync(2) to flush all unwritten changes to disk.
-// This is usually done before shutting down, rebooting or halting. ?man ## SEE
+// ?man The sync utility invokes sync(2) to flush all unwritten changes to disk
+// this is usually done before shutting down, rebooting or halting. ?man ## SEE
 // ALSO ?man fsync(2), sync(2)
 
 static void

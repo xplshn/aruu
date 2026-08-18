@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <errno.h>
@@ -70,10 +70,10 @@
 #include "var.h"
 
 /*
- * A job structure contains information about a job.  A job is either a
- * single process or a set of processes contained in a pipeline.  In the
- * latter case, pidlist will be non-NULL, and will point to a -1 terminated
- * array of pids.
+ * a job structure contains information about a job. a job is either a
+ * single process or a set of processes contained in a pipeline. in the
+ * latter case, pidlist will be non-null, and will point to a -1 terminated
+ * array of pids
  */
 
 struct procstat {
@@ -140,7 +140,7 @@ static void printjobcmd(struct job *);
 static void showjob(struct job *, int);
 
 /*
- * Turn job control on and off.
+ * turn job control on and off
  */
 
 static int jobctl;
@@ -185,9 +185,9 @@ setjobctl(int on)
     }
     if (ttyfd < 10) {
       /*
-       * Keep our TTY file descriptor out of the way of
-       * the user's redirections.
-       */
+ * keep our TTY file descriptor out of the way of
+ * the user's redirections
+ */
       if ((i = fcntl(ttyfd, F_DUPFD_CLOEXEC, 10)) < 0) {
         jobctl_notty();
         return;
@@ -452,12 +452,12 @@ showjob(struct job *jp, int mode)
 }
 
 /*
- * Print a list of jobs.  If "change" is nonzero, only print jobs whose
- * statuses have changed since the last call to showjobs.
+ * print a list of jobs. if "change" is nonzero, only print jobs whose
+ * statuses have changed since the last call to showjobs
  *
- * If the shell is interrupted in the process of creating a job, the
- * result may be a job structure containing zero processes.  Such structures
- * will be freed here.
+ * if the shell is interrupted in the process of creating a job, the
+ * result may be a job structure containing zero processes. such structures
+ * will be freed here
  */
 
 void
@@ -480,9 +480,9 @@ showjobs(int change, int mode)
     showjob(jp, mode);
     if (mode == SHOWJOBS_DEFAULT || mode == SHOWJOBS_VERBOSE) {
       jp->changed = 0;
-      /* Hack: discard jobs for which $! has not been
-       * referenced in interactive mode when they terminate.
-       */
+      /* hack: discard jobs for which $! has not been
+ * referenced in interactive mode when they terminate
+ */
       if (jp->state == JOBDONE && !jp->remembered && (iflag || jp != bgjob)) {
         freejob(jp);
       }
@@ -491,7 +491,7 @@ showjobs(int change, int mode)
 }
 
 /*
- * Mark a job structure as unused.
+ * mark a job structure as unused
  */
 
 static void
@@ -545,9 +545,9 @@ waitcmdloop(struct job *job)
   struct job *jp;
 
   /*
-   * Loop until a process is terminated or stopped, or a SIGINT is
-   * received.
-   */
+ * loop until a process is terminated or stopped, or a SIGINT is
+ * received
+ */
 
   do {
     if (job != NULL) {
@@ -611,7 +611,7 @@ jobidcmd(int argc __unused, char **argv __unused)
 }
 
 /*
- * Convert a job name to a job structure.
+ * convert a job name to a job structure
  */
 
 static struct job *
@@ -713,7 +713,7 @@ killjob(const char *name, int sig)
 }
 
 /*
- * Return a new job structure,
+ * return a new job structure,
  */
 
 struct job *
@@ -734,7 +734,7 @@ makejob(union node *node __unused, int nprocs)
         jp = ckmalloc((njobs + 4) * sizeof jobtab[0]);
         memcpy(jp, jobtab, njobs * sizeof jp[0]);
 #if JOBS
-        /* Relocate `next' pointers and list head */
+        /* relocate `next' pointers and list head */
         if (jobmru != NULL)
           jobmru = &jp[jobmru - jobtab];
         for (i = 0; i < njobs; i++)
@@ -743,7 +743,7 @@ makejob(union node *node __unused, int nprocs)
 #endif
         if (bgjob != NULL)
           bgjob = &jp[bgjob - jobtab];
-        /* Relocate `ps' pointers */
+        /* relocate `ps' pointers */
         for (i = 0; i < njobs; i++)
           if (jp[i].ps == &jobtab[i].ps0)
             jp[i].ps = &jp[i].ps0;
@@ -819,19 +819,19 @@ deljob(struct job *j)
 }
 
 /*
- * Return the most recently used job that isn't `nj', and preferably one
- * that is stopped.
+ * return the most recently used job that isnt `nj', and preferably one
+ * that is stopped
  */
 static struct job *
 getcurjob(struct job *nj)
 {
   struct job *jp;
 
-  /* Try to find a stopped one.. */
+  /* try to find a stopped one.. */
   for (jp = jobmru; jp != NULL; jp = jp->next)
     if (jp->used && jp != nj && jp->state == JOBSTOPPED)
       return (jp);
-  /* Otherwise the most recently used job that isn't `nj' */
+  /* otherwise the most recently used job that isnt `nj' */
   for (jp = jobmru; jp != NULL; jp = jp->next)
     if (jp->used && jp != nj)
       return (jp);
@@ -842,18 +842,18 @@ getcurjob(struct job *nj)
 #endif
 
 /*
- * Fork of a subshell.  If we are doing job control, give the subshell its
- * own process group.  Jp is a job structure that the job is to be added to.
- * N is the command that will be evaluated by the child.  Both jp and n may
- * be NULL.  The mode parameter can be one of the following:
- *	FORK_FG - Fork off a foreground process.
- *	FORK_BG - Fork off a background process.
- *	FORK_NOJOB - Like FORK_FG, but don't give the process its own
- *		     process group even if job control is on.
+ * fork of a subshell. if we are doing job control, give the subshell its
+ * own process group. jp is a job structure that the job is to be added to
+ * n is the command that will be evaluated by the child. both jp and n may
+ * be NULL. the mode parameter can be one of the following:
+ * FORK_FG - fork off a foreground process
+ * FORK_BG - fork off a background process
+ * FORK_NOJOB - like FORK_FG, but dont give the process its own
+ * process group even if job control is on
  *
- * When job control is turned off, background processes have their standard
+ * when job control is turned off, background processes have their standard
  * input redirected to /dev/null (except for the second and later processes
- * in a pipeline).
+ * in a pipeline)
  */
 
 pid_t
@@ -895,11 +895,11 @@ forkshell(struct job *jp, union node *n, int mode)
         pgrp = jp->ps[0].pid;
       if (setpgid(0, pgrp) == 0 && mode == FORK_FG && ttyfd >= 0) {
         /*
-         * Each process in a pipeline must have the tty
-         * pgrp set before running its code.
-         * Only for pipelines of three or more processes
-         * could this be reduced to two calls.
-         */
+ * each process in a pipeline must have the tty
+ * pgrp set before running its code
+ * only for pipelines of three or more processes
+ * could this be reduced to two calls
+ */
         if (tcsetpgrp(ttyfd, pgrp) < 0)
           error("tcsetpgrp failed, errno=%d", errno);
       }
@@ -1017,22 +1017,22 @@ vforkexecshell(struct job *jp, char **argv, char **envp, const char *path, int i
 }
 
 /*
- * Wait for job to finish.
+ * wait for job to finish
  *
- * Under job control we have the problem that while a child process is
+ * under job control we have the problem that while a child process is
  * running interrupts generated by the user are sent to the child but not
- * to the shell.  This means that an infinite loop started by an inter-
- * active user may be hard to kill.  With job control turned off, an
- * interactive user may place an interactive program inside a loop.  If
- * the interactive program catches interrupts, the user doesn't want
- * these interrupts to also abort the loop.  The approach we take here
+ * to the shell. this means that an infinite loop started by an inter-
+ * active user may be hard to kill. with job control turned off, an
+ * interactive user may place an interactive program inside a loop. if
+ * the interactive program catches interrupts, the user doesnt want
+ * these interrupts to also abort the loop. the approach we take here
  * is to have the shell ignore interrupt signals while waiting for a
  * foreground process to terminate, and then send itself an interrupt
- * signal if the child process was terminated by an interrupt signal.
- * Unfortunately, some programs want to do a bit of cleanup and then
+ * signal if the child process was terminated by an interrupt signal
+ * unfortunately, some programs want to do a bit of cleanup and then
  * exit on interrupt; unless these processes terminate themselves by
  * sending a signal to themselves (instead of calling exit) they will
- * confuse this approach.
+ * confuse this approach
  */
 
 int
@@ -1093,7 +1093,7 @@ dummy_handler(int sig __unused)
 }
 
 /*
- * Wait for a process to terminate.
+ * wait for a process to terminate
  */
 
 static pid_t
@@ -1291,8 +1291,8 @@ backgndpidval(void)
 }
 
 /*
- * Return a string identifying a command (to be printed by the
- * jobs command.
+ * return a string identifying a command (to be printed by the
+ * jobs command
  */
 
 static char *cmdnextc;

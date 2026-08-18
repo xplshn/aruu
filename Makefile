@@ -52,7 +52,7 @@ $(NINQU): $(NINQU_SRC) cmd/dev/ninqu/ninqu.h scripts/mk/config.set $(NINQU_LIB_S
 FORCE:
 
 # ninqu generates build.ninja if ninja/samu is available and execs that
-# instead of running its own backend, but you can use make BACKEND=internal
+# instead of running its own backend, but you can use make backend=internal
 # to force the internal one to be used anyways
 %: $(NINQU) FORCE
 	$(NINQU) $(JOBS) $@

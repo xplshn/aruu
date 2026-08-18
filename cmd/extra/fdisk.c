@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "diskutil.h"
 #include "util.h"
 
@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 
 struct MbrPartition {
@@ -121,6 +122,151 @@ crc32(uint32_t crc, const void *buf, size_t len)
   return crc;
 }
 
+/* short two-byte codes match gdisk/sgdisk's own convention, since
+ * every caller already writing "-t ef00" etc against those tools
+ * expects the same codes here */
+static const struct {
+  const char *code;
+  uint8_t     guid[16];
+} gpt_type_table[] = {
+    /* ef00: efi system partition */
+    {"ef00",
+     {0x28, 0x73, 0x2a, 0xc1, 0x1f, 0xf8, 0xd2, 0x11, 0xba, 0x4b, 0x00, 0xa0, 0xc9, 0x3e, 0xc9,
+      0x3b}                                                                                    },
+    /* ef02: bios boot partition */
+    {"ef02",
+     {0x48, 0x61, 0x68, 0x21, 0x49, 0x64, 0x6f, 0x6e, 0x74, 0x4e, 0x65, 0x65, 0x64, 0x45, 0x46,
+      0x49}                                                                                    },
+    /* 8200: linux swap */
+    {"8200",
+     {0x6d, 0xfd, 0x57, 0x06, 0xab, 0xa4, 0xc4, 0x43, 0x84, 0xe5, 0x09, 0x33, 0xc8, 0x4b, 0x4f,
+      0x4f}                                                                                    },
+    /* 8300: linux filesystem data */
+    {"8300",
+     {0xaf, 0x3d, 0xc6, 0x0f, 0x84, 0x83, 0x72, 0x47, 0x8e, 0x79, 0x3d, 0x69, 0xd8, 0x47, 0x7d,
+      0xe4}                                                                                    },
+};
+#define GPT_TYPE_TABLE_LEN (int)(sizeof(gpt_type_table) / sizeof(gpt_type_table[0]))
+
+/* canonical XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX form: the first three
+ * groups store little-endian, the last two store big-endian, the same
+ * mixed layout every other GUID field in this file already uses */
+static int
+parse_guid_string(const char *s, uint8_t out[16])
+{
+  static const int  group_len[5] = {8, 4, 4, 4, 12};
+  static const int  group_le[5]  = {1, 1, 1, 0, 0};
+  int               g, i, hi, lo, byte_idx = 0;
+  const char       *p = s;
+
+  for (g = 0; g < 5; g++) {
+    uint8_t bytes[6];
+    int     nbytes = group_len[g] / 2;
+    for (i = 0; i < nbytes; i++) {
+      hi = hexval(p[i * 2]);
+      lo = hexval(p[i * 2 + 1]);
+      if (hi < 0 || lo < 0)
+        return -1;
+      bytes[i] = (uint8_t)((hi << 4) | lo);
+    }
+    if (group_le[g]) {
+      for (i = nbytes - 1; i >= 0; i--)
+        out[byte_idx++] = bytes[i];
+    } else {
+      for (i = 0; i < nbytes; i++)
+        out[byte_idx++] = bytes[i];
+    }
+    p += group_len[g];
+    if (g < 4) {
+      if (*p != '-')
+        return -1;
+      p++;
+    }
+  }
+  return *p == '\0' ? 0 : -1;
+}
+
+/* opt_type is a short gdisk-style code (see gpt_type_table above), a
+ * full canonical GUID string, or unset: unset (or unrecognized, with
+ * a warning) keeps the long-standing default of "linux filesystem
+ * data", matching what every caller got before -t existed */
+static void
+gpt_type_guid(const char *type, uint8_t out[16])
+{
+  int i;
+
+  if (type) {
+    for (i = 0; i < GPT_TYPE_TABLE_LEN; i++) {
+      if (strcasecmp(type, gpt_type_table[i].code) == 0) {
+        memcpy(out, gpt_type_table[i].guid, 16);
+        return;
+      }
+    }
+    if (parse_guid_string(type, out) == 0)
+      return;
+    weprintf("unrecognized GPT type '%s', using linux filesystem data\n", type);
+  }
+  memcpy(out, gpt_type_table[GPT_TYPE_TABLE_LEN - 1].guid, 16);
+}
+
+/* resolves -b for a GPT add: a plain sector number, or 0/unset for
+ * the first free sector right after every existing partition's own
+ * end_lba (gpt_hdr.first_usable if the table is still empty), the
+ * same "0 means auto-place" convention gdisk-family tools already use */
+static uint64_t
+gpt_resolve_start(struct GptHeader *hdr, struct GptPartition *parts, const char *s)
+{
+  uint32_t i;
+  uint64_t next = hdr->first_usable;
+
+  if (s && strcmp(s, "0") != 0)
+    return (uint64_t)estrtoul(s, 10);
+
+  for (i = 0; i < hdr->num_parts; i++) {
+    if (parts[i].start_lba == 0 && parts[i].end_lba == 0)
+      continue;
+    if (parts[i].end_lba + 1 > next)
+      next = parts[i].end_lba + 1;
+  }
+  return next;
+}
+
+/* resolves -e for a GPT add: a plain sector number, 0/unset for the
+ * disk's own last usable sector, or +SIZE for a size relative to the
+ * already-resolved start */
+static uint64_t
+gpt_resolve_end(struct GptHeader *hdr, size_t sec_size, uint64_t start, const char *s)
+{
+  off_t    size_bytes;
+  uint64_t sectors;
+
+  if (!s || strcmp(s, "0") == 0)
+    return hdr->last_usable;
+  if (s[0] == '+') {
+    size_bytes = parseoffset(s + 1);
+    if (size_bytes < 0)
+      eprintf("fdisk: malformed size '%s'\n", s);
+    sectors = ((uint64_t)size_bytes + sec_size - 1) / sec_size;
+    return start + sectors - 1;
+  }
+  return (uint64_t)estrtoul(s, 10);
+}
+
+/* GPT partition names are UTF-16LE, 36 code units, null-padded: every
+ * caller so far only ever needs a plain ASCII label, so this widens
+ * each byte rather than pulling in a real UTF-8 decoder for it */
+static void
+gpt_set_name(uint16_t name[36], const char *s)
+{
+  size_t i;
+
+  memset(name, 0, 36 * sizeof(uint16_t));
+  if (!s)
+    return;
+  for (i = 0; i < 35 && s[i]; i++)
+    name[i] = (uint16_t)(unsigned char)s[i];
+}
+
 static int         opt_list           = 0;
 static int         opt_print          = 0;
 static int         opt_init_gpt       = 0;
@@ -130,16 +276,17 @@ static int         opt_add            = 0;
 static int         opt_del            = 0;
 static int         opt_part_idx       = -1;
 static int         opt_part_is_letter = 0;
-static uint64_t    opt_start          = 0;
-static uint64_t    opt_end            = 0;
+static const char *opt_start_str      = NULL;
+static const char *opt_end_str        = NULL;
 static const char *opt_type           = NULL;
+static const char *opt_name           = NULL;
 
 static void
 usage(void)
 {
   eprintf(
       "usage: %s [-l] [-p] [-g] [-m] [-s] [-a] [-d] [-n index] [-b "
-      "start] [-e end] [-t type] [device]\n",
+      "start] [-e end] [-t type] [-c name] [device]\n",
       argv0
   );
 }
@@ -445,6 +592,8 @@ do_fdisk(const char *path)
   int                  idx;
   int                  has_gpt = 0;
   int                  has_bsd = 0;
+  uint64_t             bsd_start, bsd_end;
+  uint64_t             mbr_start, mbr_end;
 
   if (blockdev_open(&dev, path, 1) < 0) {
     weprintf("cannot open %s:", path);
@@ -542,25 +691,11 @@ do_fdisk(const char *path)
         blockdev_close(&dev);
         return -1;
       }
-      gp                = &gpt_parts[opt_part_idx - 1];
-      gp->start_lba     = opt_start;
-      gp->end_lba       = opt_end;
-      gp->type_guid[0]  = 0xAF;
-      gp->type_guid[1]  = 0x3D;
-      gp->type_guid[2]  = 0xC6;
-      gp->type_guid[3]  = 0x0F;
-      gp->type_guid[4]  = 0x83;
-      gp->type_guid[5]  = 0x84;
-      gp->type_guid[6]  = 0x72;
-      gp->type_guid[7]  = 0x47;
-      gp->type_guid[8]  = 0x8E;
-      gp->type_guid[9]  = 0x79;
-      gp->type_guid[10] = 0x3D;
-      gp->type_guid[11] = 0x69;
-      gp->type_guid[12] = 0xD8;
-      gp->type_guid[13] = 0x47;
-      gp->type_guid[14] = 0x7D;
-      gp->type_guid[15] = 0xE4;
+      gp            = &gpt_parts[opt_part_idx - 1];
+      gp->start_lba = gpt_resolve_start(&gpt_hdr, gpt_parts, opt_start_str);
+      gp->end_lba   = gpt_resolve_end(&gpt_hdr, dev.sec_size, gp->start_lba, opt_end_str);
+      gpt_type_guid(opt_type, gp->type_guid);
+      gpt_set_name(gp->name, opt_name);
 
       if (gpt_write(&dev, &gpt_hdr, gpt_parts) < 0) {
         weprintf("cannot update GPT on %s:", path);
@@ -590,9 +725,11 @@ do_fdisk(const char *path)
           return -1;
         }
         bp           = &bsd_lp.d_partitions[idx];
-        bp->offset   = (uint32_t)opt_start;
-        bp->offset_h = (uint16_t)(opt_start >> 32);
-        size         = opt_end - opt_start + 1;
+        bsd_start    = opt_start_str ? (uint64_t)estrtoul(opt_start_str, 10) : 0;
+        bsd_end      = opt_end_str ? (uint64_t)estrtoul(opt_end_str, 10) : 0;
+        bp->offset   = (uint32_t)bsd_start;
+        bp->offset_h = (uint16_t)(bsd_start >> 32);
+        size         = bsd_end - bsd_start + 1;
         bp->size     = (uint32_t)size;
         bp->size_h   = (uint16_t)(size >> 32);
         bp->fstype   = opt_type ? (uint8_t)strtoul(opt_type, NULL, 0) : 7;
@@ -624,8 +761,10 @@ do_fdisk(const char *path)
           return -1;
         }
         mp            = &mbr.parts[opt_part_idx - 1];
-        mp->start_lba = (uint32_t)opt_start;
-        mp->size      = (uint32_t)(opt_end - opt_start + 1);
+        mbr_start     = opt_start_str ? (uint64_t)estrtoul(opt_start_str, 10) : 0;
+        mbr_end       = opt_end_str ? (uint64_t)estrtoul(opt_end_str, 10) : 0;
+        mp->start_lba = (uint32_t)mbr_start;
+        mp->size      = (uint32_t)(mbr_end - mbr_start + 1);
         mp->type      = opt_type ? (uint8_t)strtoul(opt_type, NULL, 0) : 0x83;
         mbr.sig[0]    = 0x55;
         mbr.sig[1]    = 0xAA;
@@ -724,8 +863,8 @@ do_fdisk(const char *path)
 
 // ?man fdisk: partition table manipulator
 // ?man arguments: [-l] [-p] [-g] [-m] [-s] [-a] [-d] [-n index] [-b start] [-e
-// end] [-t type] [device] ?man fdisk performs partition table operations for
-// MBR, GPT and BSD disklabels
+// end] [-t type] [-c name] [device] ?man fdisk performs partition table
+// operations for MBR, GPT and BSD disklabels
 int
 main(int argc, char *argv[])
 {
@@ -773,17 +912,25 @@ main(int argc, char *argv[])
       }
       break;
     }
-    // ?man -b:starting sector LBA
+    // ?man -b:starting sector LBA, or 0 for right after the last
+    // ?man partition already on the disk
     case 'b':
-      opt_start = (uint64_t)estrtoul(EARGF(usage()), 10);
+      opt_start_str = EARGF(usage());
       break;
-    // ?man -e:ending sector LBA
+    // ?man -e:ending sector LBA, 0 for the disk's last usable
+    // ?man sector, or +SIZE (K/M/G/T, e.g. +512M) for a size
+    // ?man relative to the start
     case 'e':
-      opt_end = (uint64_t)estrtoul(EARGF(usage()), 10);
+      opt_end_str = EARGF(usage());
       break;
-    // ?man -t:partition type (MBR/BSD hex or GPT string)
+    // ?man -t:partition type: MBR/BSD hex, or for GPT a gdisk-style
+    // ?man code (ef00, ef02, 8200, 8300) or a full GUID string
     case 't':
       opt_type = EARGF(usage());
+      break;
+    // ?man -c:GPT partition name, ignored for MBR/BSD
+    case 'c':
+      opt_name = EARGF(usage());
       break;
     default:
       usage();

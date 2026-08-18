@@ -3,7 +3,7 @@
 #include <regex.h>
 
 /*
- * Interface to POSIX regular expression routines.
+ * interface to POSIX regular expression routines
  */
 
 static regex_t pattern;

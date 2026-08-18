@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <pwd.h>
@@ -67,7 +67,7 @@ size_t xstrlcpy(char *, const char *, size_t);
 #endif
 
 /*
- * Shell command parser.
+ * shell command parser
  */
 
 #define PROMPTLEN 192
@@ -194,7 +194,7 @@ parser_temp_free_all(void)
 }
 
 /*
- * Read and parse a command.  Returns NEOF on end of file.  (NULL is a
+ * read and parse a command. returns NEOF on end of file. (NULL is a
  * valid parse tree indicating a blank line.)
  */
 
@@ -203,9 +203,9 @@ parsecmd(int interact)
 {
   int t;
 
-  /* This assumes the parser is not re-entered,
-   * which could happen if we add command substitution on PS1/PS2.
-   */
+  /* this assumes the parser is not re-entered,
+ * which could happen if we add command substitution on PS1/PS2
+ */
   parser_temp_free_all();
   heredoclist = NULL;
 
@@ -227,8 +227,8 @@ parsecmd(int interact)
 }
 
 /*
- * Read and parse words for wordexp.
- * Returns a list of NARG nodes; NULL if there are no words.
+ * read and parse words for wordexp
+ * returns a list of NARG nodes; NULL if there are no words
  */
 union node *
 parsewordexp(void)
@@ -236,9 +236,9 @@ parsewordexp(void)
   union node *n, *first = NULL, **pnext;
   int         t;
 
-  /* This assumes the parser is not re-entered,
-   * which could happen if we add command substitution on PS1/PS2.
-   */
+  /* this assumes the parser is not re-entered,
+ * which could happen if we add command substitution on PS1/PS2
+ */
   parser_temp_free_all();
   heredoclist = NULL;
 
@@ -411,7 +411,7 @@ command(void)
   n1          = NULL;
   rpp         = &redir;
 
-  /* Check for redirection which may precede command */
+  /* check for redirection which may precede command */
   while (readtoken() == TREDIR) {
     *rpp = n2 = redirnode;
     rpp       = &n2->nfile.next;
@@ -485,9 +485,9 @@ command(void)
         n2->narg.next          = NULL;
         n1->nfor.args          = n2;
         /*
-         * Newline or semicolon here is optional (but note
-         * that the original Bourne shell only allowed NL).
-         */
+ * newline or semicolon here is optional (but note
+ * that the original bourne shell only allowed NL)
+ */
         if (lasttoken != TSEMI)
           tokpushback++;
       }
@@ -560,7 +560,7 @@ command(void)
       consumetoken(TEND);
       checkkwd = CHKKWD | CHKALIAS;
       break;
-    /* A simple command must have at least one redirection or word. */
+    /* a simple command must have at least one redirection or word */
     case TBACKGND:
     case TSEMI:
     case TAND:
@@ -582,7 +582,7 @@ command(void)
       synexpect(-1);
   }
 
-  /* Now check for redirection which may follow command */
+  /* now check for redirection which may follow command */
   while (readtoken() == TREDIR) {
     *rpp = n2 = redirnode;
     rpp       = &n2->nfile.next;
@@ -612,18 +612,18 @@ simplecmd(union node **rpp, union node *redir)
   int          special;
   int          savecheckkwd;
 
-  /* If we don't have any redirections already, then we must reset */
-  /* rpp to be the address of the local redir variable.  */
+  /* if we dont have any redirections already, then we must reset */
+  /* rpp to be the address of the local redir variable */
   if (redir == NULL)
     rpp = &redir;
 
   args = NULL;
   app  = &args;
   /*
-   * We save the incoming value, because we need this for shell
-   * functions.  There can not be a redirect or an argument between
-   * the function name and the open parenthesis.
-   */
+ * we save the incoming value, because we need this for shell
+ * functions. there can not be a redirect or an argument between
+ * the function name and the open parenthesis
+ */
   orig_rpp = rpp;
 
   savecheckkwd = CHKALIAS;
@@ -641,15 +641,15 @@ simplecmd(union node **rpp, union node *redir)
       rpp      = &n->nfile.next;
       parsefname(); /* read name of redirection file */
     } else if (lasttoken == TLP && app == &args->narg.next && rpp == orig_rpp) {
-      /* We have a function */
+      /* we have a function */
       consumetoken(TRP);
       funclinno = plinno;
       /*
-       * - Require plain text.
-       * - Functions with '/' cannot be called.
-       * - Reject name=().
-       * - Reject ksh extended glob patterns.
-       */
+ * - require plain text
+ * - functions with '/' cannot be called
+ * - reject name=()
+ * - reject ksh extended glob patterns
+ */
       if (!noexpand(n->narg.text) || quoteflag || strchr(n->narg.text, '/')
           || strchr("!%*+-=?@}~", n->narg.text[strlen(n->narg.text) - 1]))
         synerror("Bad function name");
@@ -764,7 +764,7 @@ parsefname(void)
 }
 
 /*
- * Input any here documents.
+ * input any here documents
  */
 
 static void
@@ -811,8 +811,8 @@ top:
   t = xxreadtoken();
 
   /*
-   * eat newlines
-   */
+ * eat newlines
+ */
   if (checkkwd & CHKNL) {
     while (t == TNL) {
       parseheredoc();
@@ -821,8 +821,8 @@ top:
   }
 
   /*
-   * check for keywords and aliases
-   */
+ * check for keywords and aliases
+ */
   if (t == TWORD && !quoteflag) {
     const char *const *pp;
 
@@ -853,21 +853,21 @@ out:
 }
 
 /*
- * Read the next input token.
- * If the token is a word, we set backquotelist to the list of cmds in
- *	backquotes.  We set quoteflag to true if any part of the word was
- *	quoted.
- * If the token is TREDIR, then we set redirnode to a structure containing
- *	the redirection.
- * In all cases, the variable startlinno is set to the number of the line
- *	on which the token starts.
+ * read the next input token
+ * if the token is a word, we set backquotelist to the list of cmds in
+ * backquotes. we set quoteflag to true if any part of the word was
+ * quoted
+ * if the token is TREDIR, then we set redirnode to a structure containing
+ * the redirection
+ * in all cases, the variable startlinno is set to the number of the line
+ * on which the token starts
  *
- * [Change comment:  here documents and internal procedures]
- * [Readtoken shouldn't have any arguments.  Perhaps we should make the
- *  word parsing code into a separate routine.  In this case, readtoken
- *  doesn't need to have any internal procedures, but parseword does.
- *  We could also make parseoperator in essence the main routine, and
- *  have parseword (readtoken1?) handle both words and redirection.]
+ * [change comment: here documents and internal procedures]
+ * [readtoken shouldnt have any arguments. perhaps we should make the
+ * word parsing code into a separate routine. in this case, readtoken
+ * doesnt need to have any internal procedures, but parseword does
+ * we could also make parseoperator in essence the main routine, and
+ * have parseword (readtoken1?) handle both words and redirection.]
  */
 
 #define RETURN(token) return lasttoken = token
@@ -956,10 +956,10 @@ struct tokenstate {
 };
 
 /*
- * Check to see whether we are at the end of the here document.  When this
- * is called, c is set to the first character of the next input line.  If
- * we are at the end of the here document, this routine sets the c to PEOF.
- * The new value of c is returned.
+ * check to see whether we are at the end of the here document. when this
+ * is called, c is set to the first character of the next input line. if
+ * we are at the end of the here document, this routine sets the c to PEOF
+ * the new value of c is returned
  */
 
 static int
@@ -994,9 +994,9 @@ checkend(int c, const char *eofmark, int striptabs)
 }
 
 /*
- * Parse a redirection operator.  The variable "out" points to a string
- * specifying the fd to be redirected.  The variable "c" contains the
- * first character of the redirection operator.
+ * parse a redirection operator. the variable "out" points to a string
+ * specifying the fd to be redirected. the variable "c" contains the
+ * first character of the redirection operator
  */
 
 static void
@@ -1051,7 +1051,7 @@ parseredir(char *out, int c)
 }
 
 /*
- * Called to parse command substitutions.
+ * called to parse command substitutions
  */
 
 static char *
@@ -1095,9 +1095,9 @@ parsebackq(char *out, struct nodelist **pbqlist, int oldstyle, int dblquote, int
   heredoclist = NULL;
   INTON;
   if (oldstyle) {
-    /* We must read until the closing backquote, giving special
-       treatment to some slashes, and then push the string and
-       reread it as input, interpreting it normally.  */
+    /* we must read until the closing backquote, giving special
+ * treatment to some slashes, and then push the string and
+ * reread it as input, interpreting it normally */
     char *oout;
     int   c;
     int   olen;
@@ -1165,9 +1165,9 @@ parsebackq(char *out, struct nodelist **pbqlist, int oldstyle, int dblquote, int
   (*nlpp)->n = n;
   if (oldstyle) {
     /*
-     * Start reading from old file again, ignoring any pushed back
-     * tokens left from the backquote parsing
-     */
+ * start reading from old file again, ignoring any pushed back
+ * tokens left from the backquote parsing
+ */
     popfile();
     tokpushback = 0;
   }
@@ -1201,8 +1201,8 @@ parsebackq(char *out, struct nodelist **pbqlist, int oldstyle, int dblquote, int
 }
 
 /*
- * Called to parse a backslash escape sequence inside $'...'.
- * The backslash has already been read.
+ * called to parse a backslash escape sequence inside $'...'
+ * the backslash has already been read
  */
 static char *
 readcstyleesc(char *out)
@@ -1315,13 +1315,13 @@ readcstyleesc(char *out)
       }
       if (v == 0 || (v >= 0xd800 && v <= 0xdfff))
         synerror("Bad escape sequence");
-      /* We really need iconv here. */
+      /* we really need iconv here */
       if (initial_localeisutf8 && v > 127) {
         CHECKSTRSPACE(4, out);
         /*
-         * We cannot use wctomb() as the locale may have
-         * changed.
-         */
+ * we cannot use wctomb() as the locale may have
+ * changed
+ */
         if (v <= 0x7ff) {
           USTPUTC(0xc0 | v >> 6, out);
           USTPUTC(0x80 | (v & 0x3f), out);
@@ -1347,9 +1347,9 @@ readcstyleesc(char *out)
   }
   vc = (char)v;
   /*
-   * We can't handle NUL bytes.
-   * POSIX says we should skip till the closing quote.
-   */
+ * we cant handle NUL bytes
+ * POSIX says we should skip till the closing quote
+ */
   if (vc == '\0') {
     while ((c = pgetc()) != '\'') {
       if (c == '\\')
@@ -1374,15 +1374,15 @@ readcstyleesc(char *out)
 }
 
 /*
- * If eofmark is NULL, read a word or a redirection symbol.  If eofmark
- * is not NULL, read a here document.  In the latter case, eofmark is the
+ * if eofmark is NULL, read a word or a redirection symbol. if eofmark
+ * is not NULL, read a here document. in the latter case, eofmark is the
  * word which marks the end of the document and striptabs is true if
- * leading tabs should be stripped from the document.  The argument firstc
- * is the first character of the input token or document.
+ * leading tabs should be stripped from the document. the argument firstc
+ * is the first character of the input token or document
  *
- * Because C does not have internal subroutines, I have simulated them
- * using goto's to implement the subroutine linkage.  The following macros
- * will run code that appears at the end of readtoken1.
+ * because c does not have internal subroutines, i have simulated them
+ * using goto's to implement the subroutine linkage. the following macros
+ * will run code that appears at the end of readtoken1
  */
 
 #define PARSESUB()                                                                                 \
@@ -1539,9 +1539,9 @@ loop: { /* for each line, until end of word */
               USTPUTC(')', out);
           } else {
             /*
-             * unbalanced parens
-             *  (don't 2nd guess - no error)
-             */
+ * unbalanced parens
+ * (dont 2nd guess - no error)
+ */
             pungetc();
             USTPUTC(')', out);
           }
@@ -1598,9 +1598,9 @@ endword:
   /* end of readtoken routine */
 
   /*
-   * Parse a substitution.  At this point, we have read the dollar sign
-   * and nothing else.
-   */
+ * parse a substitution. at this point, we have read the dollar sign
+ * and nothing else
+ */
 
 parsesub: {
   int               subtype;
@@ -1645,8 +1645,8 @@ parsesub: {
         length++;
       } while (!is_eof(c) && is_in_name(c));
       if (length == 6 && strncmp(out - length, "LINENO", length) == 0) {
-        /* Replace the variable name with the
-         * current line number. */
+        /* replace the variable name with the
+ * current line number */
         STADJUST(-6, out);
         CHECKSTRSPACE(11, out);
         linno = plinno;
@@ -1705,7 +1705,7 @@ parsesub: {
         case ':':
           flags |= VSNUL;
           c = pgetc_linecont();
-          /*FALLTHROUGH*/
+          /* FALLTHROUGH */
         default:
           p = strchr(types, c);
           if (p == NULL) {
@@ -1756,18 +1756,18 @@ parsesub: {
       state[level].parenlevel = 0;
       if (subtype == VSMINUS || subtype == VSPLUS || subtype == VSQUESTION || subtype == VSASSIGN) {
         /*
-         * For operators that were in the Bourne shell,
-         * inherit the double-quote state.
-         */
+ * for operators that were in the bourne shell,
+ * inherit the double-quote state
+ */
         state[level].syntax   = state[level - 1].syntax;
         state[level].category = TSTATE_VAR_OLD;
       } else {
         /*
-         * The other operators take a pattern,
-         * so go to BASESYNTAX.
-         * Also, ' and " are now special, even
-         * in here documents.
-         */
+ * the other operators take a pattern,
+ * so go to BASESYNTAX
+ * also, ' and " are now special, even
+ * in here documents
+ */
         state[level].syntax   = BASESYNTAX;
         state[level].category = TSTATE_VAR_NEW;
         newvarnest++;
@@ -1786,7 +1786,7 @@ parsesub: {
 }
 
 /*
- * Parse an arithmetic expansion (indicate start of one and set state)
+ * parse an arithmetic expansion (indicate start of one and set state)
  */
 parsearith: {
   if (level + 1 >= maxnest) {
@@ -1812,8 +1812,8 @@ parsearith: {
 } /* end of readtoken */
 
 /*
- * Returns true if the text contains nothing to expand (no dollar signs
- * or backquotes).
+ * returns true if the text contains nothing to expand (no dollar signs
+ * or backquotes)
  */
 
 static int
@@ -1835,8 +1835,8 @@ noexpand(char *text)
 }
 
 /*
- * Return true if the argument is a legal variable name (a letter or
- * underscore followed by zero or more letters, underscores, and digits).
+ * return true if the argument is a legal variable name (a letter or
+ * underscore followed by zero or more letters, underscores, and digits)
  */
 
 int
@@ -1877,9 +1877,9 @@ consumetoken(int token)
 }
 
 /*
- * Called when an unexpected token is read during the parse.  The argument
+ * called when an unexpected token is read during the parse. the argument
  * is the token that is expected, or -1 if more than one type of token can
- * occur at this point.
+ * occur at this point
  */
 
 static void
@@ -1937,7 +1937,7 @@ pgetc_linecont(void)
         setprompt(0);
     } else {
       pungetc();
-      /* Allow the backslash to be pushed back. */
+      /* allow the backslash to be pushed back */
       pushstring("\\", 1, NULL);
       return (pgetc());
     }
@@ -1968,11 +1968,11 @@ getusername(char *name, size_t namelen)
     euid = geteuid();
 
     /*
-     * Handle the case when there is more than one
-     * login with the same UID, or when the login
-     * returned by getlogin(2) does no longer match
-     * the current UID.
-     */
+ * handle the case when there is more than one
+ * login with the same UID, or when the login
+ * returned by getlogin(2) does no longer match
+ * the current UID
+ */
     pw = getpwlogin();
     if (pw == NULL || pw->pw_uid != euid)
       pw = getpwuid(euid);
@@ -1988,8 +1988,8 @@ getusername(char *name, size_t namelen)
 }
 
 /*
- * called by editline -- any expansions to the prompt
- *    should be added here.
+ * called by editline, any expansions to the prompt
+ * should be added here
  */
 char *
 getprompt(void *unused __unused)
@@ -2003,8 +2003,8 @@ getprompt(void *unused __unused)
   static char internal_error[] = "??";
 
   /*
-   * Select prompt format.
-   */
+ * select prompt format
+ */
   switch (whichprompt) {
     case 0:
       fmt = "";
@@ -2022,17 +2022,17 @@ getprompt(void *unused __unused)
   }
 
   /*
-   * Format prompt string.
-   */
+ * format prompt string
+ */
   for (i = 0; (i < PROMPTLEN - 1) && (*fmt != '\0'); i++, fmt++) {
     if (*fmt == '$') {
       const char *varname_start, *varname_end, *value;
       char        varname[256];
       int         namelen, braced = 0;
 
-      fmt++; /* Skip the '$' */
+      fmt++; /* skip the '$' */
 
-      /* Check for ${VAR} syntax */
+      /* check for ${VAR} syntax */
       if (*fmt == '{') {
         braced = 1;
         fmt++;
@@ -2040,26 +2040,26 @@ getprompt(void *unused __unused)
 
       varname_start = fmt;
 
-      /* Extract variable name */
+      /* extract variable name */
       if (is_digit(*fmt)) {
-        /* Positional parameter: $0, $1, etc. */
+        /* positional parameter: $0, $1, etc */
         fmt++;
         varname_end = fmt;
       } else if (is_special(*fmt)) {
-        /* Special parameter: $?, $!, $$, etc. */
+        /* special parameter: $?, $!, $$, etc */
         fmt++;
         varname_end = fmt;
       } else if (is_name(*fmt)) {
-        /* Regular variable name */
+        /* regular variable name */
         do
           fmt++;
         while (is_in_name(*fmt));
         varname_end = fmt;
       } else {
         /*
-         * Not a valid variable reference.
-         * Output literal '$'.
-         */
+ * not a valid variable reference
+ * output literal '$'
+ */
         ps[i] = '$';
         if (braced && i < PROMPTLEN - 2)
           ps[++i] = '{';
@@ -2069,23 +2069,23 @@ getprompt(void *unused __unused)
 
       namelen = varname_end - varname_start;
       if (namelen == 0 || namelen >= (int)sizeof(varname)) {
-        /* Invalid or too long, output literal */
+        /* invalid or too long, output literal */
         ps[i] = '$';
         fmt   = varname_start - 1;
         continue;
       }
 
-      /* Copy variable name */
+      /* copy variable name */
       memcpy(varname, varname_start, namelen);
       varname[namelen] = '\0';
 
-      /* Handle closing brace for ${VAR} */
+      /* handle closing brace for ${VAR} */
       if (braced) {
         if (*fmt == '}') {
           fmt++;
         } else {
-          /* Missing closing brace, treat as
-           * literal */
+          /* missing closing brace, treat as
+ * literal */
           ps[i] = '$';
           if (i < PROMPTLEN - 2)
             ps[++i] = '{';
@@ -2094,9 +2094,9 @@ getprompt(void *unused __unused)
         }
       }
 
-      /* Look up the variable */
+      /* look up the variable */
       if (namelen == 1 && is_digit(*varname)) {
-        /* Positional parameters - check digits FIRST */
+        /* positional parameters - check digits FIRST */
         int num = *varname - '0';
         if (num == 0)
           value = arg0 ? arg0 : "";
@@ -2105,7 +2105,7 @@ getprompt(void *unused __unused)
         else
           value = "";
       } else if (namelen == 1 && is_special(*varname)) {
-        /* Special parameters */
+        /* special parameters */
         char valbuf[20];
         int  num;
 
@@ -2129,22 +2129,22 @@ getprompt(void *unused __unused)
         snprintf(valbuf, sizeof(valbuf), "%d", num);
         value = valbuf;
       } else {
-        /* Regular variables */
+        /* regular variables */
         value = lookupvar(varname);
         if (value == NULL)
           value = "";
       }
 
-      /* Copy value to output, respecting buffer size */
+      /* copy value to output, respecting buffer size */
       while (*value != '\0' && i < PROMPTLEN - 1) {
         ps[i++] = *value++;
       }
 
       /*
-       * Adjust fmt and i for the loop increment.
-       * fmt will be incremented by the for loop,
-       * so position it one before where we want.
-       */
+ * adjust fmt and i for the loop increment
+ * fmt will be incremented by the for loop,
+ * so position it one before where we want
+ */
       fmt--;
       i--;
       continue;
@@ -2155,19 +2155,19 @@ getprompt(void *unused __unused)
 
     switch (*++fmt) {
       /*
-       * Non-printing sequence begin and end.
-       */
+ * non-printing sequence begin and end
+ */
       case '[':
       case ']':
         ps[i] = '\001';
         break;
 
       /*
-       * Literal \ and some ASCII characters:
-       * \a	BEL
-       * \e	ESC
-       * \r	CR
-       */
+ * literal \ and some ASCII characters:
+ * \a bel
+ * \e esc
+ * \r cr
+ */
       case '\\':
       case 'a':
       case 'e':
@@ -2183,8 +2183,8 @@ getprompt(void *unused __unused)
         break;
 
       /*
-       * CRLF sequence
-       */
+ * CRLF sequence
+ */
       case 'n':
         if (i < PROMPTLEN - 3) {
           ps[i++] = '\r';
@@ -2193,60 +2193,60 @@ getprompt(void *unused __unused)
         break;
 
       /*
-       * Print the current time as per provided strftime format.
-       */
+ * print the current time as per provided strftime format
+ */
       case 'D': {
-        char       tfmt[128] = "%X"; /* \D{} means %X. */
+        char       tfmt[128] = "%X"; /* \d{} means %x */
         struct tm *now;
 
         if (fmt[1] != '{') {
           /*
-           * "\D" but not "\D{", so treat the '\'
-           * literally and rewind fmt to treat 'D'
-           * literally next iteration.
-           */
+ * "\d" but not "\d{", so treat the '\'
+ * literally and rewind fmt to treat 'd'
+ * literally next iteration
+ */
           ps[i] = '\\';
           fmt--;
           break;
         }
-        fmt += 2; /* Consume "D{". */
+        fmt += 2; /* consume "d{" */
         if (fmt[0] != '}') {
           char *end;
 
           end = memccpy(tfmt, fmt, '}', sizeof(tfmt));
           if (end == NULL) {
             /*
-             * Format too long or no '}', so
-             * ignore "\D{" altogether.
-             * The loop will do i++, but nothing
-             * was written to ps, so do i-- here.
-             * Rewind fmt for similar reason.
-             */
+ * format too long or no '}', so
+ * ignore "\d{" altogether
+ * the loop will do i++, but nothing
+ * was written to ps, so do i-- here
+ * rewind fmt for similar reason
+ */
             i--;
             fmt--;
             break;
           }
-          *--end = '\0'; /* Ignore the copy of '}'. */
+          *--end = '\0'; /* ignore the copy of '}' */
           fmt += end - tfmt;
         }
         now = localtime(&(time_t){time(NULL)});
         i += strftime(&ps[i], PROMPTLEN - i - 1, tfmt, now);
-        i--; /* The loop will do i++. */
+        i--; /* the loop will do i++ */
         break;
       }
 
       /*
-       * Hostname.
-       *
-       * \h specifies just the local hostname,
-       * \H specifies fully-qualified hostname.
-       */
+ * hostname
+ *
+ * \h specifies just the local hostname,
+ * \h specifies fully-qualified hostname
+ */
       case 'h':
       case 'H':
         ps[i] = '\0';
         gethostname(&ps[i], PROMPTLEN - i - 1);
         ps[PROMPTLEN - 1] = '\0';
-        /* Skip to end of hostname. */
+        /* skip to end of hostname */
         trim = (*fmt == 'h') ? '.' : '\0';
         while ((ps[i] != '\0') && (ps[i] != trim))
           i++;
@@ -2254,22 +2254,22 @@ getprompt(void *unused __unused)
         break;
 
       /*
-       * User name.
-       */
+ * user name
+ */
       case 'u':
         ps[i] = '\0';
         getusername(&ps[i], PROMPTLEN - i);
-        /* Skip to end of username. */
+        /* skip to end of username */
         while (ps[i + 1] != '\0')
           i++;
         break;
 
       /*
-       * Working directory.
-       *
-       * \W specifies just the final component,
-       * \w specifies the entire path.
-       */
+ * working directory
+ *
+ * \w specifies just the final component,
+ * \w specifies the entire path
+ */
       case 'W':
       case 'w':
         pwd = lookupvar("PWD");
@@ -2289,23 +2289,23 @@ getprompt(void *unused __unused)
             strlcpy(&ps[i], pwd, PROMPTLEN - i);
           }
         }
-        /* Skip to end of path. */
+        /* skip to end of path */
         while (ps[i + 1] != '\0')
           i++;
         break;
 
       /*
-       * Superuser status.
-       *
-       * '$' for normal users, '#' for root.
-       */
+ * superuser status
+ *
+ * '$' for normal users, '#' for root
+ */
       case '$':
         ps[i] = (geteuid() != 0) ? '$' : '#';
         break;
 
       /*
-       * Emit unrecognized formats verbatim.
-       */
+ * emit unrecognized formats verbatim
+ */
       default:
         ps[i] = '\\';
         if (i < PROMPTLEN - 2)

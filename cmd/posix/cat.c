@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <fcntl.h>
 #include <string.h>
@@ -62,7 +62,7 @@ main(int argc, char *argv[])
   // ?man ## Exit status
   // ?man
   // ?man cat exits 0 on success, and >0 if an error occurs reading any
-  // file ?man or writing to standard output ?man ?man ## See also ?man
+  // file ?man or writing to standard output ?man ?man ## see also ?man
   // ?man cp(1), dd(1)
   // ?man
 

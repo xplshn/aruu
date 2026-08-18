@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "bltin.h"
 #include "fs.h"
 #include "util.h"
@@ -15,8 +15,8 @@ enum {
   COMMENT_HASH,    /* line # only */
   COMMENT_PERCENT, /* line % only */
   COMMENT_SEMI,    /* line ; only */
-  COMMENT_DASH,    /* line -- only */
-  COMMENT_HASKELL, /* line -- and block {- -} */
+  COMMENT_DASH,    /* line, only */
+  COMMENT_HASKELL, /* line, and block {- -} */
   COMMENT_PAREN,   /* block (* *) only, no line comment */
 };
 
@@ -60,7 +60,7 @@ struct CommentSpec {
 };
 
 static const struct CommentSpec comment_specs[] = {
-    [COMMENT_C]       = {"//", "/*", "*/"},
+    [COMMENT_C]       = {"// ", "/*", "*/"},
     [COMMENT_HASH]    = {"#", NULL, NULL},
     [COMMENT_PERCENT] = {"%", NULL, NULL},
     [COMMENT_SEMI]    = {";", NULL, NULL},
@@ -261,9 +261,9 @@ detect_lang(const char *name)
   }
 
   /*
-   * anchored to the end of the name, so arch.txt (which contains "rc"
-   * but does not end in it) is never mistaken for a shell rc file
-   */
+ * anchored to the end of the name, so arch.txt (which contains "rc"
+ * but does not end in it) is never mistaken for a shell rc file
+ */
   nlen = strlen(name);
   if (nlen >= 2 && !strcmp(name + nlen - 2, "rc"))
     return LANG_SH;

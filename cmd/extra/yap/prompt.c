@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "prompt.h"
 #include "assert.h"
@@ -15,7 +15,7 @@
 #include "process.h"
 #include "term.h"
 
-static char *errorgiven; /* Set to error message, if there is one */
+static char *errorgiven; /* set to error message, if there is one */
 
 static char *display_basename(char *path, char *scratch, size_t scratch_size);
 
@@ -29,7 +29,7 @@ copy(char *p, const char *ep, char *s)
 }
 
 /*
- * display the prompt and refresh the screen.
+ * display the prompt and refresh the screen
  */
 
 void
@@ -50,8 +50,8 @@ give_prompt()
   }
   if (!stupid) {
     /*
-     * fancy prompt
-     */
+ * fancy prompt
+ */
     clrbline();
     standout();
     pb = copy(pb, &buf[255], display_basename(currentfile, filebuf, sizeof(filebuf)));
@@ -62,12 +62,12 @@ give_prompt()
       pb = copy(pb, &buf[255], getnum(p->lastline));
     }
   } else {
-    *pb++ = '\007'; /* Stupid terminal, stupid prompt */
+    *pb++ = '\007'; /* stupid terminal, stupid prompt */
   }
   if (errorgiven) {
     /*
-     * display error message
-     */
+ * display error message
+ */
     pb = copy(pb, &buf[255], " ");
     pb = copy(pb, &buf[255], errorgiven);
     if (stupid) {
@@ -79,8 +79,8 @@ give_prompt()
     name = &filenames[filecount];
     if (status) {
       /*
-       * indicate top and/or bottom
-       */
+ * indicate top and/or bottom
+ */
       if (status & START) {
         if (!*(name - 1)) {
           pb = copy(pb, &buf[255], "Top");
@@ -130,7 +130,7 @@ display_basename(char *path, char *scratch, size_t scratch_size)
 }
 
 /*
- * Remember error message
+ * remember error message
  */
 
 void
@@ -141,7 +141,7 @@ error(char *str)
 
 void
 ret_to_continue()
-{ /* Obvious */
+{ /* obvious */
   int         c;
   static char buf[2];
 

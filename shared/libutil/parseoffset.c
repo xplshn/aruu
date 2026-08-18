@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include <ctype.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -44,6 +44,9 @@ parseoffset(const char *str)
         break;
       case 'G':
         scale = 1024L * 1024L * 1024L;
+        break;
+      case 'T':
+        scale = 1024L * 1024L * 1024L * 1024L;
         break;
       default:
         weprintf("parseoffset %s: invalid suffix '%s'\n", str, end);

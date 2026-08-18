@@ -1,4 +1,4 @@
-/* Copyright (c) 1985 Ceriel J.H. Jacobs */
+/* copyright (c) 1985 ceriel J.H. jacobs */
 
 #include "keys.h"
 #include "assert.h"
@@ -17,13 +17,13 @@ red=^L:rep=.:bps=Z:bss=b:fps=z:fss=d:shl=!:tom=':top=\\^:vis=e:\
 wrf=w:qui=q:qui=Q:mar=m:pip=|";
 
 /*
- * Construct an error message and return it
+ * construct an error message and return it
  */
 
 static char *
 kerror(char *key, char *emess)
 {
-  static char ebuf[80]; /* Room for the error message */
+  static char ebuf[80]; /* room for the error message */
 
   (void)strcpy(ebuf, key);
   (void)strcat(ebuf, emess);
@@ -31,41 +31,41 @@ kerror(char *key, char *emess)
 }
 
 /*
- * Compile a keymap into commtable. Returns an error message if there
+ * compile a keymap into commtable. returns an error message if there
  * is one
  */
 
 static char *
 compile(char *map, struct keymap *commtable)
 {
-  char *mark; /* Indicates start of mnemonic */
-  char *c;    /* Runs through buf */
+  char *mark; /* indicates start of mnemonic */
+  char *c;    /* runs through buf */
   int   temp;
   char *escapes = commtable->k_esc;
-  char  buf[10]; /* Will hold key sequence */
+  char  buf[10]; /* will hold key sequence */
 
   (void)strcpy(commtable->k_help, "Illegal command");
   while (*map) {
     c    = buf;
-    mark = map; /* Start of mnemonic */
+    mark = map; /* start of mnemonic */
     while (*map && *map != '=') {
       map++;
     }
     if (!*map) {
       /*
-       * Mnemonic should end with '='
-       */
+ * mnemonic should end with '='
+ */
       return kerror(mark, ": Syntax error");
     }
     *map++ = 0;
     while (*map) {
       /*
-       * Get key sequence
-       */
+ * get key sequence
+ */
       if (*map == ':') {
         /*
-         * end of key sequence
-         */
+ * end of key sequence
+ */
         map++;
         break;
       }
@@ -73,8 +73,8 @@ compile(char *map, struct keymap *commtable)
       if (*c == '^' || *c == '\\') {
         if (!(temp = *map++)) {
           /*
-           * Escape not followed by a character
-           */
+ * escape not followed by a character
+ */
           return kerror(mark, ": Syntax error");
         }
         if (*c == '^') {
@@ -109,9 +109,9 @@ compile(char *map, struct keymap *commtable)
     assert(temp == FSM_OKE);
     if (!strcmp(mark, "hlp")) {
       /*
-       * Create an error message to be given when the user
-       * types an illegal command
-       */
+ * create an error message to be given when the user
+ * types an illegal command
+ */
       (void)strcpy(commtable->k_help, "Type ");
       (void)strcat(commtable->k_help, buf);
       (void)strcat(commtable->k_help, " for help");
@@ -122,7 +122,7 @@ compile(char *map, struct keymap *commtable)
 }
 
 /*
- * Initialize the keymaps
+ * initialize the keymaps
  */
 
 void
@@ -133,20 +133,20 @@ initkeys()
 
   currmap  = &xx[0];
   othermap = &xx[1];
-  p        = compile(defaultmap, currmap); /* Compile default map */
+  p        = compile(defaultmap, currmap); /* compile default map */
   assert(p == (char *)0);
   p = getenv("YAPKEYS");
   if (p) {
     if (!(p = compile(p, othermap))) {
       /*
-       * No errors in user defined keymap. So, use it
-       */
+ * no errors in user defined keymap. so, use it
+ */
       do_chkm(0L);
       return;
     }
     error(p);
   }
-  othermap = 0; /* No other keymap */
+  othermap = 0; /* no other keymap */
 }
 
 int
@@ -162,10 +162,10 @@ is_escape(int c)
 }
 
 static char keyset[16]; /* bitset indicating which keys are
-                         * used
-                         */
+ * used
+ */
 /*
- * Mark key "key" as used
+ * mark key "key" as used
  */
 
 void

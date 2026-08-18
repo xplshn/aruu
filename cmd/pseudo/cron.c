@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -97,7 +97,7 @@ runjob(char *cmd)
 
   t = time(NULL);
 
-  /* If command is already running, skip it */
+  /* if command is already running, skip it */
   TAILQ_FOREACH(je, &jobhead, entry)
   {
     if (strcmp(je->cmd, cmd) == 0) {
@@ -552,7 +552,7 @@ main(int argc, char *argv[])
       if (nflag == 0)
         unlink(pidfile);
       unloadentries();
-      /* Don't wait or kill forked processes, just exit */
+      /* dont wait or kill forked processes, just exit */
       break;
     }
 

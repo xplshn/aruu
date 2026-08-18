@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <arpa/inet.h>
 #include <ctype.h>
@@ -39,6 +39,16 @@ static void
 usage(void)
 {
   eprintf("usage: %s [addr | link | route] [args...]\n", argv0);
+}
+
+/* real ip(8) and BusyBox's own ip applet both accept any unambiguous
+ * prefix of an object name (ip a, ip li, ip ro, ...), not just the
+ * full word: obj matches full whenever it is a real, non-empty prefix */
+static int
+is_object(const char *obj, const char *full)
+{
+  size_t len = strlen(obj);
+  return len > 0 && len <= strlen(full) && strncmp(obj, full, len) == 0;
 }
 
 static void
@@ -369,7 +379,9 @@ do_route(int argc, char *argv[])
 
 // ?man ip: show or configure routing and devices
 // ?man arguments: [addr | link | route] [args ...]
-// ?man configure and view network devices, routing, and tunnels
+// ?man configure and view network devices, routing, and tunnels. any
+// ?man unambiguous prefix of an object name works too (a, addr, l,
+// ?man link, r, route)
 // ?man ## COMMANDS
 // ?man ### addr [show | list [dev <device>]]
 // ?man show interface addresses
@@ -405,11 +417,11 @@ main(int argc, char *argv[])
 
   obj = argv[0];
 
-  if (strcmp(obj, "addr") == 0 || strcmp(obj, "address") == 0) {
+  if (is_object(obj, "address")) {
     return do_addr(argc - 1, argv + 1);
-  } else if (strcmp(obj, "link") == 0) {
+  } else if (is_object(obj, "link")) {
     return do_link(argc - 1, argv + 1);
-  } else if (strcmp(obj, "route") == 0) {
+  } else if (is_object(obj, "route")) {
     return do_route(argc - 1, argv + 1);
   }
 

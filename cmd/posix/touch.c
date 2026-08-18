@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/stat.h>
 
@@ -77,7 +77,7 @@ parsetime(char *str)
       format = "%Y-%m-%dT%H:%M:%S";
       break;
     case 20:
-      /* only Zulu-timezone supported */
+      /* only zulu-timezone supported */
       if (str[19] != 'Z')
         eprintf("Invalid time zone\n");
       str[19] = 0;

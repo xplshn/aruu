@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <limits.h>
 #include <stdint.h>
@@ -25,7 +25,7 @@ isleap(size_t year, enum caltype cal)
     if (year % 100 == 0)
       return 0;
     return (year % 4 == 0);
-  } else { /* cal == Julian */
+  } else { /* cal == julian */
     return (year % 4 == 0);
   }
 }
@@ -38,7 +38,7 @@ monthlength(size_t year, int month, enum caltype cal)
   return (month == FEB && isleap(year, cal)) ? 29 : mdays[month];
 }
 
-/* From http://www.tondering.dk/claus/cal/chrweek.php#calcdow */
+/* From http:// www.tondering.dk/claus/cal/chrweek.php#calcdow */
 static int
 dayofweek(size_t year, int month, int dom, enum caltype cal)
 {
@@ -51,7 +51,7 @@ dayofweek(size_t year, int month, int dom, enum caltype cal)
 
   if (cal == GREGORIAN)
     return (dom + y + y / 4 - y / 100 + y / 400 + (31 * m) / 12) % 7;
-  else /* cal == Julian */
+  else /* cal == julian */
     return (5 + dom + y + y / 4 + (31 * m) / 12) % 7;
 }
 
@@ -59,7 +59,7 @@ static void
 printgrid(size_t year, int month, int fday, int line)
 {
   enum caltype cal;
-  int          offset, dom, d = 0, trans; /* are we in the transition from Julian to Gregorian? */
+  int          offset, dom, d = 0, trans; /* are we in the transition from julian to gregorian? */
   int          today = 0;
 
   cal    = (year < TRANS_YEAR || (year == TRANS_YEAR && month <= TRANS_MONTH)) ? JULIAN : GREGORIAN;
@@ -187,7 +187,7 @@ main(int argc, char *argv[])
   fday  = 0;
 
   if (!isatty(STDOUT_FILENO))
-    ltime = NULL; /* don't highlight today's date */
+    ltime = NULL; /* dont highlight today's date */
 
 #ifdef FEATURE_CAL_EXT
   ncols = 3;
@@ -223,7 +223,7 @@ main(int argc, char *argv[])
       fday = estrtonum(EARGF(usage()), 0, 6);
       break;
     // ?man -m: specify mode or limit
-    case 'm': /* Monday */
+    case 'm': /* monday */
       fday = 1;
       break;
     // ?man -n:num: print line numbers or counts
@@ -233,7 +233,7 @@ main(int argc, char *argv[])
       );
       break;
     // ?man -s: silent mode or print summary
-    case 's': /* Sunday */
+    case 's': /* sunday */
       fday = 0;
       break;
 #endif

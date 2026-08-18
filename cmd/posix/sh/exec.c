@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <errno.h>
@@ -41,12 +41,12 @@
 #include <unistd.h>
 
 /*
- * When commands are first encountered, they are entered in a hash table.
- * This ensures that a full path search will not have to be done for them
- * on each invocation.
+ * when commands are first encountered, they are entered in a hash table
+ * this ensures that a full path search will not have to be done for them
+ * on each invocation
  *
- * We should investigate converting to a linear search, even though that
- * would make the command name "hash" a misnomer.
+ * we should investigate converting to a linear search, even though that
+ * would make the command name "hash" a misnomer
  */
 
 #include "../../../shared/paths.h"
@@ -91,10 +91,10 @@ static void             delete_cmd_entry(void);
 static void             addcmdentry(const char *, struct cmdentry *);
 
 /*
- * Exec a program.  Never returns.  If you change this routine, you may
- * have to change the find_command routine as well.
+ * exec a program. never returns. if you change this routine, you may
+ * have to change the find_command routine as well
  *
- * The argv array may be changed and element argv[-1] should be writable.
+ * the argv array may be changed and element argv[-1] should be writable
  */
 
 void
@@ -156,7 +156,7 @@ shellexec(char **argv, char **envp, const char *path, int idx)
     }
   }
 
-  /* Map to POSIX errors */
+  /* map to POSIX errors */
   if (e == ENOENT || e == ENOTDIR)
     errorwithstatus(127, "%s: not found", argv[0]);
   else
@@ -173,16 +173,16 @@ isbinary(const char *data, size_t len)
   if (nul == NULL)
     return 0;
   /*
-   * POSIX says we shall allow execution if the initial part intended
-   * to be parsed by the shell consists of characters and does not
-   * contain the NUL character. This allows concatenating a shell
-   * script (ending with exec or exit) and a binary payload.
-   *
-   * In order to reject common binary files such as PNG images, check
-   * that there is a lowercase letter or expansion before the last
-   * newline before the NUL character, in addition to the check for
-   * the newline character suggested by POSIX.
-   */
+ * POSIX says we shall allow execution if the initial part intended
+ * to be parsed by the shell consists of characters and does not
+ * contain the NUL character. this allows concatenating a shell
+ * script (ending with exec or exit) and a binary payload
+ *
+ * in order to reject common binary files such as PNG images, check
+ * that there is a lowercase letter or expansion before the last
+ * newline before the NUL character, in addition to the check for
+ * the newline character suggested by POSIX
+ */
   hasletter = 0;
   for (p = data; *p != '\0'; p++) {
     if ((*p >= 'a' && *p <= 'z') || *p == '$' || *p == '`')
@@ -221,13 +221,13 @@ tryexec(char *cmd, char **argv, char **envp)
 }
 
 /*
- * Do a path search.  The variable path (passed by reference) should be
+ * do a path search. the variable path (passed by reference) should be
  * set to the start of the path before the first call; padvance will update
- * this value as it proceeds.  Successive calls to padvance will return
- * the possible path expansions in sequence.  If popt is not NULL, options
+ * this value as it proceeds. successive calls to padvance will return
+ * the possible path expansions in sequence. if popt is not NULL, options
  * are processed: if an option (indicated by a percent sign) appears in
  * the path entry then *popt will be set to point to it; else *popt will be
- * set to NULL.  If popt is NULL, percent signs are not special.
+ * set to NULL. if popt is NULL, percent signs are not special
  */
 
 char *
@@ -271,7 +271,7 @@ padvance(const char **path, const char **popt, const char *name)
   return stalloc(len);
 }
 
-/*** Command hashing code ***/
+/* ** command hashing code ** */
 
 int
 hashcmd(int argc __unused, char **argv __unused)
@@ -363,8 +363,8 @@ printentry(struct tblentry *cmdp, int verbose)
 }
 
 /*
- * Resolve a command name.  If you change this routine, you may have to
- * change the shellexec routine as well.
+ * resolve a command name. if you change this routine, you may have to
+ * change the shellexec routine as well
  */
 
 void
@@ -380,7 +380,7 @@ find_command(const char *name, struct cmdentry *entry, int act, const char *path
   int              spec;
   int              cd;
 
-  /* If name contains a slash, don't use the hash table */
+  /* if name contains a slash, dont use the hash table */
   if (strchr(name, '/') != NULL) {
     entry->cmdtype = CMDNORMAL;
     entry->u.index = 0;
@@ -390,7 +390,7 @@ find_command(const char *name, struct cmdentry *entry, int act, const char *path
 
   cd = 0;
 
-  /* If name is in the table, we're done */
+  /* if name is in the table, we're done */
   if ((cmdp = cmdlookup(name, 0)) != NULL) {
     if (cmdp->cmdtype == CMDFUNCTION && act & DO_NOFUNC)
       cmdp = NULL;
@@ -413,7 +413,7 @@ find_command(const char *name, struct cmdentry *entry, int act, const char *path
 
 #if FEATURE_NOEXEC || FEATURE_NOFORK
   /* when builtin dispatch is active, registered wexec builtins are available
-   * even if they are not present on the filesystem */
+ * even if they are not present on the filesystem */
   if ((wexec_get_noexec() || wexec_get_nofork()) && wexec_is_builtin(name)) {
     INTOFF;
     cmdp = cmdlookup(name, 1);
@@ -427,7 +427,7 @@ find_command(const char *name, struct cmdentry *entry, int act, const char *path
   }
 #endif
 
-  /* We have to search path. */
+  /* we have to search path */
 
   e   = ENOENT;
   idx = -1;
@@ -502,7 +502,7 @@ success:
 }
 
 /*
- * Search the table of builtin commands.
+ * search the table of builtin commands
  */
 
 int
@@ -522,8 +522,8 @@ find_builtin(const char *name, int *special)
 }
 
 /*
- * Called when a cd is done.  If any entry in cmdtable depends on the current
- * directory, simply clear cmdtable completely.
+ * called when a cd is done. if any entry in cmdtable depends on the current
+ * directory, simply clear cmdtable completely
  */
 
 void
@@ -534,9 +534,9 @@ hashcd(void)
 }
 
 /*
- * Called before PATH is changed.  The argument is the new value of PATH;
- * pathval() still returns the old value at this point.  Called with
- * interrupts off.
+ * called before PATH is changed. the argument is the new value of PATH;
+ * pathval() still returns the old value at this point. called with
+ * interrupts off
  */
 
 void
@@ -546,7 +546,7 @@ changepath(const char *newval __unused)
 }
 
 /*
- * Clear out cached utility locations.
+ * clear out cached utility locations
  */
 
 void
@@ -585,11 +585,11 @@ hashname(const char *p)
 }
 
 /*
- * Locate a command in the command hash table.  If "add" is nonzero,
- * add the command to the table if it is not already present.  The
+ * locate a command in the command hash table. if "add" is nonzero,
+ * add the command to the table if it is not already present. the
  * variable "lastcmdentry" is set to point to the address of the link
  * pointing to the entry, so that delete_cmd_entry can delete the
- * entry.
+ * entry
  */
 
 static struct tblentry **lastcmdentry;
@@ -646,7 +646,7 @@ success:
 }
 
 /*
- * Delete the command entry returned on the last lookup.
+ * delete the command entry returned on the last lookup
  */
 
 static void
@@ -662,8 +662,8 @@ delete_cmd_entry(void)
 }
 
 /*
- * Add a new command entry, replacing any existing command entry for
- * the same name.
+ * add a new command entry, replacing any existing command entry for
+ * the same name
  */
 
 static void
@@ -683,7 +683,7 @@ addcmdentry(const char *name, struct cmdentry *entry)
 }
 
 /*
- * Define a shell function.
+ * define a shell function
  */
 
 void
@@ -700,8 +700,8 @@ defun(const char *name, union node *func)
 }
 
 /*
- * Delete a function if it exists.
- * Called with interrupts off.
+ * delete a function if it exists
+ * called with interrupts off
  */
 
 int
@@ -718,7 +718,7 @@ unsetfunc(const char *name)
 }
 
 /*
- * Check if a function by a certain name exists.
+ * check if a function by a certain name exists
  */
 int
 isfunc(const char *name)
@@ -743,8 +743,8 @@ print_absolute_path(const char *name)
 }
 
 /*
- * Shared code for the following builtin commands:
- *    type, command -v, command -V
+ * shared code for the following builtin commands:
+ * type, command -v, command -V
  */
 
 int
@@ -761,7 +761,7 @@ typecmd_impl(int argc, char **argv, int cmd, const char *path)
     clearcmdentry();
 
   for (i = 1; i < argc; i++) {
-    /* First look at the keywords */
+    /* first look at the keywords */
     for (pp = parsekwd; *pp; pp++)
       if (**pp == *argv[i] && equal(*pp, argv[i]))
         break;
@@ -774,7 +774,7 @@ typecmd_impl(int argc, char **argv, int cmd, const char *path)
       continue;
     }
 
-    /* Then look at the aliases */
+    /* then look at the aliases */
     if ((ap = lookupalias(argv[i], 1)) != NULL) {
       if (cmd == TYPECMD_SMALLV) {
         out1fmt("alias %s=", argv[i]);
@@ -785,13 +785,13 @@ typecmd_impl(int argc, char **argv, int cmd, const char *path)
       continue;
     }
 
-    /* Then check if it is a tracked alias */
+    /* then check if it is a tracked alias */
     if ((cmdp = cmdlookup(argv[i], 0)) != NULL) {
       entry.cmdtype = cmdp->cmdtype;
       entry.u       = cmdp->param;
       entry.special = cmdp->special;
     } else {
-      /* Finally use brute force */
+      /* finally use brute force */
       find_command(argv[i], &entry, 0, path);
     }
 
@@ -875,7 +875,7 @@ typecmd_impl(int argc, char **argv, int cmd, const char *path)
 }
 
 /*
- * Locate and print what a word is...
+ * locate and print what a word is...
  */
 
 int

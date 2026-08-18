@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include "trap.h"
@@ -55,8 +55,8 @@
 #include <unistd.h>
 
 /*
- * Sigmode records the current value of the signal handlers for the various
- * modes.  A value of zero means that the current handler is not known.
+ * sigmode records the current value of the signal handlers for the various
+ * modes. a value of zero means that the current handler is not known
  * S_HARD_IGN indicates that the signal was ignored on entry to the shell,
  */
 
@@ -73,7 +73,7 @@ static int            in_dotrap;          /* do we execute in a trap handler? */
 static char *volatile trap[NSIG];         /* trap handler commands */
 static volatile sig_atomic_t gotsig[NSIG];
 /* indicates specified signal received */
-static int ignore_sigchld; /* Used while handling SIGCHLD traps. */
+static int ignore_sigchld; /* used while handling SIGCHLD traps */
 static int last_trapsig;
 
 static int exiting;            /* exitshell() has been called */
@@ -82,9 +82,9 @@ static int exiting_exitstatus; /* value passed to exitshell() */
 static int getsigaction(int, sig_t *);
 
 /*
- * Map a string to a signal number.
+ * map a string to a signal number
  *
- * Note: the signal number may exceed NSIG.
+ * note: the signal number may exceed NSIG
  */
 static int
 sigstring_to_signum(char *sig)
@@ -109,7 +109,7 @@ sigstring_to_signum(char *sig)
 }
 
 /*
- * Print a list of valid signal names.
+ * print a list of valid signal names
  */
 static void
 printsignals(void)
@@ -136,7 +136,7 @@ printsignals(void)
 }
 
 /*
- * The trap builtin.
+ * the trap builtin
  */
 int
 trapcmd(int argc __unused, char **argv)
@@ -200,7 +200,7 @@ trapcmd(int argc __unused, char **argv)
 }
 
 /*
- * Clear traps on a fork.
+ * clear traps on a fork
  */
 void
 clear_traps(void)
@@ -220,7 +220,7 @@ clear_traps(void)
 }
 
 /*
- * Check if we have any traps enabled.
+ * check if we have any traps enabled
  */
 int
 have_traps(void)
@@ -235,8 +235,8 @@ have_traps(void)
 }
 
 /*
- * Set the signal handler for the specified signal.  The routine figures
- * out what it should be set to.
+ * set the signal handler for the specified signal. the routine figures
+ * out what it should be set to
  */
 void
 setsignal(int signo)
@@ -281,19 +281,19 @@ setsignal(int signo)
   t = &sigmode[signo];
   if (*t == 0) {
     /*
-     * current setting unknown
-     */
+ * current setting unknown
+ */
     if (!getsigaction(signo, &sigact)) {
       /*
-       * Pretend it worked; maybe we should give a warning
-       * here, but other shells don't. We don't alter
-       * sigmode, so that we retry every time.
-       */
+ * pretend it worked; maybe we should give a warning
+ * here, but other shells dont. we dont alter
+ * sigmode, so that we retry every time
+ */
       return;
     }
     if (sigact == SIG_IGN) {
       if (mflag && (signo == SIGTSTP || signo == SIGTTIN || signo == SIGTTOU)) {
-        *t = S_IGN; /* don't hard ignore these */
+        *t = S_IGN; /* dont hard ignore these */
       } else
         *t = S_HARD_IGN;
     } else {
@@ -321,7 +321,7 @@ setsignal(int signo)
 }
 
 /*
- * Return the current setting for sig w/o changing it.
+ * return the current setting for sig w/o changing it
  */
 static int
 getsigaction(int signo, sig_t *sigact)
@@ -335,7 +335,7 @@ getsigaction(int signo, sig_t *sigact)
 }
 
 /*
- * Ignore a signal.
+ * ignore a signal
  */
 void
 ignoresig(int signo)
@@ -355,7 +355,7 @@ issigchldtrapped(void)
 }
 
 /*
- * Signal handler.
+ * signal handler
  */
 void
 onsig(int signo)
@@ -368,7 +368,7 @@ onsig(int signo)
     return;
   }
 
-  /* If we are currently in a wait builtin, prepare to break it */
+  /* if we are currently in a wait builtin, prepare to break it */
   if (signo == SIGINT || signo == SIGQUIT)
     pendingsig_waitcmd = signo;
 
@@ -380,8 +380,8 @@ onsig(int signo)
 }
 
 /*
- * Called to execute a trap.  Perhaps we should avoid entering new trap
- * handlers while we are executing a trap handler.
+ * called to execute a trap. perhaps we should avoid entering new trap
+ * handlers while we are executing a trap handler
  */
 void
 dotrap(void)
@@ -399,21 +399,21 @@ dotrap(void)
         gotsig[i] = 0;
         if (trap[i]) {
           /*
-           * Ignore SIGCHLD to avoid infinite
-           * recursion if the trap action does
-           * a fork.
-           */
+ * ignore SIGCHLD to avoid infinite
+ * recursion if the trap action does
+ * a fork
+ */
           if (i == SIGCHLD)
             ignore_sigchld++;
 
           /*
-           * Backup current evalskip
-           * state and reset it before
-           * executing a trap, so that the
-           * trap is not disturbed by an
-           * ongoing break/continue/return
-           * statement.
-           */
+ * backup current evalskip
+ * state and reset it before
+ * executing a trap, so that the
+ * trap is not disturbed by an
+ * ongoing break/continue/return
+ * statement
+ */
           prev_evalskip  = evalskip;
           prev_skipcount = skipcount;
           evalskip       = 0;
@@ -425,12 +425,12 @@ dotrap(void)
           popstackmark(&smark);
 
           /*
-           * If such a command was not
-           * already in progress, allow a
-           * break/continue/return in the
-           * trap action to have an effect
-           * outside of it.
-           */
+ * if such a command was not
+ * already in progress, allow a
+ * break/continue/return in the
+ * trap action to have an effect
+ * outside of it
+ */
           if (evalskip == 0 || prev_evalskip != 0) {
             evalskip   = prev_evalskip;
             skipcount  = prev_skipcount;
@@ -457,7 +457,7 @@ trap_init(void)
 }
 
 /*
- * Controls whether the shell is interactive or not based on iflag.
+ * controls whether the shell is interactive or not based on iflag
  */
 void
 setinteractive(void)
@@ -466,7 +466,7 @@ setinteractive(void)
 }
 
 /*
- * Called to exit the shell.
+ * called to exit the shell
  */
 void
 exitshell(int status)
@@ -497,9 +497,9 @@ exitshell_savedstatus(void)
     handler = &loc1;
     if ((p = trap[0]) != NULL && *p != '\0') {
       /*
-       * Reset evalskip, or the trap on EXIT could be
-       * interrupted if the last command was a "return".
-       */
+ * reset evalskip, or the trap on EXIT could be
+ * interrupted if the last command was a "return"
+ */
       evalskip = 0;
       trap[0]  = NULL;
       FORCEINTON;
@@ -523,7 +523,7 @@ exitshell_savedstatus(void)
     sigaddset(&sigs, sig);
     sigprocmask(SIG_UNBLOCK, &sigs, NULL);
     kill(getpid(), sig);
-    /* If the default action is to ignore, fall back to _exit(). */
+    /* if the default action is to ignore, fall back to _exit() */
   }
   _exit(exiting_exitstatus);
 }

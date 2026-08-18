@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/stat.h>
 
@@ -73,7 +73,7 @@ main(int argc, char *argv[])
   if (pages < SWAP_MIN_PAGES)
     eprintf("swap space needs to be at least %ldKiB\n", SWAP_MIN_PAGES * pagesize / 1024);
 
-  /* Fill up the swap header */
+  /* fill up the swap header */
   hdr            = (struct swap_hdr *)buf;
   hdr->version   = 1;
   hdr->last_page = pages - 1;
@@ -81,7 +81,7 @@ main(int argc, char *argv[])
 
   printf("Setting up swapspace version 1, size = %luKiB\n", (pages - 1) * pagesize / 1024);
 
-  /* Write out the signature page */
+  /* write out the signature page */
   if (write(fd, buf, pagesize) != pagesize)
     eprintf("unable to write signature page\n");
 

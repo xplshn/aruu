@@ -630,9 +630,9 @@ sanitize(struct header *h)
       {h->minor, sizeof(h->minor)}
   };
 
-  /* Numeric fields can be terminated with spaces instead of
-   * NULs as per the ustar specification.  Patch all of them to
-   * use NULs so we can perform string operations on them. */
+  /* numeric fields can be terminated with spaces instead of
+ * nuls as per the ustar specification. patch all of them to
+ * use nuls so we can perform string operations on them */
   for (i = 0; i < LEN(fields); i++) {
     j = 0, l = fields[i].l - 1;
     for (; j < l && fields[i].f[j] == ' '; j++)
@@ -706,17 +706,17 @@ xt(int argc, char *argv[], int mode)
     if ((size = strtol(h->size, &p, 8)) < 0 || *p != '\0')
       eprintf("strtol %s: invalid size\n", h->size);
 
-    /* Long file path is read directly into fname*/
+    /* long file path is read directly into fname */
     if (h->type == 'L' || h->type == 'x' || h->type == 'g') {
-      /* Read header only up to size of fname buffer */
+      /* read header only up to size of fname buffer */
       for (q = fname; q < fname + size; q += BLKSIZ) {
         if (q + BLKSIZ >= fname + sizeof fname)
           eprintf("name exceeds buffer: %.*s\n", q - fname, fname);
         eread(tarfd, q, BLKSIZ);
       }
 
-      /* Convert pax x header with 'path=' field into L header
-       */
+      /* convert pax x header with 'path=' field into l header
+ */
       if (h->type == 'x')
         for (q = fname; q < fname + size - 16; q += n) {
           if ((n = strtol(q, &p, 10)) < 0 || *p != ' ')
@@ -734,15 +734,15 @@ xt(int argc, char *argv[], int mode)
         }
       fname[size] = '\0';
 
-      /* Non L-like header (eg. pax 'g') is skipped by setting
-       * q=null */
+      /* non l-like header (eg. pax 'g') is skipped by setting
+ * q=null */
       if (h->type != 'L')
         q = NULL;
       continue;
     }
 
-    /* Ustar path is copied into fname if no L header (ie: q is
-     * NULL) */
+    /* ustar path is copied into fname if no l header (ie: q is
+ * NULL) */
     if (!q) {
       m = sizeof h->prefix, n = sizeof h->name;
       p = "/" + !h->prefix[0];
@@ -750,8 +750,8 @@ xt(int argc, char *argv[], int mode)
     }
     q = NULL;
 
-    /* If argc > 0 or files_from_cnt > 0 then only extract the
-     * matching files/dirs */
+    /* if argc > 0 or files_from_cnt > 0 then only extract the
+ * matching files/dirs */
     if (argc || files_from_cnt) {
       match = 0;
       for (i = 0; i < argc; i++) {

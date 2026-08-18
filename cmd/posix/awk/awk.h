@@ -1,26 +1,26 @@
-/****************************************************************
-Copyright (C) Lucent Technologies 1997
-All Rights Reserved
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby
-granted, provided that the above copyright notice appear in all
-copies and that both that the copyright notice and this
-permission notice and warranty disclaimer appear in supporting
-documentation, and that the name Lucent Technologies or any of
-its entities not be used in advertising or publicity pertaining
-to distribution of the software without specific, written prior
-permission.
-
-LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
-IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
-SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
-IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
-****************************************************************/
+/* ***************************************************************
+ * copyright (c) lucent technologies 1997
+ * all rights reserved
+ *
+ * permission to use, copy, modify, and distribute this software and
+ * its documentation for any purpose and without fee is hereby
+ * granted, provided that the above copyright notice appear in all
+ * copies and that both that the copyright notice and this
+ * permission notice and warranty disclaimer appear in supporting
+ * documentation, and that the name lucent technologies or any of
+ * its entities not be used in advertising or publicity pertaining
+ * to distribution of the software without specific, written prior
+ * permission
+ *
+ * LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+ * INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+ * SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+ * IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+ * THIS SOFTWARE
+ * ************************************************************** */
 
 #include <assert.h>
 #include <stddef.h>
@@ -40,7 +40,7 @@ THIS SOFTWARE.
 
 typedef double Awkfloat;
 
-/* unsigned char is more trouble than it's worth */
+/* unsigned char is more trouble than its worth */
 
 typedef unsigned char uschar;
 
@@ -50,14 +50,14 @@ typedef unsigned char uschar;
     (a) = NULL;                                                                                    \
   }
 /*
- * We sometimes cheat writing read-only pointers to NUL-terminate them
+ * we sometimes cheat writing read-only pointers to nul-terminate them
  * and then put back the original value
  */
 #define setptr(ptr, a) (*(char *)(intptr_t)(ptr)) = (a)
 
 #define NN(p)                                                                                      \
-  ((p) ? (p) : "(null)") /* guaranteed non-null for DPRINTF                                        \
-                          */
+  ((p) ? (p) : "(null)") /* guaranteed non-null for DPRINTF \
+ */
 #define DEBUG
 #ifdef DEBUG
 #define DPRINTF(...)                                                                               \
@@ -71,12 +71,12 @@ extern enum compile_states { RUNNING, COMPILING, ERROR_PRINTING } compile_time;
 
 extern bool safe; /* false => unsafe, true => safe */
 
-#define RECSIZE (8 * 1024) /* sets limit on records, fields, etc., etc. */
+#define RECSIZE (8 * 1024) /* sets limit on records, fields, etc., etc */
 extern int recsize;        /* size of current record, orig RECSIZE */
 
 extern size_t awk_mb_cur_max; /* max size of a multi-byte character */
 
-extern char      EMPTY[]; /* this avoid -Wwritable-strings issues */
+extern char      EMPTY[]; /* this avoid -wwritable-strings issues */
 extern char    **FS;
 extern char    **RS;
 extern char    **ORS;
@@ -100,13 +100,13 @@ extern bool  donerec;   /* true if record is valid (no fld has changed */
 extern int   dbg;
 
 extern const char *patbeg; /* beginning of pattern matched */
-extern int         patlen; /* length of pattern matched.  set in b.c */
+extern int         patlen; /* length of pattern matched. set in b.c */
 
-/* Cell:  all information about a variable or constant */
+/* cell: all information about a variable or constant */
 
 typedef struct Cell {
-  uschar       ctype; /* OCELL, OBOOL, OJUMP, etc. */
-  uschar       csub;  /* CCON, CTEMP, CFLD, etc. */
+  uschar       ctype; /* OCELL, OBOOL, OJUMP, etc */
+  uschar       csub;  /* CCON, CTEMP, CFLD, etc */
   char        *nval;  /* name, for variables only */
   char        *sval;  /* string value */
   Awkfloat     fval;  /* value as number */
@@ -136,7 +136,7 @@ extern Cell *rlengthloc; /* RLENGTH */
 extern Cell *subseploc;  /* SUBSEP */
 extern Cell *symtabloc;  /* SYMTAB */
 
-/* Cell.tval values: */
+/* cell.tval values: */
 #define NUM      01    /* number value is valid */
 #define STR      02    /* string value is valid */
 #define DONTFREE 04    /* string space is not freeable */
@@ -164,7 +164,7 @@ extern Cell *symtabloc;  /* SYMTAB */
 #define FTOLOWER 13
 #define FFLUSH   14
 
-/* Node:  parse tree is made of nodes, with Cell's at bottom */
+/* node: parse tree is made of nodes, with cell's at bottom */
 
 typedef struct Node {
   int          ntype;
@@ -184,7 +184,7 @@ extern Node *nullnode;
 #define OBOOL 2
 #define OJUMP 3
 
-/* Cell subtypes: csub */
+/* cell subtypes: csub */
 #define CFREE 7
 #define CCOPY 6
 #define CCON  5
@@ -231,14 +231,14 @@ extern int pairstack[], paircnt;
 #define istrue(n)     ((n)->csub == BTRUE)
 #define istemp(n)     ((n)->csub == CTEMP)
 #define isargument(n) ((n)->nobj == ARG)
-/* #define freeable(p)	(!((p)->tval & DONTFREE)) */
+/* #define freeable(p) (!((p)->tval & DONTFREE)) */
 #define freeable(p) (((p)->tval & (STR | DONTFREE)) == STR)
 
 /* structures used by regular expression matching machinery, mostly b.c: */
 
 #define NCHARS (1256 + 3)    /* 256 handles 8-bit chars; 128 does 7-bit */
                              /* BUG: some overflows (caught) if we use 256 */
-                             /* watch out in match(), etc. */
+                             /* watch out in match(), etc */
 #define HAT     (NCHARS + 2) /* matches ^ in regular expr */
 #define NSTATES 32
 
@@ -249,7 +249,7 @@ typedef struct rrow {
     Node   *np;
     uschar *up;
     int    *rp; /* rune representation of char class */
-  } lval;       /* because Al stores a pointer in it! */
+  } lval;       /* because al stores a pointer in it! */
   int *lfollow;
 } rrow;
 

@@ -1,35 +1,35 @@
-/*-
- * SPDX-License-Identifier: BSD-3-Clause
+/* -
+ * spdx-license-identifier: bsd-3-clause
  *
- * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ * copyright (c) 1991, 1993
+ * the regents of the university of california. all rights reserved
  *
- * This code is derived from software contributed to Berkeley by
- * Kenneth Almquist.
+ * this code is derived from software contributed to berkeley by
+ * kenneth almquist
  *
- * Redistribution and use in source and binary forms, with or without
+ * redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
+ * 1. redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer
+ * 2. redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution
+ * 3. neither the name of the university nor the names of its contributors
+ * may be used to endorse or promote products derived from this software
+ * without specific prior written permission
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR a PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * SUCH DAMAGE
  */
 
 #include <errno.h>
@@ -79,22 +79,22 @@ static void  read_profile(const char *);
 static char *find_dot_file(char *);
 
 /*
- * Main routine.  We initialize things, parse the arguments, execute
+ * main routine. we initialize things, parse the arguments, execute
  * profiles if we're a login shell, and then call cmdloop to execute
- * commands.  The setjmp call sets up the location to jump to when an
- * exception occurs.  When an exception occurs the variable "state"
- * is used to figure out how far we had gotten.
+ * commands. the setjmp call sets up the location to jump to when an
+ * exception occurs. when an exception occurs the variable "state"
+ * is used to figure out how far we had gotten
  */
 
 int
 main(int argc, char *argv[])
 {
   /*
-   * As smark is accessed after a longjmp, it cannot be a local in main().
-   * The C standard specifies that the values of non-volatile local
-   * variables are unspecified after a jump if modified between the
-   * setjmp and longjmp.
-   */
+ * as smark is accessed after a longjmp, it cannot be a local in main()
+ * the c standard specifies that the values of non-volatile local
+ * variables are unspecified after a jump if modified between the
+ * setjmp and longjmp
+ */
   static struct stackmark smark, smark2;
   volatile int            state;
   char                   *shinit;
@@ -130,10 +130,10 @@ main(int argc, char *argv[])
   rootpid = getpid();
   if (rootpid == 1) {
     /*
-     * Make sh usable for invocation as interactive init
-     * substitute with init_path=/bin/sh, by opening
-     * file descriptors 0, 1, and 2 on /dev/console.
-     */
+ * make sh usable for invocation as interactive init
+ * substitute with init_path=/bin/sh, by opening
+ * file descriptors 0, 1, and 2 on /dev/console
+ */
     if (fcntl(STDIN_FILENO, F_GETFL, NULL) == -1 && errno == EBADF) {
       (void)open(ARUU_PATH_DEVCONSOLE, O_RDWR);
       (void)setsid();
@@ -188,7 +188,7 @@ state4:
     cmdloop(1);
   }
   exitshell(exitstatus);
-  /*NOTREACHED*/
+  /* NOTREACHED */
   return 0;
 }
 
@@ -200,8 +200,8 @@ reset(void)
 }
 
 /*
- * Read and execute commands.  "Top" is nonzero for the top level command
- * loop; it turns on prompting if the shell is interactive.
+ * read and execute commands. "top" is nonzero for the top level command
+ * loop; it turns on prompting if the shell is interactive
  */
 
 static void
@@ -256,7 +256,7 @@ cmdloop(int top)
 }
 
 /*
- * Read /etc/profile or .profile.  Return on error.
+ * read /etc/profile or .profile. return on error
  */
 
 static void
@@ -283,7 +283,7 @@ read_profile(const char *name)
 }
 
 /*
- * Read a file containing shell functions.
+ * read a file containing shell functions
  */
 
 void
@@ -295,8 +295,8 @@ readcmdfile(const char *name, int verify)
 }
 
 /*
- * Take commands from a file.  To be compatible we should do a path
- * search for the file, which is necessary to find sub-commands.
+ * take commands from a file. to be compatible we should do a path
+ * search for the file, which is necessary to find sub-commands
  */
 
 static char *
@@ -307,16 +307,16 @@ find_dot_file(char *basename)
   const char *path = pathval();
   struct stat statb;
 
-  /* don't try this for absolute or relative paths */
+  /* dont try this for absolute or relative paths */
   if (strchr(basename, '/'))
     return basename;
 
   while ((fullname = padvance(&path, &opt, basename)) != NULL) {
     if ((stat(fullname, &statb) == 0) && S_ISREG(statb.st_mode)) {
       /*
-       * Don't bother freeing here, since it will
-       * be freed by the caller.
-       */
+ * dont bother freeing here, since it will
+ * be freed by the caller
+ */
       return fullname;
     }
     stunalloc(fullname);
@@ -335,9 +335,9 @@ dotcmd(int argc, char **argv)
   exitstatus = 0;
 
   /*
-   * Because we have historically not supported any options,
-   * only treat "--" specially.
-   */
+ * because we have historically not supported any options,
+ * only treat "--" specially
+ */
   filename = argc > 2 && strcmp(argv[1], "--") == 0 ? argv[2] : argv[1];
 
   fullname = find_dot_file(filename);

@@ -1,6 +1,6 @@
 
 
-/* taken from: https://github.com/michaelforney/pax */
+/* taken from: https:// github.com/michaelforney/pax */
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE /* needed for major/minor (non-posix) */
 #endif
@@ -2079,7 +2079,7 @@ writefile(FILE *unused, struct header *h)
       exitstatus = 1;
     } else {
       /* add back setuid/setgid bits if we preserved the
-       * uid/gid */
+ * uid/gid */
       mode = h->mode;
     }
   }

@@ -1,12 +1,12 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #ifndef ARUU_PATHS_H
 #define ARUU_PATHS_H
 
 /*
- * portable paths. override at compile time for non-FHS systems:
- *   -DARUU_PATH_ETC="/config"
+ * portable paths. override at compile time for non-fhs systems:
+ * -daruu_path_etc="/config"
  *
- * OS-specific paths (procfs, sysfs) are prefixed ARUU_LINUX_PATH_*
+ * os-specific paths (procfs, sysfs) are prefixed ARUU_LINUX_PATH_*
  * and only defined under __linux__. a util that reads /proc/modules
  * will fail to compile on BSD because ARUU_LINUX_PATH_PROC is not
  * defined there. this is intentional: the BSD code path must use
@@ -62,8 +62,14 @@
 #define ARUU_PATH_BTMP       ARUU_PATH_VAR "/log/btmp"
 #define ARUU_PATH_LASTLOG    ARUU_PATH_VAR "/log/lastlog"
 #define ARUU_PATH_BSHELL     ARUU_PATH_BIN "/sh"
-#define ARUU_PATH_STDPATH    ARUU_PATH_BIN ":/usr/bin"
-#define ARUU_PATH_DEFPATH    ARUU_PATH_BIN ":/usr/bin"
+
+#ifndef ARUU_PATH_STDPATH
+#define ARUU_PATH_STDPATH ARUU_PATH_BIN ":" ARUU_PATH_USR_BIN
+#endif
+
+#ifndef ARUU_PATH_DEFPATH
+#define ARUU_PATH_DEFPATH ARUU_PATH_BIN ":" ARUU_PATH_USR_BIN
+#endif
 
 #if defined(__linux__)
 #define ARUU_LINUX_PATH_PROC            "/proc"

@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 
 #include <sys/ioctl.h>
 #include <sys/stat.h>
@@ -11,8 +11,8 @@
 
 #include "util.h"
 
-#define FIFREEZE _IOWR('X', 119, int) /* Freeze */
-#define FITHAW   _IOWR('X', 120, int) /* Thaw */
+#define FIFREEZE _IOWR('X', 119, int) /* freeze */
+#define FITHAW   _IOWR('X', 120, int) /* thaw */
 
 static void
 usage(void)

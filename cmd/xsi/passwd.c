@@ -1,118 +1,168 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "passwd.h"
-#include "config.h"
-#include "text.h"
 #include "util.h"
 
-#include <errno.h>
+#include <crypt.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
+#include <termios.h>
 #include <unistd.h>
 
 static void
 usage(void)
 {
-  eprintf("usage: %s [username]\n", argv0);
+  eprintf("usage: %s [-l | -u | -d] [name]\n", argv0);
 }
 
-// ?man passwd: change a user password
-// ?man arguments: [username]
-// ?man change the password associated with the calling user or with username
+/* reads one line with echo off into a reusable static buffer */
+static char *
+readpass(const char *prompt)
+{
+  static char    buf[128];
+  struct termios old, raw;
+  int            have_old;
+  size_t         n;
+
+  fputs(prompt, stdout);
+  fflush(stdout);
+
+  have_old = tcgetattr(STDIN_FILENO, &old) == 0;
+  if (have_old) {
+    raw = old;
+    raw.c_lflag &= ~ECHO;
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+  }
+
+  if (!fgets(buf, sizeof(buf), stdin)) {
+    if (have_old)
+      tcsetattr(STDIN_FILENO, TCSAFLUSH, &old);
+    return NULL;
+  }
+
+  if (have_old) {
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &old);
+    fputc('\n', stdout);
+  }
+
+  n = strlen(buf);
+  if (n && buf[n - 1] == '\n')
+    buf[--n] = '\0';
+
+  return buf;
+}
+
+// ?man passwd: change a user's password
+// ?man arguments: [-l | -u | -d] [name]
+// ?man change name's password (default: the caller's own), or with -l/-u/-d
+// ?man lock, unlock, or clear it instead. only root may target another
+// ?man user, or use -l/-u/-d at all
 int
 main(int argc, char *argv[])
 {
-  struct pwdb_entry ent;
-  struct passwd    *pw;
-  char             *inpass, *prevhash = NULL, *newhash = NULL, salt[PW_SALT_MAX];
-  char             *c1, *c2;
-  int               status = 1;
+  struct pwdb_entry  ent;
+  struct passwd     *self, *target;
+  char              *name, *cur, *new1, *new2, *hash;
+  char               salt[PW_SALT_MAX];
+  int                lflag = 0, uflag = 0, dflag = 0;
+  uid_t              uid;
 
   ARGBEGIN
   {
+    // ?man -l: lock the account by prefixing its hash with '!'
+    case 'l':
+      lflag = 1;
+      break;
+    // ?man -u: unlock an account previously locked with -l
+    case 'u':
+      uflag = 1;
+      break;
+    // ?man -d: clear the password, allowing a blank password login
+    case 'd':
+      dflag = 1;
+      break;
     default:
       usage();
   }
   ARGEND
 
+  if (lflag + uflag + dflag > 1)
+    usage();
+
+  uid  = getuid();
+  self = getpwuid(uid);
+  if (!self)
+    eprintf("passwd: who are you?\n");
+
+  name = argc > 0 ? argv[0] : self->pw_name;
+  if (uid != 0 && (strcmp(name, self->pw_name) != 0 || lflag || uflag || dflag))
+    eprintf("passwd: permission denied\n");
+
+  target = getpwnam(name);
+  if (!target)
+    eprintf("passwd: unknown user: %s\n", name);
+
   pw_init();
-  umask(077);
 
-  if (argc == 0)
-    pw = getpwuid(getuid());
-  else
-    pw = getpwnam(argv[0]);
-  if (!pw) {
-    if (errno)
-      eprintf("getpwnam: %s:", argv[0]);
-    else
-      eprintf("who are you?\n");
-  }
+  if (lflag || uflag || dflag) {
+    if (pwdb_lookup(&ent, name) < 0)
+      eprintf("passwd: cannot look up %s\n", name);
 
-  if (pwdb_lookup(&ent, pw->pw_name) < 0)
-    return 1;
-  prevhash = ent.hash;
-
-  if (getuid() != 0) {
-    if (prevhash[0] == '!' || prevhash[0] == '*')
-      eprintf("denied\n");
-    if (prevhash[0] == '\0') {
-      /* no password set */
+    if (lflag) {
+      if (ent.hash[0] == '!') {
+        hash = ent.hash;
+      } else {
+        hash    = emalloc(strlen(ent.hash) + 2);
+        hash[0] = '!';
+        strcpy(hash + 1, ent.hash);
+      }
+      if (pwdb_update(name, hash) < 0)
+        eprintf("passwd: update failed\n");
+      printf("passwd: password for %s locked\n", name);
+    } else if (uflag) {
+      hash = ent.hash[0] == '!' ? ent.hash + 1 : ent.hash;
+      if (pwdb_update(name, hash) < 0)
+        eprintf("passwd: update failed\n");
+      printf("passwd: password for %s unlocked\n", name);
     } else {
-      printf("Changing password for %s\n", pw->pw_name);
-      inpass = getpass("Old password: ");
-      if (!inpass)
-        eprintf("getpass:");
-      if (inpass[0] == '\0')
-        eprintf("no password supplied\n");
-      c1 = crypt(inpass, prevhash);
-      if (!c1)
-        eprintf("crypt:");
-      if (strcmp(c1, prevhash) != 0)
-        eprintf("incorrect password\n");
-      explicit_bzero(inpass, strlen(inpass));
+      if (pwdb_update(name, "") < 0)
+        eprintf("passwd: update failed\n");
+      printf("passwd: password for %s cleared\n", name);
     }
+    return 0;
   }
 
-  inpass = getpass("Enter new password: ");
-  if (!inpass)
-    eprintf("getpass:");
-  if (inpass[0] == '\0')
-    eprintf("no password supplied\n");
-
-  if (prevhash && prevhash[0] != '\0') {
-    c1 = crypt(inpass, prevhash);
-    if (c1 && strcmp(c1, prevhash) == 0)
-      eprintf("password left unchanged\n");
+  if (uid != 0) {
+    cur = readpass("Current password: ");
+    if (!cur || pw_check(self, cur) != 1)
+      eprintf("passwd: authentication failed\n");
   }
+
+  new1 = readpass("New password: ");
+  if (!new1)
+    exit(1);
+  new1 = estrdup(new1);
+
+  new2 = readpass("Retype new password: ");
+  if (!new2 || strcmp(new1, new2) != 0) {
+    free(new1);
+    eprintf("passwd: passwords do not match\n");
+  }
+  if (new1[0] == '\0')
+    weprintf("passwd: warning: empty password\n");
 
   if (pw_gensalt(salt, sizeof(salt)) < 0)
-    eprintf("pw_gensalt:");
-  c1 = crypt(inpass, salt);
-  if (!c1)
-    eprintf("crypt:");
-  newhash = estrdup(c1);
-  explicit_bzero(inpass, strlen(inpass));
+    eprintf("passwd: cannot generate salt\n");
 
-  inpass = getpass("Retype new password: ");
-  if (!inpass)
-    eprintf("getpass:");
-  if (inpass[0] == '\0')
-    eprintf("no password supplied\n");
-  c2 = crypt(inpass, salt);
-  if (!c2)
-    eprintf("crypt:");
-  if (strcmp(c2, newhash) != 0)
-    eprintf("passwords don't match\n");
-  explicit_bzero(inpass, strlen(inpass));
+  hash = crypt(new1, salt);
+  free(new1);
+  if (!hash)
+    eprintf("passwd: crypt:");
 
-  if (pwdb_update(pw->pw_name, newhash) == 0)
-    status = 0;
+  if (pwdb_update(name, hash) < 0)
+    eprintf("passwd: update failed\n");
 
-  free(newhash);
-  free(ent.name);
-  free(ent.hash);
-  return status;
+  printf("passwd: password for %s updated\n", name);
+  return 0;
 }

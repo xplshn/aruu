@@ -120,7 +120,7 @@ main(int argc, char *argv[])
     return failed_any ? 1 : 0;
   }
 
-  /* BACKEND=internal forces executor. otherwise generate file and exec backend binary */
+  /* backend=internal forces executor. otherwise generate file and exec backend binary */
   if (strcmp(kv_get_or("BACKEND", "auto"), "internal") != 0) {
     char                 *bin;
     const struct Backend *be = backend_resolve(&bin);

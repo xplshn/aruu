@@ -38,7 +38,7 @@ static void quit(void);
 static char *code(char *, ...);
 static char *forcode(Macro *, char *, char *, char *, char *);
 static char *whilecode(Macro *, char *, char *);
-static char *ifcode(Macro *, char *, char *);
+static char *ifcode(Macro *, char *, char *, char *);
 static char *funcode(Macro *, char *, char *, char *);
 static char *param(char *, char *), *local(char *, char *);
 static char *retcode(char *);
@@ -51,6 +51,7 @@ static char *ary(char *);
 static void writeout(char *);
 
 static char *yytext, *buff, *unwind;
+static size_t buffcap;
 static char *filename;
 static FILE *filep;
 static int lineno, nerr, flowid;
@@ -65,7 +66,7 @@ static char *dcprog = "dc";
 
 %union {
 	char *str;
-	char id[2];
+	char id[16]; // matches dc's own REGSIZ: an extended register name's cap
 	Macro *macro;
 }
 
@@ -92,10 +93,14 @@ static char *dcprog = "dc";
 %token OBASE
 %token AUTO PARAM
 %token PRINT
+%token ELSE
+%token HALT
+%token READ
 
 %type <str> item statlst scolonlst
 %type <str> function assign nexpr expr exprstat rel stat ary cond
 %type <str> autolst arglst parlst
+%type <str> prlst pritem
 %type <str> params param locals local
 %type <macro> def if for while
 
@@ -134,19 +139,41 @@ statlst :                       {$$ = code("");}
         ;
 
 stat    : exprstat
-        | PRINT expr            {$$ = code("%sps.", $2);}
-        | PRINT STRING          {$$ = code("[%s]P", $2);}
-        | PRINT STRING ',' expr {$$ = code("[%s]P%sps.", $2, $4);}
+        | PRINT prlst           {$$ = $2;}
         | STRING                {$$ = code("[%s]P", $1);}
         | BREAK                 {$$ = brkcode();}
         | QUIT                  {quit();}
+        | HALT                  {$$ = code("q");}
         | RETURN                {$$ = retcode(code(" 0"));}
-        | RETURN '(' expr ')'   {$$ = retcode($3);}
+        | RETURN expr           {$$ = retcode($2);}
         | RETURN '(' ')'        {$$ = retcode(code(" 0"));}
-        | while cond stat       {$$ = whilecode($1, $2, $3);}
-        | if cond stat          {$$ = ifcode($1, $2, $3);}
+        | while cond optnl stat       {$$ = whilecode($1, $2, $4);}
+        | if cond optnl stat          {$$ = ifcode($1, $2, $4, NULL);}
+        | if cond optnl stat ELSE optnl stat  {$$ = ifcode($1, $2, $4, $7);}
         | '{' statlst '}'       {$$ = $2;}
-        | for '(' expr ';' rel ';' expr ')' stat  {$$ = forcode($1, $3, $5, $7, $9);}
+        | for '(' expr ';' rel ';' expr ')' optnl stat  {$$ = forcode($1, $3, $5, $7, $10);}
+        ;
+
+// real scripts routinely put a while/if/for's own body on the next
+// line instead of right after the condition; nothing else in this
+// grammar needs a newline here, since a body wrapped in { } already
+// goes through statlst, which handles its own internal newlines
+optnl   :
+        | optnl '\n'
+        ;
+
+// print takes a comma-separated list of any length, mixing strings
+// and expressions freely: real scripts (the kernel's own timeconst.bc
+// generator among them) routinely print three or more at once. no
+// item here ever gets an automatic trailing newline of its own,
+// matching real bc: whatever newlines appear come from the items
+// themselves
+prlst   : pritem
+        | prlst ',' pritem      {$$ = code("%s%s", $1, $3);}
+        ;
+
+pritem  : expr                  {$$ = code("%sn", $1);}
+        | STRING                {$$ = code("[%s]P", $1);}
         ;
 
 while   : WHILE                 {$$ = macro(LOOP);}
@@ -214,6 +241,7 @@ expr    : nexpr
 
 nexpr   : NUMBER                {$$ = code(" %s", code($1));}
         | ID                    {$$ = code("l%s", var($1));}
+        | READ '(' ')'          {$$ = code("?");}
         | DOT                   {$$ = code("l.");}
         | SCALE                 {$$ = code("K");}
         | IBASE                 {$$ = code("I");}
@@ -277,21 +305,38 @@ writeout(char *s)
 		goto err;
 	free(s);
 	return;
-	
+
 err:
 	eprintf("writing to dc:");
+}
+
+// grows the shared code buffer geometrically to fit at least 'need'
+// bytes: a single generated dc macro (an if/else body, a print list,
+// a deeply nested function) has no fixed upper bound, unlike the
+// stdio-buffering constant BUFSIZ this buffer borrowed its original
+// size from
+static void
+growbuff(size_t need)
+{
+	size_t newcap;
+
+	newcap = buffcap;
+	while (newcap < need)
+		newcap *= 2;
+	buff    = erealloc(buff, newcap);
+	buffcap = newcap;
 }
 
 static char *
 code(char *fmt, ...)
 {
-	char *s, *t;
+	char  *t;
 	va_list ap;
-	int c, len, room;
+	int    c, len;
+	size_t off, room;
 
 	va_start(ap, fmt);
-	room = BUFSIZ;
-	for (s = buff; *fmt; s += len) {
+	for (off = 0; *fmt; off += (size_t)len) {
 		len = 1;
 		if ((c = *fmt++) != '%')
 			goto append;
@@ -299,41 +344,41 @@ code(char *fmt, ...)
 		switch (*fmt++) {
 		case 'd':
 			c = va_arg(ap, int);
-			len = snprintf(s, room, "%d", c);
-			if (len < 0 || len >= room)
-				goto err;
+			for (;;) {
+				room = buffcap - off;
+				len  = snprintf(buff + off, room, "%d", c);
+				if (len < 0)
+					eprintf("unable to code requested operation\n");
+				if ((size_t)len < room)
+					break;
+				growbuff(off + (size_t)len + 1);
+			}
 			break;
 		case 'c':
 			c = va_arg(ap, int);
 			goto append;
 		case 's':
-			t = va_arg(ap, void *);
+			t   = va_arg(ap, void *);
 			len = strlen(t);
-			if (len >= room)
-				goto err;
-			memcpy(s, t, len);
+			if ((size_t)len >= buffcap - off)
+				growbuff(off + (size_t)len + 1);
+			memcpy(buff + off, t, len);
 			free(t);
 			break;
 		case '%':
 		append:
-			if (room <= 1)
-				goto err;
-			*s = c;
+			if (buffcap - off <= 1)
+				growbuff(off + 2);
+			buff[off] = c;
 			break;
 		default:
 			abort();
 		}
-
-		room -= len;
 	}
 	va_end(ap);
 
-	*s = '\0';
+	buff[off] = '\0';
 	return estrdup(buff);
-
-err:
-	eprintf("unable to code requested operation\n");
-	return NULL;
 }
 
 static Macro *
@@ -493,17 +538,72 @@ whilecode(Macro *d, char *cmp, char *body)
 	return s;
 }
 
+// the trailing relational operator on a cond's own generated code
+// (see the rel grammar rule) is always one of these six forms; an
+// else branch runs on whichever of them means "the opposite happened"
 static char *
-ifcode(Macro *d, char *cmp, char *body)
+invertrel(char *cmp)
 {
+	size_t n = strlen(cmp);
+	const char *suffix;
+	size_t keep;
 	char *s;
+
+	if (n >= 2 && strcmp(cmp + n - 2, "!=") == 0) {
+		keep = n - 2;
+		suffix = "=";
+	} else if (n >= 2 && strcmp(cmp + n - 2, "!<") == 0) {
+		keep = n - 2;
+		suffix = "<";
+	} else if (n >= 2 && strcmp(cmp + n - 2, "!>") == 0) {
+		keep = n - 2;
+		suffix = ">";
+	} else if (n >= 1 && cmp[n - 1] == '=') {
+		keep = n - 1;
+		suffix = "!=";
+	} else if (n >= 1 && cmp[n - 1] == '<') {
+		keep = n - 1;
+		suffix = "!<";
+	} else if (n >= 1 && cmp[n - 1] == '>') {
+		keep = n - 1;
+		suffix = "!>";
+	} else {
+		yyerror("cannot invert comparison for else");
+		return NULL;
+	}
+
+	s = emalloc(keep + strlen(suffix) + 1);
+	memcpy(s, cmp, keep);
+	strcpy(s + keep, suffix);
+
+	return s;
+}
+
+// an else branch's own stored body needs a register distinct from the
+// then branch's d->id: nested caps how high d->id itself ever goes,
+// so offsetting by it lands on a register no other nesting level, and
+// no ordinary (single-letter or, under -i, named) variable, ever uses
+static char *
+ifcode(Macro *d, char *cmp, char *body, char *ebody)
+{
+	char *s, *inv;
 
 	s = code(sflag ? "[%s]s<%d>" : "[%s]s%c",
 	         body, d->id);
 	writeout(s);
 
-	s = code(sflag ? "%s<%d> " : "%s%c ",
-	         cmp, d->id);
+	if (ebody) {
+		s = code(sflag ? "[%s]s<%d>" : "[%s]s%c",
+		         ebody, d->id + NESTED_MAX);
+		writeout(s);
+
+		inv = invertrel(cmp);
+		s = code(sflag ? "%s<%d> %s<%d> " : "%s%c %s%c ",
+		         cmp, d->id, inv, d->id + NESTED_MAX);
+	} else {
+		s = code(sflag ? "%s<%d> " : "%s%c ",
+		         cmp, d->id);
+	}
 	nested--;
 
 	return s;
@@ -582,6 +682,9 @@ iden(int ch)
 		{"obase", OBASE},
 		{"auto", AUTO},
 		{"print", PRINT},
+		{"else", ELSE},
+		{"halt", HALT},
+		{"read", READ},
 		{NULL}
 	};
 	struct keyword *p;
@@ -610,8 +713,16 @@ iden(int ch)
 	if (p->str)
 		return p->token;
 
+	// strict POSIX bc only ever names a variable/function with a
+	// single lowercase letter; every real bc script in the wild
+	// (the kernel's own timeconst.bc among them) freely uses
+	// multi-character names anyway, same as GNU bc's own default
+#if !FEATURE_BC_MULTICHAR
 	if (!sflag)
 		yyerror("invalid keyword");
+#endif
+	if (strlen(yytext) >= sizeof(yylval.id))
+		yyerror("identifier too long");
 	strcpy(yylval.id, yytext);
 	return ID;
 }
@@ -676,6 +787,50 @@ string(int ch)
 	for (bp = yytext; bp < &yytext[BUFSIZ]; ++bp) {
 		if ((ch = getc(filep)) == '"')
 			break;
+#if FEATURE_BC_ESCAPES
+		// strict POSIX bc has no escape sequences in a string at
+		// all; every real script (again, the kernel's own scripts
+		// among them) assumes GNU bc's \n/\t/etc, since dc's own
+		// string reader passes a literal byte straight through
+		// with nothing left to turn it into a real newline later
+		if (ch == '\\') {
+			switch (ch = getc(filep)) {
+			case 'a':
+				ch = '\a';
+				break;
+			case 'b':
+				ch = '\b';
+				break;
+			case 'f':
+				ch = '\f';
+				break;
+			case 'n':
+				ch = '\n';
+				break;
+			case 'r':
+				ch = '\r';
+				break;
+			case 't':
+				ch = '\t';
+				break;
+			case 'v':
+				ch = '\v';
+				break;
+			case 'q':
+				// GNU bc's own escape for a literal double
+				// quote, needed since a bc string's own
+				// delimiter is " with no other way in
+				ch = '"';
+				break;
+			case '\\':
+			case '"':
+				break;
+			default:
+				*bp++ = '\\';
+				break;
+			}
+		}
+#endif
 		*bp = ch;
 	}
 
@@ -808,8 +963,26 @@ static void
 spawn(void)
 {
 	int fds[2];
+	// dc only accepts the extended, multi-character register
+	// syntax bc.y's own ftn()/var()/ary() emit for a non-single-
+	// letter name (see iden() above) when told -i: whenever this
+	// build can produce that syntax at all, dc always needs it
+#if FEATURE_BC_MULTICHAR
+	char *par = "-i";
+#else
 	char *par = sflag ? "-i" : NULL;
+#endif
 	char errmsg[] = "bc:error execing dc\n";
+
+	// fd 0 is about to become the read end of the code pipe below,
+	// but dc's own "?" (bc's read()) needs the real, original stdin:
+	// stash it on a fixed fd dc knows to check, or read() would read
+	// straight out of this project's own generated dc code instead
+	// of whatever the user actually piped in. this has to happen
+	// before pipe() claims its own two fds, or dup2 here could
+	// clobber one of them (fd 3 is often the next one pipe() itself
+	// would have picked)
+	dup2(0, 3);
 
 	if (pipe(fds) < 0)
 		eprintf("creating pipe:");
@@ -872,7 +1045,11 @@ bc(char *fname)
 static void
 usage(void)
 {
+#if FEATURE_BC_QUIET
+	eprintf("usage: %s [-p dc][-cdlqs]\n", argv0);
+#else
 	eprintf("usage: %s [-p dc][-cdls]\n", argv0);
+#endif
 }
 
 int
@@ -892,6 +1069,11 @@ main(int argc, char *argv[])
 	case 'l':
 		lflag = 1;
 		break;
+#if FEATURE_BC_QUIET
+	// for compat with sucky impls
+	case 'q':
+		break;
+#endif
 	case 's':
 		sflag = 1;
 		break;
@@ -899,8 +1081,9 @@ main(int argc, char *argv[])
 		usage();
 	} ARGEND
 
-	yytext = malloc(BUFSIZ);
-	buff = malloc(BUFSIZ);
+	yytext  = malloc(BUFSIZ);
+	buffcap = BUFSIZ;
+	buff    = malloc(buffcap);
 	if (!yytext || !buff)
 		eprintf("out of memory\n");
 	flowid = 128;
@@ -910,9 +1093,17 @@ main(int argc, char *argv[])
 	if (lflag)
 		bc(PREFIX "/share/misc/bc.library");
 
-	while (*argv)
-		bc(*argv++);
-	bc(NULL);
+	// stdin is only the script source when no file was given at all:
+	// a real file argument alongside piped stdin data (the kernel's
+	// own "echo $HZ | bc -q file.bc" being the standing example) means
+	// that data is meant for read(), not for bc itself to parse as
+	// more of the program
+	if (!*argv) {
+		bc(NULL);
+	} else {
+		while (*argv)
+			bc(*argv++);
+	}
 
 	quit();
 }

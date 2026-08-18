@@ -1,5 +1,5 @@
 /* sdhcp: simple DHCP client, ported from git.2f30.org/sdhcp */
-/* See LICENSE file for copyright and license details */
+/* see LICENSE file for copyright and license details */
 #include "arg.h"
 #include "util.h"
 #include "wexec.h"
@@ -70,7 +70,7 @@ enum {
   OB_DNSSERVER  = 6,
   OB_HOSTNAME   = 12,
   OB_BADDR      = 28,
-  /* DHCP-specific options */
+  /* dhcp-specific options */
   OD_IPADDR        = 50, /* 0x32 */
   OD_LEASE         = 51,
   OD_OVERLOAD      = 52,
@@ -542,7 +542,7 @@ main(int argc, char *argv[])
 
   ARGBEGIN
   {
-    case 'd': /* don't update /etc/resolv.conf */
+    case 'd': /* dont update /etc/resolv.conf */
       dflag = 0;
       break;
     case 'e': /* exec program on each lease */
@@ -551,7 +551,7 @@ main(int argc, char *argv[])
     case 'f': /* stay in foreground */
       fflag = 1;
       break;
-    case 'i': /* don't configure IP address */
+    case 'i': /* dont configure IP address */
       iflag = 0;
       break;
     default:

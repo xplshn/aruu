@@ -95,7 +95,7 @@ void          lex_swallow_dollar(struct SLex *lx, char *buf, size_t *blen, size_
 void          lex_string(struct SLex *lx, char *buf, size_t bsz);
 const char   *find_dollar_close(const char *inner);
 
-/* gate: (not X) | (and X...) | (or X...) | bare var */
+/* gate: (not x) | (and x...) | (or x...) | bare var */
 enum GKind { G_TRUE, G_VAR, G_NOT, G_AND, G_OR };
 
 struct Gate {

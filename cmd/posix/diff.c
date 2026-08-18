@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include "paths.h"
 #include "util.h"
 #include "wexec.h"
@@ -2079,7 +2079,7 @@ proceed:
     fetch(ixnew, c, d, f2, diff_format == D_NORMAL ? '>' : '\0', 0, *pflags);
   if (edoffset != 0 && diff_format == D_EDIT) {
     printf(".\n");
-    printf("%ds/.//\n", a + edoffset - 1);
+    printf("%ds/.// \n", a + edoffset - 1);
     b = a + edoffset - 1;
     a = b + 1;
     c += edoffset;

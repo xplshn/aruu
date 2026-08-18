@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+/* see LICENSE file for copyright and license details */
 #include <dirent.h>
 #include <limits.h>
 #include <stdio.h>
