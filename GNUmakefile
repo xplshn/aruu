@@ -3,7 +3,7 @@ CFLAGS   ?= -std=c99 -Wall -Wextra -pedantic
 
 BACKEND  ?= auto
 
-CPPFLAGS ?= -Ishared -D_DEFAULT_SOURCE -D_POSIX_C_SOURCE=200809L \
+CPPFLAGS ?= -Ishared -D_POSIX_C_SOURCE=200809L \
             -DFEATURE_NOFORK=0 -DFEATURE_NOEXEC=0
 # NOEXEC cannot be on the bootstrap compile, but it can
 # be on when one compiles aruu-box with ninqu included
@@ -40,10 +40,9 @@ NINQU_SRC =\
 NINQU ?= cmd/dev/ninqu/ninqu
 JOBS  ?= $(filter -j%,$(MAKEFLAGS))
 
-# rebuilds config.set first so a build.cfg edit is picked up before
-# ninqu compiles, ninqu also does this lazily on its own via
-# (set-file), this just avoids the extra shell startup on every run
-$(NINQU): $(NINQU_SRC) cmd/dev/ninqu/ninqu.h scripts/mk/config.set $(NINQU_LIB_SRC)
+# rebuild the config first so a build.cfg edit lands before ninqu
+# compiles. ninqu does this lazily too, this saves a shell startup
+$(NINQU): $(NINQU_SRC) cmd/dev/ninqu/ninqu.h scripts/mk/config.set scripts/mk/features.h shared/libutil/nofork_list.h $(NINQU_LIB_SRC)
 	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(NINQU_SRC) $(NINQU_LIB_SRC)
 
 # FORCE has no rule, thus making any pattern
@@ -62,13 +61,17 @@ clean: $(NINQU)
 	rm -f $(NINQU) build.ninja
 
 scripts/mk/config.set: build.cfg scripts/genconfig.sh
-	sh scripts/genconfig.sh config
+	sh scripts/genconfig.sh config-set
 
-# stops the % pattern rule above from trying to rebuild these as if
-# they were stale build targets: GNU make's own implicit "remake my
-# makefiles" check runs the pattern rule against this file's own
-# name too, otherwise (and, since a POSIX Makefile can sit right next
-# to this one, against that name as well)
+scripts/mk/features.h: build.cfg scripts/genconfig.sh
+	sh scripts/genconfig.sh features-h
+
+shared/libutil/nofork_list.h: build.cfg scripts/genconfig.sh
+	sh scripts/genconfig.sh nofork-list-h
+
+# keep the % pattern rule from rebuilding these as stale targets. make
+# remakes its own makefiles by running the rule on this file name, and
+# on Makefile when one sits next to it
 GNUmakefile: ;
 Makefile: ;
 ninqu.rules: ;

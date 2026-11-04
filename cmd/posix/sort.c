@@ -298,27 +298,21 @@ parse_flags(char **s, int *flags, int bflag)
 {
   while (isalpha((int)**s)) {
     switch (*((*s)++)) {
-        // ?man -b: specify block size or base directory
       case 'b':
         *flags |= bflag;
         break;
-        // ?man -d: specify directory
       case 'd':
         *flags |= MOD_D;
         break;
-        // ?man -f: force the operation
       case 'f':
         *flags |= MOD_F;
         break;
-        // ?man -i: interactive mode or prompt for confirmation
       case 'i':
         *flags |= MOD_I;
         break;
-        // ?man -n: print line numbers or counts
       case 'n':
         *flags |= MOD_N;
         break;
-        // ?man -r: operate recursively
       case 'r':
         *flags |= MOD_R;
         break;

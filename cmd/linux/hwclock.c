@@ -1,5 +1,10 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_LINUX_TIME
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/time.h>

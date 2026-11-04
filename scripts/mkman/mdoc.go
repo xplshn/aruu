@@ -8,30 +8,38 @@ import (
 
 type MdocRenderer struct {
 	page *Page
-	w    io.Writer
+	w    *trackingWriter
 }
 
 func NewMdocRenderer(page *Page, w io.Writer) *MdocRenderer {
-	return &MdocRenderer{page: page, w: w}
+	return &MdocRenderer{page: page, w: newTrackingWriter(w)}
 }
 
 func (r *MdocRenderer) Render() error {
-	if err := r.page.validate(); err != nil { return err; }
+	if err := r.page.validate(); err != nil {
+		return err
+	}
 
 	fmt.Fprintf(r.w, ".Dd %s\n", troffEscape(r.page.Date))
 	fmt.Fprintf(r.w, ".Dt %s %d\n", strings.ToUpper(r.page.Name), r.page.Section)
 	fmt.Fprintf(r.w, ".Os %s\n", "aruu")
 
 	r.renderName()
-	if len(r.page.Synopsis) != 0 { r.renderSynopsis(); }
-	if len(r.page.Description) != 0 { r.renderDescription(); }
-	if len(r.page.Options) != 0 { r.renderOptions(); }
+	if len(r.page.Synopsis) != 0 {
+		r.renderSynopsis()
+	}
+	if len(r.page.Description) != 0 {
+		r.renderDescription()
+	}
+	if len(r.page.Options) != 0 {
+		r.renderOptions()
+	}
 
 	for _, section := range r.page.Sections {
 		r.renderSection(section.Title, section.Blocks)
 	}
 
-	return nil
+	return r.w.err
 }
 
 func (r *MdocRenderer) renderName() {
@@ -114,11 +122,15 @@ func renderSynopsisPhrase(items []SynopsisItem, topLevel bool) string {
 
 func renderMacro(name, body string, topLevel bool) string {
 	if body == "" {
-		if topLevel { return "." + name; }
+		if topLevel {
+			return "." + name
+		}
 
 		return name
 	}
-	if topLevel { return "." + name + " " + body; }
+	if topLevel {
+		return "." + name + " " + body
+	}
 
 	return name + " " + body
 }
@@ -245,4 +257,4 @@ func trailingSpace(inline Inline) bool {
 	}
 }
 
-func isSpaceByte(b byte) bool { return b == ' ' || b == '\t' || b == '\n'; }
+func isSpaceByte(b byte) bool { return b == ' ' || b == '\t' || b == '\n' }

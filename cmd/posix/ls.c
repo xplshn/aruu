@@ -1,5 +1,10 @@
 /* see license file for copyright and license details */
 
+#if FEATURE_LS_COLOR
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifndef major
@@ -417,11 +422,9 @@ entcmp(const void *va, const void *vb)
   const struct entry *a = va, *b = vb;
 
   switch (sort) {
-    // ?man -S: sort by file size
     case 'S':
       cmp = b->size - a->size;
       break;
-    // ?man -t: sort by modification time
     case 't':
       if (!(cmp = b->t.tv_sec - a->t.tv_sec))
         cmp = b->t.tv_nsec - a->t.tv_nsec;
@@ -725,7 +728,7 @@ main(int argc, char *argv[])
     // ?man --: specify - option
     case '-':
 #if FEATURE_LS_COLOR
-      // ?man --color [when]: control coloring
+      // ?man --color:when: control coloring
       if (strncmp(argv[0], "-color", 6) == 0) {
         char *val = NULL;
         if (argv[0][6] == '=') {

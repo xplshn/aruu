@@ -1,5 +1,9 @@
 /* see license file for copyright and license details */
 
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
+
 #include "arg.h"
 #include "tls.h"
 #include "util.h"
@@ -14,8 +18,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -462,7 +468,7 @@ main(int argc, char *argv[])
     post_len = st.st_size;
   }
 
-  /* wgets own -t: 0 means retry forever */
+  /* -t 0 means retry forever */
   max_tries = tries == 0 ? INT_MAX : tries;
 
   while (!tls_sock) {

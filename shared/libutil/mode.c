@@ -1,4 +1,9 @@
 /* see LICENSE file for copyright and license details */
+#if FEATURE_FILE_MODE_EXT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>

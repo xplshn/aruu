@@ -1,5 +1,10 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_ENV_PUTENV
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>

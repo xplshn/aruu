@@ -1,4 +1,9 @@
 
+#if FEATURE_LINUX_SYSCALL
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include "arg.h"
 #include "fs.h"
 #include "paths.h"
@@ -542,10 +547,11 @@ usage(void)
 // ?man modprobe: add or remove modules from the Linux kernel
 // ?man arguments: module [symbol=value ...]
 // ?man modprobe loads or removes kernel modules from the running system
-// ?man It reads modules.dep, modules.alias, and modules.symbols from the
-// appropriate ?man /lib/modules/release directory to resolve module names and
-// dependencies, ?man loading prerequisites first. ?man without -r, modprobe
-// loads the named module (and any required dependencies) ?man into the kernel
+// ?man It reads modules.dep, modules.alias, and modules.symbols from the appropriate
+// ?man /lib/modules/release directory to resolve module names and dependencies,
+// ?man loading prerequisites first.
+// ?man without -r, modprobe loads the named module (and any required dependencies)
+// ?man into the kernel
 int
 main(int argc, char *argv[])
 {
@@ -556,63 +562,49 @@ main(int argc, char *argv[])
 
   ARGBEGIN
   {
-    // ?man -a: specify a option
     case 'a':
-      // ?man -a: Load all modules named on the command line (rather
-      // than stopping after the first)
+      // ?man -a: Load all modules named on the command line (rather than stopping after the first)
       aflag = 1;
       break;
-    // ?man -r: specify r option
     case 'r':
-      // ?man -r: Remove the named modules from the kernel
-      // dependencies are not automatically removed
+      // ?man -r: Remove the named modules from the kernel dependencies are not automatically
+      // ?man removed
       rflag = 1;
       break;
-    // ?man -q: specify q option
     case 'q':
       // ?man -q: Quiet mode.  Suppress error messages
       qflag = 1;
       break;
-    // ?man -v: specify v option
     case 'v':
       // ?man -v: Verbose mode.  Print each action taken
       vflag = 1;
       break;
-    // ?man -l: specify l option
     case 'l':
-      // ?man -l: List available modules matching the optional
-      // _pattern_ (a fnmatch(3) glob)
+      // ?man -l: List available modules matching the optional _pattern_ (a fnmatch(3) glob)
       lflag = 1;
       break;
 #if FEATURE_MODPROBE_SHOW_DEPENDS
-    // ?man -D: specify D option
     case 'D':
-      // ?man -D: Print the sequence of insmod commands that would be
-      // used to load the module, without actually loading anything
+      // ?man -D: Print the sequence of insmod commands that would be used to load the module,
+      // ?man without actually loading anything
       Dflag = 1;
       break;
 #endif
 #if FEATURE_MODPROBE_BLACKLIST
-    // ?man -b: specify b option
     case 'b':
-      // ?man -b: Skip modules listed as blacklist in
-      // /etc/modprobe.d/
+      // ?man -b: Skip modules listed as blacklist in /etc/modprobe.d/
       bflag = 1;
       break;
 #endif
 #if FEATURE_MODPROBE_SYSLOG
-    // ?man -s: specify s option
     case 's':
-      // ?man -s: Log messages to syslog(3) (facility LOG_DAEMON)
-      // instead of standard error
+      // ?man -s: Log messages to syslog(3) (facility LOG_DAEMON) instead of standard error
       sflag = 1;
       break;
 #endif
 #if FEATURE_MODPROBE_DIR_OVERRIDE
-    // ?man -d:file: specify d option
     case 'd':
-      // ?man -d dir: Use dir as the base directory for module files
-      // instead of /lib/modules/release
+      // ?man -d:dir: use dir as the base directory for module files instead of /lib/modules/release
       strlist_append(&moddirs, EARGF(usage()));
       break;
 #endif

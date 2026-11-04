@@ -103,7 +103,10 @@ void errorwithstatus(int, const char *, ...) __printf0like(2, 3) __dead2;
  * so we use _setjmp instead
  */
 
+#if FEATURE_SH_LONGJMP
+void _longjmp(jmp_buf, int);
 #undef setjmp
 #define setjmp(jmploc) _setjmp(jmploc)
 #undef longjmp
 #define longjmp(jmploc, val) _longjmp(jmploc, val)
+#endif

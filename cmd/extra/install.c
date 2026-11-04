@@ -169,7 +169,7 @@ install_one(const char *src, const char *dst)
 // ?man arguments: source ... dest
 // ?man install copies each source to dest, or into dest when dest is a
 // ?man directory or -t is given, then applies mode/owner/group; with
-// ?man -d, every argument is a directory to create instead
+// ?man with -d, every argument is a directory to create instead
 int
 main(int argc, char *argv[])
 {

@@ -1,4 +1,8 @@
 /* see LICENSE file for copyright and license details */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
+
 #include <unistd.h>
 
 #include "arg.h"
@@ -6,9 +10,10 @@
 
 // ?man sync: flush disk cache
 // ?man synopsis:
-// ?man The sync utility invokes sync(2) to flush all unwritten changes to disk
-// this is usually done before shutting down, rebooting or halting. ?man ## SEE
-// ALSO ?man fsync(2), sync(2)
+// ?man The sync utility invokes sync(2) to flush all unwritten changes to disk. this is usually done
+// ?man before shutting down, rebooting or halting.
+// ?man ## SEE ALSO
+// ?man fsync(2), sync(2)
 
 static void
 usage(void)

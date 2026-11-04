@@ -1,5 +1,11 @@
 
 
+#if FEATURE_MKNOD
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
+
 #include "config.h"
 #include "fs.h"
 #include "utf.h"
@@ -526,6 +532,7 @@ unarchive(char *fname, ssize_t l, char b[BLKSIZ])
         break;
       case CHARDEV:
       case BLOCKDEV:
+#if FEATURE_MKNOD
         if ((mode = strtol(h->mode, &p, 8)) < 0 || *p != '\0')
           eprintf("strtol %s: invalid mode\n", h->mode);
         if ((major = strtol(h->major, &p, 8)) < 0 || *p != '\0')
@@ -535,12 +542,19 @@ unarchive(char *fname, ssize_t l, char b[BLKSIZ])
         type = (h->type == CHARDEV) ? S_IFCHR : S_IFBLK;
         if (mknod(fname, type | mode, makedev(major, minor)) < 0)
           eprintf("mknod %s:", fname);
+#else
+        eprintf("tar: device extraction not supported\n");
+#endif
         break;
       case FIFO:
+#if FEATURE_MKNOD
         if ((mode = strtol(h->mode, &p, 8)) < 0 || *p != '\0')
           eprintf("strtol %s: invalid mode\n", h->mode);
         if (mknod(fname, S_IFIFO | mode, 0) < 0)
           eprintf("mknod %s:", fname);
+#else
+        eprintf("tar: fifo extraction not supported\n");
+#endif
         break;
       default:
         eprintf("unsupported tar-filetype %c\n", h->type);
@@ -838,8 +852,8 @@ usage(void)
 
 // ?man tar: tape archiver
 // ?man arguments: [x | t | -x | -t] [file ...]
-// ?man tar [c | -c] [-C dir] [-J | -Z | -a | -j | -z] [-h] [-T file] [-X file]
-// path ... [-f file] ?man manipulate tape archive files
+// ?man tar [c | -c] [-C dir] [-J | -Z | -a | -j | -z] [-h] [-T file] [-X file] path ... [-f file]
+// ?man manipulate tape archive files
 int
 main(int argc, char *argv[])
 {
@@ -1021,7 +1035,6 @@ main(int argc, char *argv[])
 
   switch (mode) {
 #if FEATURE_TAR_CREATE
-    // ?man -c: create a new archive
     case 'c':
       if (!argc && !files_from_cnt)
         usage();
@@ -1049,9 +1062,7 @@ main(int argc, char *argv[])
 #endif
       break;
 #endif
-    // ?man -t: list the contents of an archive
     case 't':
-    // ?man -x: extract files from an archive
     case 'x':
       tarfd = 0;
       if (file && *file != '-') {

@@ -1,5 +1,28 @@
 package main
 
+import "io"
+
+type trackingWriter struct {
+	w   io.Writer
+	err error
+}
+
+func newTrackingWriter(w io.Writer) *trackingWriter {
+	return &trackingWriter{w: w}
+}
+
+func (w *trackingWriter) Write(p []byte) (int, error) {
+	if w.err != nil {
+		return 0, w.err
+	}
+	n, err := w.w.Write(p)
+	if err == nil && n != len(p) {
+		err = io.ErrShortWrite
+	}
+	w.err = err
+	return n, err
+}
+
 type Page struct {
 	Name        string
 	Summary     string

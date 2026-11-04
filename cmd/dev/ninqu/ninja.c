@@ -4,11 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* ninjas own tokenizer treats '$', ':' and ' ' as special outside
- * of a rules variables, so any path used in a build statement
- * (outputs, inputs, deps) needs those three escaped with a leading
- * '$'. this is a different escaping pass from shell quoting below,
- * it runs on ninjas file syntax, not on the command it configures */
+/* ninja treats '$', ':' and ' ' as special in a build statement path
+ * (outputs, inputs, deps), so escape them with a leading '$'. this is
+ * ninja file syntax, separate from the shell quoting below */
 static char *
 ninja_path_escape(const char *s)
 {
@@ -25,12 +23,10 @@ ninja_path_escape(const char *s)
   return out;
 }
 
-/* ninqus argv is already fully expanded ($(VAR) substitution
- * happened at parse time), so the ninja rules command is a plain
- * literal string, never $in/$out. write one argv word as a single
- * shell-quoted token: close/escape/reopen for an embedded quote,
- * and double any '$' so ninjas own preprocessing pass on the
- * "command" value hands the shell back exactly one '$' */
+/* argv is fully expanded at parse time, so the ninja command is a
+ * plain literal, never $in/$out. write one word as a single shell
+ * quoted token, and double each '$' so ninja preprocessing hands the
+ * shell exactly one */
 static void
 fprint_shell_word_plain(FILE *f, const char *s)
 {
@@ -46,23 +42,12 @@ fprint_shell_word_plain(FILE *f, const char *s)
   fputc('\'', f);
 }
 
-/* ninja reads a "command = ..." value to the end of the physical
- * line: a literal newline byte terminates the statement, and $\n is
- * a continuation that strips the newline rather than preserving it,
- * so neither lets a real newline survive inside the value. POSIX
- * single quotes cannot help either, there is no escape processing
- * inside them, so a backslash-n written between quotes stays two
- * literal characters, not a newline, once the shell reads it back
- *
- * the fix is to not carry the newline in quoted text at all: emit
- * a command substitution that runs the word through `printf '%b'`,
- * whose %b directive is posix-specified to expand backslash escapes
- * (including \n) in its argument at runtime. the argument to printf
- * is itself single-quoted using the same rules as the plain case,
- * plus doubling any backslash so it survives as data rather than
- * being read as an escape by the quoting layer itself, and the `$(`
- * that opens the substitution needs its own `$` doubled so ninjas
- * pass just picks it out unmodified for the shell to see */
+/* ninja ends a "command = ..." value at the physical line end and $\n
+ * strips the newline, and \n inside posix single quotes stays two
+ * characters. so emit a command substitution running the word through
+ * `printf '%b'`, which expands escapes at run time. the argument is
+ * single-quoted with backslashes doubled, and the `$` of the opening
+ * `$(` is doubled so ninja leaves it for the shell */
 static void
 fprint_shell_word(FILE *f, const char *s)
 {
@@ -101,16 +86,12 @@ fprint_shell_word(FILE *f, const char *s)
   fputs("')\"", f);
 }
 
-/* an instance with no (out) has no on-disk path of its own (a
- * (phony) rule, or a pure grouping rule). ninja still needs a
- * target name to hang a build statement off, so one is made up
- * from the rule name and instance index. it is never a real file,
- * so ninja will always find it missing and re-run it, the same
- * "always stale" behaviour inst_stale() gives phony instances in
- * the internal engine. the name is a single flat path component
- * (no '/'), so ninja never mkdir -p's a directory for it: ninja
- * only creates the parent directory of a build outputs path, and a
- * name with no slash has no parent beyond the working directory */
+/* an instance with no (out) has no on-disk path (a phony or pure
+ * grouping rule), but ninja needs a target name for its build
+ * statement, so one is made from the rule name and instance index.
+ * it never exists as a file, so ninja always re-runs it, matching the
+ * "always stale" behaviour inst_stale() gives phony instances. the
+ * name has no '/', so ninja never creates a parent directory for it */
 static const char *
 inst_target(struct Inst *inst, int idx, char *buf, size_t bufsz)
 {
@@ -120,15 +101,12 @@ inst_target(struct Inst *inst, int idx, char *buf, size_t bufsz)
   return buf;
 }
 
-/* does this instance look like "cc ... -c ... -o foo.o"? if so its
- * a real compile step and ninja can track its header dependencies
- * precisely via a gcc-style depfile instead of only the coarse
- * order-only edges dep_inst gives every instance. matched by
- * basename so whatever CC the manifest actually resolved (gcc,
- * clang, a cross compiler under some path) is what gets the extra
- * flags, nothing here hardcodes a specific compiler binary; the
- * check is on -c and a .o output, not on the compiler name meaning
- * anything beyond "probably understands -MMD -MF" */
+/* does this instance look like "cc ... -c ... -o foo.o"? if so it is a
+ * real compile step, and ninja can track header dependencies through
+ * a gcc-style depfile instead of only the coarse order-only edges
+ * dep_inst gives. the check is on -c and a .o output, not the
+ * compiler name, so any CC the manifest resolved works as long as it
+ * understands -MMD -MF */
 static int
 is_cc_compile(struct Inst *inst)
 {
@@ -211,28 +189,19 @@ emit_command(FILE *f, struct Inst *inst)
   }
 }
 
-/* write every instance currently in insts[] (the same closure the
- * internal engine would have built, wanted targets plus their
- * transitive deps) out as a build.ninja. one rule per instance
- * (ninqu already resolved everything to a literal command line, so
- * there is no shared rule template to factor out), one build
- * statement per instance. dep_inst edges become order-only ("||"):
- * inst_stale() never consults dep_inst for staleness either, only
- * (in)/(stale_extra), so mirroring that as a plain (not order-only)
- * prerequisite list is what makes ninjas own mtime check agree
- * with ninqus
+/* write every instance in insts[] (wanted targets plus their
+ * transitive deps) out as a build.ninja: one rule and one build
+ * statement per instance, since ninqu already resolved each to a
+ * literal command line. dep_inst edges become order-only ("||"),
+ * because inst_stale() only consults (in)/(stale_extra), so this
+ * keeps ninja's mtime check in agreement with ninqu's
  *
- * ninja only knows build outputs, never ninqus rule/group/meta
- * names, so `ninja LIBUTIL` (what the makefile forwards $@ as) has
- * nothing to resolve against on its own. wanted carries the literal
- * command-line words ninqu itself was invoked with, one phony alias
- * per word makes that name buildable too. when more than one target
- * was requested in the same invocation every alias points at the
- * whole combined closure rather than just its own slice, since
- * insts[] no longer remembers which instance came from which wanted
- * name, thats fine for the makefiles own use (always one target
- * per invocation), just slightly conservative for a multi-target
- * `ninqu -G ninja a b` run */
+ * ninja only knows build outputs, not ninqu's rule/group/meta names,
+ * so `ninja LIBUTIL` has nothing to resolve. wanted holds the words
+ * ninqu was invoked with, and one phony alias per word makes each
+ * buildable. with several targets in one invocation every alias
+ * points at the whole combined closure, which is slightly
+ * conservative but fine for the makefile's one-target use */
 void
 emit_ninja(const char *path, struct StrList *wanted)
 {

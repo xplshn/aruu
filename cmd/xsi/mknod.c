@@ -1,4 +1,10 @@
 /* see LICENSE file for copyright and license details */
+#if FEATURE_MKNOD
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
+
 #include <sys/stat.h>
 #include <sys/types.h>
 

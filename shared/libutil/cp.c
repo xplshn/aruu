@@ -1,4 +1,9 @@
 /* see LICENSE file for copyright and license details */
+#if FEATURE_MKNOD
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>

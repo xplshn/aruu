@@ -46,6 +46,7 @@ int wsystem(const char *cmd);
 
 void wexecvp_self(const char *name, char *const *argv) __attribute__((noreturn));
 void wexecv_self(const char *path, char *const *argv) __attribute__((noreturn));
+void wexecve_self(const char *path, char *const *argv, char *const *envp) __attribute__((noreturn));
 
 int   wpopen_track(FILE *fp, pid_t pid);
 pid_t wpopen_untrack(FILE *fp);

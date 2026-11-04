@@ -1,5 +1,11 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_HOSTNAME_SET
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -32,8 +38,12 @@ main(int argc, char *argv[])
       eprintf("gethostname:");
     puts(host);
   } else if (argc == 1) {
+#if FEATURE_HOSTNAME_SET
     if (sethostname(argv[0], strlen(argv[0])) < 0)
       eprintf("sethostname:");
+#else
+    eprintf("hostname: setting not supported\n");
+#endif
   } else {
     usage();
   }

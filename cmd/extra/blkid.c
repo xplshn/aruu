@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 
 static char *oflag = "full";
@@ -79,8 +80,8 @@ do_blkid(const char *path)
 
 // ?man blkid: print block device attributes
 // ?man arguments: [device ...]
-// ?man blkid locates and prints attributes (such as uuid, volume label, and
-// filesystem type) ?man of block devices or partition images
+// ?man blkid locates and prints attributes (such as uuid, volume label, and filesystem type)
+// ?man of block devices or partition images
 int
 main(int argc, char *argv[])
 {

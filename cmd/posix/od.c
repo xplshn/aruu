@@ -62,7 +62,6 @@ printchunk(const unsigned char *s, unsigned char format, size_t len)
   };
 
   switch (format) {
-    // ?man -a: print or show all entries
     case 'a':
       c = *s & ~128; /* clear high bit as required by standard */
       if (c < LEN(namedict) || c == 127) {
@@ -71,7 +70,6 @@ printchunk(const unsigned char *s, unsigned char format, size_t len)
         printf(" %3c", c);
       }
       break;
-    // ?man -c: print count or perform stdout action
     case 'c':
       if (strchr("\a\b\t\n\v\f\r\0", *s)) {
         printf(" %3s", escdict[*s]);
@@ -94,13 +92,9 @@ printchunk(const unsigned char *s, unsigned char format, size_t len)
         }
       }
       /* x/o print a fixed-width, zero-padded field: 2 hex digits per
-       * byte, or ceil(8*len/3) octal digits, the exact digit count
-       * needed for len bytes' worth of bits, not the old 4*len-1
-       * estimate (right for octal/decimal at len==1 only by
-       * coincidence, and short for hex at every len). d/u stay right-
-       * justified with spaces at that same estimate, same as every
-       * other od: an oversized width there is just extra leading
-       * whitespace, harmless under a space fill */
+       * byte, or ceil(8*len/3) octal digits. d/u stay right-justified
+       * with spaces at the older estimate, where an oversized width
+       * only adds leading whitespace */
       fmt[2] = (format == 'x' || format == 'o') ? '0' : ' ';
       fmt[6] = format;
       switch (format) {
@@ -292,19 +286,13 @@ main(int argc, char *argv[])
       s = EARGF(usage());
       for (; *s; s++) {
         switch (*s) {
-          // ?man -a: print or show all entries
           case 'a':
-          // ?man -c: print count or perform stdout action
           case 'c':
             addtype(*s, 1);
             break;
-          // ?man -d: specify directory
           case 'd':
-          // ?man -o: specify output file
           case 'o':
-          // ?man -u: unbuffered output
           case 'u':
-          // ?man -x: hex format or match whole lines
           case 'x':
             fmt_char = *s;
             if (isdigit((unsigned char)*(s + 1))) {
@@ -312,22 +300,18 @@ main(int argc, char *argv[])
               s   = end - 1;
             } else {
               switch (*(s + 1)) {
-                // ?man -C: specify option flag
                 case 'C':
                   len = sizeof(char);
                   s++;
                   break;
-                // ?man -S: specify option flag
                 case 'S':
                   len = sizeof(short);
                   s++;
                   break;
-                // ?man -I: specify option flag
                 case 'I':
                   len = sizeof(int);
                   s++;
                   break;
-                // ?man -L: specify option flag
                 case 'L':
                   len = sizeof(long);
                   s++;

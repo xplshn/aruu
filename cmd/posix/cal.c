@@ -160,7 +160,7 @@ drawcal(size_t year, int month, size_t ncols, size_t nmons, int fday)
 static void
 usage(void)
 {
-#ifdef FEATURE_CAL_EXT
+#if FEATURE_CAL_EXT
   eprintf(
       "usage: %s [-1 | -3 | -y | -n num] "
       "[-s | -m | -f num] [-c num] [[month] year]\n",
@@ -189,7 +189,7 @@ main(int argc, char *argv[])
   if (!isatty(STDOUT_FILENO))
     ltime = NULL; /* dont highlight today's date */
 
-#ifdef FEATURE_CAL_EXT
+#if FEATURE_CAL_EXT
   ncols = 3;
   nmons = 0;
 #else
@@ -199,7 +199,7 @@ main(int argc, char *argv[])
 
   ARGBEGIN
   {
-#ifdef FEATURE_CAL_EXT
+#if FEATURE_CAL_EXT
     // ?man -1: specify option flag
     case '1':
       nmons = 1;
@@ -247,7 +247,7 @@ main(int argc, char *argv[])
   }
   ARGEND
 
-#ifdef FEATURE_CAL_EXT
+#if FEATURE_CAL_EXT
   if (nmons == 0) {
     if (argc == 1) {
       month = 1;

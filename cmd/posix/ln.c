@@ -1,5 +1,10 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_LN_RELATIVE
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <sys/stat.h>
 
 #include <errno.h>
@@ -130,8 +135,7 @@ main(int argc, char *argv[])
 
   ARGBEGIN
   {
-    // ?man -f: force creation of links by removing existing destination
-    // files
+    // ?man -f: force creation of links by removing existing destination files
     case 'f':
       fflag = 1;
       break;
@@ -144,8 +148,8 @@ main(int argc, char *argv[])
       flags &= ~AT_SYMLINK_FOLLOW;
       break;
 #if FEATURE_LN_RELATIVE
-    // ?man -r: with -s, store the target as a path relative to name's
-    // own directory instead of copying it as given
+    // ?man -r: with -s, store the target as a path relative to name's own directory instead of
+    // ?man copying it as given
     case 'r':
       rflag = 1;
       sflag = 1;
@@ -156,9 +160,8 @@ main(int argc, char *argv[])
       sflag = 1;
       break;
 #if FEATURE_LN_NO_TARGET_DIR
-    // ?man -T: treat name as a regular file, never as a directory to
-    // place the link into, even if a file of that name is currently
-    // a directory
+    // ?man -T: treat name as a regular file, never as a directory to place the link into, even if a
+    // ?man file of that name is currently a directory
     case 'T':
       Tflag = 1;
       break;
@@ -232,10 +235,9 @@ main(int argc, char *argv[])
 
 #if FEATURE_LN_RELATIVE
     if (rflag) {
-      /* targetdir only names the real destination directory when name
-       * was defaulted from target's own basename (the dir-argument
-       * form); an explicit name may itself carry a directory prefix
-       * (ln -r target dir/name), which then names it instead */
+      /* targetdir is the real destination dir only when name defaulted from
+       * the basename of target. an explicit name may carry a dir prefix
+       * (ln -r target dir/name), which then names the destination */
       char        dirbuf[PATH_MAX];
       const char *fromdir = targetdir;
 

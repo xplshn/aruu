@@ -1,5 +1,11 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_NET_IOCTL
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
+
 #include "arg.h"
 #include "util.h"
 

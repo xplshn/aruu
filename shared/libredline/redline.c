@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if FEATURE_CASEFOLD
+#include <strings.h>
+#endif
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -309,7 +312,11 @@ isUnsupportedTerm(void)
   if (term == NULL)
     return 0;
   for (i = 0; unsupported[i]; i++) {
+#if FEATURE_CASEFOLD
     if (strcasecmp(term, unsupported[i]) == 0)
+#else
+    if (strcmp(term, unsupported[i]) == 0)
+#endif
       return 1;
   }
   return 0;

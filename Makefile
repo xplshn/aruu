@@ -1,9 +1,15 @@
 CC       = cc -static
 CFLAGS   = -std=c99 -Wall -Wextra -pedantic
 
+# ninqu has to exist before any ninqu.rules build (box, dev, ...) can
+# start, so it compiles with BOOTSTRAP_CC. plain $(CC) could resolve to
+# an installed aruu cc that cant yet build the tool it is needed for.
+# defaults to $(CC), override it alone to pick a bootstrap compiler
+BOOTSTRAP_CC ?= $(CC)
+
 BACKEND  ?= auto
 
-CPPFLAGS ?= -Ishared -D_DEFAULT_SOURCE -D_POSIX_C_SOURCE=200809L \
+CPPFLAGS ?= -Ishared -D_POSIX_C_SOURCE=200809L \
             -DFEATURE_NOFORK=0 -DFEATURE_NOEXEC=0
 
 NINQU_LIB_SRC =\
@@ -35,24 +41,29 @@ NINQU_SRC =\
         cmd/dev/ninqu/ninja.c
 
 NINQU ?= cmd/dev/ninqu/ninqu
-# no $(filter -j%,$(MAKEFLAGS)) equivalent here (GNUmakefile's own
-# trick): pass ninqu's own parallelism directly, "make JOBS=-j8 box"
+# no $(filter -j%,$(MAKEFLAGS)) trick here, pass the parallelism
+# directly: make JOBS=-j8 box
 JOBS ?=
 
-# every real goal ninqu.rules exposes, listed once instead of
-# GNUmakefile's own "%: FORCE" catch-all. a new top-level group needs
-# a matching name added here too
+# every goal ninqu.rules exposes, since there is no %: FORCE catch-all
+# here. a new top-level group needs a name added too
 .PHONY: all default clean box dev man install install-base uninstall \
-        remove fmt fmt-all lib posix linux net xsi pseudo extra codegen
+        remove fmt fmt-all lib posix linux net xsi pseudo extra codegen test
 
-$(NINQU): $(NINQU_SRC) cmd/dev/ninqu/ninqu.h scripts/mk/config.set $(NINQU_LIB_SRC)
-	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(NINQU_SRC) $(NINQU_LIB_SRC)
+$(NINQU): $(NINQU_SRC) cmd/dev/ninqu/ninqu.h scripts/mk/config.set scripts/mk/features.h shared/libutil/nofork_list.h $(NINQU_LIB_SRC)
+	$(BOOTSTRAP_CC) $(CFLAGS) $(CPPFLAGS) -o $@ $(NINQU_SRC) $(NINQU_LIB_SRC)
 
 scripts/mk/config.set: build.cfg scripts/genconfig.sh
-	sh scripts/genconfig.sh config
+	sh scripts/genconfig.sh config-set
+
+scripts/mk/features.h: build.cfg scripts/genconfig.sh
+	sh scripts/genconfig.sh features-h
+
+shared/libutil/nofork_list.h: build.cfg scripts/genconfig.sh
+	sh scripts/genconfig.sh nofork-list-h
 
 all default box dev man install install-base uninstall remove \
-fmt fmt-all lib posix linux net xsi pseudo extra codegen: $(NINQU)
+        fmt fmt-all lib posix linux net xsi pseudo extra codegen test: $(NINQU)
 	$(NINQU) $(JOBS) $@
 
 clean: $(NINQU)

@@ -50,7 +50,7 @@ int     is_file(const char *path);
 ssize_t getline_chomp(char **lineptr, size_t *n, FILE *stream);
 ssize_t getline_cont(char **lineptr, size_t *n, FILE *stream, int *plineno);
 
-/* memory: toolchain-local, same contract as aruu emalloc/ecalloc/erealloc
+/* memory: toolchain-local, same behavior as aruu emalloc/ecalloc/erealloc
  * kept separate so the toolchain can build standalone without libutil */
 void *malloc_or_die(size_t size);
 void *calloc_or_die(size_t size);

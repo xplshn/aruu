@@ -1,4 +1,9 @@
 %{
+#if FEATURE_BC_ASCII
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <libgen.h>
 #include <unistd.h>
 
@@ -13,6 +18,7 @@
 
 #include "arg.h"
 #include "util.h"
+#include "wexec.h"
 
 #define DIGITS   "0123456789ABCDEF"
 #define NESTED_MAX 32
@@ -66,7 +72,7 @@ static char *dcprog = "dc";
 
 %union {
 	char *str;
-	char id[16]; // matches dc's own REGSIZ: an extended register name's cap
+	char id[16]; // dc REGSIZ: cap on an extended register name
 	Macro *macro;
 }
 
@@ -154,20 +160,14 @@ stat    : exprstat
         | for '(' expr ';' rel ';' expr ')' optnl stat  {$$ = forcode($1, $3, $5, $7, $10);}
         ;
 
-// real scripts routinely put a while/if/for's own body on the next
-// line instead of right after the condition; nothing else in this
-// grammar needs a newline here, since a body wrapped in { } already
-// goes through statlst, which handles its own internal newlines
+// a while/if/for body may start on the next line. a { } body goes
+// through statlst, which handles its own newlines
 optnl   :
         | optnl '\n'
         ;
 
-// print takes a comma-separated list of any length, mixing strings
-// and expressions freely: real scripts (the kernel's own timeconst.bc
-// generator among them) routinely print three or more at once. no
-// item here ever gets an automatic trailing newline of its own,
-// matching real bc: whatever newlines appear come from the items
-// themselves
+// print takes any number of strings and expressions, mixed. no item
+// gets an implicit trailing newline, as in real bc
 prlst   : pritem
         | prlst ',' pritem      {$$ = code("%s%s", $1, $3);}
         ;
@@ -310,11 +310,8 @@ err:
 	eprintf("writing to dc:");
 }
 
-// grows the shared code buffer geometrically to fit at least 'need'
-// bytes: a single generated dc macro (an if/else body, a print list,
-// a deeply nested function) has no fixed upper bound, unlike the
-// stdio-buffering constant BUFSIZ this buffer borrowed its original
-// size from
+// grow the code buffer geometrically to fit need bytes. a generated dc
+// macro has no fixed upper bound, unlike BUFSIZ
 static void
 growbuff(size_t need)
 {
@@ -538,9 +535,8 @@ whilecode(Macro *d, char *cmp, char *body)
 	return s;
 }
 
-// the trailing relational operator on a cond's own generated code
-// (see the rel grammar rule) is always one of these six forms; an
-// else branch runs on whichever of them means "the opposite happened"
+// the trailing relational op (see rel) is one of these six, else runs
+// on the opposite one
 static char *
 invertrel(char *cmp)
 {
@@ -579,10 +575,9 @@ invertrel(char *cmp)
 	return s;
 }
 
-// an else branch's own stored body needs a register distinct from the
-// then branch's d->id: nested caps how high d->id itself ever goes,
-// so offsetting by it lands on a register no other nesting level, and
-// no ordinary (single-letter or, under -i, named) variable, ever uses
+// an else body needs a register distinct from the then branch d->id.
+// nested bounds d->id, so offsetting by it never collides with another
+// nesting level or a named variable
 static char *
 ifcode(Macro *d, char *cmp, char *body, char *ebody)
 {
@@ -713,10 +708,8 @@ iden(int ch)
 	if (p->str)
 		return p->token;
 
-	// strict POSIX bc only ever names a variable/function with a
-	// single lowercase letter; every real bc script in the wild
-	// (the kernel's own timeconst.bc among them) freely uses
-	// multi-character names anyway, same as GNU bc's own default
+	// posix bc names variables and functions with one lowercase letter,
+	// but real scripts use longer names, as GNU bc does
 #if !FEATURE_BC_MULTICHAR
 	if (!sflag)
 		yyerror("invalid keyword");
@@ -788,11 +781,9 @@ string(int ch)
 		if ((ch = getc(filep)) == '"')
 			break;
 #if FEATURE_BC_ESCAPES
-		// strict POSIX bc has no escape sequences in a string at
-		// all; every real script (again, the kernel's own scripts
-		// among them) assumes GNU bc's \n/\t/etc, since dc's own
-		// string reader passes a literal byte straight through
-		// with nothing left to turn it into a real newline later
+		// posix bc has no string escapes, but scripts assume GNU \n \t etc,
+		// and dc passes a literal byte through with nothing to turn it into a
+		// newline later
 		if (ch == '\\') {
 			switch (ch = getc(filep)) {
 			case 'a':
@@ -817,9 +808,7 @@ string(int ch)
 				ch = '\v';
 				break;
 			case 'q':
-				// GNU bc's own escape for a literal double
-				// quote, needed since a bc string's own
-				// delimiter is " with no other way in
+				// GNU escape for a literal double quote, the only way into a bc string
 				ch = '"';
 				break;
 			case '\\':
@@ -963,10 +952,9 @@ static void
 spawn(void)
 {
 	int fds[2];
-	// dc only accepts the extended, multi-character register
-	// syntax bc.y's own ftn()/var()/ary() emit for a non-single-
-	// letter name (see iden() above) when told -i: whenever this
-	// build can produce that syntax at all, dc always needs it
+	// dc needs the extended register syntax from ftn()/var()/ary() (see
+	// iden()) for any name that is not one letter, so pass -i whenever
+	// this build can emit it
 #if FEATURE_BC_MULTICHAR
 	char *par = "-i";
 #else
@@ -974,14 +962,10 @@ spawn(void)
 #endif
 	char errmsg[] = "bc:error execing dc\n";
 
-	// fd 0 is about to become the read end of the code pipe below,
-	// but dc's own "?" (bc's read()) needs the real, original stdin:
-	// stash it on a fixed fd dc knows to check, or read() would read
-	// straight out of this project's own generated dc code instead
-	// of whatever the user actually piped in. this has to happen
-	// before pipe() claims its own two fds, or dup2 here could
-	// clobber one of them (fd 3 is often the next one pipe() itself
-	// would have picked)
+	// fd 0 becomes the read end of the code pipe below, but dc ? (bc
+	// read()) needs the original stdin. stash it on fd 3, which dc checks,
+	// or read() would consume the generated code. do it before pipe() so
+	// dup2 cant clobber one of its fds
 	dup2(0, 3);
 
 	if (pipe(fds) < 0)
@@ -1002,9 +986,9 @@ spawn(void)
 		dup(fds[0]);
 		close(fds[0]);
 		close(fds[1]);
-		execlp(dcprog, "dc", par, (char *) NULL);
+		wexecvp_self(dcprog, (char *const[]){"dc", par, NULL});
 
-		/* it shouldn't happen */
+		/* it shouldnt happen */
 		write(3, errmsg, sizeof(errmsg)-1);
 		_Exit(2);
 	}
@@ -1093,11 +1077,8 @@ main(int argc, char *argv[])
 	if (lflag)
 		bc(PREFIX "/share/misc/bc.library");
 
-	// stdin is only the script source when no file was given at all:
-	// a real file argument alongside piped stdin data (the kernel's
-	// own "echo $HZ | bc -q file.bc" being the standing example) means
-	// that data is meant for read(), not for bc itself to parse as
-	// more of the program
+	// stdin is the script only when no file was given. with a file plus
+	// piped data (echo $HZ | bc -q file.bc) the data is for read()
 	if (!*argv) {
 		bc(NULL);
 	} else {

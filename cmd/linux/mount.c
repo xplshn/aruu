@@ -1,5 +1,10 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_LINUX_MOUNT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/types.h>

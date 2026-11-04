@@ -7,10 +7,8 @@
 #include <utmpx.h>
 
 #include "config.h"
+#include "sysinfo.h"
 #include "util.h"
-
-int get_uptime(long *);
-int get_loads(double *);
 
 static void
 usage(void)

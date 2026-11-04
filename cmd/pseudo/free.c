@@ -3,9 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "sysinfo.h"
 #include "util.h"
-
-int get_meminfo(struct MemInfo *);
 
 static unsigned int mem_unit = 1;
 static unsigned int unit_shift;

@@ -38,9 +38,9 @@ static struct hit  *hits;
 static size_t       nhits, hitscap;
 static int          count;
 
-// newest/oldest are mutually exclusive with each other and with
-// printing every match as it is found, so they buffer every match
-// instead of streaming it: 0 means "print as found"
+/* newest/oldest are mutually exclusive with each other and with
+ * printing every match as it is found, so they buffer every match
+ * instead of streaming it: 0 means "print as found" */
 enum { PGREP_NONE = 0, PGREP_NEWEST, PGREP_OLDEST };
 static int select_mode;
 

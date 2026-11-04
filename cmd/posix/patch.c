@@ -1,4 +1,9 @@
 /* see LICENSE file for copyright and license details */
+#if FEATURE_PATCH_EXT
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include "paths.h"
 #include "util.h"
 #include "wexec.h"

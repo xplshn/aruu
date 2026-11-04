@@ -9,6 +9,11 @@
  * POSIX says dont flush on n when out of input, but GNU and busybox do
  */
 
+#if FEATURE_SED_ASCII
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include "config.h"
 #include "utf.h"
 #include "util.h"
@@ -851,7 +856,7 @@ free_acir_arg(Cmd *c)
  * whitespace, closing braces, etc. and can be limited to 8 bytes
  *
  * i allow a semicolon or closing brace to terminate a label name, its not
- * POSIX compliant, but its useful and every sed version i've tried to date
+ * POSIX compliant, but its useful and every sed version i have tried to date
  * does the same
  *
  * FIXME: POSIX dictates that leading whitespace is ignored but trailing
@@ -1148,7 +1153,7 @@ run(void)
     leprintf("extra {");
 
   /* genbuf has already been initialized, patt will be in new_line
- * (or we'll halt) */
+ * (or we will halt) */
   stracpy(&hold, "");
 
   insert_labels();
@@ -1226,7 +1231,7 @@ next_file(void)
     if (!strcmp(*files, "-")) {
       file = stdin;
     } else if (!(file = fopen(*files, "r"))) {
-      /* warn this file didn't open, but move on to next */
+      /* warn this file didnt open, but move on to next */
       weprintf("fopen %s:", *files);
       ret = 1;
     }
@@ -1591,7 +1596,7 @@ cmd_s(Cmd *c)
             leprintf("this shouldn't be possible");
             break;
           case '\0':
-            /* we're at the end, back up one so the
+            /* we are at the end, back up one so the
  * ++p will put us on the null byte to
  * break out of the loop */
             --p;

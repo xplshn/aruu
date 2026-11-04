@@ -17,12 +17,12 @@ const (
 
 type TxtRenderer struct {
 	page  *Page
-	w     io.Writer
+	w     *trackingWriter
 	wrote bool
 }
 
 func NewTxtRenderer(page *Page, w io.Writer) *TxtRenderer {
-	return &TxtRenderer{page: page, w: w}
+	return &TxtRenderer{page: page, w: newTrackingWriter(w)}
 }
 
 func (r *TxtRenderer) Render() error {
@@ -51,7 +51,7 @@ func (r *TxtRenderer) Render() error {
 			r.renderBlock(block, txtIndent)
 		}
 	}
-	return nil
+	return r.w.err
 }
 
 // heading prints a flush-left section title, with a blank line above

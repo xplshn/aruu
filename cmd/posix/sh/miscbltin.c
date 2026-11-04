@@ -36,6 +36,14 @@
  * miscellaneous builtins
  */
 
+#if FEATURE_SH_EXT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -289,7 +297,7 @@ readcmd(int argc __unused, char **argv __unused)
     }
     sigprocmask(SIG_SETMASK, &oset, NULL);
     /*
- * if there's nothing ready, return an error
+ * if theres nothing ready, return an error
  */
     if (status <= 0) {
       while (*ap != NULL)

@@ -2,6 +2,7 @@
 
 #include "arg.h"
 #include "util.h"
+#include "wexec.h"
 
 #include <assert.h>
 #include <ctype.h>
@@ -1652,11 +1653,9 @@ string(char *dst, int *np)
 
     switch (ch) {
       case '\0':
-        /* the read above already stepped input->s one past this
-         * buffer's own terminator; moreinput()'s own fast path
-         * dereferences input->s directly on the assumption it is
-         * always in bounds, so it has to be backed up first or that
-         * check reads one byte past the allocation */
+        /* the read above stepped input->s past the buffer terminator. back it
+         * up first, moreinput() assumes input->s is in bounds and would read a
+         * byte past the allocation */
         --input->s;
         if (!moreinput())
           exit(0);
@@ -1962,10 +1961,9 @@ printbytes(void)
   freeval(v);
 }
 
-/* bc's own spawn() repurposes fd 0 as the read end of the pipe
- * carrying its generated code, and dups the real, original stdin to
- * fd 3 first so this command still has somewhere real to read from;
- * standalone dc (fd 3 never opened) falls back to its own real stdin */
+/* bc spawn() makes fd 0 the read end of the pipe with the generated
+ * code and dups the original stdin to fd 3 first. standalone dc has no
+ * fd 3 and falls back to stdin */
 static FILE *
 readsrc(void)
 {
@@ -2113,7 +2111,7 @@ eval(void)
           ch = NE;
           break;
         default:
-          system(input->s - 1);
+          wsystem(input->s - 1);
           goto discard;
       }
     case '>':
@@ -2122,10 +2120,8 @@ eval(void)
       relational(ch);
       break;
     case '?':
-      /* real dc executes the line as commands rather than pushing it
-       * as a string: bc's own read() relies on exactly this, since a
-       * bare number is already a complete, valid command that pushes
-       * itself */
+      /* real dc runs the line as commands instead of pushing a string. bc
+       * read() depends on it, a bare number is a command that pushes itself */
       s = NULL;
       if (getline(&s, &siz, readsrc()) > 0) {
         addinput(NULL, s);

@@ -18,4 +18,13 @@ ssize_t tlss_write(struct TlsSocket *s, const void *buf, size_t len);
 /* closes the tls connection and optionally closes the socket fd */
 void tlss_close(struct TlsSocket *s, int close_fd);
 
+#ifdef ARUU_TLS_TESTING
+int tlss_test_b64_decode(
+    const char *src, size_t src_len, unsigned char *dst, size_t dst_cap, size_t *dst_len
+);
+int tlss_test_load_ca_certs(const char *path);
+int tlss_test_sigpipe_setup(void);
+int tlss_test_sigpipe_teardown(void);
+#endif
+
 #endif /* tls_h_ */

@@ -1,5 +1,10 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_ID_GROUPLIST
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include <sys/types.h>
 
 #include <ctype.h>

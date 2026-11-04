@@ -1,0 +1,339 @@
+#!/bin/sh
+# aruu dev toolchain configure
+#
+# generates three headers:
+#   config.h        architecture and platform for as, ld, libtcutil
+#   cc/config.h     driver configuration (crt files, lib paths, defines)
+#   version.h       version string
+#
+# crt and runtime files are discovered, not assumed from the libc:
+# crt1 crti crtn exist everywhere, crtbegin crtend libgcc only with a
+# gcc runtime, so the same script works on musl and glibc
+
+set -u
+
+fail() {
+	echo "configure: $*" >&2
+	exit 1
+}
+
+devdir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+normpath() {
+	( cd "$1" 2>/dev/null && pwd ) || echo "$1"
+}
+
+rootpath() {
+	case "$1" in
+	/) printf '%s' / ;;
+	*) printf '%s' "${1%/}" ;;
+	esac
+}
+
+host=
+target=
+sysroot=
+gcclibdir=
+CC=${CC:-cc}
+
+for arg; do
+	case "$arg" in
+	--host=*) host=${arg#*=} ;;
+	--target=*) target=${arg#*=} ;;
+	--sysroot=*) sysroot=${arg#*=} ;;
+	--with-gcclibdir=*) gcclibdir=${arg#*=} ;;
+	CC=*) CC=${arg#*=} ;;
+	*) fail "unknown option: $arg" ;;
+	esac
+done
+
+# determine host triplet, prefer an explicit --host, then try the c
+# compiler, then fall back to uname so the script works without gcc
+if [ -z "$host" ]; then
+	host=$($CC -dumpmachine 2>/dev/null) || true
+fi
+if [ -z "$host" ]; then
+	m=$(uname -m)
+	s=$(uname -s | tr '[:upper:]' '[:lower:]')
+	case "$s" in
+	linux)
+		libc=gnu
+		[ -f "/lib/ld-musl-$m.so.1" ] && libc=musl
+		host="$m-pc-linux-$libc"
+		;;
+	*)	host="$m-pc-$s" ;;
+	esac
+fi
+: "${target:=$host}"
+
+printf 'host:   %s\n' "$host"
+printf 'target: %s\n' "$target"
+
+# map target to architecture constants used by as, ld, libtcutil
+case "$target" in
+x86_64-*|amd64-*)
+	tc_arch=1
+	machine=EM_X86_64
+	;;
+aarch64-*)
+	tc_arch=2
+	machine=EM_AARCH64
+	;;
+riscv64-*)
+	tc_arch=3
+	machine=EM_RISCV
+	;;
+*) fail "unsupported target: $target" ;;
+esac
+
+case "$target" in
+*-apple-darwin*) tc_platform=2 ;;
+*) tc_platform=1 ;;
+esac
+
+# an explicit sysroot is a search boundary, not a prefix preference
+root=
+if [ -n "$sysroot" ]; then
+	root=$(rootpath "$(normpath "$sysroot")")
+fi
+
+# find the libc directory: the first standard path that contains crt1.o
+crtdir=
+if [ -n "$root" ]; then
+	for dir in "$root/lib"; do
+		if [ -f "$dir/crt1.o" ]; then
+			crtdir=$(normpath "$dir")
+			break
+		fi
+	done
+else
+	printf 'no sysroot: using standalone host runtime paths\n'
+	for dir in /usr/lib /lib /usr/local/lib; do
+		if [ -f "$dir/crt1.o" ]; then
+			crtdir=$(normpath "$dir")
+			break
+		fi
+	done
+fi
+if [ -z "$crtdir" ]; then
+	if [ -n "$root" ]; then
+		fail "cannot find crt1.o inside target sysroot"
+	fi
+	fail "cannot find host crt1.o, use --sysroot for an isolated target"
+fi
+printf 'libc directory: %s\n' "$crtdir"
+
+# find the gcc runtime directory: glibc systems have one, musl does not,
+# and crtbeginT.o is what marks it as usable
+if [ -n "$root" ] && [ -n "$gcclibdir" ]; then
+	if [ "$root" != / ]; then
+		case "$gcclibdir" in
+		"$root"/*) ;;
+		*) fail "--with-gcclibdir escapes --sysroot" ;;
+		esac
+	elif [ "${gcclibdir#/}" = "$gcclibdir" ]; then
+		fail "--with-gcclibdir must name an absolute target-root path"
+	fi
+elif [ -n "$root" ]; then
+	for dir in "$root"/lib/gcc/*/*/ "$root"/usr/lib/gcc/*/*/; do
+		if [ -f "${dir}crtbeginT.o" ]; then
+			gcclibdir=$(normpath "$dir")
+			break
+		fi
+	done
+elif [ -z "$gcclibdir" ]; then
+	for dir in /usr/lib/gcc/*/*/ /usr/local/lib/gcc/*/*/; do
+		if [ -f "${dir}crtbeginT.o" ]; then
+			gcclibdir=$(normpath "$dir")
+			break
+		fi
+	done
+fi
+# validate: only treat gcclibdir as real if crtbeginT.o is there
+if [ -z "$gcclibdir" ] || [ ! -f "$gcclibdir/crtbeginT.o" ]; then
+	gcclibdir=
+fi
+if [ -n "$gcclibdir" ]; then
+	printf 'gcc runtime: %s\n' "$gcclibdir"
+fi
+
+# build library search paths
+searchpaths=$crtdir
+[ -n "$gcclibdir" ] && searchpaths="$searchpaths $gcclibdir"
+
+linkflags=
+for dir in $searchpaths; do
+	linkflags=$linkflags' "-L", "'$dir'",'
+done
+
+# crt file lists: crt1 crti crtn are standard across libcs, crtbegin and
+# crtend come with gcc. libgcc is listed when present and the static
+# linker skips unused members, so it is harmless on musl. libc wraps
+# libgcc because libgcc_eh needs libc symbols (pthread_cond) and libc
+# needs libgcc symbols (unwind)
+startfiles='-l", ":crt1.o", "-l", ":crti.o"'
+endfiles='-l", "c"'
+
+if [ -n "$gcclibdir" ] && [ -f "$gcclibdir/crtbeginT.o" ]; then
+	startfiles=$startfiles', "-l", ":crtbeginT.o"'
+
+	if [ -f "$gcclibdir/libgcc.a" ]; then
+		endfiles='-l", "c", "-l", "gcc"'
+		if [ -f "$gcclibdir/libgcc_eh.a" ]; then
+			endfiles=$endfiles', "-l", "gcc_eh"'
+		fi
+		endfiles=$endfiles', "-l", "c"'
+	fi
+
+	endfiles=$endfiles', "-l", ":crtend.o"'
+fi
+
+endfiles=$endfiles', "-l", ":crtn.o"'
+
+# fix up leading quote (the string starts with -l, needs ")
+startfiles='"'"$startfiles"
+endfiles='"'"$endfiles"
+
+# target-specific defines (architecture, os, data model), not libc-specific:
+# the type and feature macros system headers expect from a hosted compiler
+defines='
+	"-D", "__STDC_ENDIAN_LITTLE__=1234",
+	"-D", "__STDC_ENDIAN_BIG__=4321",
+	"-D", "__STDC_ENDIAN_NATIVE__=__STDC_ENDIAN_LITTLE__",
+	"-D", "__ORDER_LITTLE_ENDIAN__=__STDC_ENDIAN_LITTLE__",
+	"-D", "__ORDER_BIG_ENDIAN__=__STDC_ENDIAN_BIG__",
+	"-D", "__BYTE_ORDER__=__STDC_ENDIAN_NATIVE__",
+	"-D", "__FLT_EVAL_METHOD__=1",
+	"-D", "__BITINT_MAXWIDTH__=64",
+'
+
+case "$target" in
+x86_64-*|amd64-*)
+	defines=$defines'
+	"-D", "__x86_64__",
+	"-D", "__amd64__",
+	'
+	;;
+aarch64-*)
+	defines=$defines'
+	"-D", "__aarch64__",
+	'
+	;;
+riscv64-*)
+	defines=$defines'
+	"-D", "__riscv",
+	"-D", "__riscv_i=2001000",
+	"-D", "__riscv_m=2000000",
+	"-D", "__riscv_a=2001000",
+	"-D", "__riscv_f=2002000",
+	"-D", "__riscv_d=2002000",
+	"-D", "__riscv_c=2000000",
+	"-D", "__riscv_xlen=64",
+	"-D", "__riscv_flen=64",
+	'
+	;;
+esac
+
+# lp64 data model
+defines=$defines'
+	"-D", "__LP64__",
+	"-D", "__SIZEOF_LONG__=8",
+	"-D", "__SIZEOF_POINTER__=8",
+	"-D", "__SIZEOF_SIZE_T__=8",
+	"-D", "__SIZEOF_PTRDIFF_T__=8",
+
+	/* standard integer type mappings, needed by system headers */
+	"-D", "__SIZE_TYPE__=unsigned long",
+	"-D", "__PTRDIFF_TYPE__=long",
+	"-D", "__WCHAR_TYPE__=int",
+	"-D", "__WINT_TYPE__=unsigned int",
+	"-D", "__INTMAX_TYPE__=long",
+	"-D", "__UINTMAX_TYPE__=unsigned long",
+
+	"-D", "__CHAR_BIT__=8",
+	"-D", "__SCHAR_MAX__=0x7f",
+	"-D", "__SHRT_MAX__=0x7fff",
+	"-D", "__INT_MAX__=0x7fffffff",
+	"-D", "__LONG_MAX__=0x7fffffffffffffffL",
+	"-D", "__LONG_LONG_MAX__=0x7fffffffffffffffL",
+'
+
+# os defines
+case "$target" in
+*linux*)
+	defines=$defines'
+	"-D", "__linux__",
+	"-D", "__unix__",
+	'
+	;;
+esac
+
+if [ -n "$root" ]; then
+	sysincdirs="$root${ARUU_PATH_INCLUDE:-/include}"
+else
+	sysincdirs="/usr/include /usr/local/include"
+	case "$target" in
+	x86_64-*|amd64-*) sysincdirs="$sysincdirs /usr/include/x86_64-linux-gnu" ;;
+	esac
+fi
+includeflags=
+for dir in $sysincdirs; do
+	includeflags=$includeflags' "-I", "'$dir'",'
+	printf 'system include: %s\n' "$dir"
+done
+
+DEFAULT_CPP=$(printf '"%s", ' cpp)
+DEFAULT_QBE=$(printf '"%s", ' qbe)
+DEFAULT_AS=$(printf '"%s", ' as)
+DEFAULT_LD=$(printf '"%s", ' ld)
+
+# generate config.h
+printf 'creating config.h... '
+cat >"$devdir/config.h" <<EOF
+/* generated by configure, do not edit */
+
+#define TC_ARCH_X64      1
+#define TC_ARCH_AARCH64  2
+#define TC_ARCH_RISCV64  3
+
+#define TC_TARGET_ARCH  $tc_arch
+
+#define TC_PLATFORM_POSIX  1
+#define TC_PLATFORM_APPLE  2
+
+#define TC_TARGET_PLATFORM  $tc_platform
+
+#define TARGET_POINTER_SIZE  8
+
+#define MACHINE_TYPE  $machine
+EOF
+echo done
+
+# generate cc/config.h
+printf 'creating cc/config.h... '
+cat >"$devdir/cc/config.h" <<EOF
+/* generated by configure, do not edit */
+
+static const char target[]               = "$target";
+static const char *const startfiles[]    = {$startfiles};
+static const char *const endfiles[]      = {$endfiles};
+static const char *const preprocesscmd[] = {
+	$DEFAULT_CPP"-undef",
+	$includeflags
+	"-D", "__STDC_NO_COMPLEX__",
+
+	"-D", "__extension__=",
+$defines};
+static const char *const codegencmd[]    = {$DEFAULT_QBE};
+static const char *const assemblecmd[]   = {$DEFAULT_AS};
+static const char *const linkcmd[]       = {$DEFAULT_LD$linkflags};
+EOF
+echo done
+
+# generate version.h
+printf 'creating version.h... '
+cat >"$devdir/version.h" <<EOF
+/* generated by configure, do not edit */
+#define VERSION "aruu-dev"
+EOF
+echo done

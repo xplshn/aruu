@@ -8,7 +8,9 @@
 #include "output.h"
 #include "process.h"
 #include "prompt.h"
+#include "paths.h"
 #include "term.h"
+#include "wexec.h"
 
 int   nopipe;
 char *progname;
@@ -45,7 +47,7 @@ main(int argc, char **argv)
   }
   if (no_tty) {
     *--av = "cat";
-    execve("/bin/cat", av, (char *const[]){NULL});
+    wexecve_self(ARUU_PATH_BIN "/cat", av, (char *const[]){NULL});
   } else
     processfiles(argc - (av - argv), av);
   (void)quit();

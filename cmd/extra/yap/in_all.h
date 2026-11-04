@@ -1,8 +1,10 @@
 #ifndef IN_ALL_H
 #define IN_ALL_H
 
+#if FEATURE_YAP_EXT
 #ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
+#endif
 #endif
 
 #include <errno.h>

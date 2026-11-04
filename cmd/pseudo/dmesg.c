@@ -5,11 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "sysinfo.h"
 #include "util.h"
-
-ssize_t get_dmesg(char *, size_t);
-int     clear_dmesg(void);
-int     set_console_level(int);
 
 static void
 dmesg_show(const void *buf, size_t n)

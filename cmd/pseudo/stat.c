@@ -1,5 +1,9 @@
 
 
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
+
 #include "config.h"
 #include "util.h"
 
@@ -55,8 +59,7 @@ print_custom(const char *file, struct stat *st, const char *fmt)
         case 'n':
           putchar('\n');
           break;
-          // ?man -t: sort or specify timestamp
-        case 't':
+          case 't':
           putchar('\t');
           break;
         case 'r':
@@ -65,7 +68,6 @@ print_custom(const char *file, struct stat *st, const char *fmt)
         case 'b':
           putchar('\b');
           break;
-          // ?man -f: force the operation
         case 'f':
           putchar('\f');
           break;
@@ -183,8 +185,7 @@ print_custom(const char *file, struct stat *st, const char *fmt)
         fmt_spec[fmt_len]   = '\0';
         printf(fmt_spec, (long long)st->st_size);
         break;
-        // ?man -t: sort or specify timestamp
-      case 't':
+        case 't':
         fmt_spec[fmt_len++] = 'x';
         fmt_spec[fmt_len]   = '\0';
         printf(fmt_spec, major(st->st_rdev));
@@ -313,8 +314,7 @@ print_fs_custom(const char *file, struct statfs *st, const char *fmt)
         case 'n':
           putchar('\n');
           break;
-          // ?man -t: sort or specify timestamp
-        case 't':
+          case 't':
           putchar('\t');
           break;
         case 'r':
@@ -323,7 +323,6 @@ print_fs_custom(const char *file, struct statfs *st, const char *fmt)
         case 'b':
           putchar('\b');
           break;
-          // ?man -f: force the operation
         case 'f':
           putchar('\f');
           break;
@@ -377,8 +376,7 @@ print_fs_custom(const char *file, struct statfs *st, const char *fmt)
         fmt_spec[fmt_len]   = '\0';
         printf(fmt_spec, (long long)st->f_blocks);
         break;
-        // ?man -c: print count or perform stdout action
-      case 'c':
+        case 'c':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
@@ -392,7 +390,6 @@ print_fs_custom(const char *file, struct statfs *st, const char *fmt)
         fmt_spec[fmt_len]   = '\0';
         printf(fmt_spec, (long long)st->f_ffree);
         break;
-        // ?man -f: force the operation
       case 'f':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'l';
@@ -434,8 +431,7 @@ print_fs_custom(const char *file, struct statfs *st, const char *fmt)
         fmt_spec[fmt_len]   = '\0';
         printf(fmt_spec, (long)st->f_frsize ? (long)st->f_frsize : (long)st->f_bsize);
         break;
-        // ?man -t: sort or specify timestamp
-      case 't':
+        case 't':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'x';
         fmt_spec[fmt_len]   = '\0';
@@ -544,13 +540,11 @@ main(int argc, char *argv[])
       fn     = stat;
       fnname = "stat";
       break;
-    // ?man -t: sort or specify timestamp
-    case 't':
+          case 't':
       showstat = show_stat_terse;
       break;
 #if FEATURE_STAT_FILESYSTEM
-    // ?man -f: force the operation
-    case 'f':
+      case 'f':
       fflag = 1;
       break;
 #endif

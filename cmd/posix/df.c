@@ -1,13 +1,11 @@
 /* see LICENSE file for copyright and license details */
 
-#include <sys/statvfs.h>
-
-#include <mntent.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "filesystem.h"
 #include "util.h"
+
+#include <errno.h>
+#include <stdio.h>
+#include <string.h>
 
 static long blksize = 512;
 static int  aflag   = 0;
@@ -67,17 +65,17 @@ print_human(
 static int
 mnt_show(const char *fsname, const char *dir)
 {
-  struct statvfs     s;
-  unsigned long long total, used, avail;
-  int                capacity = 0;
-  int                bs;
+  struct FilesystemStatus status;
+  unsigned long long      total, used, avail;
+  int                     capacity = 0;
+  int                     bs;
 
-  if (statvfs(dir, &s) < 0)
+  if (fs_get_status(dir, &status) < 0)
     return -1;
 
-  bs    = s.f_frsize / blksize;
-  total = s.f_blocks * bs;
-  avail = s.f_bfree * bs;
+  bs    = status.block_size / blksize;
+  total = status.total_blocks * bs;
+  avail = status.free_blocks * bs;
   used  = total - avail;
 
   if (used + avail) {
@@ -105,9 +103,10 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-  struct mntent *me = NULL;
-  FILE          *fp;
-  int            ret = 0;
+  struct FilesystemMount *mounts = NULL;
+  size_t                  count;
+  size_t                  i;
+  int                     ret = 0;
 
   ARGBEGIN
   {
@@ -128,9 +127,11 @@ main(int argc, char *argv[])
       break;
     // ?man -s: silent mode or print summary
     case 's':
+      eprintf("-s is not supported\n");
+      break;
     // ?man -i: interactive mode or prompt for confirmation
     case 'i':
-      eprintf("not implemented\n");
+      eprintf("-i is not supported\n");
       break;
     default:
       usage();
@@ -149,17 +150,18 @@ main(int argc, char *argv[])
         blksize
     );
 
-  fp = setmntent("/proc/mounts", "r");
-  if (!fp)
-    eprintf("setmntent %s:", "/proc/mounts");
-  while ((me = getmntent(fp)) != NULL) {
-    if (aflag == 0)
-      if (strcmp(me->mnt_type, "rootfs") == 0)
-        continue;
-    if (mnt_show(me->mnt_fsname, me->mnt_dir) < 0)
+  if (fs_get_mounts(&mounts, &count) < 0) {
+    if (errno == ENOTSUP)
+      eprintf("filesystem mount table is not supported\n");
+    eprintf("cannot read filesystem mount table:");
+  }
+  for (i = 0; i < count; i++) {
+    if (aflag == 0 && strcmp(mounts[i].type, "rootfs") == 0)
+      continue;
+    if (mnt_show(mounts[i].source, mounts[i].path) < 0)
       ret = 1;
   }
-  endmntent(fp);
+  fs_free_mounts(mounts, count);
 
   return ret;
 }

@@ -1,27 +1,25 @@
-; genconfig.sh config produces four files from build.cfg in one
-; invocation: config.set (read by ninqu), config.kv (read by mkman),
-; nofork_list.h (included by wexec.c), and features.h (-included
-; into every compile). only CONFIG_SET actually runs the script;
-; NOFORK_LIST_H and FEATURES_H depend on its output instead of
-; re-running genconfig.sh themselves, so ninja never schedules two
-; invocations of the same script concurrently. running it twice in
-; parallel raced both invocations' truncate-then-append writes to
-; the same files, byte-interleaving their output into invalid C
-;
+; each generated file has one rule and one target, so parallel
+; generators never write through another target's side effects
+
 (rule CONFIG_SET
   (out "scripts/mk/config.set")
   (dep "build.cfg" "scripts/genconfig.sh")
-  (exec sh scripts/genconfig.sh config))
+  (exec sh scripts/genconfig.sh config-set))
+
+(rule CONFIG_KV
+  (out "scripts/mk/config.kv")
+  (dep "build.cfg" "scripts/genconfig.sh")
+  (exec sh scripts/genconfig.sh config-kv))
 
 (rule NOFORK_LIST_H
   (out "shared/libutil/nofork_list.h")
-  (dep "scripts/mk/config.set")
-  (exec true))
+  (dep "build.cfg" "scripts/genconfig.sh")
+  (exec sh scripts/genconfig.sh nofork-list-h))
 
 (rule FEATURES_H
   (out "scripts/mk/features.h")
-  (dep "scripts/mk/config.set")
-  (exec true))
+  (dep "build.cfg" "scripts/genconfig.sh")
+  (exec sh scripts/genconfig.sh features-h))
 
 (set-file "scripts/mk/config.set")
 
@@ -29,7 +27,7 @@
 ;
 (rule LIBUTF_OBJ
   (glob "shared/libutf/*.c")
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Ishared/libutf $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -42,13 +40,29 @@
 
   (rule LIBUTIL_OBJ
   (glob "shared/libutil/*.c")
-  (dep $(MATCH))
-  (after NOFORK_LIST_H FEATURES_H)
+  (skip "filesystem_linux.c" "filesystem_other.c"
+        "net_linux.c" "net_other.c"
+        "sysinfo_linux.c" "sysinfo_other.c")
+  (dep $(MATCH) FEATURES_H)
+  (after NOFORK_LIST_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS_LIBUTIL) -Ishared/libutil $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
+  (rule LIBUTIL_OS_OBJ
+  (glob "shared/libutil/filesystem_linux.c"
+        "shared/libutil/filesystem_other.c"
+        "shared/libutil/net_linux.c"
+        "shared/libutil/net_other.c"
+        "shared/libutil/sysinfo_linux.c"
+        "shared/libutil/sysinfo_other.c")
+  (dep $(MATCH) "shared/filesystem.h" "shared/net.h"
+       "shared/sysinfo.h" FEATURES_H)
+  (after NOFORK_LIST_H)
+  (out "shared/libutil/$(BASESTEM).o")
+  (exec $(CC) $(CPPFLAGS_LIBUTIL) -Ishared -Ishared/libutil $(CFLAGS) -c -o $(OUT) $(MATCH)))
+
   (rule LIBUTIL
-  (dep LIBUTIL_OBJ)
+  (dep LIBUTIL_OBJ LIBUTIL_OS_OBJ)
   (out "shared/libutil/libutil.a")
   (description "allocation, error reporting, and string helpers shared by every tool")
   (feature core-lib)
@@ -56,7 +70,7 @@
 
   (rule LIBREDLINE_OBJ
   (glob "shared/libredline/*.c")
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Ishared/libredline $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -69,7 +83,7 @@
 
   (rule LIBBLAKE3_OBJ
   (glob "shared/libblake3/*.c")
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Ishared/libblake3 $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -122,7 +136,7 @@
   (rule $(NAME)
     (glob "cmd/$(CATEGORY)/*.c")
   (gate build_$(CATEGORY)_$(IDENT))
-  (dep $(MATCH) LIBUTIL LIBUTF LIBBLAKE3)
+  (dep $(MATCH) FEATURES_H LIBUTIL LIBUTF LIBBLAKE3)
   (after $(EXTRA_AFTER))
   (out $(STEM))
   (description $(DESC))
@@ -177,7 +191,7 @@
   (out "cmd/dev/config.h")
   (dep "cmd/dev/configure")
   (phony)
-  (exec sh cmd/dev/configure))
+  (exec sh cmd/dev/configure --target=$(MICE_TARGET_TRIPLE) --sysroot=$(MICE_TARGET_SYSROOT)))
 
   (group codegen GETCONF_H POSIX_BC_C POSIX_AWK_C POSIX_SH_C DEVCONF)
 
@@ -188,7 +202,7 @@
   (rule POSIX_BC_OBJ
   (glob "cmd/posix/bc.c")
   (gate build_posix_bc)
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (after POSIX_BC_C)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH)))
@@ -204,7 +218,7 @@
   (glob "cmd/posix/awk/*.c")
   (gate build_posix_awk)
   (skip "maketab.c")
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (after POSIX_AWK_C)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Icmd/posix/awk $(CFLAGS) -c -o $(OUT) $(MATCH)))
@@ -220,7 +234,7 @@
   (glob "cmd/posix/sh/*.c")
   (gate build_posix_sh)
   (skip "mknodes.c" "mksyntax.c")
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (after POSIX_SH_C)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -DSHELL -Icmd/posix/sh $(CFLAGS) -c -o $(OUT) $(MATCH)))
@@ -235,7 +249,7 @@
   (rule POSIX_MAKE_OBJ
   (glob "cmd/posix/make/*.c")
   (gate build_posix_make)
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -249,7 +263,7 @@
   (rule EXTRA_YAP_OBJ
   (glob "cmd/extra/yap/*.c")
   (gate build_extra_yap)
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -272,7 +286,8 @@
   (glob "cmd/dev/ar/*.c")
   (gate build_dev_ar)
   (skip "tinyar.c")
-  (dep $(MATCH))
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Icmd/dev/ar $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -288,14 +303,16 @@
   (rule TCUTIL_OBJ
   (glob "shared/libtcutil/*.c" "shared/libtcutil/elf/*.c" "shared/libtcutil/ar/*.c")
   (gate build_dev_cc)
-  (dep $(MATCH))
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Ishared/libtcutil -Ishared/libtcutil/elf -Ishared/libtcutil/ar -Icmd/dev $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
   (rule AS_OBJ
   (glob "cmd/dev/as/*.c" "cmd/dev/as/arch/x64/*.c")
   (gate build_dev_cc)
-  (dep $(MATCH))
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Ishared/libtcutil -Ishared/libtcutil/elf -Ishared/libtcutil/ar -Icmd/dev -Icmd/dev/as -Icmd/dev/as/arch/x64 -Ishared $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -308,7 +325,8 @@
   (rule LD_OBJ
   (glob "cmd/dev/ld/*.c" "cmd/dev/ld/arch/*/*.c")
   (gate build_dev_ld)
-  (dep $(MATCH))
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Icmd/dev/ld $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -323,14 +341,16 @@
   (rule CCPOOL_OBJ
   (glob "cmd/dev/cc/*.c")
   (gate build_dev_cc)
-  (dep $(MATCH))
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Icmd/dev/cc $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
   (rule CC1_OBJ
   (glob "cmd/dev/cc/cc1.c")
   (gate build_dev_cc)
-  (dep $(MATCH))
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Icmd/dev/cc $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -342,7 +362,8 @@
   (rule UTIL_OBJ
   (glob "cmd/dev/cc/util.c")
   (gate build_dev_cc)
-  (dep $(MATCH))
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Icmd/dev/cc $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -355,7 +376,8 @@
   (rule CPP_OBJ
   (glob "cmd/dev/cc/cpp.c")
   (gate build_dev_cc)
-  (dep $(MATCH))
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
   (out "$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Icmd/dev/cc $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -365,12 +387,19 @@
   (out "cmd/dev/cc/cpp")
   (exec $(CC) -static -o $(OUT) $(IN) $(LDFLAGS)))
 
+  ; driver.c's own quoted #include "config.h" needs cmd/dev/config.h
+  ; (DEVCONF's own output), not shared/config.h, MICE's unrelated
+  ; project-wide one that $(CPPFLAGS)'s own -Ishared would otherwise
+  ; win on: -Icmd/dev goes first, ahead of $(CPPFLAGS), so it wins the
+  ; search. (after DEVCONF) orders the generation itself first, or
+  ; parallel execution can compile driver.c before config.h exists
   (rule CCDRV_OBJ
   (glob "cmd/dev/cc/driver.c")
   (gate build_dev_cc)
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
+  (after DEVCONF)
   (out "$(STEM).o")
-  (exec $(CC) $(CPPFLAGS) -Icmd/dev/cc $(CFLAGS) -c -o $(OUT) $(MATCH)))
+  (exec $(CC) -Icmd/dev $(CPPFLAGS) -Icmd/dev/cc $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
   (rule CCDRV
   (gate build_dev_cc)
@@ -378,18 +407,28 @@
   (out "cmd/dev/cc/cc")
   (exec $(CC) -static -o $(OUT) $(IN) $(LDFLAGS)))
 
-  ; like BOX_OBJ: rename main and hide other globals so ninqu can link
-  ; into aruu-box. it is still not reentrant, so it stays out of
-  ; NOFORK_LIST
+  ; ninqu is multiple translation units sharing globals (rules, insts,
+  ; and so on), unlike the single-file tools BOX_OBJ handles: combine
+  ; its objects first, like POSIX_BC_BOX/POSIX_AWK_BOX/POSIX_SH_BOX/
+  ; POSIX_MAKE_BOX/EXTRA_YAP_BOX do for their own multi-file tools, so
+  ; --keep-global-symbol only strips main across the combined object
+  ; instead of hiding every cross-file global before linking even
+  ; happens. it is still not reentrant, so it stays out of NOFORK_LIST
   ;
   (rule NINQU_BOX_OBJ
   (glob "cmd/dev/ninqu/*.c")
   (gate build_dev_ninqu)
-  (dep $(MATCH))
-  (after LIBUTIL LIBUTF LIBREDLINE NOFORK_LIST_H FEATURES_H GETCONF_H)
-  (out ".box/cmd/dev/$(BASESTEM).o")
-  (description "ninqu as a box builtin, main renamed for the box dispatch table")
-  (shell "$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH) && sym=`echo $(BASESTEM) | tr '.-' '__'`_main && $(OBJCOPY) --redefine-sym main=$sym $(OUT) && $(OBJCOPY) --keep-global-symbol=$sym $(OUT)")
+  (dep $(MATCH) FEATURES_H)
+  (after LIBUTIL LIBUTF LIBREDLINE NOFORK_LIST_H GETCONF_H)
+  (out ".box/parts/$(STEM).o")
+  (exec $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH)))
+
+  (rule NINQU_BOX
+  (gate build_dev_ninqu)
+  (dep NINQU_BOX_OBJ)
+  (out ".box/cmd/dev/ninqu.o")
+  (description "ninqu's objects combined into one relocatable object, main renamed for the box dispatch table")
+  (shell "$(LD) -r -o $(OUT) $(IN) && $(OBJCOPY) --redefine-sym main=ninqu_main $(OUT) && $(OBJCOPY) --keep-global-symbol=ninqu_main $(OUT)")
   (group box))
 
   (group dev lib DEVCONF AR AS LD CC1 CPP CCDRV)
@@ -405,7 +444,7 @@
   (rule MAN_MDOC
   (glob "cmd/**/*.c")
   (mark "?man")
-  (dep (after MKMAN))
+  (dep CONFIG_KV (after MKMAN))
   (out "man/man$(SEC_OF:$(DIR))/$(BASESTEM).$(SEC_OF:$(DIR))")
   (exec scripts/mkman/mkman -fmt mdoc -config scripts/mk/config.kv $(MATCH))
   (redirect))
@@ -413,13 +452,14 @@
   (rule MAN_TXT
   (glob "cmd/**/*.c")
   (mark "?man")
-  (dep (after MKMAN))
+  (dep CONFIG_KV (after MKMAN))
   (out "man/man$(SEC_OF:$(DIR))/$(BASESTEM).$(SEC_OF:$(DIR)).txt")
   (exec scripts/mkman/mkman -fmt txt -config scripts/mk/config.kv $(MATCH))
   (redirect))
 
   (map SEC_OF
   (cmd/posix 1)
+  (cmd/posix/make 1)
   (cmd/linux 8)
   (cmd/net 8)
   (cmd/xsi 1)
@@ -470,8 +510,11 @@
   (phony)
   (after ALL_BINS LIBUTIL MAN_MDOC MAN_TXT)
   (shell "
-  d=\"${DESTDIR:-}$(PREFIX)\"
-  m=\"${DESTDIR:-}$(MANPREFIX)\"
+  [ -n \"${DESTDIR:-}\" ] || { printf 'install requires DESTDIR\n' >&2; exit 1; }
+    case \"$(PREFIX)\" in /usr|/usr/*|usr|usr/*) printf 'ARUU cannot install into usr\n' >&2; exit 1 ;; esac
+    case \"$DESTDIR\" in /usr|/usr/*) printf 'ARUU cannot install into usr\n' >&2; exit 1 ;; esac
+  d=\"$DESTDIR$(PREFIX)\"
+  m=\"$DESTDIR$(MANPREFIX)\"
   mkdir -p \"$d/bin\" \"$m/man1\" \"$m/man8\" \"$d/lib\" \"$d/include/aruu\"
 
   find cmd -type f ! -name '*.*' -perm -100 | while read -r bin; do
@@ -490,7 +533,8 @@
     printf '  INSTALL %s/lib/libaruu.a\n' '$(PREFIX)'
     cp shared/libutil/libutil.a \"$d/lib/libaruu.a\"
     chmod 644 \"$d/lib/libaruu.a\"
-    for h in shared/util.h shared/wexec.h shared/arg.h shared/compat.h; do
+    for h in shared/util.h shared/wexec.h shared/arg.h shared/compat.h \
+        shared/filesystem.h shared/net.h shared/sysinfo.h; do
       printf '  INSTALL %s/include/aruu/%s\n' '$(PREFIX)' \"${h##*/}\"
       cp \"$h\" \"$d/include/aruu/${h##*/}\"
       chmod 644 \"$d/include/aruu/${h##*/}\"
@@ -508,8 +552,11 @@
          POSIX_BC POSIX_AWK POSIX_SH POSIX_MAKE EXTRA_YAP
          LIBUTIL MAN_MDOC MAN_TXT)
   (shell "
-    d=\"${DESTDIR:-}$(PREFIX)\"
-    m=\"${DESTDIR:-}$(MANPREFIX)\"
+    [ -n \"${DESTDIR:-}\" ] || { printf 'install-base requires DESTDIR\n' >&2; exit 1; }
+  case \"$(PREFIX)\" in /usr|/usr/*|usr|usr/*) printf 'ARUU cannot install into usr\n' >&2; exit 1 ;; esac
+  case \"$DESTDIR\" in /usr|/usr/*) printf 'ARUU cannot install into usr\n' >&2; exit 1 ;; esac
+    d=\"$DESTDIR$(PREFIX)\"
+    m=\"$DESTDIR$(MANPREFIX)\"
     mkdir -p \"$d/bin\" \"$m/man1\" \"$m/man8\" \"$d/lib\" \"$d/include/aruu\"
 
     find cmd -type f ! -name '*.*' -perm -100 ! -path 'cmd/dev/*' | while read -r bin; do
@@ -528,7 +575,8 @@
     printf '  INSTALL %s/lib/libaruu.a\n' '$(PREFIX)'
     cp shared/libutil/libutil.a \"$d/lib/libaruu.a\"
     chmod 644 \"$d/lib/libaruu.a\"
-    for h in shared/util.h shared/wexec.h shared/arg.h shared/compat.h; do
+    for h in shared/util.h shared/wexec.h shared/arg.h shared/compat.h \
+        shared/filesystem.h shared/net.h shared/sysinfo.h; do
       printf '  INSTALL %s/include/aruu/%s\n' '$(PREFIX)' \"${h##*/}\"
       cp \"$h\" \"$d/include/aruu/${h##*/}\"
       chmod 644 \"$d/include/aruu/${h##*/}\"
@@ -541,26 +589,31 @@
 (rule REMOVE
   (phony)
   (shell "
+    [ -n \"${DESTDIR:-}\" ] || { printf 'remove requires DESTDIR\n' >&2; exit 1; }
+    case \"$(PREFIX)\" in /usr|/usr/*|usr|usr/*) printf 'ARUU cannot remove from usr\n' >&2; exit 1 ;; esac
+    case \"$DESTDIR\" in /usr|/usr/*) printf 'ARUU cannot remove from usr\n' >&2; exit 1 ;; esac
+    d=\"$DESTDIR$(PREFIX)\"
+    m=\"$DESTDIR$(MANPREFIX)\"
     find cmd -type f ! -name '*.*' -perm -100 | while read -r bin; do
       name=${bin##*/}
       printf '  REMOVE %s/bin/%s\n' '$(PREFIX)' \"$name\"
-      rm -f \"$(PREFIX)/bin/$name\"
+      rm -f \"$d/bin/$name\"
     done
 
     find man/man1 man/man8 -type f -name '*.[18]' 2>/dev/null | while read -r f; do
       sec=${f%/*}; sec=${sec##*/}
       name=${f##*/}
       printf '  REMOVE %s/%s/%s\n' '$(MANPREFIX)' \"$sec\" \"$name\"
-      rm -f \"$(MANPREFIX)/$sec/$name\"
+      rm -f \"$m/$sec/$name\"
     done
 
     printf '  REMOVE %s/lib/libaruu.a\n' '$(PREFIX)'
-    rm -f \"$(PREFIX)/lib/libaruu.a\"
-    for h in util.h wexec.h arg.h compat.h; do
+    rm -f \"$d/lib/libaruu.a\"
+    for h in util.h wexec.h arg.h compat.h filesystem.h net.h sysinfo.h; do
       printf '  REMOVE %s/include/aruu/%s\n' '$(PREFIX)' \"$h\"
-      rm -f \"$(PREFIX)/include/aruu/$h\"
+      rm -f \"$d/include/aruu/$h\"
     done
-    rmdir \"$(PREFIX)/include/aruu\" 2>/dev/null || :
+    rmdir \"$d/include/aruu\" 2>/dev/null || :
   "))
 
 (group remove REMOVE)
@@ -634,8 +687,8 @@
   (glob "cmd/posix/*.c" "cmd/linux/*.c" "cmd/net/*.c" "cmd/pseudo/*.c"
         "cmd/xsi/*.c" "cmd/extra/*.c")
   (gate build_$(CATEGORY_OF:$(DIR))_$(IDENT))
-  (dep $(MATCH))
-  (after LIBUTIL LIBUTF LIBREDLINE NOFORK_LIST_H FEATURES_H GETCONF_H)
+  (dep $(MATCH) FEATURES_H)
+  (after LIBUTIL LIBUTF LIBREDLINE NOFORK_LIST_H GETCONF_H)
   (out ".box/$(DIR)/$(BASESTEM).o")
   (description "one object per enabled tool, main renamed for the box dispatch table")
   (shell "$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH) && sym=`echo $(BASESTEM) | tr '.-' '__'`_main && $(OBJCOPY) --redefine-sym main=$sym $(OUT) && $(OBJCOPY) --keep-global-symbol=$sym $(OUT)")
@@ -652,7 +705,7 @@
   (rule POSIX_BC_BOX_OBJ
   (glob "cmd/posix/bc.c")
   (gate build_posix_bc)
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (after POSIX_BC_C)
   (out ".box/parts/$(STEM).o")
   (exec $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH)))
@@ -669,7 +722,7 @@
   (glob "cmd/posix/awk/*.c")
   (gate build_posix_awk)
   (skip "maketab.c")
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (after POSIX_AWK_C)
   (out ".box/parts/$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -Icmd/posix/awk $(CFLAGS) -c -o $(OUT) $(MATCH)))
@@ -686,7 +739,7 @@
   (glob "cmd/posix/sh/*.c")
   (gate build_posix_sh)
   (skip "mknodes.c" "mksyntax.c")
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (after POSIX_SH_C)
   (out ".box/parts/$(STEM).o")
   (exec $(CC) $(CPPFLAGS) -DSHELL -Icmd/posix/sh $(CFLAGS) -c -o $(OUT) $(MATCH)))
@@ -702,7 +755,7 @@
   (rule POSIX_MAKE_BOX_OBJ
   (glob "cmd/posix/make/*.c")
   (gate build_posix_make)
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (out ".box/parts/$(STEM).o")
   (exec $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -717,7 +770,7 @@
   (rule EXTRA_YAP_BOX_OBJ
   (glob "cmd/extra/yap/*.c")
   (gate build_extra_yap)
-  (dep $(MATCH))
+  (dep $(MATCH) FEATURES_H)
   (out ".box/parts/$(STEM).o")
   (exec $(CC) $(CPPFLAGS) $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
@@ -734,7 +787,7 @@
   ; and tool names directly from these paths and outputs the dispatch code
   ;
   (rule BOX_DISPATCH
-  (dep BOX_OBJ POSIX_BC_BOX POSIX_AWK_BOX POSIX_SH_BOX POSIX_MAKE_BOX EXTRA_YAP_BOX NINQU_BOX_OBJ)
+  (dep BOX_OBJ POSIX_BC_BOX POSIX_AWK_BOX POSIX_SH_BOX POSIX_MAKE_BOX EXTRA_YAP_BOX NINQU_BOX)
   (out ".box/aruu-box.c")
   (description "dispatch table and main() for aruu-box, generated from the enabled tool list")
   (exec scripts/genbox.sh $(IN))
@@ -748,8 +801,13 @@
   ; disabled. genconfig.sh exports BOX_EXTRA_LIBS as "-ltinfo" or an empty string
   ; based on whether yap is enabled
   ;
+  ; libblake3 is the same story as libm: b3sum needs it, EXTRA_LIBS only
+  ; applies to PERFILE's own standalone link line, box has no per-tool
+  ; equivalent, so LIBBLAKE3 goes in BOX's own dep list unconditionally
+  ; instead, same as LIBUTIL/LIBUTF/LIBREDLINE
+  ;
   (rule BOX
-  (dep BOX_DISPATCH BOX_OBJ POSIX_BC_BOX POSIX_AWK_BOX POSIX_SH_BOX POSIX_MAKE_BOX EXTRA_YAP_BOX NINQU_BOX_OBJ LIBUTIL LIBUTF LIBREDLINE)
+  (dep BOX_DISPATCH BOX_OBJ POSIX_BC_BOX POSIX_AWK_BOX POSIX_SH_BOX POSIX_MAKE_BOX EXTRA_YAP_BOX NINQU_BOX LIBUTIL LIBUTF LIBREDLINE LIBBLAKE3)
   (out "aruu-box")
   (description "single multi-call binary, one dispatch table for every enabled tool")
   (shell "$(CC) $(CPPFLAGS) $(CFLAGS) -o $(OUT) $(IN) $(LDFLAGS) $(LDLIBS) $(BOX_EXTRA_LIBS)")

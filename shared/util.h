@@ -12,6 +12,8 @@
 
 #include "arg.h"
 #include "compat.h"
+#include "net.h"
+#include "sysinfo.h"
 
 #define UTF8_POINT(c) (((c) & 0xc0) != 0x80)
 
@@ -111,69 +113,6 @@ void explicit_bzero(void *, size_t);
 void recurse_dir(const char *, void (*)(const char *));
 void devtotty(int, int *, int *);
 int  ttytostr(int, int, char *, size_t);
-
-#include <netinet/in.h>
-#include <sys/socket.h>
-
-#ifndef IFNAMSIZ
-#define IFNAMSIZ 16
-#endif
-
-struct NetStats {
-  unsigned long long rx_bytes;
-  unsigned long long rx_packets;
-  unsigned long long rx_errs;
-  unsigned long long rx_drop;
-  unsigned long long tx_bytes;
-  unsigned long long tx_packets;
-  unsigned long long tx_errs;
-  unsigned long long tx_drop;
-};
-
-struct NetInterface {
-  char          name[IFNAMSIZ];
-  unsigned int  flags;
-  int           mtu;
-  int           metric;
-  unsigned char mac[6];
-  int           has_mac;
-
-  /* ipv4 addresses */
-  struct sockaddr_in ipv4_addr;
-  int                has_ipv4;
-  struct sockaddr_in ipv4_mask;
-  struct sockaddr_in ipv4_brd;
-
-  /* ipv6 addresses */
-  struct sockaddr_in6 ipv6_addr;
-  int                 has_ipv6;
-  unsigned int        ipv6_scope;
-  unsigned int        ipv6_prefix;
-};
-
-struct MemInfo {
-  unsigned long long total;
-  unsigned long long free;
-  unsigned long long shared;
-  unsigned long long buffers;
-  unsigned long long cached;
-  unsigned long long totalswap;
-  unsigned long long freeswap;
-};
-
-int net_get_interfaces(struct NetInterface **, int *);
-int net_get_stats(const char *, struct NetStats *);
-int net_set_flags(const char *, unsigned int, int);
-int net_set_mtu(const char *, int);
-int net_set_mac(const char *, const unsigned char *);
-int net_add_addr(const char *, const char *, int);
-int net_del_addr(const char *, const char *, int);
-int net_show_routes(void);
-int net_add_route(const char *, const char *, const char *, const char *, int);
-int net_del_route(const char *, const char *, const char *, const char *, int);
-int net_flush_addrs(const char *);
-int net_set_txqueuelen(const char *, int);
-int net_set_name(const char *, const char *);
 
 #if FEATURE_NOEXEC || FEATURE_NOFORK
 #include "wexec.h"

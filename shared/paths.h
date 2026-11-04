@@ -33,6 +33,10 @@
 #define ARUU_PATH_TMP "/tmp"
 #endif
 
+#ifndef ARUU_PATH_INCLUDE
+#define ARUU_PATH_INCLUDE "/include"
+#endif
+
 #ifndef ARUU_PATH_BIN
 #define ARUU_PATH_BIN "/bin"
 #endif
@@ -74,7 +78,9 @@
 #if defined(__linux__)
 #define ARUU_LINUX_PATH_PROC            "/proc"
 #define ARUU_LINUX_PATH_SYS             "/sys"
+#ifndef ARUU_LINUX_PATH_PROC_MOUNTS
 #define ARUU_LINUX_PATH_PROC_MOUNTS     ARUU_LINUX_PATH_PROC "/mounts"
+#endif
 #define ARUU_LINUX_PATH_PROC_PARTITIONS ARUU_LINUX_PATH_PROC "/partitions"
 #define ARUU_LINUX_PATH_PROC_MEMINFO    ARUU_LINUX_PATH_PROC "/meminfo"
 #define ARUU_LINUX_PATH_PROC_LOADAVG    ARUU_LINUX_PATH_PROC "/loadavg"

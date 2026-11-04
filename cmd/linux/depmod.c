@@ -264,8 +264,6 @@ usage(void)
 // ?man depmod: generate modules.dep and map files
 // ?man arguments: version
 // ?man depmod generates modules.dep containing dependency information for
-// modprobe ?man // ?man -n: dry run print results to stdout instead of writing
-// files ?man // ?man -b basedir: use basedir as prefix for module directories
 int
 main(int argc, char *argv[])
 {

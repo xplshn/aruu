@@ -27,11 +27,14 @@ struct x509_noverify_ctx {
   br_x509_minimal_context minimal;
 };
 
+struct TlsTrustStore;
+
 struct TlsSocket {
   int                      fd;
   int                      is_tls;
   br_ssl_client_context    sc;
   struct x509_noverify_ctx x509_noverify;
+  struct TlsTrustStore    *tas;
   unsigned char            iobuf[BR_SSL_BUFSIZE_BIDI];
   br_sslio_context         ioc;
 };
@@ -138,6 +141,21 @@ sock_write(void *ctx, const unsigned char *buf, size_t len)
   }
 }
 
+struct TlsTrustStore {
+  br_x509_trust_anchor *v;
+  size_t                num;
+  size_t                cap;
+};
+
+struct PemDecoder {
+  unsigned char *data;
+  size_t         len;
+  size_t         cap;
+  unsigned int   value;
+  size_t         quantum;
+  size_t         padding;
+};
+
 static int
 b64_decode_char(char c)
 {
@@ -151,26 +169,99 @@ b64_decode_char(char c)
     return 62;
   if (c == '/')
     return 63;
+  if (c == '=')
+    return -2;
   return -1;
 }
 
-static size_t
-b64_decode(const char *src, size_t src_len, unsigned char *dst)
+static int
+b64_decoder_flush(struct PemDecoder *dec)
 {
-  size_t i, j = 0;
-  int    val = 0, valb = -8;
-  for (i = 0; i < src_len; i++) {
-    int c = b64_decode_char(src[i]);
-    if (c >= 0) {
-      val = (val << 6) | c;
-      valb += 6;
-      if (valb >= 0) {
-        dst[j++] = (val >> valb) & 0xFF;
-        valb -= 8;
-      }
+  size_t i, n;
+
+  if (dec->quantum != 4)
+    return -1;
+  n = 3 - dec->padding;
+  for (i = 0; i < n; i++) {
+    if (dec->len == dec->cap) {
+      size_t cap = dec->cap ? dec->cap * 2 : 1024;
+      if (cap < dec->cap)
+        return -1;
+      dec->data = erealloc(dec->data, cap);
+      dec->cap  = cap;
     }
+    dec->data[dec->len++] = (dec->value >> (16 - i * 8)) & 0xFF;
   }
-  return j;
+  dec->value   = 0;
+  dec->quantum = 0;
+  dec->padding = 0;
+  return 0;
+}
+
+static int
+b64_decoder_push(struct PemDecoder *dec, char c)
+{
+  int value = b64_decode_char(c);
+
+  if (value == -2) {
+    if ((!dec->padding && dec->quantum < 2) || (dec->padding && dec->quantum != 3))
+      return -1;
+    dec->value <<= 6;
+    dec->padding++;
+    dec->quantum++;
+  } else {
+    if (value < 0 || dec->padding)
+      return -1;
+    dec->value = (dec->value << 6) | (unsigned int)value;
+    dec->quantum++;
+  }
+  if (dec->quantum == 4)
+    return b64_decoder_flush(dec);
+  return 0;
+}
+
+static int
+b64_decoder_push_line(struct PemDecoder *dec, const char *line, size_t len)
+{
+  size_t i;
+
+  for (i = 0; i < len; i++) {
+    if (b64_decoder_push(dec, line[i]) < 0)
+      return -1;
+  }
+  return 0;
+}
+
+static int
+b64_decoder_finish(const struct PemDecoder *dec)
+{
+  return dec->quantum == 0 ? 0 : -1;
+}
+
+static void
+trust_anchor_free(br_x509_trust_anchor *ta)
+{
+  free(ta->dn.data);
+  if (ta->pkey.key_type == BR_KEYTYPE_RSA) {
+    free(ta->pkey.key.rsa.n);
+    free(ta->pkey.key.rsa.e);
+  } else if (ta->pkey.key_type == BR_KEYTYPE_EC) {
+    free(ta->pkey.key.ec.q);
+  }
+  memset(ta, 0, sizeof(*ta));
+}
+
+static void
+trust_store_free(struct TlsTrustStore *tas)
+{
+  size_t i;
+
+  if (!tas)
+    return;
+  for (i = 0; i < tas->num; i++)
+    trust_anchor_free(&tas->v[i]);
+  free(tas->v);
+  memset(tas, 0, sizeof(*tas));
 }
 
 static int
@@ -180,6 +271,7 @@ decode_cert_der(const unsigned char *der, size_t der_len, br_x509_trust_anchor *
   struct dn_accum         accum = {NULL, 0, 0};
   const br_x509_pkey     *pk;
 
+  memset(ta, 0, sizeof(*ta));
   br_x509_decoder_init(&dc, append_dn_callback, &accum);
   br_x509_decoder_push(&dc, der, der_len);
   if (br_x509_decoder_last_error(&dc) != 0) {
@@ -210,76 +302,170 @@ decode_cert_der(const unsigned char *der, size_t der_len, br_x509_trust_anchor *
     ta->pkey.key.ec.q     = emalloc(pk->key.ec.qlen);
     memcpy(ta->pkey.key.ec.q, pk->key.ec.q, pk->key.ec.qlen);
   } else {
-    free(accum.data);
+    trust_anchor_free(ta);
     return 0;
   }
   return 1;
 }
 
-static br_x509_trust_anchor *tas     = NULL;
-static size_t                tas_num = 0;
+static int
+trust_store_append(struct TlsTrustStore *tas, const br_x509_trust_anchor *ta)
+{
+  if (tas->num == tas->cap) {
+    size_t cap = tas->cap ? tas->cap * 2 : 8;
+    if (cap < tas->cap)
+      return -1;
+    tas->v   = ereallocarray(tas->v, cap, sizeof(*tas->v));
+    tas->cap = cap;
+  }
+  tas->v[tas->num++] = *ta;
+  return 0;
+}
+
+static int
+line_is(const char *line, size_t len, const char *text)
+{
+  return strlen(text) == len && memcmp(line, text, len) == 0;
+}
+
+static int
+load_ca_certs_file(const char *path, struct TlsTrustStore *tas)
+{
+  static const char begin[] = "-----BEGIN CERTIFICATE-----";
+  static const char end[]   = "-----END CERTIFICATE-----";
+  FILE             *fp;
+  char             *line     = NULL;
+  size_t            line_cap = 0, line_len, line_no = 0, cert_num = 0;
+  ssize_t           nread;
+  int               in_cert = 0, failed = 0;
+  struct PemDecoder dec = {0};
+
+  fp = fopen(path, "r");
+  if (!fp)
+    return 0;
+  while ((nread = getline(&line, &line_cap, fp)) >= 0) {
+    line_no++;
+    line_len = (size_t)nread;
+    while (line_len > 0 && (line[line_len - 1] == '\r' || line[line_len - 1] == '\n'))
+      line_len--;
+    if (in_cert && memchr(line, '\0', line_len) != NULL) {
+      weprintf("%s:%zu: invalid base64 in CA certificate %zu\n", path, line_no, cert_num);
+      failed = 1;
+      break;
+    }
+    if (line_is(line, line_len, begin)) {
+      if (in_cert) {
+        weprintf("%s:%zu: malformed PEM in CA certificate %zu\n", path, line_no, cert_num);
+        failed = 1;
+        break;
+      }
+      cert_num++;
+      in_cert = 1;
+      continue;
+    }
+    if (line_is(line, line_len, end)) {
+      br_x509_trust_anchor ta;
+      if (!in_cert) {
+        weprintf("%s:%zu: unexpected CA certificate end\n", path, line_no);
+        failed = 1;
+        break;
+      }
+      if (b64_decoder_finish(&dec) < 0 || dec.len == 0) {
+        weprintf("%s:%zu: invalid base64 in CA certificate %zu\n", path, line_no, cert_num);
+        failed = 1;
+        break;
+      }
+      if (!decode_cert_der(dec.data, dec.len, &ta)) {
+        weprintf("%s:%zu: malformed CA certificate %zu\n", path, line_no, cert_num);
+        failed = 1;
+        break;
+      }
+      if (trust_store_append(tas, &ta) < 0) {
+        trust_anchor_free(&ta);
+        weprintf("%s:%zu: cannot store CA certificate %zu\n", path, line_no, cert_num);
+        failed = 1;
+        break;
+      }
+      free(dec.data);
+      memset(&dec, 0, sizeof(dec));
+      in_cert = 0;
+      continue;
+    }
+    if (in_cert && b64_decoder_push_line(&dec, line, line_len) < 0) {
+      weprintf("%s:%zu: invalid base64 in CA certificate %zu\n", path, line_no, cert_num);
+      failed = 1;
+      break;
+    }
+  }
+  if (!failed && ferror(fp)) {
+    weprintf("%s:%zu: cannot read CA certificates\n", path, line_no + 1);
+    failed = 1;
+  }
+  if (!failed && in_cert) {
+    weprintf("%s:%zu: unterminated CA certificate %zu\n", path, line_no, cert_num);
+    failed = 1;
+  }
+  if (fclose(fp) != 0 && !failed) {
+    weprintf("%s: cannot close CA certificates\n", path);
+    failed = 1;
+  }
+  free(line);
+  free(dec.data);
+  if (failed) {
+    trust_store_free(tas);
+    return -1;
+  }
+  return 1;
+}
 
 static void
-load_ca_certs(void)
+warn_no_ca_certs(void)
+{
+  weprintf(
+      "no CA certificates found, TLS verification will "
+      "fail\n"
+  );
+}
+
+static int
+load_ca_certs(struct TlsTrustStore *tas)
 {
   static const char *ca_paths[] = {
       ARUU_PATH_ETC "/ssl/certs/ca-certificates.crt",
       ARUU_PATH_ETC "/ssl/cert.pem",
       ARUU_PATH_ETC "/pki/tls/certs/ca-bundle.crt",
   };
-  FILE  *fp = NULL;
   size_t i;
-  char   line[512];
-  struct {
-    char  *data;
-    size_t len;
-    size_t cap;
-  } pem       = {NULL, 0, 0};
-  int in_cert = 0;
+  int    r;
 
   for (i = 0; i < LEN(ca_paths); i++) {
-    if ((fp = fopen(ca_paths[i], "r")))
-      break;
-  }
-  if (!fp) {
-    weprintf(
-        "no CA certificates found, TLS verification will "
-        "fail\n"
-    );
-    return;
-  }
-
-  while (fgets(line, sizeof(line), fp)) {
-    if (strncmp(line, "-----BEGIN CERTIFICATE-----", 27) == 0) {
-      in_cert = 1;
-      pem.len = 0;
-    } else if (strncmp(line, "-----END CERTIFICATE-----", 25) == 0) {
-      if (in_cert) {
-        unsigned char       *der     = emalloc(pem.len);
-        size_t               der_len = b64_decode(pem.data, pem.len, der);
-        br_x509_trust_anchor ta;
-        if (decode_cert_der(der, der_len, &ta)) {
-          tas            = ereallocarray(tas, tas_num + 1, sizeof(*tas));
-          tas[tas_num++] = ta;
-        }
-        free(der);
-        in_cert = 0;
-      }
-    } else if (in_cert) {
-      size_t llen = strlen(line);
-      while (llen > 0 && (line[llen - 1] == '\r' || line[llen - 1] == '\n'))
-        llen--;
-      if (pem.len + llen > pem.cap) {
-        pem.cap  = pem.len + llen + 1024;
-        pem.data = erealloc(pem.data, pem.cap);
-      }
-      memcpy(pem.data + pem.len, line, llen);
-      pem.len += llen;
+    r = load_ca_certs_file(ca_paths[i], tas);
+    if (r >= 0) {
+      if (r == 0)
+        warn_no_ca_certs();
+      return 1;
     }
   }
-  free(pem.data);
-  fclose(fp);
+  warn_no_ca_certs();
+  return 1;
 }
+
+static int
+sigpipe_ignore(struct sigaction *old)
+{
+  struct sigaction sa;
+
+  memset(&sa, 0, sizeof(sa));
+  sa.sa_handler = SIG_IGN;
+  return sigaction(SIGPIPE, &sa, old);
+}
+
+static int
+sigpipe_restore(const struct sigaction *old)
+{
+  return sigaction(SIGPIPE, old, NULL);
+}
+
 #else
 struct TlsSocket {
   int fd;
@@ -295,10 +481,13 @@ tlss_connect(int fd, const char *host, int check_cert, int is_tls)
   s         = emalloc(sizeof(*s));
   s->fd     = fd;
   s->is_tls = is_tls;
+#if FEATURE_USE_BEARSSL
+  s->tas = NULL;
+#endif
 
   if (!is_tls)
     return s;
-#if !FEATURE_USE_LIBTLS && !FEATURE_USE_BEARSSL && !FEATURE_USE_OPENSSL
+#if !FEATURE_USE_LIBTLS && !FEATURE_USE_BEARSSL
   (void)host;
   (void)check_cert;
 #endif
@@ -342,15 +531,18 @@ tlss_connect(int fd, const char *host, int check_cert, int is_tls)
   }
 #elif FEATURE_USE_BEARSSL
   {
-    signal(SIGPIPE, SIG_IGN);
+    struct sigaction old_sigpipe;
+    int              r;
 
     if (check_cert) {
-      static int ca_loaded = 0;
-      if (!ca_loaded) {
-        load_ca_certs();
-        ca_loaded = 1;
+      s->tas = emalloc(sizeof(*s->tas));
+      if (!load_ca_certs(s->tas)) {
+        weprintf("cannot load CA certificates\n");
+        free(s->tas);
+        free(s);
+        return NULL;
       }
-      br_ssl_client_init_full(&s->sc, &s->x509_noverify.minimal, tas, tas_num);
+      br_ssl_client_init_full(&s->sc, &s->x509_noverify.minimal, s->tas->v, s->tas->num);
     } else {
       br_ssl_client_init_full(&s->sc, &s->x509_noverify.minimal, NULL, 0);
       s->x509_noverify.vtable = &x509_noverify_vtable;
@@ -361,8 +553,22 @@ tlss_connect(int fd, const char *host, int check_cert, int is_tls)
     br_ssl_client_reset(&s->sc, host, 0);
     br_sslio_init(&s->ioc, &s->sc.eng, sock_read, &s->fd, sock_write, &s->fd);
 
-    if (br_sslio_flush(&s->ioc) < 0) {
+    if (sigpipe_ignore(&old_sigpipe) < 0) {
+      weprintf("cannot suppress SIGPIPE for TLS handshake\n");
+      trust_store_free(s->tas);
+      free(s->tas);
+      free(s);
+      return NULL;
+    }
+    r = br_sslio_flush(&s->ioc);
+    if (sigpipe_restore(&old_sigpipe) < 0) {
+      weprintf("cannot restore SIGPIPE after TLS handshake\n");
+      r = -1;
+    }
+    if (r < 0) {
       weprintf("TLS handshake failed with %s\n", host);
+      trust_store_free(s->tas);
+      free(s->tas);
       free(s);
       return NULL;
     }
@@ -424,12 +630,25 @@ tlss_write(struct TlsSocket *s, const void *buf, size_t len)
   }
 #elif FEATURE_USE_BEARSSL
   {
-    int r = br_sslio_write_all(&s->ioc, buf, len);
+    struct sigaction old_sigpipe;
+    int              r;
+
+    if (sigpipe_ignore(&old_sigpipe) < 0) {
+      weprintf("cannot suppress SIGPIPE for TLS write\n");
+      return -1;
+    }
+    r = br_sslio_write_all(&s->ioc, buf, len);
     if (r < 0)
+      r = -1;
+    else if (br_sslio_flush(&s->ioc) < 0)
+      r = -1;
+    else
+      r = 0;
+    if (sigpipe_restore(&old_sigpipe) < 0) {
+      weprintf("cannot restore SIGPIPE after TLS write\n");
       return -1;
-    if (br_sslio_flush(&s->ioc) < 0)
-      return -1;
-    return len;
+    }
+    return r < 0 ? -1 : (ssize_t)len;
   }
 #else
   return -1;
@@ -444,10 +663,79 @@ tlss_close(struct TlsSocket *s, int close_fd)
     tls_close(s->ctx);
     tls_free(s->ctx);
 #elif FEATURE_USE_BEARSSL
-    br_sslio_close(&s->ioc);
+    {
+      struct sigaction old_sigpipe;
+
+      if (sigpipe_ignore(&old_sigpipe) < 0) {
+        weprintf("cannot suppress SIGPIPE for TLS teardown\n");
+      } else {
+        br_sslio_close(&s->ioc);
+        if (sigpipe_restore(&old_sigpipe) < 0)
+          weprintf("cannot restore SIGPIPE after TLS teardown\n");
+      }
+    }
+    trust_store_free(s->tas);
+    free(s->tas);
 #endif
   }
   if (close_fd)
     close(s->fd);
   free(s);
 }
+
+#if FEATURE_USE_BEARSSL && defined(ARUU_TLS_TESTING)
+int
+tlss_test_b64_decode(
+    const char *src, size_t src_len, unsigned char *dst, size_t dst_cap, size_t *dst_len
+)
+{
+  struct PemDecoder dec = {0};
+  size_t            i;
+
+  for (i = 0; i < src_len; i++) {
+    if (b64_decoder_push(&dec, src[i]) < 0)
+      break;
+  }
+  if (i == src_len && b64_decoder_finish(&dec) == 0 && dec.len <= dst_cap) {
+    memcpy(dst, dec.data, dec.len);
+    *dst_len = dec.len;
+    free(dec.data);
+    return 0;
+  }
+  free(dec.data);
+  return -1;
+}
+
+int
+tlss_test_load_ca_certs(const char *path)
+{
+  struct TlsTrustStore tas = {0};
+  int                  num;
+
+  if (load_ca_certs_file(path, &tas) != 1)
+    return -1;
+  num = (int)tas.num;
+  trust_store_free(&tas);
+  return num;
+}
+
+int
+tlss_test_sigpipe_setup(void)
+{
+  struct sigaction old_sigpipe;
+
+  if (sigpipe_ignore(&old_sigpipe) < 0)
+    return -1;
+  return sigpipe_restore(&old_sigpipe);
+}
+
+int
+tlss_test_sigpipe_teardown(void)
+{
+  struct sigaction old_sigpipe;
+
+  if (sigpipe_ignore(&old_sigpipe) < 0)
+    return -1;
+  return sigpipe_restore(&old_sigpipe);
+}
+#endif

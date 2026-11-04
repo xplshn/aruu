@@ -9,11 +9,9 @@
 # (gate ...) in ninqu.rules only ever checks
 # the lowercase form
 #
-# scripts/mk/config.kv shell-quoted KEY="VAL" format. sourced by
-# read via the -config flag by scripts/mkman
-# nothing in the ninqu build itself sources
-# this file: genbox.sh takes its input on argv
-# only, see the BOX section of ninqu.rules
+# scripts/mk/config.kv strictly quoted KEY="VAL" format, read by
+# mkman through its -config flag. nothing in the ninqu build itself
+# sources this file: genbox.sh takes its input on argv only
 #
 # shared/libutil/nofork_list.h
 # wexec.c includes this at compile time
@@ -169,56 +167,52 @@ clean() {
 # (KEY=VAL) since ninqu's (set-file) takes the rest of the line
 # verbatim
 
-config() {
-        mkdir -p scripts/mk
+config_check() {
+        case "${cppflags_common}" in
+                *-D_POSIX_C_SOURCE=200809L*) ;;
+                *) printf 'genconfig: missing POSIX 2008 baseline\n' >&2; return 1 ;;
+        esac
+        case "${cppflags_common}" in
+                *-D_DEFAULT_SOURCE*|*-D_GNU_SOURCE*|*-D_NETBSD_SOURCE*|*-D_BSD_SOURCE*|*-D_XOPEN_SOURCE*)
+                        printf 'genconfig: non-POSIX feature-test macro leaked into CPPFLAGS\n' >&2
+                        return 1
+                        ;;
+        esac
+        for f in ${features}; do
+                eval "val=\$$f"
+                case "${val}" in
+                        0|1) ;;
+                        *) printf 'genconfig: %s must be 0 or 1, got %s\n' "${f}" "${val}" >&2; return 1 ;;
+                esac
+        done
+}
 
-        kv_file="scripts/mk/config.kv"
-        set_file="scripts/mk/config.set"
+config_resolve() {
+        VERSION=${VERSION:-0}
+        PREFIX=${PREFIX:-}
+        MANPREFIX=${MANPREFIX:-/share/man}
+        RANLIB=${RANLIB:-ranlib}
+        AR=${AR:-ar}
+        ARFLAGS=${ARFLAGS:-rc}
+        CC=${CC:-cc}
+        CFLAGS=${CFLAGS:--std=c99 -Wall -Wextra -pedantic}
+        OBJCOPY=${OBJCOPY:-objcopy}
+        LD=${LD:-ld}
+        LDFLAGS_TLS=${LDFLAGS_TLS:-}
+        LDLIBS_TLS=${LDLIBS_TLS:-}
+        CPPFLAGS_TLS=${CPPFLAGS_TLS:-}
+        NINJA_TRY=${NINJA_TRY:-samu,ninja}
+        LDFLAGS="${LDFLAGS:-} ${LDFLAGS_TLS}"
+        LDLIBS="${LDLIBS:-} ${LDLIBS_TLS}"
 
-        : > "${kv_file}"
-        : > "${set_file}"
-
-        emit() {
-                local k="$1" v="$2"
-                echo "${k}=\"${v}\"" >> "${kv_file}"
-                echo "${k}=${v}" >> "${set_file}"
-        }
-
-        emit VERSION   "${VERSION}"
-        emit PREFIX    "${PREFIX}"
-        emit MANPREFIX "${MANPREFIX:-/usr/local/share/man}"
-        emit RANLIB    "${RANLIB:-ranlib}"
-        emit AR        "${AR:-ar}"
-        emit ARFLAGS   "${ARFLAGS:-rc}"
-        emit CC        "${CC:-cc}"
-        emit CFLAGS    "${CFLAGS:--std=c99 -Wall -Wextra -pedantic}"
-        emit LDFLAGS   "${LDFLAGS:-} ${LDFLAGS_TLS:-}"
-        emit LDLIBS    "${LDLIBS:-} ${LDLIBS_TLS:-}"
-        emit OBJCOPY   "${OBJCOPY:-objcopy}"
-        emit LD        "${LD:-ld}"
-
-        emit CPPFLAGS_TLS "${CPPFLAGS_TLS:-}"
-        emit LDFLAGS_TLS  "${LDFLAGS_TLS:-}"
-        emit LDLIBS_TLS   "${LDLIBS_TLS:-}"
-
-        # for when ninqu builds itself, otherwise it wont have this value
-        emit NINJA_TRY "${NINJA_TRY:-samu,ninja}"
-
-        # these seven are only consulted per-tool below (build_category_tool,
-        # build_category_$(basestem))
         for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
-                eval "val=\${$g:-0}"
-                echo "${g}=\"${val}\"" >> "${kv_file}"
+                eval "${g}=\${${g}:-0}"
         done
 
-        # per-tool toggles: scan cmd/<category>/ for tools. a tool is
-        # either a .c/.y file directly in the category dir (perfile)
-        # or a subdirectory (multi-file tool). emit BUILD_<CATEGORY>_<TOOL>
-        # plus lowercase alias for each
+        config_build_tools=""
         for category in posix xsi net pseudo extra linux dev; do
                 [ -d "cmd/$category" ] || continue
-                u_category=$(echo "$category" | tr '[:lower:]' '[:upper:]')
-
+                u_category=$(printf '%s' "$category" | tr '[:lower:]' '[:upper:]')
                 tools=""
                 for d in "cmd/$category"/*; do
                         [ -d "$d" ] && tools="$tools ${d##*/}"
@@ -233,81 +227,166 @@ config() {
                         esac
                         tools="$tools $b"
                 done
-
-                tools=$(echo "$tools" | tr ' ' '\n' | sort -u | grep -v '^$' || true)
-
-                for b in $tools; do
-                        u_tool=$(echo "$b" | tr 'a-z-' 'A-Z_')
+                tools=$(printf '%s\n' ${tools} | sort -u | grep -v '^$' || true)
+                for b in ${tools}; do
+                        u_tool=$(printf '%s' "$b" | tr 'a-z-' 'A-Z_')
                         var_name="BUILD_${u_category}_${u_tool}"
-
-                        # if [ "$category" = "dev" ] && [ "$u_tool" = "AS" ]; then
-                        # var_name="build_dev_cc"
-                        # fi
-
-                        eval "has_override=\${$var_name+yes}"
-                        if [ "$has_override" = "yes" ]; then
-                                eval "val=\${$var_name}"
+                        eval "has_override=\${${var_name}+yes}"
+                        if [ "$has_override" = yes ]; then
+                                eval "val=\${${var_name}}"
                         else
                                 eval "val=\$BUILD_${u_category}"
                         fi
-
-                        echo "${var_name}=\"${val}\"" >> "${kv_file}"
-                        lk=$(echo "$var_name" | tr '[:upper:]' '[:lower:]')
-                        echo "${lk}=${val}" >> "${set_file}"
+                        config_build_tools="${config_build_tools} ${var_name}=${val}"
                 done
         done
 
-        # box's own link line has no per-tool composition the way a
-        # standalone PERFILE binary's EXTRA_LIBS map does (box links
-        # every enabled tool's object into one binary in one shot), so
-        # a tool that needs a library nothing else in the box needs
-        # (yap needs terminfo) can only get it by ninqu.rules reading
-        # a value genconfig.sh already resolved, same as every other
-        # build_* toggle. this is still data, not policy: which
-        # library to add for which tool is decided here, not what to
-        # do with that decision
         box_extra_libs=""
-        [ "${yap_val:-0}" != "0" ] && box_extra_libs="-ltinfo"
-        emit BOX_EXTRA_LIBS "${box_extra_libs}"
-
+        [ "${BUILD_EXTRA_YAP:-0}" != 0 ] && box_extra_libs=-ltinfo
+        config_build_tools="${config_build_tools} BOX_EXTRA_LIBS=${box_extra_libs}"
         features=$(set | grep '^FEATURE_[A-Za-z0-9_]*=' | cut -d= -f1 | sort)
-        for f in $features; do
-                eval "val=\$$f"
-                emit "$f" "$val"
-        done
 
-        # every resolved FEATURE_* becomes a #define in one generated
-        # header. config.h's own #ifndef guards still apply to anything
-        # not here (there is nothing not here), and any file gets the
-        # real values just by being compiled with -include, whether or
-        # not it bothers to #include "config.h" itself
-        features_h="scripts/mk/features.h"
+        cppflags_common="-DPREFIX=\"${PREFIX}\" -D_POSIX_C_SOURCE=200809L -D_FILE_OFFSET_BITS=64 -include scripts/mk/features.h ${CPPFLAGS_TLS}"
+        config_check
+}
+
+config_kv_quote() {
+        escaped=$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')
+        printf '"%s"' "$escaped"
+}
+
+config_kv() {
+        config_resolve
+        mkdir -p scripts/mk
+        tmp="scripts/mk/config.kv.tmp.$$"
         {
-                echo "/* autogenerated by genconfig.sh, do not edit */"
-                for f in $features; do
-                        eval "fval=\$$f"
-                        echo "# define ${f} ${fval}"
+                emit_kv() {
+                        printf '%s=' "$1"
+                        config_kv_quote "$2"
+                        printf '\n'
+                }
+
+                emit_kv VERSION "${VERSION}"
+                emit_kv PREFIX "${PREFIX}"
+                emit_kv MANPREFIX "${MANPREFIX}"
+                emit_kv RANLIB "${RANLIB}"
+                emit_kv AR "${AR}"
+                emit_kv ARFLAGS "${ARFLAGS}"
+                emit_kv CC "${CC}"
+                emit_kv CFLAGS "${CFLAGS}"
+                emit_kv LDFLAGS "${LDFLAGS}"
+                emit_kv LDLIBS "${LDLIBS}"
+                emit_kv OBJCOPY "${OBJCOPY}"
+                emit_kv LD "${LD}"
+                emit_kv CPPFLAGS_TLS "${CPPFLAGS_TLS}"
+                emit_kv LDFLAGS_TLS "${LDFLAGS_TLS}"
+                emit_kv LDLIBS_TLS "${LDLIBS_TLS}"
+                emit_kv NINJA_TRY "${NINJA_TRY}"
+
+                for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
+                        eval "val=\$$g"
+                        emit_kv "$g" "$val"
                 done
-        } > "${features_h}"
+                for entry in ${config_build_tools}; do
+                        emit_kv "${entry%%=*}" "${entry#*=}"
+                done
+                for f in ${features}; do
+                        eval "val=\$$f"
+                        emit_kv "$f" "$val"
+                done
+                emit_kv CPPFLAGS "-Ishared ${cppflags_common}"
+                emit_kv CPPFLAGS_LIBUTIL "${cppflags_common}"
+        } > "${tmp}"
+        mv "${tmp}" scripts/mk/config.kv
+}
 
-        cppflags_common="-DPREFIX=\"${PREFIX}\" -D_DEFAULT_SOURCE -D_GNU_SOURCE -D_NETBSD_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE=700 -D_FILE_OFFSET_BITS=64 -include ${features_h} ${CPPFLAGS_TLS:-}"
-        cppflags_set="-Ishared ${cppflags_common}"
-        echo "CPPFLAGS=\"${cppflags_set}\"" >> "${kv_file}"
-        echo "CPPFLAGS=${cppflags_set}" >> "${set_file}"
+config_set() {
+        config_resolve
+        mkdir -p scripts/mk
+        tmp="scripts/mk/config.set.tmp.$$"
+        {
+                emit_set() {
+                        case "$2" in
+                                *'
+'*) printf 'genconfig: %s contains a newline\n' "$1" >&2; return 1 ;;
+                        esac
+                        printf '%s=%s\n' "$1" "$2"
+                }
 
-        # shared/tls.h would conflict with the system's tls.h
-        # if we passed -ishared to build libutil
-        echo "CPPFLAGS_LIBUTIL=\"${cppflags_common}\"" >> "${kv_file}"
-        echo "CPPFLAGS_LIBUTIL=${cppflags_common}" >> "${set_file}"
+                emit_set VERSION "${VERSION}"
+                emit_set PREFIX "${PREFIX}"
+                emit_set MANPREFIX "${MANPREFIX}"
+                emit_set RANLIB "${RANLIB}"
+                emit_set AR "${AR}"
+                emit_set ARFLAGS "${ARFLAGS}"
+                emit_set CC "${CC}"
+                emit_set CFLAGS "${CFLAGS}"
+                emit_set LDFLAGS "${LDFLAGS}"
+                emit_set LDLIBS "${LDLIBS}"
+                emit_set OBJCOPY "${OBJCOPY}"
+                emit_set LD "${LD}"
+                emit_set CPPFLAGS_TLS "${CPPFLAGS_TLS}"
+                emit_set LDFLAGS_TLS "${LDFLAGS_TLS}"
+                emit_set LDLIBS_TLS "${LDLIBS_TLS}"
+                emit_set NINJA_TRY "${NINJA_TRY}"
 
-        nofork_h="shared/libutil/nofork_list.h"
-        echo "/* autogenerated by genconfig.sh */" > "${nofork_h}"
-        echo "static const char *nofork_list[] = {" >> "${nofork_h}"
-        for app in ${NOFORK_LIST}; do
-                echo "  \"${app}\"," >> "${nofork_h}"
-        done
-        echo "  NULL" >> "${nofork_h}"
-        echo "};" >> "${nofork_h}"
+                for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
+                        eval "val=\$$g"
+                        emit_set "$g" "$val"
+                done
+                for entry in ${config_build_tools}; do
+                        entry_name="${entry%%=*}"
+                        entry_value="${entry#*=}"
+                        emit_set "${entry_name}" "${entry_value}"
+                        entry_lower=$(printf '%s' "${entry_name}" | tr '[:upper:]' '[:lower:]')
+                        emit_set "${entry_lower}" "${entry_value}"
+                done
+                for f in ${features}; do
+                        eval "val=\$$f"
+                        emit_set "$f" "$val"
+                        feature_lower=$(printf '%s' "$f" | tr '[:upper:]' '[:lower:]')
+                        emit_set "$feature_lower" "$val"
+                done
+                emit_set CPPFLAGS "-Ishared ${cppflags_common}"
+                emit_set CPPFLAGS_LIBUTIL "${cppflags_common}"
+        } > "${tmp}"
+        mv "${tmp}" scripts/mk/config.set
+}
+
+features_h() {
+        config_resolve
+        mkdir -p scripts/mk
+        tmp="scripts/mk/features.h.tmp.$$"
+        {
+                printf '/* generated by genconfig.sh */\n'
+                for f in ${features}; do
+                        eval "val=\$$f"
+                        printf '#define %s %s\n' "$f" "$val"
+                done
+        } > "${tmp}"
+        mv "${tmp}" scripts/mk/features.h
+}
+
+nofork_list_h() {
+        config_resolve
+        tmp="shared/libutil/nofork_list.h.tmp.$$"
+        {
+                printf '/* generated by genconfig.sh */\n'
+                printf 'static const char *nofork_list[] = {\n'
+                for app in ${NOFORK_LIST:-}; do
+                        printf '  "%s",\n' "$app"
+                done
+                printf '  NULL\n'
+                printf '};\n'
+        } > "${tmp}"
+        mv "${tmp}" shared/libutil/nofork_list.h
+}
+
+config() {
+        config_set
+        config_kv
+        features_h
+        nofork_list_h
 }
 
 case "$target" in
@@ -321,11 +400,16 @@ case "$target" in
                 gen_awk
                 gen_sh
                 ;;
-        config)  config ;;
-        clean)   clean ;;
+        config)         config ;;
+        config-set)     config_set ;;
+        config-kv)      config_kv ;;
+        features-h)     features_h ;;
+        nofork-list-h)  nofork_list_h ;;
+        config-check)   config_resolve ;;
+        clean)          clean ;;
         *)
                 printf "genconfig: unknown target: %s\n" "$target" >&2
-                printf "usage: %s (config|getconf|bc|awk|sh|all|clean)\n" "$0" >&2
+                printf "usage: %s (config|config-set|config-kv|features-h|nofork-list-h|config-check|getconf|bc|awk|sh|all|clean)\n" "$0" >&2
                 exit 1
                 ;;
 esac

@@ -23,10 +23,8 @@ main(int argc, char *argv[])
 
   ARGBEGIN
   {
-    // ?man -u: specify u option
     case 'u':
-      // ?man -u: ignored; accepted for posix compatibility; output is
-      // always unbuffered
+      // ?man -u: ignored; accepted for posix compatibility; output is always unbuffered
       break;
     default:
       usage();
@@ -61,8 +59,11 @@ main(int argc, char *argv[])
   // ?man
   // ?man ## Exit status
   // ?man
-  // ?man cat exits 0 on success, and >0 if an error occurs reading any
-  // file ?man or writing to standard output ?man ?man ## see also ?man
+  // ?man cat exits 0 on success, and >0 if an error occurs reading any file
+  // ?man or writing to standard output
+  // ?man
+  // ?man ## see also
+  // ?man
   // ?man cp(1), dd(1)
   // ?man
 

@@ -1,5 +1,14 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_CHROOT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
+#endif
+
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -35,8 +44,12 @@ main(int argc, char *argv[])
   if ((aux = getenv("SHELL")))
     shell[0] = aux;
 
+#if FEATURE_CHROOT
   if (chroot(argv[0]) < 0)
     eprintf("chroot %s:", argv[0]);
+#else
+  eprintf("chroot: not supported\n");
+#endif
 
   if (chdir("/") < 0)
     eprintf("chdir:");

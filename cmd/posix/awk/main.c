@@ -25,6 +25,11 @@
 const char *version = "version 20260426";
 
 #define DEBUG
+#if FEATURE_AWK_RANDOM
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include "awk.h"
 #include <ctype.h>
 #include <locale.h>

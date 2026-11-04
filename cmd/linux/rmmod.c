@@ -1,4 +1,9 @@
 
+#if FEATURE_LINUX_SYSCALL
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include <sys/syscall.h>
 
 #include <fcntl.h>
@@ -19,8 +24,8 @@ usage(void)
 // ?man rmmod: remove a module from the Linux kernel
 // ?man arguments: module...
 // ?man rmmod removes a kernel module from the running kernel
-// ?man // ?man -f: force removal of a module even if it is busy or in use
-// ?man // ?man -w: wait for the module to become unused before removing
+// ?man -f: force removal of a module even if it is busy or in use
+// ?man -w: wait for the module to become unused before removing
 int
 main(int argc, char *argv[])
 {

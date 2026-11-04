@@ -856,12 +856,10 @@ readpax(struct bufio *f, struct header *h)
       case 'g':
         readexthdr(f, &globexthdr, h->size);
         break;
-        // ?man -x: hex format or match whole lines
-      case 'x':
+        case 'x':
         readexthdr(f, &exthdr, h->size);
         break;
-        // ?man -L: specify option flag
-      case 'L':
+        case 'L':
         if ((exthdr.delete | opt.delete) & PATH)
           break;
         readgnuhdr(f, &exthdr.pathbuf, h->size);
@@ -2179,12 +2177,10 @@ parsereplstr(char *str)
       case 'g':
         r->global = 1;
         break;
-        // ?man -p: preserve file attributes
       case 'p':
         r->print = 1;
         break;
-        // ?man -s: silent mode or print summary
-      case 's':
+       case 's':
         r->symlink = 0;
         break;
       case 'S':
@@ -2464,8 +2460,7 @@ main(int argc, char *argv[])
 
   ARGBEGIN
   {
-    // ?man -a: print or show all entries
-    case 'a':
+           case 'a':
       aflag = 1;
       break;
     // ?man -b:str: specify block size or base directory
@@ -2520,8 +2515,7 @@ main(int argc, char *argv[])
     case 'o':
       parseopts(EARGF(usage()));
       break;
-    // ?man -p:str: preserve file attributes
-    case 'p':
+           case 'p':
       for (arg = EARGF(usage()); *arg; ++arg) {
         switch (*arg) {
           // ?man -a: print or show all entries
@@ -2536,11 +2530,10 @@ main(int argc, char *argv[])
           case 'm':
             preserve &= ~MTIME;
             break;
-          // ?man -o: specify output file
-          case 'o':
+           case 'o':
             preserve |= UID | GID;
             break;
-          // ?man -p: preserve file attributes
+      // ?man -p:str: preserve file attributes
           case 'p':
             preserve |= MODE;
             break;

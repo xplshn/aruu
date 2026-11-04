@@ -1,4 +1,9 @@
 /* see LICENSE file for copyright and license details */
+#if FEATURE_PASSWD_EXT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include "../passwd.h"
 #include "../paths.h"
 #include "../text.h"
@@ -78,11 +83,10 @@ pw_check(const struct passwd *pw, const char *pass)
       weprintf("denied\n");
       return -1;
     }
-    /* same empty-hash fast path as above, re-checked here: stored was
-     * just reassigned from the shadow entry's own field, and an empty
-     * shadow hash means "passwordless account", not "match nothing"
-     * (falling through to crypt() with an empty salt does the latter,
-     * since crypt("", "") is never itself the empty string) */
+    /* same empty-hash path as above, redone because stored was just
+     * reassigned from the shadow entry. an empty shadow hash means a
+     * passwordless account, while crypt() with an empty salt would match
+     * nothing */
     if (stored[0] == '\0') {
       if (pass[0] == '\0')
         return 1;
@@ -370,19 +374,37 @@ static int
 update_master_passwd(const char *name, const char *newhash)
 {
   int   r;
-  pid_t pid;
+  pid_t pid, wr;
   int   st;
 
   r = update_passwd_file(ARUU_BSD_PATH_MASTER_PASSWD, name, newhash);
   if (r != 0)
     return r;
   pid = fork();
+  if (pid < 0) {
+    weprintf("fork:");
+    return -1;
+  }
   if (pid == 0) {
     execl(ARUU_BSD_PATH_PWD_MKDB, "pwd_mkdb", "-p", NULL);
+    weprintf("exec %s:", ARUU_BSD_PATH_PWD_MKDB);
     _exit(127);
   }
-  if (pid > 0)
-    waitpid(pid, &st, 0);
+  do {
+    wr = waitpid(pid, &st, 0);
+  } while (wr < 0 && errno == EINTR);
+  if (wr < 0) {
+    weprintf("waitpid:");
+    return -1;
+  }
+  if (!WIFEXITED(st)) {
+    weprintf("pwd_mkdb did not exit normally\n");
+    return -1;
+  }
+  if (WEXITSTATUS(st) != 0) {
+    weprintf("pwd_mkdb exited with status %d\n", WEXITSTATUS(st));
+    return -1;
+  }
   return 0;
 }
 #endif

@@ -1328,7 +1328,6 @@ repeat:
       goto print;
     case 'l':
     case 'n':
-    // ?man -p: preserve file attributes
     case 'p':
       back(cmd);
       chkprint(1);
@@ -1387,7 +1386,6 @@ repeat:
         error("nothing to undo");
       undo();
       break;
-    // ?man -s: silent mode or print summary
     case 's':
       deflines(curln, curln);
       c = input();

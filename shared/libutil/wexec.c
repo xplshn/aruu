@@ -13,6 +13,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+extern char **environ;
+
 #define MAX_BUILTINS 256
 #define MAX_POPEN    32
 
@@ -641,6 +643,46 @@ wexecv_self(const char *path, char *const *argv)
 #endif
   execv(path, argv);
   weprintf("execv %s:", path);
+  exit((errno == ENOENT) ? 127 : 126);
+}
+
+void
+wexecve_self(const char *path, char *const *argv, char *const *envp)
+{
+#if FEATURE_NOEXEC
+  {
+    const char *base = strrchr(path, '/');
+    base             = base ? base + 1 : path;
+    if (wexec_get_noexec() && wexec_is_builtin(base)) {
+      struct sigaction sa;
+      char           **oldenv;
+      int              i, ret;
+
+      for (i = 1; i < NSIG; i++) {
+        if (sigaction(i, NULL, &sa) == 0) {
+          if (sa.sa_handler != SIG_IGN && sa.sa_handler != SIG_DFL) {
+            sa.sa_handler = SIG_DFL;
+            sa.sa_flags   = 0;
+            sigemptyset(&sa.sa_mask);
+            sigaction(i, &sa, NULL);
+          }
+        }
+      }
+
+      oldenv = environ;
+      environ = (char **)envp;
+      fflush(stdout);
+      fflush(stderr);
+      ret = wexec_call_builtin(base, argv);
+      environ = oldenv;
+      fflush(stdout);
+      fflush(stderr);
+      exit(ret);
+    }
+  }
+#endif
+  execve(path, argv, envp);
+  weprintf("execve %s:", path);
   exit((errno == ENOENT) ? 127 : 126);
 }
 

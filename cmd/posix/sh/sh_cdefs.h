@@ -14,6 +14,15 @@
 #ifndef SH_CDEFS_H
 #define SH_CDEFS_H
 
+#if FEATURE_SH_EXT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
+
 #ifndef __dead2
 #define __dead2 __attribute__((__noreturn__))
 #endif

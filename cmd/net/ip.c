@@ -1,39 +1,12 @@
 /* see LICENSE file for copyright and license details */
 
 #include <arpa/inet.h>
-#include <ctype.h>
-#include <errno.h>
-#include <net/if.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
 
+#include "net.h"
 #include "util.h"
-
-#if FEATURE_IP_ROUTE_ADD_DEL
-static void
-prefix_to_mask(int prefix, char *mask_str, size_t mask_str_len)
-{
-  unsigned long  mask;
-  struct in_addr addr;
-
-  if (prefix < 0)
-    prefix = 32;
-  if (prefix > 32)
-    eprintf("invalid prefix: %d\n", prefix);
-
-  if (prefix == 0) {
-    mask = 0;
-  } else {
-    mask = 0xffffffffUL << (32 - prefix);
-  }
-  addr.s_addr = htonl(mask);
-  strlcpy(mask_str, inet_ntoa(addr), mask_str_len);
-}
-#endif
 
 static void
 usage(void)
@@ -41,9 +14,8 @@ usage(void)
   eprintf("usage: %s [addr | link | route] [args...]\n", argv0);
 }
 
-/* real ip(8) and BusyBox's own ip applet both accept any unambiguous
- * prefix of an object name (ip a, ip li, ip ro, ...), not just the
- * full word: obj matches full whenever it is a real, non-empty prefix */
+/* like ip(8) and busybox, accept any unambiguous prefix of an object
+ * name (ip a, ip li, ip ro), not only the full word */
 static int
 is_object(const char *obj, const char *full)
 {
@@ -75,13 +47,13 @@ static void
 print_link_iface(const struct NetInterface *iface)
 {
   printf("%d: %s: mtu %d ", iface->metric, iface->name, iface->mtu);
-  if (iface->flags & IFF_UP)
+  if (iface->flags & NET_IF_UP)
     printf("UP ");
-  if (iface->flags & IFF_LOOPBACK)
+  if (iface->flags & NET_IF_LOOPBACK)
     printf("LOOPBACK ");
-  if (iface->flags & IFF_POINTOPOINT)
+  if (iface->flags & NET_IF_POINTOPOINT)
     printf("POINTOPOINT ");
-  if (iface->flags & IFF_RUNNING)
+  if (iface->flags & NET_IF_RUNNING)
     printf("RUNNING ");
   printf("\n");
   if (iface->has_mac) {
@@ -210,7 +182,7 @@ do_link(int argc, char *argv[])
   struct NetInterface *ifaces = NULL;
   char                *cmd, *dev, *mac_str;
   int                  count = 0;
-  int                  i, mtu;
+  int                  i, mtu, qlen, set;
   unsigned char        mac[6];
 
   if (argc == 0)
@@ -245,10 +217,10 @@ do_link(int argc, char *argv[])
     dev = argv[1];
     for (i = 2; i < argc; i++) {
       if (strcmp(argv[i], "up") == 0) {
-        if (net_set_flags(dev, IFF_UP, 1) < 0)
+        if (net_set_flags(dev, NET_IF_UP, 1) < 0)
           eprintf("net_set_flags up:");
       } else if (strcmp(argv[i], "down") == 0) {
-        if (net_set_flags(dev, IFF_UP, 0) < 0)
+        if (net_set_flags(dev, NET_IF_UP, 0) < 0)
           eprintf("net_set_flags down:");
       } else if (strcmp(argv[i], "mtu") == 0 && i + 1 < argc) {
         mtu = atoi(argv[i + 1]);
@@ -262,41 +234,33 @@ do_link(int argc, char *argv[])
           eprintf("net_set_mac:");
         i++;
 #if FEATURE_IP_LINK_SET
-#ifdef IFF_NOARP
       } else if (strcmp(argv[i], "arp") == 0 && i + 1 < argc) {
-        int set = (strcmp(argv[i + 1], "off") == 0);
-        if (net_set_flags(dev, IFF_NOARP, set) < 0)
+        set = (strcmp(argv[i + 1], "off") == 0);
+        if (net_set_flags(dev, NET_IF_NOARP, set) < 0)
           eprintf("net_set_flags arp:");
         i++;
-#endif
-#ifdef IFF_MULTICAST
       } else if (strcmp(argv[i], "multicast") == 0 && i + 1 < argc) {
-        int set = (strcmp(argv[i + 1], "on") == 0);
-        if (net_set_flags(dev, IFF_MULTICAST, set) < 0)
+        set = (strcmp(argv[i + 1], "on") == 0);
+        if (net_set_flags(dev, NET_IF_MULTICAST, set) < 0)
           eprintf("net_set_flags multicast:");
         i++;
-#endif
-#ifdef IFF_ALLMULTI
       } else if (strcmp(argv[i], "allmulticast") == 0 && i + 1 < argc) {
-        int set = (strcmp(argv[i + 1], "on") == 0);
-        if (net_set_flags(dev, IFF_ALLMULTI, set) < 0)
+        set = (strcmp(argv[i + 1], "on") == 0);
+        if (net_set_flags(dev, NET_IF_ALLMULTI, set) < 0)
           eprintf("net_set_flags allmulticast:");
         i++;
-#endif
-#ifdef IFF_PROMISC
       } else if (strcmp(argv[i], "promisc") == 0 && i + 1 < argc) {
-        int set = (strcmp(argv[i + 1], "on") == 0);
-        if (net_set_flags(dev, IFF_PROMISC, set) < 0)
+        set = (strcmp(argv[i + 1], "on") == 0);
+        if (net_set_flags(dev, NET_IF_PROMISC, set) < 0)
           eprintf("net_set_flags promisc:");
         i++;
-#endif
       } else if (strcmp(argv[i], "name") == 0 && i + 1 < argc) {
         if (net_set_name(dev, argv[i + 1]) < 0)
           eprintf("net_set_name:");
         dev = argv[i + 1];
         i++;
       } else if (strcmp(argv[i], "txqueuelen") == 0 && i + 1 < argc) {
-        int qlen = atoi(argv[i + 1]);
+        qlen = atoi(argv[i + 1]);
         if (net_set_txqueuelen(dev, qlen) < 0)
           eprintf("net_set_txqueuelen:");
         i++;
@@ -316,7 +280,6 @@ do_route(int argc, char *argv[])
   char       *cmd, *dst, *slash;
   const char *gateway = NULL, *dev = NULL;
   int         prefix_len = -1, metric = -1, i;
-  char        mask_str[32];
 
   if (argc == 0)
     cmd = "show";
@@ -346,8 +309,8 @@ do_route(int argc, char *argv[])
     } else if (strcmp(dst, "default") == 0) {
       prefix_len = 0;
     }
-
-    prefix_to_mask(prefix_len, mask_str, sizeof(mask_str));
+    if (prefix_len > 32)
+      eprintf("invalid prefix: %d\n", prefix_len);
 
     for (i = 2; i < argc; i++) {
       if (strcmp(argv[i], "via") == 0 && i + 1 < argc) {
@@ -363,10 +326,10 @@ do_route(int argc, char *argv[])
     }
 
     if (strcmp(cmd, "add") == 0) {
-      if (net_add_route(dst, gateway, mask_str, dev, metric) < 0)
+      if (net_add_route(dst, gateway, dev, prefix_len, metric) < 0)
         eprintf("net_add_route:");
     } else {
-      if (net_del_route(dst, gateway, mask_str, dev, metric) < 0)
+      if (net_del_route(dst, gateway, dev, prefix_len, metric) < 0)
         eprintf("net_del_route:");
     }
     return 0;
@@ -393,11 +356,12 @@ do_route(int argc, char *argv[])
 // ?man flush all addresses from interface
 // ?man ### link [show | list [dev <device>]]
 // ?man show interface link states
-// ?man ### link set <interface> [up | down | mtu <mtu> | address <mac> | arp
-// on|off | multicast on|off | allmulticast on|off | promisc on|off | name
-// <newname> | txqueuelen <qlen>] ?man configure interface settings ?man ###
-// route [show | list] ?man show routing table ?man ### route add <prefix> [via
-// <gateway>] [dev <device>] [metric <metric>] ?man add route to routing table
+// ?man ### link set <interface> [up | down | mtu <mtu> | address <mac> | arp on|off | multicast on|off | allmulticast on|off | promisc on|off | name <newname> | txqueuelen <qlen>]
+// ?man configure interface settings
+// ?man ### route [show | list]
+// ?man show routing table
+// ?man ### route add <prefix> [via <gateway>] [dev <device>] [metric <metric>]
+// ?man add route to routing table
 // ?man ### route del <prefix> [via <gateway>] [dev <device>] [metric <metric>]
 // ?man delete route from routing table
 int

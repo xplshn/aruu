@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "util.h"
@@ -20,10 +21,10 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-  char       cmd[BUFSIZ];
-  char      *end;
-  useconds_t interval = 2 * 1E6;
-  float      period;
+  char            cmd[BUFSIZ];
+  char           *end;
+  struct timespec interval = { .tv_sec = 2, .tv_nsec = 0 };
+  float           period;
   int        i;
 
   ARGBEGIN
@@ -38,7 +39,8 @@ main(int argc, char *argv[])
         eprintf("invalid interval\n");
       if (period < 0)
         period = 0.1f;
-      interval = period * 1E6;
+      interval.tv_sec = period;
+      interval.tv_nsec = (period - interval.tv_sec) * 1E9;
       break;
     default:
       usage();
@@ -61,7 +63,7 @@ main(int argc, char *argv[])
     printf("\x1b[2J\x1b[H"); /* clear */
     fflush(NULL);
     wsystem(cmd);
-    usleep(interval);
+    nanosleep(&interval, NULL);
   }
   return 0;
 }

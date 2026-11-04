@@ -59,7 +59,6 @@ format:
     fmt++;
 
   switch (*fmt) {
-    // ?man -f: force the operation
     case 'f':
     case 'F':
     case 'g':

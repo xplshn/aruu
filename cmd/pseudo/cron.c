@@ -1,5 +1,11 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_LOGGER_SYSLOG || FEATURE_CRON_DAEMON
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
+
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -56,9 +62,11 @@ loginfo(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
+#if FEATURE_LOGGER_SYSLOG
   if (nflag == 0)
     vsyslog(LOG_INFO, fmt, ap);
   else
+#endif
     vfprintf(stdout, fmt, ap);
   fflush(stdout);
   va_end(ap);
@@ -69,9 +77,11 @@ logwarn(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
+#if FEATURE_LOGGER_SYSLOG
   if (nflag == 0)
     vsyslog(LOG_WARNING, fmt, ap);
   else
+#endif
     vfprintf(stderr, fmt, ap);
   va_end(ap);
 }
@@ -81,9 +91,11 @@ logerr(const char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
+#if FEATURE_LOGGER_SYSLOG
   if (nflag == 0)
     vsyslog(LOG_ERR, fmt, ap);
   else
+#endif
     vfprintf(stderr, fmt, ap);
   va_end(ap);
 }
@@ -524,11 +536,17 @@ main(int argc, char *argv[])
     usage();
 
   if (nflag == 0) {
+#if FEATURE_LOGGER_SYSLOG
     openlog(argv[0], LOG_CONS | LOG_PID, LOG_CRON);
+#endif
+#if FEATURE_CRON_DAEMON
     if (daemon(1, 0) < 0) {
       logerr("error: failed to daemonize %s\n", strerror(errno));
       return 1;
     }
+#else
+    eprintf("cron: daemon support not built\n");
+#endif
     if ((fp = fopen(pidfile, "w"))) {
       fprintf(fp, "%d\n", getpid());
       fclose(fp);
@@ -577,8 +595,10 @@ main(int argc, char *argv[])
     }
   }
 
+#if FEATURE_LOGGER_SYSLOG
   if (nflag == 0)
     closelog();
+#endif
 
   return 0;
 }

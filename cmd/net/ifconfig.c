@@ -1,22 +1,12 @@
 /* see LICENSE file for copyright and license details */
 
 #include <arpa/inet.h>
-#include <ctype.h>
-#include <errno.h>
-#include <net/if.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
 
+#include "net.h"
 #include "util.h"
-
-int net_get_interfaces(struct NetInterface **, int *);
-int net_get_stats(const char *, struct NetStats *);
-int net_set_txqueuelen(const char *, int);
 
 static void
 usage(void)
@@ -41,7 +31,7 @@ display_interface(const struct NetInterface *iface)
         iface->mac[4],
         iface->mac[5]
     );
-  } else if (iface->flags & IFF_LOOPBACK) {
+  } else if (iface->flags & NET_IF_LOOPBACK) {
     printf("Local Loopback\n");
   } else {
     printf("UNSPEC\n");
@@ -60,25 +50,25 @@ display_interface(const struct NetInterface *iface)
   }
 
   printf("        ");
-  if (iface->flags & IFF_UP)
+  if (iface->flags & NET_IF_UP)
     printf("UP ");
-  if (iface->flags & IFF_BROADCAST)
+  if (iface->flags & NET_IF_BROADCAST)
     printf("BROADCAST ");
-  if (iface->flags & IFF_DEBUG)
+  if (iface->flags & NET_IF_DEBUG)
     printf("DEBUG ");
-  if (iface->flags & IFF_LOOPBACK)
+  if (iface->flags & NET_IF_LOOPBACK)
     printf("LOOPBACK ");
-  if (iface->flags & IFF_POINTOPOINT)
+  if (iface->flags & NET_IF_POINTOPOINT)
     printf("POINTOPOINT ");
-  if (iface->flags & IFF_RUNNING)
+  if (iface->flags & NET_IF_RUNNING)
     printf("RUNNING ");
-  if (iface->flags & IFF_NOARP)
+  if (iface->flags & NET_IF_NOARP)
     printf("NOARP ");
-  if (iface->flags & IFF_PROMISC)
+  if (iface->flags & NET_IF_PROMISC)
     printf("PROMISC ");
-  if (iface->flags & IFF_ALLMULTI)
+  if (iface->flags & NET_IF_ALLMULTI)
     printf("ALLMULTI ");
-  if (iface->flags & IFF_MULTICAST)
+  if (iface->flags & NET_IF_MULTICAST)
     printf("MULTICAST ");
 
   printf(" MTU:%d  Metric:%d\n", iface->mtu, iface->metric);
@@ -114,7 +104,7 @@ list_interfaces(int all)
     eprintf("net_get_interfaces:");
 
   for (i = 0; i < count; i++) {
-    if (all || (ifaces[i].flags & IFF_UP)) {
+    if (all || (ifaces[i].flags & NET_IF_UP)) {
       display_interface(&ifaces[i]);
     }
   }
@@ -129,17 +119,13 @@ main(int argc, char *argv[])
 {
   struct NetInterface       *ifaces = NULL;
   const struct NetInterface *iface  = NULL;
-  struct ifreq               ifr;
-  struct sockaddr_in        *sin;
   char                      *name;
   char                      *arg;
   char                      *slash;
   int                        aflag = 0;
-  int                        sock  = -1;
   int                        i     = 1;
   int                        prefix;
   int                        count = 0;
-  unsigned int               mask;
 
   ARGBEGIN
   {
@@ -177,68 +163,40 @@ main(int argc, char *argv[])
     return 0;
   }
 
-  sock = socket(AF_INET, SOCK_DGRAM, 0);
-  if (sock < 0)
-    eprintf("socket:");
-
-  memset(&ifr, 0, sizeof(ifr));
-  strlcpy(ifr.ifr_name, name, sizeof(ifr.ifr_name));
-
   while (i < argc) {
     arg = argv[i];
 
     if (strcmp(arg, "up") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_UP | NET_IF_RUNNING, 1) < 0)
+        eprintf("net_set_flags up:");
       i++;
     } else if (strcmp(arg, "down") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags &= ~IFF_UP;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_UP, 0) < 0)
+        eprintf("net_set_flags down:");
       i++;
     } else if (strcmp(arg, "netmask") == 0) {
       if (i + 1 >= argc)
         eprintf("netmask needs an address\n");
-      sin             = (struct sockaddr_in *)&ifr.ifr_netmask;
-      sin->sin_family = AF_INET;
-      if (inet_pton(AF_INET, argv[i + 1], &sin->sin_addr) <= 0)
-        eprintf("invalid address: %s\n", argv[i + 1]);
-      if (ioctl(sock, SIOCSIFNETMASK, &ifr) < 0)
-        eprintf("ioctl SIOCSIFNETMASK:");
+      if (net_set_mask(name, argv[i + 1]) < 0)
+        eprintf("net_set_mask:");
       i += 2;
     } else if (strcmp(arg, "broadcast") == 0) {
       if (i + 1 >= argc)
         eprintf("broadcast needs an address\n");
-      sin             = (struct sockaddr_in *)&ifr.ifr_broadaddr;
-      sin->sin_family = AF_INET;
-      if (inet_pton(AF_INET, argv[i + 1], &sin->sin_addr) <= 0)
-        eprintf("invalid address: %s\n", argv[i + 1]);
-      if (ioctl(sock, SIOCSIFBRDADDR, &ifr) < 0)
-        eprintf("ioctl SIOCSIFBRDADDR:");
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags |= IFF_BROADCAST;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_broadcast(name, argv[i + 1]) < 0)
+        eprintf("net_set_broadcast:");
       i += 2;
     } else if (strcmp(arg, "mtu") == 0) {
       if (i + 1 >= argc)
         eprintf("mtu needs a value\n");
-      ifr.ifr_mtu = atoi(argv[i + 1]);
-      if (ioctl(sock, SIOCSIFMTU, &ifr) < 0)
-        eprintf("ioctl SIOCSIFMTU:");
+      if (net_set_mtu(name, atoi(argv[i + 1])) < 0)
+        eprintf("net_set_mtu:");
       i += 2;
     } else if (strcmp(arg, "metric") == 0) {
       if (i + 1 >= argc)
         eprintf("metric needs a value\n");
-      ifr.ifr_metric = atoi(argv[i + 1]);
-      if (ioctl(sock, SIOCSIFMETRIC, &ifr) < 0)
-        eprintf("ioctl SIOCSIFMETRIC:");
+      if (net_set_metric(name, atoi(argv[i + 1])) < 0)
+        eprintf("net_set_metric:");
       i += 2;
     } else if (strcmp(arg, "txqueuelen") == 0) {
       if (i + 1 >= argc)
@@ -249,116 +207,55 @@ main(int argc, char *argv[])
     } else if (strcmp(arg, "dstaddr") == 0 || strcmp(arg, "pointopoint") == 0) {
       if (i + 1 >= argc)
         eprintf("%s needs an address\n", arg);
-      sin             = (struct sockaddr_in *)&ifr.ifr_dstaddr;
-      sin->sin_family = AF_INET;
-      if (inet_pton(AF_INET, argv[i + 1], &sin->sin_addr) <= 0)
-        eprintf("invalid address: %s\n", argv[i + 1]);
-      if (ioctl(sock, SIOCSIFDSTADDR, &ifr) < 0)
-        eprintf("ioctl SIOCSIFDSTADDR:");
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags |= IFF_POINTOPOINT;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_dstaddr(name, argv[i + 1]) < 0)
+        eprintf("net_set_dstaddr:");
       i += 2;
     } else if (strcmp(arg, "arp") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags &= ~IFF_NOARP;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_NOARP, 0) < 0)
+        eprintf("net_set_flags arp:");
       i++;
     } else if (strcmp(arg, "-arp") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags |= IFF_NOARP;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_NOARP, 1) < 0)
+        eprintf("net_set_flags -arp:");
       i++;
     } else if (strcmp(arg, "promisc") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags |= IFF_PROMISC;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_PROMISC, 1) < 0)
+        eprintf("net_set_flags promisc:");
       i++;
     } else if (strcmp(arg, "-promisc") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags &= ~IFF_PROMISC;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_PROMISC, 0) < 0)
+        eprintf("net_set_flags -promisc:");
       i++;
     } else if (strcmp(arg, "allmulti") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags |= IFF_ALLMULTI;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_ALLMULTI, 1) < 0)
+        eprintf("net_set_flags allmulti:");
       i++;
     } else if (strcmp(arg, "-allmulti") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags &= ~IFF_ALLMULTI;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_ALLMULTI, 0) < 0)
+        eprintf("net_set_flags -allmulti:");
       i++;
     } else if (strcmp(arg, "multicast") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags |= IFF_MULTICAST;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_MULTICAST, 1) < 0)
+        eprintf("net_set_flags multicast:");
       i++;
     } else if (strcmp(arg, "-multicast") == 0) {
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags &= ~IFF_MULTICAST;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
+      if (net_set_flags(name, NET_IF_MULTICAST, 0) < 0)
+        eprintf("net_set_flags -multicast:");
       i++;
     } else {
-      sin             = (struct sockaddr_in *)&ifr.ifr_addr;
-      sin->sin_family = AF_INET;
-      slash           = strchr(arg, '/');
-      prefix          = -1;
+      slash  = strchr(arg, '/');
+      prefix = -1;
       if (slash) {
         *slash = '\0';
         prefix = atoi(slash + 1);
       }
-      if (inet_pton(AF_INET, arg, &sin->sin_addr) <= 0) {
-        eprintf(
-            "unknown action or invalid address: "
-            "%s\n",
-            arg
-        );
-      }
-      if (ioctl(sock, SIOCSIFADDR, &ifr) < 0)
-        eprintf("ioctl SIOCSIFADDR:");
-
-      if (prefix >= 0) {
-        mask = 0;
-        if (prefix > 0)
-          mask = htonl(~0U << (32 - prefix));
-        sin                  = (struct sockaddr_in *)&ifr.ifr_netmask;
-        sin->sin_family      = AF_INET;
-        sin->sin_addr.s_addr = mask;
-        if (ioctl(sock, SIOCSIFNETMASK, &ifr) < 0)
-          eprintf("ioctl SIOCSIFNETMASK:");
-      }
-
-      if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCGIFFLAGS:");
-      ifr.ifr_flags |= IFF_UP | IFF_RUNNING;
-      if (ioctl(sock, SIOCSIFFLAGS, &ifr) < 0)
-        eprintf("ioctl SIOCSIFFLAGS:");
-
+      if (net_add_addr(name, arg, prefix) < 0)
+        eprintf("net_add_addr:");
       i++;
     }
   }
 
   free(ifaces);
-  close(sock);
 
   if (fshut(stdin, "<stdin>") | fshut(stdout, "<stdout>"))
     return 1;

@@ -10,20 +10,110 @@ import (
 )
 
 var xrefPattern = regexp.MustCompile(`^\s*([A-Za-z0-9][A-Za-z0-9+_.-]*)\((\d+[A-Za-z]*)\)\s*$`)
-var groupPattern = regexp.MustCompile(`\{([A-Za-z0-9_-]+)\}`)
+var groupPattern = regexp.MustCompile(`\{[A-Za-z][A-Za-z0-9_-]*\}`)
+var macroNamePattern = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*$`)
+var manNamePattern = regexp.MustCompile(`^[A-Za-z0-9][A-Za-z0-9+_.-]*$`)
 
 func parseNameSummary(line string) (string, string, bool) {
 	line = strings.TrimSpace(line)
-	if idx := strings.Index(line, ":"); idx >= 0 {
-		return strings.TrimSpace(line[:idx]), strings.TrimSpace(line[idx+1:]), true
+	idx := strings.IndexByte(line, ':')
+	if idx < 0 {
+		return "", "", false
 	}
-	if idx := strings.Index(line, " \\- "); idx >= 0 {
-		return strings.TrimSpace(line[:idx]), strings.TrimSpace(line[idx+4:]), true
+	return strings.TrimSpace(line[:idx]), strings.TrimSpace(line[idx+1:]), true
+}
+
+func parseConditional(directive string, cfg Config, stack *ifStack, lineNo int) error {
+	name := directive
+	if fields := strings.Fields(directive); len(fields) != 0 {
+		name = fields[0]
 	}
-	if idx := strings.Index(line, " - "); idx >= 0 {
-		return strings.TrimSpace(line[:idx]), strings.TrimSpace(line[idx+3:]), true
+
+	switch name {
+	case "if", "ifdef", "ifndef", "elif", "else", "endif":
+	default:
+		if strings.HasPrefix(name, "if") || strings.HasPrefix(name, "elif") ||
+			strings.HasPrefix(name, "else") || strings.HasPrefix(name, "endif") {
+			return fmt.Errorf("line %d: unsupported preprocessor conditional %q", lineNo, directive)
+		}
+		return nil
 	}
-	return "", "", false
+
+	switch name {
+	case "if":
+		if !strings.HasPrefix(directive, "if ") {
+			return fmt.Errorf("line %d: malformed #if directive", lineNo)
+		}
+		result, err := evalCondition(strings.TrimSpace(directive[3:]), cfg)
+		if err != nil {
+			return fmt.Errorf("line %d: %w", lineNo, err)
+		}
+		pa := stack.parentActive()
+		stack.push(pa && result, result)
+	case "ifdef", "ifndef":
+		prefix := name + " "
+		if !strings.HasPrefix(directive, prefix) {
+			return fmt.Errorf("line %d: malformed #%s directive", lineNo, name)
+		}
+		key := strings.TrimSpace(directive[len(prefix):])
+		if !macroNamePattern.MatchString(key) {
+			return fmt.Errorf("line %d: invalid macro name %q", lineNo, key)
+		}
+		if err := validateConditionalName(key); err != nil {
+			return fmt.Errorf("line %d: %w", lineNo, err)
+		}
+		_, defined := cfg[key]
+		result := defined
+		if name == "ifndef" {
+			result = !result
+		}
+		pa := stack.parentActive()
+		stack.push(pa && result, result)
+	case "else":
+		if directive != "else" {
+			return fmt.Errorf("line %d: malformed #else directive", lineNo)
+		}
+		top := stack.top()
+		if top == nil {
+			return fmt.Errorf("line %d: #else without #if", lineNo)
+		}
+		if top.elseSeen {
+			return fmt.Errorf("line %d: duplicate #else", lineNo)
+		}
+		pa := stack.parentActive()
+		top.active = pa && !top.seen
+		top.seen = true
+		top.elseSeen = true
+	case "elif":
+		if !strings.HasPrefix(directive, "elif ") {
+			return fmt.Errorf("line %d: malformed #elif directive", lineNo)
+		}
+		top := stack.top()
+		if top == nil {
+			return fmt.Errorf("line %d: #elif without #if", lineNo)
+		}
+		if top.elseSeen {
+			return fmt.Errorf("line %d: #elif after #else", lineNo)
+		}
+		result, err := evalCondition(strings.TrimSpace(directive[5:]), cfg)
+		if err != nil {
+			return fmt.Errorf("line %d: %w", lineNo, err)
+		}
+		pa := stack.parentActive()
+		top.active = pa && !top.seen && result
+		if result {
+			top.seen = true
+		}
+	case "endif":
+		if directive != "endif" {
+			return fmt.Errorf("line %d: malformed #endif directive", lineNo)
+		}
+		if stack.top() == nil {
+			return fmt.Errorf("line %d: #endif without #if", lineNo)
+		}
+		stack.pop()
+	}
+	return nil
 }
 
 func extractManLines(path string, cfg Config) ([]string, error) {
@@ -38,7 +128,9 @@ func extractManLines(path string, cfg Config) ([]string, error) {
 	sc.Buffer(make([]byte, 1<<20), 1<<20)
 	inBlockComment := false
 
+	lineNo := 0
 	for sc.Scan() {
+		lineNo++
 		line := sc.Text()
 		trimmed := strings.TrimSpace(line)
 
@@ -75,40 +167,8 @@ func extractManLines(path string, cfg Config) ([]string, error) {
 			}
 			directive = strings.TrimSpace(directive)
 
-			switch {
-			case strings.HasPrefix(directive, "ifdef "):
-				key := strings.TrimSpace(directive[6:])
-				_, defined := cfg[key]
-				pa := stack.parentActive()
-				stack.push(pa && defined, defined)
-			case strings.HasPrefix(directive, "ifndef "):
-				key := strings.TrimSpace(directive[7:])
-				_, defined := cfg[key]
-				pa := stack.parentActive()
-				stack.push(pa && !defined, !defined)
-			case strings.HasPrefix(directive, "if "):
-				expr := strings.TrimSpace(directive[3:])
-				result := evalCondition(expr, cfg)
-				pa := stack.parentActive()
-				stack.push(pa && result, result)
-			case directive == "else":
-				if top := stack.top(); top != nil {
-					pa := stack.parentActive()
-					top.active = pa && !top.seen
-					top.seen = true
-				}
-			case strings.HasPrefix(directive, "elif "):
-				if top := stack.top(); top != nil {
-					expr := strings.TrimSpace(directive[5:])
-					result := evalCondition(expr, cfg)
-					pa := stack.parentActive()
-					top.active = pa && !top.seen && result
-					if result {
-						top.seen = true
-					}
-				}
-			case directive == "endif":
-				stack.pop()
+			if err := parseConditional(directive, cfg, stack, lineNo); err != nil {
+				return nil, err
 			}
 			continue
 		}
@@ -136,6 +196,12 @@ func extractManLines(path string, cfg Config) ([]string, error) {
 
 	if err := sc.Err(); err != nil {
 		return nil, err
+	}
+	if inBlockComment {
+		return nil, fmt.Errorf("unterminated man comment")
+	}
+	if len(stack.frames) != 0 {
+		return nil, fmt.Errorf("unterminated preprocessor conditional")
 	}
 	return lines, nil
 }
@@ -165,7 +231,7 @@ func ParsePage(path string, cfg Config, section int, date string) (*Page, error)
 	var fallbackArgs string
 	var rawOptions []rawOption
 	var currentOption *rawOption
-	optionIndex := make(map[string]int)
+	optionNames := make(map[string]bool)
 
 	for _, raw := range lines {
 		line := strings.TrimSpace(raw)
@@ -182,6 +248,9 @@ func ParsePage(path string, cfg Config, section int, date string) (*Page, error)
 
 		if page.Name == "" && !strings.HasPrefix(line, "-") && !strings.HasPrefix(line, "#") {
 			if name, summary, ok := parseNameSummary(line); ok {
+				if !manNamePattern.MatchString(name) || summary == "" {
+					return nil, fmt.Errorf("malformed command metadata %q", line)
+				}
 				page.Name = name
 				page.Summary = summary
 				sawContent = true
@@ -190,18 +259,28 @@ func ParsePage(path string, cfg Config, section int, date string) (*Page, error)
 		}
 
 		lower := strings.ToLower(line)
+		if lower == "synopsis" || lower == "arguments" {
+			return nil, fmt.Errorf("invalid synopsis metadata %q", line)
+		}
 		switch {
 		case strings.HasPrefix(lower, "synopsis:"):
 			currentOption = nil
 			form := strings.TrimSpace(line[len("synopsis:"):])
 			if form != "" {
-				page.Synopsis = append(page.Synopsis, parseSynopsis(form, true))
+				synopsis, err := parseSynopsis(form, true)
+				if err != nil {
+					return nil, fmt.Errorf("invalid synopsis metadata: %w", err)
+				}
+				page.Synopsis = append(page.Synopsis, synopsis)
 			}
 			sawContent = true
 			continue
 		case strings.HasPrefix(lower, "arguments:"):
 			currentOption = nil
 			fallbackArgs = strings.TrimSpace(line[len("arguments:"):])
+			if fallbackArgs == "" {
+				return nil, fmt.Errorf("invalid synopsis metadata: empty arguments")
+			}
 			sawContent = true
 			continue
 		case strings.HasPrefix(line, "## "):
@@ -214,7 +293,16 @@ func ParsePage(path string, cfg Config, section int, date string) (*Page, error)
 		}
 
 		if currentSection == nil {
-			if opt, ok := parseOption(line); ok {
+			if strings.HasPrefix(line, "-") {
+				opt, err := parseOption(line)
+				if err != nil {
+					return nil, err
+				}
+				name := optionIdentity(opt)
+				if optionNames[name] {
+					return nil, fmt.Errorf("duplicate option %q", name)
+				}
+				optionNames[name] = true
 				rawOptions = append(rawOptions, rawOption{
 					Option: opt,
 					Lines:  []string{opt.Desc},
@@ -235,19 +323,53 @@ func ParsePage(path string, cfg Config, section int, date string) (*Page, error)
 		sawContent = true
 	}
 
-	if !sawContent || page.Name == "" {
+	if !sawContent {
 		return nil, nil
+	}
+	if page.Name == "" {
+		return nil, fmt.Errorf("first man comment must be NAME: SUMMARY")
+	}
+
+	groupMembers := make(map[string]int)
+	groupRequired := make(map[string]int)
+	for _, raw := range rawOptions {
+		option := raw.Option
+		if option.Group == "" {
+			continue
+		}
+		groupMembers[option.Group]++
+		required := 0
+		if option.Required {
+			required = 1
+		}
+		if groupRequired[option.Group] != 0 && groupRequired[option.Group] != required {
+			groupRequired[option.Group] = -1
+		} else if groupRequired[option.Group] == 0 {
+			groupRequired[option.Group] = required
+		}
+	}
+	for name, count := range groupMembers {
+		if count < 2 {
+			return nil, fmt.Errorf("mutual exclusion group %q has one option", name)
+		}
+		if groupRequired[name] < 0 {
+			return nil, fmt.Errorf("mutual exclusion group %q mixes required and optional options", name)
+		}
 	}
 
 	// explicit synopsis forms are authoritative. for simple pages we can produce
 	// a synopsis from the parsed option specs plus the arguments line
 	for _, raw := range rawOptions {
 		raw.Option.Body = parseBlocks(raw.Lines, "")
-		addOption(page, optionIndex, raw.Option)
+		page.Options = append(page.Options, raw.Option)
 	}
 
 	if len(page.Synopsis) == 0 && fallbackArgs != "" {
-		page.Synopsis = append(page.Synopsis, synthesizeSynopsis(page.Options, fallbackArgs))
+		synopsis, err := synthesizeSynopsis(page.Options, fallbackArgs)
+		if err != nil {
+			return nil, fmt.Errorf("invalid synopsis metadata: %w", err)
+		}
+		page.Synopsis = append(page.Synopsis, synopsis)
 	}
 
 	page.Description = parseBlocks(descriptionLines, "")
@@ -272,79 +394,111 @@ type rawOption struct {
 	Lines  []string
 }
 
-func parseOption(line string) (Option, bool) {
-	if !strings.HasPrefix(line, "-") {
-		return Option{}, false
-	}
+var optionFlagPattern = regexp.MustCompile(`^(?:--|--?[A-Za-z0-9?][A-Za-z0-9?-]*)$`)
+var optionTypePattern = regexp.MustCompile(`^[A-Za-z][A-Za-z0-9_-]*$`)
 
+func parseOption(line string) (Option, error) {
 	parts := strings.Split(line, ":")
 	if len(parts) < 2 {
-		return Option{}, false
+		return Option{}, fmt.Errorf("malformed option %q: missing type separator", line)
+	}
+
+	if len(parts) > 2 && strings.TrimSpace(parts[1]) == "" {
+		return Option{}, fmt.Errorf("malformed option %q: empty type", line)
 	}
 
 	specParts := []string{strings.TrimSpace(parts[0])}
-	i := 1
-	for i < len(parts)-1 {
-		part := strings.TrimSpace(parts[i])
+	descriptionAt := 1
+	for descriptionAt < len(parts)-1 {
+		part := strings.TrimSpace(parts[descriptionAt])
 		if !looksLikeOptionArg(part) {
 			break
 		}
 		specParts = append(specParts, part)
-		i++
+		descriptionAt++
+	}
+	if len(specParts) > 2 {
+		return Option{}, fmt.Errorf("malformed option %q: expected at most one type", line)
 	}
 
-	desc := strings.TrimSpace(strings.Join(parts[i:], ":"))
-	flag, typ, group, required := splitOptionSpec(strings.Join(specParts, ":"))
-	if flag == "" {
-		return Option{}, false
+	description := strings.TrimSpace(strings.Join(parts[descriptionAt:], ":"))
+	spec := strings.Join(specParts, ":")
+	flag, typ, group, required, err := splitOptionSpec(spec)
+	if err != nil {
+		return Option{}, fmt.Errorf("malformed option %q: %w", line, err)
+	}
+	if !optionFlagPattern.MatchString(flag) {
+		return Option{}, fmt.Errorf("malformed option %q: invalid flag", line)
+	}
+	if typ != "" && !optionTypePattern.MatchString(typ) {
+		return Option{}, fmt.Errorf("malformed option %q: invalid type %q", line, typ)
 	}
 
 	rawSpec := flag
 	if typ != "" {
 		rawSpec += " " + typ
 	}
-	spec := normalizeOptionSpec(rawSpec)
-	desc = stripRepeatedSpec(spec, desc)
-	if spec == "" || desc == "" {
-		return Option{}, false
+	normalized := normalizeOptionSpec(rawSpec)
+	description = stripRepeatedSpec(normalized, description)
+	if description == "" {
+		return Option{}, fmt.Errorf("malformed option %q: missing description", line)
+	}
+	items, err := parseSynopsis(normalized, false)
+	if err != nil {
+		return Option{}, fmt.Errorf("malformed option %q: %w", line, err)
+	}
+	if len(items.Items) == 0 {
+		return Option{}, fmt.Errorf("malformed option %q: empty synopsis", line)
 	}
 
 	return Option{
-		Spec:     parseSynopsis(spec, false).Items,
-		Desc:     desc,
-		Key:      synopsisKey(spec) + "\x00" + group,
+		Spec:     items.Items,
+		Desc:     description,
+		Key:      synopsisKey(normalized) + "\x00" + group,
 		Group:    group,
 		Required: required,
-	}, true
+	}, nil
 }
 
-// splitoptionspec peels the required marker (!) and the mutual exclusion
-// group marker ({name}) off a raw option spec, leaving the bare flag and
-// its optional colon-delimited type suffix
-func splitOptionSpec(raw string) (flag, typ, group string, required bool) {
+func splitOptionSpec(raw string) (flag, typ, group string, required bool, err error) {
 	raw = strings.TrimSpace(raw)
+	if strings.Count(raw, "!") > 1 {
+		return "", "", "", false, fmt.Errorf("duplicate required marker")
+	}
 	if strings.HasSuffix(raw, "!") {
 		required = true
-		raw = raw[:len(raw)-1]
+		raw = strings.TrimSpace(raw[:len(raw)-1])
+	} else if strings.Contains(raw, "!") {
+		return "", "", "", false, fmt.Errorf("misplaced required marker")
 	}
-	if m := groupPattern.FindStringSubmatchIndex(raw); m != nil {
-		group = raw[m[2]:m[3]]
-		raw = raw[:m[0]] + raw[m[1]:]
+
+	matches := groupPattern.FindAllStringIndex(raw, -1)
+	if strings.ContainsAny(raw, "{}") {
+		if len(matches) != 1 {
+			return "", "", "", false, fmt.Errorf("invalid mutual exclusion group")
+		}
+		start, end := matches[0][0], matches[0][1]
+		if start == 0 || (end != len(raw) && !strings.HasPrefix(raw[end:], ":")) {
+			return "", "", "", false, fmt.Errorf("misplaced mutual exclusion group")
+		}
+		group = raw[start+1 : end-1]
+		raw = raw[:start] + raw[end:]
 	}
-	if idx := strings.Index(raw, ":"); idx >= 0 {
-		flag = raw[:idx]
-		typ = raw[idx+1:]
+
+	if strings.Count(raw, ":") > 1 {
+		return "", "", "", false, fmt.Errorf("more than one type suffix")
+	}
+	if idx := strings.IndexByte(raw, ':'); idx >= 0 {
+		flag = strings.TrimSpace(raw[:idx])
+		typ = strings.TrimSpace(raw[idx+1:])
 	} else {
-		flag = raw
+		flag = strings.TrimSpace(raw)
 	}
-	return flag, typ, group, required
+	return flag, typ, group, required, nil
 }
 
 func looksLikeOptionArg(s string) bool {
-	if s == "" {
-		return false
-	}
-	return !strings.ContainsAny(s, " \t")
+	return s != "" && !strings.ContainsAny(s, " \t")
 }
 
 func normalizeOptionSpec(spec string) string {
@@ -384,49 +538,14 @@ func stripRepeatedSpec(spec, desc string) string {
 	return desc
 }
 
-func addOption(page *Page, index map[string]int, opt Option) {
-	if idx, ok := index[opt.Key]; ok {
-		if betterOptionDesc(opt.Desc, page.Options[idx].Desc) {
-			page.Options[idx].Desc = opt.Desc
-			page.Options[idx].Spec = opt.Spec
-			page.Options[idx].Body = opt.Body
-		}
-		return
-	}
-
-	primary := optionPrimaryFlag(opt)
-	if primary != "" {
-		for idx, existing := range page.Options {
-			if optionPrimaryFlag(existing) != primary {
-				continue
-			}
-			if betterOptionDesc(opt.Desc, existing.Desc) {
-				page.Options[idx].Desc = opt.Desc
-				page.Options[idx].Spec = opt.Spec
-				page.Options[idx].Body = opt.Body
-				delete(index, existing.Key)
-				index[opt.Key] = idx
-			}
-			return
+func optionIdentity(opt Option) string {
+	parts := make([]string, 0, len(opt.Spec))
+	for _, item := range opt.Spec {
+		if item.Kind == SynFlag {
+			parts = append(parts, item.Text)
 		}
 	}
-
-	index[opt.Key] = len(page.Options)
-	page.Options = append(page.Options, opt)
-}
-
-func betterOptionDesc(newDesc, oldDesc string) bool {
-	return optionDescScore(newDesc) > optionDescScore(oldDesc)
-}
-
-func optionDescScore(desc string) int {
-	desc = strings.TrimSpace(desc)
-	score := len(desc)
-	lower := strings.ToLower(desc)
-	if strings.HasPrefix(lower, "specify ") && strings.HasSuffix(lower, " option") {
-		score -= 1000
-	}
-	return score
+	return strings.Join(parts, "\x00")
 }
 
 func optionPrimaryFlag(opt Option) string {
@@ -554,8 +673,8 @@ func parseSubsections(lines []string, title string) ([]Block, bool) {
 			lines = lines[1:]
 		}
 		blocks = append(blocks, Block{
-			Kind:  BlockSubsection,
-			Title: subtitle,
+			Kind:   BlockSubsection,
+			Title:  subtitle,
 			Blocks: parseBlocks(body, subtitle),
 		})
 	}
@@ -746,7 +865,7 @@ func classifyInlineLiteral(s string) Inline {
 	return Inline{Kind: InlineLiteral, Text: s}
 }
 
-func synthesizeSynopsis(options []Option, args string) SynopsisForm {
+func synthesizeSynopsis(options []Option, args string) (SynopsisForm, error) {
 	type unit struct {
 		sortKey string
 		items   []SynopsisItem
@@ -816,8 +935,12 @@ func synthesizeSynopsis(options []Option, args string) SynopsisForm {
 	for _, u := range units {
 		items = append(items, u.items...)
 	}
-	items = append(items, parseSynopsis(args, false).Items...)
-	return SynopsisForm{Items: items}
+	argsSynopsis, err := parseSynopsis(args, false)
+	if err != nil {
+		return SynopsisForm{}, err
+	}
+	items = append(items, argsSynopsis.Items...)
+	return SynopsisForm{Items: items}, nil
 }
 
 func optionSortKey(opt Option) string {
@@ -875,10 +998,22 @@ func parseXRefs(s string) ([]XRef, bool) {
 	return refs, len(refs) != 0
 }
 
-func parseSynopsis(raw string, explicit bool) SynopsisForm {
+func parseSynopsis(raw string, explicit bool) (SynopsisForm, error) {
 	tokens := tokenizeSynopsis(raw)
-	items, _ := parseSynopsisSeq(tokens, 0, explicit, true)
-	return SynopsisForm{Items: items}
+	if len(tokens) == 0 {
+		return SynopsisForm{}, nil
+	}
+	items, next, closer, err := parseSynopsisSeq(tokens, 0, explicit, true)
+	if err != nil {
+		return SynopsisForm{}, err
+	}
+	if closer != "" {
+		return SynopsisForm{}, fmt.Errorf("unexpected %q", closer)
+	}
+	if next != len(tokens) {
+		return SynopsisForm{}, fmt.Errorf("unclosed %q", tokens[next])
+	}
+	return SynopsisForm{Items: items}, nil
 }
 
 func tokenizeSynopsis(raw string) []string {
@@ -907,43 +1042,84 @@ func tokenizeSynopsis(raw string) []string {
 	return tokens
 }
 
-func parseSynopsisSeq(tokens []string, start int, explicit bool, topLevel bool) ([]SynopsisItem, int) {
+func parseSynopsisSeq(tokens []string, start int, explicit bool, topLevel bool) ([]SynopsisItem, int, string, error) {
 	var items []SynopsisItem
 	seenNonFlag := false
 
 	for i := start; i < len(tokens); i++ {
 		switch tokens[i] {
 		case "]", "}":
-			return items, i
-		case "[":
-			children, end := parseSynopsisSeq(tokens, i+1, explicit, false)
-			items = append(items, SynopsisItem{Kind: SynOptional, Children: children})
-			i = end
-		case "{":
-			children, end := parseSynopsisSeq(tokens, i+1, explicit, false)
-			items = append(items, SynopsisItem{Kind: SynRequiredGroup, Children: children})
-			i = end
+			if len(items) == 0 {
+				return nil, i, tokens[i], fmt.Errorf("empty group")
+			}
+			return items, i, tokens[i], nil
+		case "[", "{":
+			open := tokens[i]
+			children, next, closer, err := parseSynopsisSeq(tokens, i+1, explicit, false)
+			if err != nil {
+				return nil, next, closer, err
+			}
+			if closer == "" {
+				return nil, next, closer, fmt.Errorf("unclosed %q", open)
+			}
+			expected := "]"
+			kind := SynOptional
+			if open == "{" {
+				expected = "}"
+				kind = SynRequiredGroup
+			}
+			if closer != expected {
+				return nil, next, closer, fmt.Errorf("mismatched %q and %q", open, closer)
+			}
+			items = append(items, SynopsisItem{Kind: kind, Children: children})
+			i = next
 		case "|":
+			if i+1 >= len(tokens) || tokens[i+1] == "|" || tokens[i+1] == "]" || tokens[i+1] == "}" {
+				return nil, i, "", fmt.Errorf("misplaced |")
+			}
+			if i != start {
+				previous := tokens[i-1]
+				if previous == "|" || previous == "[" || previous == "{" {
+					return nil, i, "", fmt.Errorf("misplaced |")
+				}
+			} else if !topLevel {
+				return nil, i, "", fmt.Errorf("misplaced |")
+			}
 			items = append(items, SynopsisItem{Kind: SynPipe, Text: "|"})
 		default:
+			if err := validateSynopsisToken(tokens[i]); err != nil {
+				return nil, i, "", err
+			}
 			if flags, ok := splitGroupedFlags(tokens[i]); ok {
 				items = append(items, flags...)
 				continue
 			}
 			kind := classifySynopsisToken(tokens, i, explicit, topLevel, seenNonFlag)
-			text := tokens[i]
-			if text == "..." && len(items) != 0 {
+			if tokens[i] == "..." {
+				if len(items) == 0 {
+					return nil, i, "", fmt.Errorf("misplaced ...")
+				}
 				items[len(items)-1].Text += " ..."
 				continue
 			}
-			items = append(items, SynopsisItem{Kind: kind, Text: text})
+			items = append(items, SynopsisItem{Kind: kind, Text: tokens[i]})
 			if kind != SynFlag && kind != SynPipe {
 				seenNonFlag = true
 			}
 		}
 	}
 
-	return items, len(tokens)
+	return items, len(tokens), "", nil
+}
+
+func validateSynopsisToken(token string) error {
+	if strings.HasPrefix(token, "<") && (!strings.HasSuffix(token, ">") || token == "<>") {
+		return fmt.Errorf("malformed angle placeholder %q", token)
+	}
+	if strings.HasSuffix(token, ">") && !strings.HasPrefix(token, "<") {
+		return fmt.Errorf("malformed angle placeholder %q", token)
+	}
+	return nil
 }
 
 func splitGroupedFlags(tok string) ([]SynopsisItem, bool) {

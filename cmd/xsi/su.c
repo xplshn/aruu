@@ -1,4 +1,8 @@
 /* see LICENSE file for copyright and license details */
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+
 #include "passwd.h"
 #include "util.h"
 #include "wexec.h"

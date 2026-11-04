@@ -1,5 +1,10 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_CASEFOLD
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include "config.h"
 #include "util.h"
 #include "wexec.h"
@@ -1022,13 +1027,13 @@ parse(int argc, char **argv)
       default:
         /* this expression can be simplified, but i decided copy
  * the verbage from the wikipedia page in order to more
- * clearly explain what's going on */
+ * clearly explain whats going on */
         while (top-- > stack
                && ((tok->u.oinfo->lassoc && tok->u.oinfo->prec <= (*top)->u.oinfo->prec)
                    || (!tok->u.oinfo->lassoc && tok->u.oinfo->prec < (*top)->u.oinfo->prec)))
           *out++ = **top;
 
-        /* top now points to either an operator we didn't pop,
+        /* top now points to either an operator we didnt pop,
  * or stack[-1] either way we need to increment it
  * before using it, then increment again so the stack
  * works */

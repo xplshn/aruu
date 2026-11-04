@@ -1,4 +1,9 @@
 /* see LICENSE file for copyright and license details */
+#if FEATURE_DIFF_EXT
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include "paths.h"
 #include "util.h"
 #include "wexec.h"
@@ -404,13 +409,7 @@ stop_pr(struct Pr *pr)
 
 // ?man diff: differential file and directory comparator
 // ?man arguments: file1 file2
-// ?man synopsis: [-aBbdipTtw] [-c|-e|-f|-n|-q|-u|-y] [-A algo] [--brief]
-// [--color=when] [--changed-group-format GFMT] [--ed] [--expand-tabs]
-// [--forward-ed] [--ignore-all-space] [--ignore-case] [--ignore-space-change]
-// [--initial-tab] [--minimal] [--no-dereference] [--no-ignore-file-name-case]
-// [--normal] [--rcs] [--show-c-function] [--starting-file]
-// [--speed-large-files] [--strip-trailing-cr] [--tabsize number] [--text] [-I
-// pattern] [-F pattern] [-L label] file1 file2
+// ?man synopsis: [-aBbdipTtw] [-c|-e|-f|-n|-q|-u|-y] [-A algo] [--brief] [--color=when] [--changed-group-format GFMT] [--ed] [--expand-tabs] [--forward-ed] [--ignore-all-space] [--ignore-case] [--ignore-space-change] [--initial-tab] [--minimal] [--no-dereference] [--no-ignore-file-name-case] [--normal] [--rcs] [--show-c-function] [--starting-file] [--speed-large-files] [--strip-trailing-cr] [--tabsize number] [--text] [-I pattern] [-F pattern] [-L label] file1 file2
 int
 main(int argc, char **argv)
 {

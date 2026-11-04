@@ -1,5 +1,13 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_TOUCH_EXT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+#endif
 #include <sys/stat.h>
 
 #include <errno.h>

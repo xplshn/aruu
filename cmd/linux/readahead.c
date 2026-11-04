@@ -1,5 +1,13 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_LINUX_READAHEAD
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>

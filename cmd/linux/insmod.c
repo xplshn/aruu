@@ -1,4 +1,9 @@
 
+#if FEATURE_LINUX_SYSCALL
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include <sys/stat.h>
 #include <sys/syscall.h>
 

@@ -27,14 +27,12 @@ dropinit(int fd, const char *fname, size_t count)
   count--; /* numbering starts at 1 */
   while (count && (n = read(fd, buf, sizeof(buf))) > 0) {
     switch (mode) {
-        // ?man -n: print line numbers or counts
       case 'n': /* lines */
         for (p = buf; count && n > 0; p++, n--) {
           if (*p == '\n')
             count--;
         }
         break;
-        // ?man -c: print count or perform stdout action
       case 'c': /* bytes */
         if (count > (size_t)n) {
           count -= n;
@@ -44,7 +42,6 @@ dropinit(int fd, const char *fname, size_t count)
           count = 0;
         }
         break;
-        // ?man -m: specify mode or limit
       case 'm': /* runes */
         for (p = buf; count && n > 0; p += nr, n -= nr, count--) {
           nr = charntorune(&r, p, n);
@@ -106,7 +103,6 @@ taketail(int fd, const char *fname, size_t count)
       break;
     len += n;
     switch (mode) {
-        // ?man -n: print line numbers or counts
       case 'n': /* lines */
         /* ignore the last character; if it is a newline, it
  * ends the last line */
@@ -120,11 +116,9 @@ taketail(int fd, const char *fname, size_t count)
           }
         }
         break;
-        // ?man -c: print count or perform stdout action
       case 'c': /* bytes */
         p = count < len ? buf + len - count : buf;
         break;
-        // ?man -m: specify mode or limit
       case 'm': /* runes */
         for (p = buf + len - 1, left = count; p >= buf; p--) {
           /* skip utf-8 continuation bytes */

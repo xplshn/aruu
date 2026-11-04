@@ -1,5 +1,13 @@
 /* see LICENSE file for copyright and license details */
 
+#if FEATURE_SWITCH_ROOT_EXT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+#endif
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <sys/vfs.h>
@@ -13,6 +21,7 @@
 #include <unistd.h>
 
 #include "util.h"
+#include "wexec.h"
 
 #define RAMFS_MAGIC 0x858458f6 /* some random number */
 #define TMPFS_MAGIC 0x01021994
@@ -131,7 +140,7 @@ main(int argc, char *argv[])
   }
 
   /* execute init */
-  execv(argv[1], argv);
+  wexecv_self(argv[1], argv);
   eprintf("can't execute '%s':", argv[1]);
   return 1;
 }

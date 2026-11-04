@@ -27,8 +27,15 @@
 #endif
 
 #define DEBUG
+#if FEATURE_AWK_RANDOM
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
 #include "awk.h"
 #include "awkgram.tab.h"
+#include "wexec.h"
+
 #include <ctype.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -2180,7 +2187,6 @@ bltin(Node **a, int n) /* builtin functions. a[0] is type, a[1] is arg list */
   char    *buf;
   Node    *nextarg;
   FILE    *fp;
-  int      status  = 0;
   int      estatus = 0;
 
   t       = ptoi(a[0]);
@@ -2224,20 +2230,7 @@ bltin(Node **a, int n) /* builtin functions. a[0] is type, a[1] is arg list */
       break;
     case FSYSTEM:
       fflush(stdout); /* in case something is buffered already */
-      estatus = status = system(getsval(x));
-      if (status != -1) {
-        if (WIFEXITED(status)) {
-          estatus = WEXITSTATUS(status);
-        } else if (WIFSIGNALED(status)) {
-          estatus = WTERMSIG(status) + 256;
-#ifdef WCOREDUMP
-          if (WCOREDUMP(status))
-            estatus += 256;
-#endif
-        } else /* something else?!? */
-          estatus = 0;
-      }
-      /* else estatus was set to -1 */
+      estatus = wsystem(getsval(x));
       u = estatus;
       break;
     case FRAND:
@@ -2391,7 +2384,7 @@ openfile(int a, const char *us, bool *pnewflag)
         *pnewflag = false;
       return files[i].fp;
     }
-  if (a == FFLUSH) /* didn't find it, so dont create it! */
+  if (a == FFLUSH) /* didnt find it, so dont create it! */
     return NULL;
   for (i = 0; i < nfiles; i++)
     if (files[i].fp == NULL)
@@ -2421,9 +2414,9 @@ openfile(int a, const char *us, bool *pnewflag)
     fp = fopen(s, "a");
     m  = GT;             /* so can mix > and >> */
   } else if (a == '|') { /* output pipe */
-    fp = popen(s, "w");
+    fp = wpopen(s, NULL, "w");
   } else if (a == LE) { /* input pipe */
-    fp = popen(s, "r");
+    fp = wpopen(s, NULL, "r");
   } else if (a == LT) {                               /* getline <file */
     fp = strcmp(s, "-") == 0 ? stdin : fopen(s, "r"); /* "-" is stdin */
   } else                                              /* cant happen */
@@ -2475,7 +2468,7 @@ closefile(Node **a, int n)
     if (files[i].fp == stdin || files[i].fp == stdout || files[i].fp == stderr)
       stat = freopen("/dev/null", "r+", files[i].fp) == NULL;
     else if (files[i].mode == '|' || files[i].mode == LE)
-      stat = pclose(files[i].fp) == -1;
+      stat = wpclose(files[i].fp) == -1;
     else
       stat = fclose(files[i].fp) == EOF;
     if (stat)
@@ -2511,7 +2504,7 @@ closeall(void)
     if (files[i].fp == stdin || files[i].fp == stdout || files[i].fp == stderr)
       continue;
     if (files[i].mode == '|' || files[i].mode == LE)
-      stat = pclose(files[i].fp) == -1;
+      stat = wpclose(files[i].fp) == -1;
     else
       stat = fclose(files[i].fp) == EOF;
     if (stat)

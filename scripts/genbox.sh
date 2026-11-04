@@ -1,9 +1,8 @@
 #!/bin/sh
 # genbox.sh - generate the aruu-box dispatch table
 #
-# does one thing: given a list of object file paths on argv, each one
-# of BOX_OBJ's own outputs (".box/cmd/<category>/<tool>.o"), emit the c
-# source for aruu-box's dispatch table and main() on stdout
+# given the BOX_OBJ output paths (".box/cmd/<category>/<tool>.o") on
+# argv, print the c source of the dispatch table and main() on stdout
 #
 set -e
 
@@ -12,11 +11,9 @@ set -e
         exit 1
 }
 
-# derive category, tool basestem, and c symbol from one BOX_OBJ output
-# path. the symbol transform (tr '.-' '__', append _main) must match
-# BOX_OBJ's own objcopy step exactly, see the CATEGORY_OF/symbol
-# comment in ninqu.rules for why this is a shell transform and not a
-# map
+# derive category, tool and c symbol from one BOX_OBJ output path. the
+# transform (tr '.-' '__', append _main) must match the BOX_OBJ objcopy
+# step, see the CATEGORY_OF comment in ninqu.rules
 path_category() {
         rest=${1#.box/cmd/}
         printf "%s\n" "${rest%%/*}"
@@ -45,8 +42,8 @@ cat << 'HEAD'
 
 HEAD
 
-# extern decls, in the order ninqu passed the objects in (BOX_OBJ's
-# own glob order, one category at a time)
+# extern decls, in the order ninqu passed the objects in (BOX_OBJ glob
+# order, one category at a time)
 for obj in "$@"; do
         sym=$(path_symbol "$obj")
         echo "int ${sym}(int, char **);"
@@ -77,6 +74,10 @@ for category in $categories; do
                 printf '\t{ "%s", %s, "%s" },\n' "$tool" "$sym" "$category"
                 if [ "$tool" = "test" ]; then
                         printf '\t{ "[", %s, "%s" },\n' "$sym" "$category"
+                fi
+                if [ "$tool" = "grep" ]; then
+                        printf '\t{ "egrep", %s, "%s" },\n' "$sym" "$category"
+                        printf '\t{ "fgrep", %s, "%s" },\n' "$sym" "$category"
                 fi
         done
 done
@@ -141,6 +142,7 @@ main(int argc, char *argv[])
 {
         struct Cmd *c;
         char *s;
+        int dash;
 
         argv0 = argv[0];
 
@@ -170,10 +172,18 @@ main(int argc, char *argv[])
                 else
                         s = argv[0];
         }
+        /* login exec's a shell with a '-' prefixed to argv[0]; match the
+           applet without it, and leave argv[0] alone so the applet can
+           still see it was invoked as a login shell */
+        dash = (*s == '-');
+        if (dash)
+                s++;
+
         for (c = cmds; c->name; c++) {
                 if (strcmp(c->name, s) == 0) {
                         argv0 = (char *)c->name;
-                        argv[0] = (char *)c->name;
+                        if (!dash)
+                                argv[0] = (char *)c->name;
                         return c->fn(argc, argv);
                 }
         }

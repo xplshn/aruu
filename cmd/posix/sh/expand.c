@@ -36,6 +36,14 @@
  * SUCH DAMAGE
  */
 
+#if FEATURE_SH_EXT
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#endif
 #include <dirent.h>
 #include <errno.h>
 #include <inttypes.h>
@@ -1078,7 +1086,7 @@ expmeta(char *enddir, char *name, struct arglist *arglist)
       }
     }
   }
-  if (metaflag == 0) { /* we've reached the end of the file name */
+  if (metaflag == 0) { /* we have reached the end of the file name */
     if (enddir != expdir)
       metaflag++;
     for (p = name;; p++) {

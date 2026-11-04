@@ -1,5 +1,11 @@
 /* sdhcp: simple DHCP client, ported from git.2f30.org/sdhcp */
 /* see LICENSE file for copyright and license details */
+#if FEATURE_NET_IOCTL
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#endif
+
 #include "arg.h"
 #include "util.h"
 #include "wexec.h"
@@ -405,7 +411,8 @@ calctimeout(int n, struct itimerspec *ts)
 static void
 run(void)
 {
-  int               forked  = 0, t;
+  int               forked = 0, t;
+  pid_t             pid;
   struct itimerspec timeout = {0};
   uint32_t          renewaltime, rebindingtime, lease;
 
@@ -460,7 +467,10 @@ Bound:
   acceptlease();
   puts("Bound. Network configured.");
   if (!fflag && !forked) {
-    if (fork())
+    pid = fork();
+    if (pid < 0)
+      eprintf("fork:");
+    if (pid > 0)
       exit(0);
     forked = 1;
   }

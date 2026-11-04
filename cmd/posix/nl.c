@@ -71,7 +71,6 @@ nl(const char *fname, FILE *fp)
         if (line.data[0] != '\n')
           donumber = 1;
         break;
-        // ?man -p: preserve file attributes
       case 'p':
         if (!regexec(preg + section, line.data, 0, NULL, 0))
           donumber = 1;
