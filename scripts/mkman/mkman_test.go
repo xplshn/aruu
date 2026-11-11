@@ -155,6 +155,28 @@ func TestParsePageRejectionClasses(t *testing.T) {
 	}
 }
 
+func TestParseDirectiveComments(t *testing.T) {
+	content := "// ?man cmd: summary\n" +
+		"#ifndef O_SEARCH /* not present on some bsds */\n" +
+		"// ?man -a: use a\n" +
+		"#endif /* O_SEARCH */\n" +
+		"#ifdef FEATURE_A /* gated\n" +
+		"                    feature\n" +
+		"                    still */\n" +
+		"// ?man -b: use b\n" +
+		"#endif\n" +
+		"#if defined(FEATURE_A) /* a // b */\n" +
+		"// ?man -c: use c\n" +
+		"#endif\n"
+	page, err := parseSource(t, content, Config{"FEATURE_A": "1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(page.Options) != 3 {
+		t.Fatalf("got %d options, want 3", len(page.Options))
+	}
+}
+
 func TestParseOptionCompatibility(t *testing.T) {
 	for _, line := range []string{
 		"-a: use a",

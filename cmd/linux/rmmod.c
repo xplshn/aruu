@@ -35,11 +35,9 @@ main(int argc, char *argv[])
 
   ARGBEGIN
   {
-    // ?man -f: specify f option
     case 'f':
       flags |= O_TRUNC;
       break;
-    // ?man -w: specify w option
     case 'w':
       flags &= ~O_NONBLOCK;
       break;

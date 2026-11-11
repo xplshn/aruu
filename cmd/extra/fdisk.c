@@ -862,9 +862,8 @@ do_fdisk(const char *path)
 }
 
 // ?man fdisk: partition table manipulator
-// ?man arguments: [-l] [-p] [-g] [-m] [-s] [-a] [-d] [-n index] [-b start] [-e
-// end] [-t type] [-c name] [device] ?man fdisk performs partition table
-// operations for MBR, GPT and BSD disklabels
+// ?man arguments: [-l] [-p] [-g] [-m] [-s] [-a] [-d] [-n index] [-b start] [-e end] [-t type] [-c name] [device]
+// ?man fdisk performs partition table operations for MBR, GPT and BSD disklabels
 int
 main(int argc, char *argv[])
 {

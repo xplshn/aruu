@@ -116,6 +116,31 @@ func parseConditional(directive string, cfg Config, stack *ifStack, lineNo int) 
 	return nil
 }
 
+// stripDirectiveComments removes c comments from a preprocessor line. open
+// reports a block comment that carries on past the end of the line
+func stripDirectiveComments(s string) (string, bool) {
+	var b strings.Builder
+	for {
+		block := strings.Index(s, "/*")
+		line := strings.Index(s, "//")
+		if line >= 0 && (block < 0 || line < block) {
+			b.WriteString(s[:line])
+			return strings.TrimSpace(b.String()), false
+		}
+		if block < 0 {
+			b.WriteString(s)
+			return strings.TrimSpace(b.String()), false
+		}
+		b.WriteString(s[:block])
+		end := strings.Index(s[block+2:], "*/")
+		if end < 0 {
+			return strings.TrimSpace(b.String()), true
+		}
+		b.WriteByte(' ')
+		s = s[block+2+end+2:]
+	}
+}
+
 func extractManLines(path string, cfg Config) ([]string, error) {
 	contentBytes, err := os.ReadFile(path)
 	if err != nil {
@@ -127,6 +152,8 @@ func extractManLines(path string, cfg Config) ([]string, error) {
 	sc := bufio.NewScanner(strings.NewReader(string(contentBytes)))
 	sc.Buffer(make([]byte, 1<<20), 1<<20)
 	inBlockComment := false
+	inDirectiveComment := false
+	pendingDirective := ""
 
 	lineNo := 0
 	for sc.Scan() {
@@ -160,14 +187,27 @@ func extractManLines(path string, cfg Config) ([]string, error) {
 			continue
 		}
 
-		if strings.HasPrefix(trimmed, "#") {
-			directive := trimmed[1:]
-			if ci := strings.Index(directive, "// "); ci >= 0 {
-				directive = directive[:ci]
+		if inDirectiveComment || strings.HasPrefix(trimmed, "#") {
+			text := pendingDirective
+			if inDirectiveComment {
+				idx := strings.Index(trimmed, "*/")
+				if idx < 0 {
+					continue
+				}
+				text += " " + trimmed[idx+2:]
+				pendingDirective = ""
+				inDirectiveComment = false
+			} else {
+				text = trimmed[1:]
 			}
-			directive = strings.TrimSpace(directive)
+			text, open := stripDirectiveComments(text)
+			if open {
+				inDirectiveComment = true
+				pendingDirective = text
+				continue
+			}
 
-			if err := parseConditional(directive, cfg, stack, lineNo); err != nil {
+			if err := parseConditional(text, cfg, stack, lineNo); err != nil {
 				return nil, err
 			}
 			continue

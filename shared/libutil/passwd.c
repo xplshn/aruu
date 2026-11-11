@@ -1,5 +1,8 @@
 /* see LICENSE file for copyright and license details */
 #if FEATURE_PASSWD_EXT
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE /* musl declares fgetpwent/putpwent only under it */
+#endif
 #ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
 #endif
