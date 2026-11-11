@@ -535,7 +535,7 @@ usage(void)
 #if FEATURE_MODPROBE_SYSLOG
       "s"
 #endif
-      "] "
+      "] [-S version] "
 #if FEATURE_MODPROBE_DIR_OVERRIDE
       "[-d dir] "
 #endif
@@ -558,6 +558,7 @@ main(int argc, char *argv[])
   struct utsname  uts;
   struct StrNode *pn;
   char            path[PATH_MAX];
+  char           *version = NULL;
   int             i, ret = 0;
 
   ARGBEGIN
@@ -582,6 +583,10 @@ main(int argc, char *argv[])
     case 'l':
       // ?man -l: List available modules matching the optional _pattern_ (a fnmatch(3) glob)
       lflag = 1;
+      break;
+    case 'S':
+      // ?man -S:version: Use version instead of the running kernel release
+      version = EARGF(usage());
       break;
 #if FEATURE_MODPROBE_SHOW_DEPENDS
     case 'D':
@@ -622,9 +627,12 @@ main(int argc, char *argv[])
 #endif
 
   if (!moddirs) {
-    if (uname(&uts) < 0)
-      eprintf("uname:");
-    snprintf(path, sizeof(path), "/lib/modules/%s", uts.release);
+    if (!version) {
+      if (uname(&uts) < 0)
+        eprintf("uname:");
+      version = uts.release;
+    }
+    snprintf(path, sizeof(path), "/lib/modules/%s", version);
     strlist_append(&moddirs, path);
   }
 
