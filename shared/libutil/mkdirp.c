@@ -16,24 +16,22 @@ mkdirp(const char *path, mode_t mode, mode_t pmode)
     if (S_ISDIR(st.st_mode))
       return 0;
     errno = ENOTDIR;
-    weprintf("%s:", path);
     return -1;
   }
 
-  estrlcpy(tmp, path, sizeof(tmp));
+  if (strlcpy(tmp, path, sizeof(tmp)) >= sizeof(tmp)) {
+    errno = ENAMETOOLONG;
+    return -1;
+  }
   for (p = tmp + (tmp[0] == '/'); *p; p++) {
     if (*p != '/')
       continue;
     *p = '\0';
-    if (mkdir(tmp, pmode) < 0 && errno != EEXIST) {
-      weprintf("mkdir %s:", tmp);
+    if (mkdir(tmp, pmode) < 0 && errno != EEXIST)
       return -1;
-    }
     *p = '/';
   }
-  if (mkdir(tmp, mode) < 0 && errno != EEXIST) {
-    weprintf("mkdir %s:", tmp);
+  if (mkdir(tmp, mode) < 0 && errno != EEXIST)
     return -1;
-  }
   return 0;
 }

@@ -50,14 +50,3 @@ strlcat(char *dst, const char *src, size_t siz)
   *d = '\0';
   return (dlen + (s - src)); /* count does not include NUL */
 }
-
-size_t
-estrlcat(char *dst, const char *src, size_t siz)
-{
-  size_t ret;
-
-  if ((ret = strlcat(dst, src, siz)) >= siz)
-    eprintf("strlcat: input string too long\n");
-
-  return ret;
-}

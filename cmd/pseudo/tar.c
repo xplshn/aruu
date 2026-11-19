@@ -317,19 +317,27 @@ decomp(int fd, const char *tool, const char *flags)
   return fds[0];
 }
 
+/* fills buf unless the input ends first: a pipe from a decompressor hands
+ * back whatever it has, and a short block would put every later header
+ * at the wrong offset */
 static ssize_t
 eread(int fd, void *buf, size_t n)
 {
+  size_t got = 0;
   ssize_t r;
 
-again:
-  r = read(fd, buf, n);
-  if (r < 0) {
-    if (errno == EINTR)
-      goto again;
-    eprintf("read:");
+  while (got < n) {
+    r = read(fd, (char *)buf + got, n - got);
+    if (r < 0) {
+      if (errno == EINTR)
+        continue;
+      eprintf("read:");
+    }
+    if (r == 0)
+      break;
+    got += (size_t)r;
   }
-  return r;
+  return (ssize_t)got;
 }
 
 static ssize_t

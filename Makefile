@@ -17,6 +17,8 @@ NINQU_LIB_SRC =\
         shared/libutil/eprintf.c\
         shared/libutil/strlcpy.c\
         shared/libutil/strlcat.c\
+        shared/libutil/estrlcpy.c\
+        shared/libutil/estrlcat.c\
         shared/libutil/strtonum.c\
         shared/libutil/fshut.c\
         shared/libutil/mkdirp.c\

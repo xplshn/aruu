@@ -18,6 +18,7 @@ struct recursor {
   int             maxdepth;
   int             follow;
   int             flags;
+  int             err; /* errno of the first failure */
 };
 
 enum {
@@ -26,6 +27,9 @@ enum {
   SILENT   = 1 << 2,
   CONFIRM  = 1 << 3,
   IGNORE   = 1 << 4,
+  /* for a library: nothing printed and nothing asked, failures are only
+   * counted and the first one kept in err */
+  QUIET    = 1 << 5,
 };
 
 extern int cp_aflag;
@@ -34,8 +38,10 @@ extern int cp_iflag;
 extern int cp_pflag;
 extern int cp_rflag;
 extern int cp_vflag;
+extern int cp_qflag;
 extern int cp_follow;
 extern int cp_status;
+extern int cp_errno;
 
 extern int rm_status;
 

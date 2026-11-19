@@ -24,7 +24,7 @@ struct procstat {
   unsigned long long starttime;
   unsigned long      vsize;
   long               rss;
-  long               rsslim;
+  unsigned long      rsslim;
 };
 
 struct procstatus {

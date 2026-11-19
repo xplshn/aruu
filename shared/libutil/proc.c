@@ -25,38 +25,42 @@ parsecmdline(pid_t pid, char *buf, size_t siz)
   if (fd < 0)
     return -1;
   n = read(fd, buf, siz > 0 ? siz - 1 : 0);
-  if (n < 0) {
-    weprintf("read %s:", path);
-    close(fd);
+  close(fd);
+  if (n <= 0)
     return -1;
-  }
-  if (!n) {
-    close(fd);
-    return -1;
-  }
   buf[n] = '\0';
   for (i = 0; i < n; i++)
     if (buf[i] == '\0')
       buf[i] = ' ';
-  close(fd);
   return 0;
 }
 
 int
 parsestat(pid_t pid, struct procstat *ps)
 {
-  char   path[PATH_MAX];
+  char   path[PATH_MAX], line[BUFSIZ], *lp, *rp;
   FILE  *fp;
   size_t len;
+  int    n;
 
   snprintf(path, sizeof(path), ARUU_LINUX_PATH_PROC "/%d/stat", pid);
   if (!(fp = fopen(path, "r")))
     return -1;
-  fscanf(
-      fp,
-      "%d %s %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu",
-      &ps->pid,
-      ps->comm,
+  n = fgets(line, sizeof(line), fp) != NULL;
+  fclose(fp);
+  /* comm is whatever the process named itself, spaces and parens included,
+   * so it runs from the first ( to the last ) */
+  if (!n || !(lp = strchr(line, '(')) || !(rp = strrchr(line, ')')) || rp < lp) {
+    errno = EINVAL;
+    return -1;
+  }
+  len = MIN((size_t)(rp - lp - 1), sizeof(ps->comm) - 1);
+  memcpy(ps->comm, lp + 1, len);
+  ps->comm[len] = '\0';
+  ps->pid       = pid;
+  n             = sscanf(
+      rp + 1,
+      " %c %d %d %d %d %d %u %lu %lu %lu %lu %lu %lu %ld %ld %ld %ld %ld %ld %llu %lu %ld %lu",
       &ps->state,
       &ps->ppid,
       &ps->pgrp,
@@ -69,11 +73,7 @@ parsestat(pid_t pid, struct procstat *ps)
       &ps->majflt,
       &ps->cmajflt,
       &ps->utime,
-      &ps->stime
-  );
-  fscanf(
-      fp,
-      "%ld %ld %ld %ld %ld %ld %llu %lu %ld %ld",
+      &ps->stime,
       &ps->cutime,
       &ps->cstime,
       &ps->priority,
@@ -85,12 +85,10 @@ parsestat(pid_t pid, struct procstat *ps)
       &ps->rss,
       &ps->rsslim
   );
-  /* filter out '(' and ')' from comm */
-  if ((len = strlen(ps->comm)) > 0)
-    len--;
-  ps->comm[len] = '\0';
-  memmove(ps->comm, ps->comm + 1, len);
-  fclose(fp);
+  if (n != 23) {
+    errno = EINVAL;
+    return -1;
+  }
   return 0;
 }
 
@@ -107,14 +105,10 @@ parsestatus(pid_t pid, struct procstatus *pstatus)
   if (fd < 0)
     return -1;
   n = read(fd, buf, sizeof(buf) - 1);
-  if (n < 0)
-    eprintf("%s: read error:", path);
-  if (!n) {
-    close(fd);
-    return -1;
-  }
-  buf[n] = '\0';
   close(fd);
+  if (n <= 0)
+    return -1;
+  buf[n] = '\0';
   off = strstr(buf, "Uid:");
   if (!off)
     return -1;

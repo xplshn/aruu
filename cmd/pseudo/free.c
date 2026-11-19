@@ -57,18 +57,20 @@ main(int argc, char *argv[])
   if (get_meminfo(&mi) < 0)
     eprintf("get_meminfo:");
 
-  printf("     %13s%13s%13s%13s%13s\n", "total", "used", "free", "shared", "buffers");
+  printf("     %13s%13s%13s%13s%13s%13s\n", "total", "used", "free", "shared", "buffers", "cached");
   printf("Mem: ");
   printf(
-      "%13llu%13llu%13llu%13llu%13llu\n",
+      "%13llu%13llu%13llu%13llu%13llu%13llu\n",
       scale(mi.total),
       scale(mi.total - mi.free),
       scale(mi.free),
       scale(mi.shared),
-      scale(mi.buffers)
+      scale(mi.buffers),
+      scale(mi.cached)
   );
+  /* what programs hold, and what they could still have */
   printf("-/+ buffers/cache:");
-  printf("%13llu%13llu\n", scale(mi.total - mi.free - mi.buffers), scale(mi.free + mi.buffers));
+  printf("%13llu%13llu\n", scale(mi.total - mi.available), scale(mi.available));
   printf("Swap:");
   printf(
       "%13llu%13llu%13llu\n",

@@ -29,7 +29,7 @@ rm(int dirfd, const char *name, struct stat *st, void *data, struct recursor *r)
     goto err;
   }
 
-  if (!quiet && ((!write && isatty(0)) || ask)) {
+  if (!quiet && !(r->flags & QUIET) && ((!write && isatty(0)) || ask)) {
     if (!confirm("remove file '%s'? ", r->path))
       return;
   }
@@ -45,7 +45,10 @@ rm(int dirfd, const char *name, struct stat *st, void *data, struct recursor *r)
 
 err:
   if (!ignore) {
-    weprintf("cannot remove '%s':", r->path);
+    if (!r->err)
+      r->err = errno;
+    if (!(r->flags & QUIET))
+      weprintf("cannot remove '%s':", r->path);
     rm_status = 1;
   }
 }

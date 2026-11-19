@@ -136,8 +136,11 @@
   (rule $(NAME)
     (glob "cmd/$(CATEGORY)/*.c")
   (gate build_$(CATEGORY)_$(IDENT))
-  (dep $(MATCH) FEATURES_H LIBUTIL LIBUTF LIBBLAKE3)
-  (after $(EXTRA_AFTER))
+  ; compiled and linked in one step, so the header that every compile
+  ; -includes is order-only: as a dep it would land in $(IN) and be
+  ; passed to the linker. its path still makes a change rebuild
+  (dep $(MATCH) LIBUTIL LIBUTF LIBBLAKE3)
+  (after "scripts/mk/features.h" $(EXTRA_AFTER))
   (out $(STEM))
   (description $(DESC))
   (feature perfile)

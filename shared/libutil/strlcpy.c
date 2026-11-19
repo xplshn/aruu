@@ -46,14 +46,3 @@ strlcpy(char *dst, const char *src, size_t siz)
   }
   return (s - src - 1); /* count does not include NUL */
 }
-
-size_t
-estrlcpy(char *dst, const char *src, size_t siz)
-{
-  size_t ret;
-
-  if ((ret = strlcpy(dst, src, siz)) >= siz)
-    eprintf("strlcpy: input string too long\n");
-
-  return ret;
-}

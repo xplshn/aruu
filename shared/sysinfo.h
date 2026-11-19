@@ -6,10 +6,11 @@
 
 struct MemInfo {
   unsigned long long total;
-  unsigned long long free;
+  unsigned long long free;      /* not used at all */
+  unsigned long long available; /* free plus what the kernel can take back */
   unsigned long long shared;
   unsigned long long buffers;
-  unsigned long long cached;
+  unsigned long long cached;    /* page cache and reclaimable slab */
   unsigned long long totalswap;
   unsigned long long freeswap;
 };

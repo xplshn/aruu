@@ -45,8 +45,10 @@ main(int argc, char *argv[])
 
   for (; *argv; argc--, argv++) {
     if (pflag) {
-      if (mkdirp(*argv, mode, 0777 & (~mask | 0300)) < 0)
+      if (mkdirp(*argv, mode, 0777 & (~mask | 0300)) < 0) {
+        weprintf("mkdir %s:", *argv);
         ret = 1;
+      }
     } else if (mkdir(*argv, mode) < 0) {
       weprintf("mkdir %s:", *argv);
       ret = 1;
