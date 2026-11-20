@@ -16,8 +16,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 
+#include "diskutil.h"
 #include "paths.h"
 #include "text.h"
 #include "util.h"
@@ -38,6 +40,7 @@ struct {
     {"nodev", "dev", MS_NODEV},
     {"noatime", "atime", MS_NOATIME},
     {"noauto", "auto", 0},
+    {"nofail", NULL, 0},
     {"nodiratime", "diratime", MS_NODIRATIME},
     {"noexec", "exec", MS_NOEXEC},
     {"nosuid", "suid", MS_NOSUID},
@@ -49,6 +52,7 @@ struct {
 
 static unsigned long argflags              = 0;
 static char          fsopts[FSOPTS_MAXLEN] = "";
+static int           nofail_opt            = 0;
 
 static char *
 findtype(const char *types, const char *t)
@@ -79,7 +83,11 @@ parseopts(const char *popts, unsigned long *flags, char *data, size_t datasiz)
       optlen = strlen(name);
 
     validopt = 0;
-    for (i = 0; optnames[i].opt; i++) {
+    if (optlen == 6 && !strncmp(name, "nofail", 6)) {
+      nofail_opt = 1;
+      validopt   = 1;
+    }
+    for (i = 0; !validopt && optnames[i].opt; i++) {
       if (optnames[i].opt && !strncmp(name, optnames[i].opt, optlen)) {
         *flags |= optnames[i].v;
         validopt = 1;
@@ -114,13 +122,18 @@ mounthelper(const char *fsname, const char *dir, const char *fstype)
   char const *eargv[10];
   int         status, i;
 
+  if (!fstype || strcmp(fstype, "auto") == 0)
+    return 1;
+
+  snprintf(eprog, sizeof(eprog), "mount.%s", fstype);
+  if (strcmp(argv0, eprog) == 0)
+    return 1;
+
   pid = fork();
   switch (pid) {
     case -1:
       break;
     case 0:
-      snprintf(eprog, sizeof(eprog), "mount.%s", fstype);
-
       i          = 0;
       eargv[i++] = eprog;
       if (argflags & MS_BIND)
@@ -156,6 +169,74 @@ mounthelper(const char *fsname, const char *dir, const char *fstype)
       break;
   }
   return 0;
+}
+
+static const char *
+resolve_source(const char *src, char *buf, size_t bufsz)
+{
+  struct BlockDevInfo *list, *cur;
+  struct BlockDev      dev;
+  char                 dev_type[32], dev_label[128], dev_uuid[128];
+  const char          *target_val;
+  int                  is_label;
+
+  if (!src)
+    return NULL;
+
+  if (strncmp(src, "LABEL=", 6) == 0) {
+    target_val = src + 6;
+    is_label   = 1;
+  } else if (strncmp(src, "UUID=", 5) == 0) {
+    target_val = src + 5;
+    is_label   = 0;
+  } else {
+    return src;
+  }
+
+  list = blockdev_get_list();
+  if (!list)
+    return NULL;
+
+  for (cur = list; cur; cur = cur->next) {
+    if (blockdev_open(&dev, cur->path, 0) == 0) {
+      if (blockdev_detect_fs(&dev, dev_type, sizeof(dev_type), dev_label,
+                             sizeof(dev_label), dev_uuid, sizeof(dev_uuid)) == 0) {
+        if (is_label && strcmp(dev_label, target_val) == 0) {
+          blockdev_close(&dev);
+          estrlcpy(buf, cur->path, bufsz);
+          blockdev_free_list(list);
+          return buf;
+        }
+        if (!is_label && strcasecmp(dev_uuid, target_val) == 0) {
+          blockdev_close(&dev);
+          estrlcpy(buf, cur->path, bufsz);
+          blockdev_free_list(list);
+          return buf;
+        }
+      }
+      blockdev_close(&dev);
+    }
+  }
+  blockdev_free_list(list);
+  return NULL;
+}
+
+static const char *
+detect_fstype(const char *devpath, char *buf, size_t bufsz)
+{
+  struct BlockDev dev;
+  char            label[128], uuid[128];
+
+  if (!devpath)
+    return NULL;
+  if (blockdev_open(&dev, devpath, 0) == 0) {
+    if (blockdev_detect_fs(&dev, buf, bufsz, label, sizeof(label), uuid, sizeof(uuid)) == 0) {
+      blockdev_close(&dev);
+      return buf;
+    }
+    blockdev_close(&dev);
+  }
+  return NULL;
 }
 
 static int
@@ -245,6 +326,9 @@ main(int argc, char *argv[])
   }
   ARGEND;
 
+  if (!types && strncmp(argv0, "mount.", 6) == 0)
+    types = argv0 + 6;
+
   if (argc < 1 && aflag == 0) {
     if (!(fp = fopen(files[0], "r")))
       eprintf("fopen %s:", files[0]);
@@ -299,27 +383,59 @@ main(int argc, char *argv[])
     eprintf("can't find %s in /etc/fstab\n", target);
 
 mountsingle:
-  r = mounthelper(source, target, types);
-  if (r == -1)
-    status = 1;
-  if (r > 0 && mount(source, target, types, argflags | flags, data) < 0) {
-    weprintf("mount: %s:", source);
-    status = 1;
+  {
+    char        resbuf[PATH_MAX];
+    char        typebuf[32];
+    const char *realsrc;
+
+    realsrc = resolve_source(source, resbuf, sizeof(resbuf));
+    if (!realsrc) {
+      if (nofail_opt) {
+        if (fp)
+          endmntent(fp);
+        free(resolvpath);
+        return 0;
+      }
+      eprintf("mount: unable to resolve %s\n", source);
+    }
+    source = realsrc;
+
+    if (!types || strcmp(types, "auto") == 0) {
+      const char *det = detect_fstype(source, typebuf, sizeof(typebuf));
+      if (det)
+        types = (char *)det;
+    }
+
+    r = mounthelper(source, target, types);
+    if (r == -1)
+      status = 1;
+    if (r > 0 && mount(source, target, types, argflags | flags, data) < 0) {
+      if (!nofail_opt) {
+        weprintf("mount: %s:", source);
+        status = 1;
+      }
+    }
+    if (fp)
+      endmntent(fp);
+    free(resolvpath);
+    return status;
   }
-  if (fp)
-    endmntent(fp);
-  free(resolvpath);
-  return status;
 
 mountall:
   if (!(fp = setmntent("/etc/fstab", "r")))
     eprintf("setmntent %s:", "/etc/fstab");
   while ((me = getmntent(fp))) {
+    char        resbuf[PATH_MAX];
+    char        typebuf[32];
+    const char *realsrc;
+    const char *mtype = me->mnt_type;
+
     /* has "noauto" option or already mounted: skip */
     if (hasmntopt(me, MNTOPT_NOAUTO) || mounted(me->mnt_dir))
       continue;
-    flags     = 0;
-    fsopts[0] = '\0';
+    flags      = 0;
+    fsopts[0]  = '\0';
+    nofail_opt = 0;
     if (strlcat(fsopts, me->mnt_opts, sizeof(fsopts)) >= sizeof(fsopts)) {
       weprintf("%s: option string too long\n", me->mnt_dir);
       status = 1;
@@ -334,10 +450,27 @@ mountall:
             || (!findtype(types, me->mnt_type))))
       continue;
 
-    r = mounthelper(me->mnt_fsname, me->mnt_dir, me->mnt_type);
-    if (r > 0 && mount(me->mnt_fsname, me->mnt_dir, me->mnt_type, argflags | flags, data) < 0) {
-      weprintf("mount: %s:", me->mnt_fsname);
+    realsrc = resolve_source(me->mnt_fsname, resbuf, sizeof(resbuf));
+    if (!realsrc) {
+      if (nofail_opt)
+        continue;
+      weprintf("mount: unable to resolve %s\n", me->mnt_fsname);
       status = 1;
+      continue;
+    }
+
+    if (!mtype || strcmp(mtype, "auto") == 0) {
+      const char *det = detect_fstype(realsrc, typebuf, sizeof(typebuf));
+      if (det)
+        mtype = det;
+    }
+
+    r = mounthelper(realsrc, me->mnt_dir, mtype);
+    if (r > 0 && mount(realsrc, me->mnt_dir, mtype, argflags | flags, data) < 0) {
+      if (!nofail_opt) {
+        weprintf("mount: %s:", realsrc);
+        status = 1;
+      }
     }
   }
   endmntent(fp);

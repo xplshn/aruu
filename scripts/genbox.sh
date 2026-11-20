@@ -79,6 +79,15 @@ for category in $categories; do
                         printf '\t{ "egrep", %s, "%s" },\n' "$sym" "$category"
                         printf '\t{ "fgrep", %s, "%s" },\n' "$sym" "$category"
                 fi
+                if [ "$tool" = "mount" ]; then
+                        printf '\t{ "mount.iso9660", %s, "%s" },\n' "$sym" "$category"
+                        printf '\t{ "mount.ext4", %s, "%s" },\n' "$sym" "$category"
+                        printf '\t{ "mount.ext3", %s, "%s" },\n' "$sym" "$category"
+                        printf '\t{ "mount.ext2", %s, "%s" },\n' "$sym" "$category"
+                        printf '\t{ "mount.vfat", %s, "%s" },\n' "$sym" "$category"
+                        printf '\t{ "mount.f2fs", %s, "%s" },\n' "$sym" "$category"
+                        printf '\t{ "mount.auto", %s, "%s" },\n' "$sym" "$category"
+                fi
         done
 done
 

@@ -502,7 +502,7 @@ unarchive(char *fname, ssize_t l, char b[BLKSIZ])
       return 0;
     }
   } else {
-    if (strcmp(fname, ".") && strcmp(fname, "./") && remove(fname) < 0)
+    if (h->type != DIRECTORY && strcmp(fname, ".") && strcmp(fname, "./") && remove(fname) < 0)
       if (errno != ENOENT)
         weprintf("remove %s:", fname);
 
