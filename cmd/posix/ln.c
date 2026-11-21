@@ -129,6 +129,7 @@ main(int argc, char *argv[])
   int  rflag = 0;
   char relbuf[PATH_MAX];
 #endif
+  int nflag = 0;
 #if FEATURE_LN_NO_TARGET_DIR
   int Tflag = 0;
 #endif
@@ -166,10 +167,18 @@ main(int argc, char *argv[])
       Tflag = 1;
       break;
 #endif
+    // ?man -n: with two arguments, treat name as a file even when it is a symlink to a directory
+    case 'n':
+      nflag = 1;
+      break;
     default:
       usage();
   }
   ARGEND
+#if FEATURE_LN_NO_TARGET_DIR
+  if (nflag && argc == 2)
+    Tflag = 1;
+#endif
 
   if (!argc)
     usage();
