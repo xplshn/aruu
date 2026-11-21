@@ -170,8 +170,9 @@ install_one(const char *src, const char *dst)
 // makefiles write "install file -m 644 dest": options may follow operands, so
 // move them in front of the first operand before they are parsed
 static char **
-options_first(int argc, char **argv)
+options_first(int *argcp, char **argv)
 {
+  int    argc = *argcp;
   char **out = ecalloc(argc + 2, sizeof(*out));
   int    n = 0, i, rest = 0;
 
@@ -206,6 +207,7 @@ options_first(int argc, char **argv)
     out[n++] = argv[i];
   }
   out[n] = NULL;
+  *argcp = n;
   return out;
 }
 
@@ -221,7 +223,7 @@ main(int argc, char *argv[])
   int         isdir;
   int         i;
 
-  argv = options_first(argc, argv);
+  argv = options_first(&argc, argv);
   ARGBEGIN
   {
     // ?man -c: ignored; accepted for compatibility with older install callers
