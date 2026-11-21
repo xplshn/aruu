@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -372,6 +373,9 @@ disableRawMode(int fd)
   }
 }
 
+// how long a terminal gets to answer the cursor position query
+#define CURSOR_REPLY_MS 300
+
 static int
 getCursorPosition(int ifd, int ofd)
 {
@@ -382,7 +386,13 @@ getCursorPosition(int ifd, int ofd)
   if (write(ofd, "\x1b[6n", 4) != 4)
     return -1;
 
+  // a terminal that never answers, a serial console with nothing on the
+  // other end, must not leave the shell stuck before its first prompt
   while (i < sizeof(buf) - 1) {
+    struct pollfd pfd = { ifd, POLLIN, 0 };
+
+    if (poll(&pfd, 1, CURSOR_REPLY_MS) != 1)
+      break;
     if (read(ifd, buf + i, 1) != 1)
       break;
     if (buf[i] == 'R')
