@@ -167,6 +167,48 @@ install_one(const char *src, const char *dst)
 
 // ?man install: copy files and set attributes
 // ?man arguments: source ... dest
+// makefiles write "install file -m 644 dest": options may follow operands, so
+// move them in front of the first operand before they are parsed
+static char **
+options_first(int argc, char **argv)
+{
+  char **out = ecalloc(argc + 2, sizeof(*out));
+  int    n = 0, i, rest = 0;
+
+  out[n++] = argv[0];
+  for (i = 1; i < argc; i++) {
+    const char *a = argv[i];
+    size_t      l = strlen(a);
+
+    if (strcmp(a, "--") == 0)
+      break;
+    if (a[0] != '-' || l < 2)
+      continue;
+    out[n++] = argv[i];
+    // the last letter of a cluster takes the next word when it ends it
+    if (strchr("ogmt", a[l - 1]) && i + 1 < argc)
+      out[n++] = argv[++i];
+  }
+  out[n++] = "--";
+  for (i = 1; i < argc; i++) {
+    const char *a = argv[i];
+    size_t      l = strlen(a);
+
+    if (!rest && strcmp(a, "--") == 0) {
+      rest = 1;
+      continue;
+    }
+    if (!rest && a[0] == '-' && l >= 2) {
+      if (strchr("ogmt", a[l - 1]) && i + 1 < argc)
+        i++;
+      continue;
+    }
+    out[n++] = argv[i];
+  }
+  out[n] = NULL;
+  return out;
+}
+
 // ?man install copies each source to dest, or into dest when dest is a
 // ?man directory or -t is given, then applies mode/owner/group; with
 // ?man with -d, every argument is a directory to create instead
@@ -179,6 +221,7 @@ main(int argc, char *argv[])
   int         isdir;
   int         i;
 
+  argv = options_first(argc, argv);
   ARGBEGIN
   {
     // ?man -c: ignored; accepted for compatibility with older install callers
