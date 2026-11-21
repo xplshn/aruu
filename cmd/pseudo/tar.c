@@ -103,7 +103,7 @@ static int   tarfd;
 static ino_t tarinode;
 static dev_t tardev;
 
-static int mflag, vflag;
+static int mflag, vflag, no_same_owner;
 static int filtermode;
 
 #if FEATURE_TAR_EXCLUDE
@@ -595,10 +595,10 @@ unarchive(char *fname, ssize_t l, char b[BLKSIZ])
   if (!mflag && utimensat(AT_FDCWD, fname, times, AT_SYMLINK_NOFOLLOW) < 0)
     weprintf("utimensat %s:", fname);
   if (lnk) {
-    if (!getuid() && lchown(fname, uid, gid))
+    if (!no_same_owner && !getuid() && lchown(fname, uid, gid))
       weprintf("lchown %s:", fname);
   } else {
-    if (!getuid() && chown(fname, uid, gid))
+    if (!no_same_owner && !getuid() && chown(fname, uid, gid))
       weprintf("chown %s:", fname);
     if (chmod(fname, mode) < 0)
       eprintf("fchmod %s:", fname);
@@ -972,6 +972,11 @@ main(int argc, char *argv[])
 #endif
     // ?man --:num: specify - option
     case '-':
+      if (strcmp(argv[0], "-no-same-owner") == 0) {
+        no_same_owner = 1;
+        brk_          = 1;
+        break;
+      }
 #if FEATURE_TAR_EXCLUDE
       if (strncmp(argv[0], "-exclude=", 9) == 0) {
         add_exclude(argv[0] + 9);
