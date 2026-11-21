@@ -120,6 +120,7 @@ mounthelper(const char *fsname, const char *dir, const char *fstype)
   pid_t       pid;
   char        eprog[PATH_MAX];
   char const *eargv[10];
+  char       *found;
   int         status, i;
 
   if (!fstype || strcmp(fstype, "auto") == 0)
@@ -128,6 +129,13 @@ mounthelper(const char *fsname, const char *dir, const char *fstype)
   snprintf(eprog, sizeof(eprog), "mount.%s", fstype);
   if (strcmp(argv0, eprog) == 0)
     return 1;
+
+  /* no helper for this type: mount(2) does it, and nothing is printed */
+  if (!wexec_is_builtin(eprog)) {
+    if (!(found = wwhich(eprog)))
+      return 1;
+    free(found);
+  }
 
   pid = fork();
   switch (pid) {
@@ -152,11 +160,6 @@ mounthelper(const char *fsname, const char *dir, const char *fstype)
       eargv[i]   = NULL;
 
       wexecvp_self(eprog, (char *const *)eargv);
-      if (errno == ENOENT)
-        _exit(1);
-      weprintf("wexecvp:");
-      _exit(1);
-      break;
     default:
       if (waitpid(pid, &status, 0) < 0) {
         weprintf("waitpid:");
