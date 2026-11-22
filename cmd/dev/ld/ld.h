@@ -21,7 +21,7 @@
 #define PAGE_SIZE  (1 << 12)
 #define PAGE_MASK  (PAGE_SIZE - 1)
 #define MAXFILES   (1 << 10)
-#define MAXPHDRS   4
+#define MAXPHDRS   5
 #define MAXLIBDIRS 32
 #define PATHLEN    256
 #define MAXGOT     (1 << 16)
@@ -117,6 +117,12 @@ struct outelf {
  * variables are addressed tp-relative, not absolutely */
   unsigned long tls_size;
   unsigned long tls_filesz;
+
+  /* the notes of every object, laid out together after the code, which
+ * the PT_NOTE segment covers */
+  unsigned long note_faddr;
+  unsigned long note_vaddr;
+  unsigned long note_len;
 
   Elf_Shdr      shdr[MAXSECS];
   int           nsh;

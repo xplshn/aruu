@@ -545,6 +545,8 @@ construct_section_headers(struct Work *work, uint64_t offset)
     Elf64_Word type;
     if (section->flag & SF_BSS)
       type = SHT_NOBITS;
+    else if (section->flag & SF_NOTE)
+      type = SHT_NOTE;
     else if (equal_name(section->name, init_array_name))
       type = SHT_INIT_ARRAY;
     else if (equal_name(section->name, fini_array_name))

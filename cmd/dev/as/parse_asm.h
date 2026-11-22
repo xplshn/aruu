@@ -74,6 +74,7 @@ enum DirectiveType {
 #define SF_TLS          (1 << 3)
 #define SF_INIT_FUNCS   (1 << 8)
 #define SF_CSTRLITERALS (1 << 9)
+#define SF_NOTE         (1 << 10)
 
 struct SectionInfo {
   const struct Name *name;

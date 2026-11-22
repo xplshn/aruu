@@ -1194,14 +1194,18 @@ dir_section(struct ParseInfo *info, enum DirectiveType dir)
 
   /* optional third field, elf section type (@progbits, @nobits, @note,
    * ...): this assembler infers the section type from the section
-   * name/flags itself, so the field is accepted and discarded rather
-   * than fed into set_current_section below */
+   * name/flags itself, so the field is accepted and only @note, which
+   * the name .note* implies as well, changes anything */
+  if (name->bytes >= 5 && !strncmp(name->chars, ".note", 5))
+    flag |= SF_NOTE;
   p = skip_whitespaces(info->p);
   if (*p == ',') {
     const char *q = p + 1;
     q             = skip_whitespaces(q);
     if (*q == '@') {
       ++q;
+      if (!strncmp(q, "note", 4) && !isalnum((unsigned char)q[4]))
+        flag |= SF_NOTE;
       while (isalpha((unsigned char)*q) || isdigit((unsigned char)*q))
         ++q;
       info->p = q;

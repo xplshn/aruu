@@ -361,7 +361,8 @@ outelf_bss(struct outelf *oe)
 #define SEC_TLS(s)   ((s)->sh_flags & SHF_TLS)
 #define SEC_CODE(s)  (!SEC_TLS(s) && ((s)->sh_flags & SHF_EXECINSTR))
 #define SEC_BSS(s)   (!SEC_TLS(s) && (s)->sh_type == SHT_NOBITS)
-#define SEC_DATA(s)  (!SEC_TLS(s) && !SEC_CODE(s) && !SEC_BSS(s))
+#define SEC_NOTE(s)  (!SEC_TLS(s) && !SEC_CODE(s) && (s)->sh_type == SHT_NOTE)
+#define SEC_DATA(s)  (!SEC_TLS(s) && !SEC_CODE(s) && !SEC_BSS(s) && !SEC_NOTE(s))
 #define SEC_TDATA(s) (SEC_TLS(s) && (s)->sh_type != SHT_NOBITS)
 #define SEC_TBSS(s)  (SEC_TLS(s) && (s)->sh_type == SHT_NOBITS)
 
@@ -610,13 +611,15 @@ link_cs(
   /* .init/.fini of all objects are fragments of one function (crti.o
    * prologue, object parts, crtn.o epilogue) and must be byte-adjacent
    * wherever the objects sit in link order. pass 0 lays out every .init,
-   * pass 1 every .fini, pass 2 the rest */
-  for (pass = 0; pass < 3; pass++) {
+   * pass 1 every .fini, pass 2 the rest, pass 3 the notes: read only like
+   * the code, and one run of them for the PT_NOTE segment to cover */
+  oe->note_len = 0;
+  for (pass = 0; pass < 4; pass++) {
     for (i = 0; i < oe->nsecs; i++) {
       struct secmap *sec = &oe->secs[i];
       const char    *name;
       int            alignment, is_init, is_fini;
-      if (!SEC_CODE(sec->o_shdr))
+      if (pass == 3 ? !SEC_NOTE(sec->o_shdr) : !SEC_CODE(sec->o_shdr))
         continue;
       name    = sec->obj->shstr + sec->o_shdr->sh_name;
       is_init = !strcmp(name, ".init");
@@ -628,7 +631,13 @@ link_cs(
       len        = ALIGN(vaddr + len, alignment) - vaddr;
       sec->vaddr = vaddr + len;
       sec->faddr = faddr + len;
+      if (pass == 3 && !oe->note_len) {
+        oe->note_vaddr = sec->vaddr;
+        oe->note_faddr = sec->faddr;
+      }
       len += sec->o_shdr->sh_size;
+      if (pass == 3)
+        oe->note_len = sec->vaddr + sec->o_shdr->sh_size - oe->note_vaddr;
     }
   }
   phdr->p_type   = PT_LOAD;
@@ -790,7 +799,19 @@ outelf_link(struct outelf *oe)
   oe->bss_vaddr = vaddr;
   len           = link_bss(oe, &oe->phdr[2], faddr, vaddr, oe->bss_len);
 
-  oe->nph        = has_tls ? 4 : 3;
+  oe->nph = has_tls ? 4 : 3;
+  if (oe->note_len) {
+    Elf_Phdr *note = &oe->phdr[oe->nph++];
+
+    note->p_type   = PT_NOTE;
+    note->p_flags  = PF_R;
+    note->p_vaddr  = oe->note_vaddr;
+    note->p_paddr  = oe->note_vaddr;
+    note->p_offset = oe->note_faddr;
+    note->p_filesz = oe->note_len;
+    note->p_memsz  = oe->note_len;
+    note->p_align  = 4;
+  }
   oe->shdr_faddr = faddr;
   outelf_reloc(oe);
 }
