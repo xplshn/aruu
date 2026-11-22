@@ -433,8 +433,9 @@ mountall:
     const char *realsrc;
     const char *mtype = me->mnt_type;
 
-    /* has "noauto" option or already mounted: skip */
-    if (hasmntopt(me, MNTOPT_NOAUTO) || mounted(me->mnt_dir))
+    /* has "noauto" option or already mounted: skip. swap has no
+     * directory to mount on, swapon -a takes it */
+    if (!strcmp(me->mnt_type, MNTTYPE_SWAP) || hasmntopt(me, MNTOPT_NOAUTO) || mounted(me->mnt_dir))
       continue;
     flags      = 0;
     fsopts[0]  = '\0';
