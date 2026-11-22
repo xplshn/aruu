@@ -303,6 +303,20 @@
   (out "cmd/dev/ar/ar")
   (exec $(CC) -static -o $(OUT) $(IN) $(LDFLAGS)))
 
+  (rule XELF_OBJ
+  (glob "cmd/dev/xelf/*.c")
+  (gate build_dev_xelf)
+  (after DEVCONF)
+  (dep $(MATCH) FEATURES_H)
+  (out "$(STEM).o")
+  (exec $(CC) $(CPPFLAGS) -Icmd/dev/xelf $(CFLAGS) -c -o $(OUT) $(MATCH)))
+
+  (rule XELF
+  (gate build_dev_xelf)
+  (dep XELF_OBJ LIBUTIL LIBUTF)
+  (out "cmd/dev/xelf/xelf")
+  (exec $(CC) -static -o $(OUT) $(IN) $(LDFLAGS)))
+
   (rule TCUTIL_OBJ
   (glob "shared/libtcutil/*.c" "shared/libtcutil/elf/*.c" "shared/libtcutil/ar/*.c")
   (gate build_dev_cc)
@@ -434,7 +448,7 @@
   (shell "$(LD) -r -o $(OUT) $(IN) && $(OBJCOPY) --redefine-sym main=ninqu_main $(OUT) && $(OBJCOPY) --keep-global-symbol=ninqu_main $(OUT)")
   (group box))
 
-  (group dev lib DEVCONF AR AS LD CC1 CPP CCDRV)
+  (group dev lib DEVCONF AR XELF AS LD CC1 CPP CCDRV)
 
   ; man pages: build mdoc and text pages from ?man-marked sources
   ;
@@ -832,7 +846,7 @@
   POSIX_BIN LINUX_BIN NET_BIN XSI_BIN
   PSEUDO_BIN EXTRA_BIN
   POSIX_BC POSIX_AWK POSIX_SH POSIX_MAKE EXTRA_YAP
-  AR AS LD CC1 CPP CCDRV)
+  AR XELF AS LD CC1 CPP CCDRV)
   (exec true))
 
   (group all ALL_BINS)
