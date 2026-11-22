@@ -4,7 +4,7 @@
  *
  * a record is one note owned by "xELF": type 1 a manifest (text), 2 the
  * rules the program serves to a plumber (text), 3 an icon (image(6)
- * r8g8b8a8) and 4 an icon in svg, the last two after a line "size <px>"
+ * qx) and 4 an icon in svg, the last two after a line "size <px>"
  * (0 for scalable). type 0 is a record that was taken out. readers walk
  * the program headers and ignore any type or note they do not know, so
  * a strip that keeps the segments keeps the records
@@ -33,8 +33,7 @@
 #define REC_BINARY (1024 * 1024)
 #define TOTAL_MAX  (5 * 1024 * 1024)
 #define PAGE_MIN   4096
-#define IMAGE_HDR  60
-#define IMAGE_CHAN "r8g8b8a8"
+#define QX_MAGIC   "qxi\001"
 
 enum { T_DEAD, T_MANIFEST, T_PLUMB, T_ICON, T_SVG };
 
@@ -424,7 +423,7 @@ dump_note(struct elf *e, size_t at, uint32_t type, size_t desc, size_t len, void
 
     while (n < len && e->b[desc + n] != '\n')
       n++;
-    printf("%.*s (%zu bytes of image)\n", (int)n, e->b + desc, len - n - 1);
+    printf("%.*s (%zu bytes of qx)\n", (int)n, e->b + desc, len - n - 1);
   } else {
     printf("%zu bytes\n", len);
   }
@@ -457,8 +456,26 @@ write_out(const struct elf *e, const char *path, const unsigned char *extra, siz
   }
 }
 
-/* an icon file as a record: svg as it is, anything else must be image(6)
- * r8g8b8a8, whose width is the size the record says */
+/* the width a qx file says it has: the varint after its ten fixed bytes,
+ * 0 when the bytes are not qx */
+static unsigned long
+qx_width(const unsigned char *b, size_t n)
+{
+  unsigned long w = 0;
+  size_t i;
+
+  if (n < 12 || memcmp(b, QX_MAGIC, 4))
+    return 0;
+  for (i = 0; i < 9 && 10 + i < n; i++) {
+    w |= (unsigned long)(b[10 + i] & 0x7F) << (7 * i);
+    if (!(b[10 + i] & 0x80))
+      return w;
+  }
+  return 0;
+}
+
+/* an icon file as a record: svg as it is, anything else must be qx, whose
+ * width is the size the record says */
 static struct rec
 icon_rec(const char *path)
 {
@@ -472,19 +489,12 @@ icon_rec(const char *path)
     r.type = T_SVG;
     snprintf(head, sizeof head, "size 0\n");
   } else {
-    long minx, maxx, size;
+    unsigned long size = qx_width(file, len);
 
-    if (len < IMAGE_HDR || memcmp(file, IMAGE_CHAN, strlen(IMAGE_CHAN)))
-      eprintf("%s: not an svg or an image(6) of %s\n", path, IMAGE_CHAN);
-    /* the header is the channels, then minx miny maxx maxy, each padded
-     * to 11 and followed by a space */
-    minx = strtol((char *)file + 12, NULL, 10);
-    maxx = strtol((char *)file + 36, NULL, 10);
-    size = maxx - minx;
-    if (size <= 0)
-      eprintf("%s: an image with no width\n", path);
+    if (!size)
+      eprintf("%s: not an svg or a qx file\n", path);
     r.type = T_ICON;
-    snprintf(head, sizeof head, "size %ld\n", size);
+    snprintf(head, sizeof head, "size %lu\n", size);
   }
   n = strlen(head);
   d = emalloc(n + len);
@@ -670,11 +680,19 @@ check_load_order(const struct elf *e, const char *path)
 static void
 check_note(struct elf *e, size_t at, uint32_t type, size_t desc, size_t len, void *arg)
 {
-  (void)e;
   (void)at;
-  (void)type;
-  (void)desc;
-  (void)len;
+  if (type == T_ICON) {
+    size_t       n = 0;
+    unsigned long said = 0;
+
+    while (n < len && e->b[desc + n] != '\n')
+      n++;
+    if (n < 6 || memcmp(e->b + desc, "size ", 5))
+      eprintf("%s: an icon record with no size line\n", argv0);
+    said = strtoul((char *)e->b + desc + 5, NULL, 10);
+    if (said != qx_width(e->b + desc + n + 1, len - n - 1))
+      eprintf("%s: an icon record whose size is not its picture's width\n", argv0);
+  }
   ++*(int *)arg;
 }
 
@@ -687,7 +705,7 @@ usage(void)
 // ?man xelf: records inside an executable
 // ?man arguments: add [-p plumb] bin manifest [icon ...] | dump bin | rm bin | check bin
 // ?man keeps records in ELF notes owned by xELF: a manifest, the rules the
-// ?man program serves to a plumber and icons (image(6) or svg). add
+// ?man program serves to a plumber and icons (qx or svg). add
 // ?man replaces what the program carries, dump prints it, rm takes it
 // ?man out and check says whether the program is laid out as a loader
 // ?man needs it
