@@ -19,7 +19,7 @@
 static void
 usage(void)
 {
-  eprintf("usage: %s [-l] [name]\n", argv0);
+  eprintf("usage: %s [-l] [-s shell] [-c command] [name]\n", argv0);
 }
 
 /* reads one line with echo off into a reusable static buffer */
@@ -60,18 +60,19 @@ readpass(const char *prompt)
 }
 
 // ?man su: become another user
-// ?man arguments: [-l] [name]
+// ?man arguments: [-l] [-s shell] [-c command] [name]
 // ?man authenticate as name (default: root) and start a shell as them
 // ?man with -l, also chdir to their home directory and run a login shell,
-// ?man same as login would
+// ?man same as login would. with -c, the shell runs command and ends
 int
 main(int argc, char *argv[])
 {
   struct passwd *pw;
   char           shellbuf[PATH_MAX];
   char          *name, *pass, *base;
-  char          *shargv[2];
-  int            lflag = 0;
+  char          *shargv[4];
+  char          *shell = NULL, *command = NULL;
+  int            n, lflag = 0;
   uid_t          uid;
 
   ARGBEGIN
@@ -79,6 +80,14 @@ main(int argc, char *argv[])
     // ?man -l: start a login shell, chdir home like login does
     case 'l':
       lflag = 1;
+      break;
+    // ?man -s:shell run shell, not the one in the password database
+    case 's':
+      shell = EARGF(usage());
+      break;
+    // ?man -c:command have the shell run command, and end
+    case 'c':
+      command = EARGF(usage());
       break;
     default:
       usage();
@@ -104,7 +113,7 @@ main(int argc, char *argv[])
   if (setuid(pw->pw_uid) < 0)
     eprintf("setuid:");
 
-  strlcpy(shellbuf, pw->pw_shell[0] ? pw->pw_shell : "/bin/sh", sizeof(shellbuf));
+  strlcpy(shellbuf, shell ? shell : pw->pw_shell[0] ? pw->pw_shell : "/bin/sh", sizeof(shellbuf));
 
   if (lflag) {
     if (chdir(pw->pw_dir) < 0)
@@ -125,7 +134,12 @@ main(int argc, char *argv[])
   } else {
     shargv[0] = estrdup(base);
   }
-  shargv[1] = NULL;
+  n = 1;
+  if (command) {
+    shargv[n++] = "-c";
+    shargv[n++] = command;
+  }
+  shargv[n] = NULL;
 
   wexecv_self(shellbuf, shargv);
   return 1;
