@@ -11,6 +11,7 @@ struct BlockDev {
   int      fd;
   uint64_t size;
   size_t   sec_size;
+  int      dirty; // written to: the kernel's view of the table is stale
 };
 
 struct BlockDevInfo {

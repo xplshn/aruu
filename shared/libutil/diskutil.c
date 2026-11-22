@@ -47,6 +47,7 @@ blockdev_open(struct BlockDev *dev, const char *path, int writable)
   dev->fd       = fd;
   dev->size     = st.st_size;
   dev->sec_size = 512;
+  dev->dirty    = 0;
 
   if (S_ISBLK(st.st_mode) || S_ISCHR(st.st_mode)) {
 #if defined(__linux__)
@@ -108,6 +109,7 @@ blockdev_write(struct BlockDev *dev, uint64_t sector, const void *buf, size_t se
   n = write(dev->fd, buf, size);
   if (n < 0 || (size_t)n != size)
     return -1;
+  dev->dirty = 1;
 
   return 0;
 }
@@ -115,6 +117,15 @@ blockdev_write(struct BlockDev *dev, uint64_t sector, const void *buf, size_t se
 void
 blockdev_close(struct BlockDev *dev)
 {
+#if defined(__linux__)
+  struct stat st;
+
+  // the kernel keeps the partition table it read when the disk appeared:
+  // a table written here has no device nodes until it is asked to read
+  // again, which fails harmlessly while a partition is in use
+  if (dev->dirty && dev->fd >= 0 && fstat(dev->fd, &st) == 0 && S_ISBLK(st.st_mode))
+    ioctl(dev->fd, BLKRRPART);
+#endif
   if (dev->fd >= 0) {
     close(dev->fd);
     dev->fd = -1;
