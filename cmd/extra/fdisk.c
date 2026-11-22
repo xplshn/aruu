@@ -209,6 +209,24 @@ gpt_type_guid(const char *type, uint8_t out[16])
   memcpy(out, gpt_type_table[GPT_TYPE_TABLE_LEN - 1].guid, 16);
 }
 
+/* a random GUID, version 4: the disk and each partition must have a
+ * GUID of their own, and a loader such as limine ignores a partition
+ * whose GUID is zero */
+static int
+gpt_random_guid(uint8_t out[16])
+{
+  int     fd = open(ARUU_PATH_DEVURANDOM, O_RDONLY);
+  ssize_t n  = fd < 0 ? -1 : read(fd, out, 16);
+
+  if (fd >= 0)
+    close(fd);
+  if (n != 16)
+    return -1;
+  out[6] = (out[6] & 0x0f) | 0x40;
+  out[8] = (out[8] & 0x3f) | 0x80;
+  return 0;
+}
+
 /* resolves -b for a GPT add: a plain sector number, or 0/unset for
  * the first free sector right after every existing partition's own
  * end_lba (gpt_hdr.first_usable if the table is still empty), the
@@ -628,6 +646,11 @@ do_fdisk(const char *path)
     gpt_hdr.partition_lba = 2;
     gpt_hdr.num_parts     = 128;
     gpt_hdr.part_size     = 128;
+    if (gpt_random_guid(gpt_hdr.disk_guid) < 0) {
+      weprintf("cannot read %s:", ARUU_PATH_DEVURANDOM);
+      blockdev_close(&dev);
+      return -1;
+    }
     memset(gpt_parts, 0, sizeof(gpt_parts));
 
     if (gpt_write(&dev, &gpt_hdr, gpt_parts) < 0) {
@@ -695,6 +718,11 @@ do_fdisk(const char *path)
       gp->start_lba = gpt_resolve_start(&gpt_hdr, gpt_parts, opt_start_str);
       gp->end_lba   = gpt_resolve_end(&gpt_hdr, dev.sec_size, gp->start_lba, opt_end_str);
       gpt_type_guid(opt_type, gp->type_guid);
+      if (gpt_random_guid(gp->part_guid) < 0) {
+        weprintf("cannot read %s:", ARUU_PATH_DEVURANDOM);
+        blockdev_close(&dev);
+        return -1;
+      }
       gpt_set_name(gp->name, opt_name);
 
       if (gpt_write(&dev, &gpt_hdr, gpt_parts) < 0) {
