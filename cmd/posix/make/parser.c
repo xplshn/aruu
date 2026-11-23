@@ -11,7 +11,7 @@
 
 #include "make.h"
 
-#define MAXREPL  30
+#define MAXREPL  256
 #define TABSIZ   64
 #define MAXTOKEN FILENAME_MAX
 #define ITEM     128
@@ -915,12 +915,54 @@ dirbase(char *name, int which)
   return r;
 }
 
+/* a macro name that holds a macro, as in $(tag-static-$(static)): the inner
+ * one is read to its closing bracket and its value joins the name. the
+ * pieces of a $(name:from=to) hold them too, kept as text until used */
+static int
+rawref(char *dst, int di, int max)
+{
+  int c, open, close, depth = 1;
+
+  dst[di++] = '$';
+  open      = nextc();
+  if (open != '(' && open != '{')
+    error("invalid macro name in expansion");
+  close     = open == '(' ? ')' : '}';
+  dst[di++] = open;
+  while (depth && (c = nextc()) != EOF) {
+    if (di >= max - 2)
+      error("expansion text too long");
+    depth += (c == open) - (c == close);
+    dst[di++] = c;
+  }
+  if (depth)
+    error("found eof while parsing expansion");
+  dst[di] = '\0';
+  return di;
+}
+
+static int
+nested(char *name, int namei, Target *tp)
+{
+  char  ref[MAXTOKEN], *val;
+  int   n;
+
+  rawref(ref, 0, MAXTOKEN);
+  val    = expandstring(ref, tp, getloc());
+  n      = strlen(val);
+  if (namei + n >= MAXTOKEN - 1)
+    error("expansion text too long");
+  memcpy(name + namei, val, n);
+  free(val);
+  return namei + n;
+}
+
 static void
 expansion(Target *tp)
 {
   int   delim, c, repli, toi, namei, st;
   char  name[MAXTOKEN], repl[MAXREPL], to[MAXREPL];
-  char *s, *erepl;
+  char *s, *erepl, *eto;
 
   c = nextc();
   if (c == '(')
@@ -966,7 +1008,11 @@ expansion(Target *tp)
           break;
         }
 
-        if (!validchar(c))
+        if (c == '$') {
+          namei = nested(name, namei, tp);
+          break;
+        }
+        if (!validchar(c) && c != '+')
           error("invalid macro name in expansion");
         name[namei++] = c;
         break;
@@ -991,6 +1037,10 @@ expansion(Target *tp)
               "invalid replacement pattern in "
               "expansion"
           );
+        if (c == '$') {
+          repli = rawref(repl, repli, MAXREPL);
+          break;
+        }
         if (repli == MAXREPL - 1)
           error("macro replacement too big");
         repl[repli++] = c;
@@ -1001,6 +1051,10 @@ expansion(Target *tp)
           break;
         }
 
+        if (c == '$') {
+          toi = rawref(to, toi, MAXREPL);
+          break;
+        }
         if (toi == MAXREPL - 1)
           error("macro substiturion too big");
         to[toi++] = c;
@@ -1015,8 +1069,10 @@ expansion(Target *tp)
   to[toi]     = '\0';
 
   erepl = expandstring(repl, tp, getloc());
-  replace(s, erepl, to);
+  eto   = expandstring(to, tp, getloc());
+  replace(s, erepl, eto);
 
+  free(eto);
   free(erepl);
   free(s);
   return;
@@ -1302,9 +1358,8 @@ rule(char *targets[], int ntargets)
   struct action *acts;
   char         **deps = NULL;
 
-  if (ntargets == 0)
-    error("missing target");
-
+  // a name that expands to nothing, as ${SO}: does when SO is unset, makes
+  // a rule that is not there
   for (ndeps = 0; next() == ITEM; ++ndeps) {
     deps        = erealloc(deps, (ndeps + 1) * sizeof(char *));
     deps[ndeps] = estrdup(token);

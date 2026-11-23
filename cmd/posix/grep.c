@@ -31,6 +31,7 @@ static int eflag;
 static int fflag;
 static int hflag;
 static int iflag;
+static int oflag;
 static int sflag;
 static int vflag;
 static int wflag;
@@ -106,6 +107,64 @@ print_line(const char *str, const char *line, long line_no, char sep)
   puts(line);
 }
 #endif
+
+// the leftmost longest match of any pattern in text, its offset and length.
+// notbol is set once part of the line is behind us, so ^ matches nothing
+// in the middle of it
+static int
+firstmatch(const char *text, int notbol, size_t *at, size_t *len)
+{
+  struct pattern *pnode;
+  regmatch_t      pm;
+  const char     *hit;
+  size_t          o, l;
+  int             found = 0;
+
+  SLIST_FOREACH(pnode, &phead, entry)
+  {
+    if (Fflag) {
+      if (!(hit = (iflag ? strcasestr : strstr)(text, pnode->pattern)))
+        continue;
+      o = hit - text;
+      l = strlen(pnode->pattern);
+    } else {
+      if (regexec(&pnode->preg, text, 1, &pm, notbol ? REG_NOTBOL : 0))
+        continue;
+      o = pm.rm_so;
+      l = pm.rm_eo - pm.rm_so;
+    }
+    if (!found || o < *at || (o == *at && l > *len)) {
+      *at   = o;
+      *len  = l;
+      found = 1;
+    }
+  }
+  return found;
+}
+
+// -o: each match on a line of its own, with the prefix a whole line has
+static void
+print_matches(const char *str, const char *line, long line_no)
+{
+  size_t at, len;
+  int    notbol = 0;
+
+  while (*line && firstmatch(line, notbol, &at, &len)) {
+    if (!len) {
+      // an empty match says nothing, step over a character
+      line++;
+      notbol = 1;
+      continue;
+    }
+    if (!hflag && (many || Hflag))
+      printf("%s:", str);
+    if (mode == 'n')
+      printf("%ld:", line_no);
+    printf("%.*s\n", (int)len, line + at);
+    line += at + len;
+    notbol = 1;
+  }
+}
 
 static int
 grep(FILE *fp, const char *str)
@@ -190,6 +249,10 @@ grep(FILE *fp, const char *str)
             last_printed_line = n;
           } else {
 #endif
+            if (oflag && !vflag) {
+              print_matches(str, buf, n);
+              break;
+            }
             if (!hflag && (many || Hflag))
               printf("%s:", str);
             if (mode == 'n')
@@ -248,7 +311,7 @@ usage(void)
 {
   enprintf(
       Error,
-      "usage: %s [-EFHchilnqsvwx]"
+      "usage: %s [-EFHchilnoqsvwx]"
 #if FEATURE_GREP_CONTEXT
       " [-A num] [-B num] [-C num]"
 #endif
@@ -274,6 +337,7 @@ main(int argc, char *argv[])
   char           *arg;
 
   SLIST_INIT(&phead);
+  argv0 = argv[0];
 
   // egrep/fgrep: legacy invocation names many upstream scripts still
   // assume exist as their own commands rather than as grep -E/-F
@@ -368,6 +432,11 @@ main(int argc, char *argv[])
       // ?man -i: perform case-insensitive matching
       flags |= REG_ICASE;
       iflag = 1;
+      break;
+    case 'o':
+      // ?man -o: print only the matching parts of a line, each on a line of its own
+      oflag = 1;
+      flags &= ~REG_NOSUB;
       break;
     case 's':
       // ?man -s: suppress error messages about nonexistent or unreadable files

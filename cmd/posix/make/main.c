@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdarg.h>
@@ -93,21 +94,53 @@ getarg(char **args, char ***argv)
   return **argv;
 }
 
+// MAKEFLAGS is a list of words, so a space inside one, as in CFLAGS=-O2 -g,
+// goes in behind a backslash, and so does a backslash
 static void
 appendmakeflags(char *text)
 {
-  int   n;
-  char *s, *t, *fmt;
+  size_t n;
+  char  *s, *t, *w;
 
-  s   = getmacro("MAKEFLAGS");
-  fmt = *s ? "%s %s" : "%s%s";
-  n   = snprintf(NULL, 0, fmt, s, text);
-
-  t = emalloc(n + 1);
-  snprintf(t, n + 1, fmt, s, text);
+  s = getmacro("MAKEFLAGS");
+  n = strlen(s);
+  t = emalloc(n + 2 * strlen(text) + 2);
+  memcpy(t, s, n);
+  w = t + n;
+  if (n)
+    *w++ = ' ';
+  for (; *text; text++) {
+    if (*text == ' ' || *text == '\t' || *text == '\\')
+      *w++ = '\\';
+    *w++ = *text;
+  }
+  *w = '\0';
   setmacro("MAKEFLAGS", t, MAKEFLAGS, EXPORT);
 
   free(t);
+}
+
+// the next word of a MAKEFLAGS list, cut out in place and its escapes
+// undone. NULL at the end
+static char *
+flagword(char **list)
+{
+  char *start, *w;
+
+  while (**list == ' ' || **list == '\t')
+    (*list)++;
+  if (!**list)
+    return NULL;
+  start = w = *list;
+  while (**list && **list != ' ' && **list != '\t') {
+    if (**list == '\\' && (*list)[1])
+      (*list)++;
+    *w++ = *(*list)++;
+  }
+  if (**list)
+    (*list)++;
+  *w = '\0';
+  return start;
 }
 
 static int
@@ -116,10 +149,22 @@ hasargs(int c)
   return c == 'f' || c == 'j';
 }
 
+// a bare -j, with nothing after it or something that is not a count, asks
+// for as many jobs as there can be and takes no argument
+static int
+takesarg(int c, char **args, char ***argv)
+{
+  if (c != 'j')
+    return hasargs(c);
+  if ((*args)[1])
+    return 1;
+  return argv && (*argv)[1] && isdigit((unsigned char)(*argv)[1][0]);
+}
+
 static void
 parseflag(int flag, char **args, char ***argv)
 {
-  if (hasargs(flag))
+  if (takesarg(flag, args, argv))
     getarg(args, argv);
 
   switch (flag) {
@@ -211,11 +256,16 @@ assign(char *s, int where, int export)
   return 1;
 }
 
+// macros may come after targets too, as they do in "make all CC=cc", so a
+// command line is read to its end and what is not an option or a macro is a
+// target. the options of MAKEFLAGS have no targets to collect
 static void
 parseargv(char **argv, char ***targets, int where, int export)
 {
-  char *s;
-  char *hm = NULL;
+  char  *s;
+  char  *hm = NULL;
+  char **found = NULL;
+  int    n = 0;
 
   for (; *argv; ++argv) {
     s = *argv;
@@ -224,16 +274,26 @@ parseargv(char **argv, char ***targets, int where, int export)
     } else if (hm && s[0] == '-') {
       break;
     } else if (s[0] != '-') {
-      if (!assign(s, where, export))
+      if (assign(s, where, export))
+        continue;
+      if (!targets)
         break;
+      found       = erealloc(found, (n + 2) * sizeof(*found));
+      found[n++]  = s;
+      found[n]    = NULL;
       continue;
     }
     while (hm == NULL && *++s)
       parseflag(*s, &s, &argv);
   }
 
-  if (targets)
-    *targets = argv;
+  if (targets) {
+    if (!found) {
+      found    = emalloc(sizeof(*found));
+      found[0] = NULL;
+    }
+    *targets = found;
+  }
 }
 
 static void
@@ -258,7 +318,7 @@ parsemakeflags(void)
   } else {
     n   = 0;
     arr = NULL;
-    for (s = strtok(flags, " \t"); s; s = strtok(NULL, " \t")) {
+    while ((s = flagword(&flags))) {
       n++;
       arr        = erealloc(arr, sizeof(char *) * (n + 1));
       arr[n - 1] = s;
@@ -278,9 +338,11 @@ parsemakefiles(char **argv)
   int   c, hasmake;
 
   hasmake = 0;
-  for (; *argv && **argv == '-'; ++argv) {
+  for (; *argv; ++argv) {
+    if (**argv != '-')
+      continue;
     for (s = *argv; (c = *s); ++s) {
-      if (hasargs(c))
+      if (takesarg(c, &s, &argv))
         arg = getarg(&s, &argv);
 
       if (c == 'f') {
@@ -315,7 +377,7 @@ enadebug(char *argv[])
   for (; *argv && **argv == '-'; ++argv) {
     p = *argv;
     for (++p; (c = *p); ++p) {
-      if (hasargs(c))
+      if (takesarg(c, &p, &argv))
         getarg(&p, &argv);
       if (c == 'd')
         dflag = 1;
