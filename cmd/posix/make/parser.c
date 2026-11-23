@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <ctype.h>
 #include <errno.h>
+#include <glob.h>
+#include <libgen.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -13,6 +15,7 @@
 #define TABSIZ   64
 #define MAXTOKEN FILENAME_MAX
 #define ITEM     128
+#define IMMED    129
 
 typedef struct macro Macro;
 
@@ -732,6 +735,19 @@ validchar(int c)
   return c == '.' || c == '/' || c == '_' || c == '-' || isalnum(c);
 }
 
+/* what a target, a dependency or a macro name in a rule line may hold.
+ * + and ? only end a name when they start += or ?=, so g++ and
+ * the glob patterns of other makes are names */
+static int
+itemchar(int c)
+{
+  if (validchar(c))
+    return 1;
+  if (c == '*' || c == '[' || c == ']' || c == '~' || c == ',')
+    return 1;
+  return (c == '+' || c == '?') && ahead() != '=';
+}
+
 static char *
 expandmacro(char *name)
 {
@@ -885,6 +901,20 @@ internal(int ch)
   }
 }
 
+/* $(@D) and $(@F) and their kin: the directory part of a name or the rest.
+ * the string given is freed */
+static char *
+dirbase(char *name, int which)
+{
+  char *copy, *r;
+
+  copy = estrdup(name);
+  r    = estrdup(which == 'D' ? dirname(copy) : basename(copy));
+  free(copy);
+  free(name);
+  return r;
+}
+
 static void
 expansion(Target *tp)
 {
@@ -941,6 +971,10 @@ expansion(Target *tp)
         name[namei++] = c;
         break;
       case STINTERNAL:
+        if (c == 'D' || c == 'F') {
+          s = dirbase(s, c);
+          break;
+        }
         if (c == delim)
           goto no_replace;
         if (c != ':')
@@ -1047,7 +1081,7 @@ item(void)
     c = nextc();
     if (c == '$' && ahead() != '$')
       expansion(NULL);
-    else if (validchar(c))
+    else if (itemchar(c))
       *s++ = c;
     else
       break;
@@ -1101,8 +1135,18 @@ repeat:
       comment();
       c = '\n';
       /* fallthrough */
-    case ';':
     case ':':
+      /* := and ::= expand their text where they are read */
+      if (ahead() == ':')
+        nextc();
+      if (ahead() == '=') {
+        nextc();
+        strcpy(token, ":=");
+        tok = IMMED;
+        break;
+      }
+      goto single;
+    case ';':
     case '=':
     case '\n':
     single:
@@ -1111,23 +1155,25 @@ repeat:
       tok      = c;
       break;
     case '+':
-      if (nextc() == '=') {
+      if (ahead() == '=') {
+        nextc();
         token[0] = '+';
         token[1] = '=';
         token[2] = '\0';
         tok      = '+';
         break;
       }
-      error("unexpected character '+'");
+      goto name;
     case '?':
-      if (nextc() == '=') {
+      if (ahead() == '=') {
+        nextc();
         token[0] = '?';
         token[1] = '=';
         token[2] = '\0';
         tok      = '?';
         break;
       }
-      error("unexpected character '?'");
+      goto name;
     case '!':
       if (nextc() == '=') {
         token[0] = '!';
@@ -1138,7 +1184,8 @@ repeat:
       }
       error("unexpected character '!'");
     default:
-      if (!validchar(c))
+    name:
+      if (!itemchar(c))
         error("unexpected character '%c'", c);
       back(c);
       tok = item();
@@ -1220,6 +1267,34 @@ readcmd(void)
   return act;
 }
 
+/* a dependency with glob characters stands for the files that match,
+ * as it does in the other makes. one that matches nothing stays as it
+ * is and fails as a missing file would */
+static int
+globdeps(char ***deps, int n)
+{
+  char **out = NULL;
+  int    i, j, m = 0;
+  glob_t g;
+
+  for (i = 0; i < n; i++) {
+    if (strpbrk((*deps)[i], "*?[") && glob((*deps)[i], 0, NULL, &g) == 0) {
+      for (j = 0; j < (int)g.gl_pathc; j++) {
+        out        = erealloc(out, (m + 1) * sizeof(char *));
+        out[m++]   = estrdup(g.gl_pathv[j]);
+      }
+      globfree(&g);
+      free((*deps)[i]);
+      continue;
+    }
+    out      = erealloc(out, (m + 1) * sizeof(char *));
+    out[m++] = (*deps)[i];
+  }
+  free(*deps);
+  *deps = out;
+  return m;
+}
+
 static void
 rule(char *targets[], int ntargets)
 {
@@ -1238,6 +1313,8 @@ rule(char *targets[], int ntargets)
   if (tok != '\n' && tok != ';')
     error("garbage at the end of the line");
 
+  ndeps = globdeps(&deps, ndeps);
+
   nactions = 0;
   acts     = NULL;
   if (tok == ';') {
@@ -1251,6 +1328,10 @@ rule(char *targets[], int ntargets)
       comment();
       continue;
     }
+    /* a blank line does not end the commands: the makefiles of
+     * other makes put one between two of them */
+    if (c == '\n')
+      continue;
     if (c != '\t')
       break;
     nactions++;
@@ -1315,6 +1396,23 @@ assign_append(char *macros[], int where, int n)
   new[olen + dlen] = '\0';
   setmacro(*macros, new, where, NOEXPORT);
   free(new);
+  free(defs);
+}
+
+/* := reads the text as it is now, so what a later line sets does not move it */
+static void
+assign_immediate(char *macros[], int where, int n)
+{
+  char *defs, *text;
+
+  if (n != 1)
+    error("invalid macro definition");
+
+  skipspaces();
+  defs = readmacrodef();
+  text = expandstring(defs, NULL, getloc());
+  setmacro(*macros, text, where, NOEXPORT);
+  free(text);
   free(defs);
 }
 
@@ -1401,6 +1499,9 @@ parseinput(int where)
         break;
       case '=':
         assign(targets, where, n);
+        break;
+      case IMMED:
+        assign_immediate(targets, where, n);
         break;
       case '+':
         assign_append(targets, where, n);
