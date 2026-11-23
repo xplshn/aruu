@@ -129,11 +129,12 @@ include(void)
     }
   }
 
-  /* freestanding headers (stddef.h etc) ship in an include/ dir next to
-     the compiler binary itself, the same layout gcc and clang use for
-     their own built-in headers */
+  /* freestanding headers (stddef.h etc) the libc may not ship: an include/
+     dir next to the compiler in a source tree, lib/aruu/include in a
+     system whose binaries are all in bin/ */
   if (!f) {
-    char    self[FILENAME_MAX];
+    static const char *const rel[] = {"include", "../lib/aruu/include"};
+    char                     self[FILENAME_MAX];
     ssize_t n = readlink("/proc/self/exe", self, sizeof(self) - 1);
     if (n == -1) {
       n = strlen(argv0);
@@ -146,9 +147,11 @@ include(void)
     char *dir = strrchr(self, '/');
     if (dir) {
       *dir = '\0';
-      if (strlen(self) + sizeof("/include/") + strlen(name) < sizeof(path)) {
-        snprintf(path, sizeof(path), "%s/include/%s", self, name);
-        f = fopen(path, "r");
+      for (size_t i = 0; !f && i < sizeof(rel) / sizeof(*rel); i++) {
+        if (strlen(self) + 1 + strlen(rel[i]) + 1 + strlen(name) < sizeof(path)) {
+          snprintf(path, sizeof(path), "%s/%s/%s", self, rel[i], name);
+          f = fopen(path, "r");
+        }
       }
     }
   }
