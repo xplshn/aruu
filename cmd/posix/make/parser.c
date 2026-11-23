@@ -16,7 +16,7 @@
 #define TABSIZ   64
 #define MAXTOKEN FILENAME_MAX
 #define ITEM     128
-#define IMMED    129 /* gmake compat: := */
+#define IMMED    129 /* ::= */
 
 typedef struct macro Macro;
 
@@ -1210,11 +1210,20 @@ repeat:
       expansion(NULL);
       goto repeat;
     case ':':
-#if FEATURE_MAKE_GMAKE
-      /* gmake compat: := and ::= expand their text where they are read */
-      if (ahead() == ':')
+      // ::= expands its text where it is read
+      if (ahead() == ':') {
         nextc();
-      if (ahead() == '=') {
+        if (ahead() == '=') {
+          nextc();
+          strcpy(token, "::=");
+          tok = IMMED;
+          break;
+        }
+        back(':');
+      }
+#if FEATURE_MAKE_GMAKE
+      /* gmake compat: := is the same */
+      else if (ahead() == '=') {
         nextc();
         strcpy(token, ":=");
         tok = IMMED;
@@ -1234,8 +1243,6 @@ repeat:
       token[1] = '\0';
       tok      = c;
       break;
-#if MAKE_SHARED
-    /* bmake and gmake compat: += and ?= */
     case '+':
       if (ahead() == '=') {
         nextc();
@@ -1256,9 +1263,6 @@ repeat:
         break;
       }
       goto name;
-#endif
-#if FEATURE_MAKE_BMAKE
-    /* bmake compat: != */
     case '!':
       if (nextc() == '=') {
         token[0] = '!';
@@ -1268,11 +1272,8 @@ repeat:
         break;
       }
       error("unexpected character '!'");
-#endif
     default:
-#if MAKE_SHARED
     name:
-#endif
       if (!itemchar(c))
         error("unexpected character '%c'", c);
       back(c);
@@ -1470,8 +1471,6 @@ assign(char *macros[], int where, int n)
   free(defs);
 }
 
-#if MAKE_SHARED
-/* bmake and gmake compat: += */
 static void
 assign_append(char *macros[], int where, int n)
 {
@@ -1498,10 +1497,7 @@ assign_append(char *macros[], int where, int n)
   free(defs);
 }
 
-#endif
-
-#if FEATURE_MAKE_GMAKE
-/* gmake compat: := reads the text as it is now, so what a later line sets does not move it */
+/* ::= reads the text as it is now, so what a later line sets does not move it */
 static void
 assign_immediate(char *macros[], int where, int n)
 {
@@ -1518,10 +1514,7 @@ assign_immediate(char *macros[], int where, int n)
   free(defs);
 }
 
-#endif
-
-#if MAKE_SHARED
-/* bmake and gmake compat: ?= sets a macro only when nothing, the environment included, has */
+/* ?= sets a macro only when nothing, the environment included, has */
 static void
 assign_default(char *macros[], int where, int n)
 {
@@ -1537,10 +1530,7 @@ assign_default(char *macros[], int where, int n)
   free(defs);
 }
 
-#endif
-
-#if FEATURE_MAKE_BMAKE
-/* bmake compat: != reads a macro from a command's output */
+/* != reads a macro from a command's output */
 static void
 assign_shell(char *macros[], int where, int n)
 {
@@ -1580,7 +1570,6 @@ assign_shell(char *macros[], int where, int n)
   free(out);
   free(cmd);
 }
-#endif
 
 void
 parseinput(int where)
@@ -1610,24 +1599,18 @@ parseinput(int where)
       case '=':
         assign(targets, where, n);
         break;
-#if FEATURE_MAKE_GMAKE
       case IMMED:
         assign_immediate(targets, where, n);
         break;
-#endif
-#if MAKE_SHARED
       case '+':
         assign_append(targets, where, n);
         break;
       case '?':
         assign_default(targets, where, n);
         break;
-#endif
-#if FEATURE_MAKE_BMAKE
       case '!':
         assign_shell(targets, where, n);
         break;
-#endif
       default:
         error("unexpected token '%s'(%d)", token, tok);
     }
