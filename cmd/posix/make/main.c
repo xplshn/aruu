@@ -150,12 +150,12 @@ hasargs(int c)
   return c == 'f' || c == 'j';
 }
 
-// bmake/gmake compat: a bare -j, with nothing after it or something that is
+// gmake compat: a bare -j, with nothing after it or something that is
 // not a count, asks for as many jobs as there can be and takes no argument
 static int
 takesarg(int c, char **args, char ***argv)
 {
-#if FEATURE_MAKE_COMPAT
+#if FEATURE_MAKE_GMAKE
   if (c == 'j') {
     if ((*args)[1])
       return 1;

@@ -16,7 +16,7 @@
 #define TABSIZ   64
 #define MAXTOKEN FILENAME_MAX
 #define ITEM     128
-#define IMMED    129 /* bmake/gmake compat: := */
+#define IMMED    129 /* gmake compat: := */
 
 typedef struct macro Macro;
 
@@ -737,14 +737,14 @@ validchar(int c)
 }
 
 /* what a target, a dependency or a macro name in a rule line may hold.
- * bmake/gmake compat: * [ ] ~ , and + ? that do not start += or ?= are
+ * bmake and gmake compat: * [ ] ~ , and + ? that do not start += or ?= are
  * names too, as in g++ and the glob patterns of those makes */
 static int
 itemchar(int c)
 {
   if (validchar(c))
     return 1;
-#if FEATURE_MAKE_COMPAT
+#if MAKE_SHARED
   if (c == '*' || c == '[' || c == ']' || c == '~' || c == ',')
     return 1;
   return (c == '+' || c == '?') && ahead() != '=';
@@ -920,10 +920,10 @@ dirbase(char *name, int which)
   return r;
 }
 
-/* bmake/gmake compat: a macro name that holds a macro, as in $(tag-static-$(static)): the inner
+/* gmake compat: a macro name that holds a macro, as in $(tag-static-$(static)): the inner
  * one is read to its closing bracket and its value joins the name. the
  * pieces of a $(name:from=to) hold them too, kept as text until used */
-#if FEATURE_MAKE_COMPAT
+#if FEATURE_MAKE_GMAKE
 static int
 rawref(char *dst, int di, int max)
 {
@@ -1015,7 +1015,7 @@ expansion(Target *tp)
           break;
         }
 
-#if FEATURE_MAKE_COMPAT
+#if FEATURE_MAKE_GMAKE
         if (c == '$') {
           namei = nested(name, namei, tp);
           break;
@@ -1051,7 +1051,7 @@ expansion(Target *tp)
               "invalid replacement pattern in "
               "expansion"
           );
-#if FEATURE_MAKE_COMPAT
+#if FEATURE_MAKE_GMAKE
         if (c == '$') {
           repli = rawref(repl, repli, MAXREPL);
           break;
@@ -1067,7 +1067,7 @@ expansion(Target *tp)
           break;
         }
 
-#if FEATURE_MAKE_COMPAT
+#if FEATURE_MAKE_GMAKE
         if (c == '$') {
           toi = rawref(to, toi, MAXREPL);
           break;
@@ -1087,7 +1087,7 @@ expansion(Target *tp)
   to[toi]     = '\0';
 
   erepl = expandstring(repl, tp, getloc());
-#if FEATURE_MAKE_COMPAT
+#if FEATURE_MAKE_GMAKE
   eto = expandstring(to, tp, getloc());
 #else
   eto = estrdup(to);
@@ -1210,9 +1210,8 @@ repeat:
       expansion(NULL);
       goto repeat;
     case ':':
-#if FEATURE_MAKE_COMPAT
-      /* bmake/gmake compat: := and ::= expand their text where they are
-       * read */
+#if FEATURE_MAKE_GMAKE
+      /* gmake compat: := and ::= expand their text where they are read */
       if (ahead() == ':')
         nextc();
       if (ahead() == '=') {
@@ -1235,8 +1234,8 @@ repeat:
       token[1] = '\0';
       tok      = c;
       break;
-#if FEATURE_MAKE_COMPAT
-    /* bmake/gmake compat: += ?= and != */
+#if MAKE_SHARED
+    /* bmake and gmake compat: += and ?= */
     case '+':
       if (ahead() == '=') {
         nextc();
@@ -1257,6 +1256,9 @@ repeat:
         break;
       }
       goto name;
+#endif
+#if FEATURE_MAKE_BMAKE
+    /* bmake compat: != */
     case '!':
       if (nextc() == '=') {
         token[0] = '!';
@@ -1268,7 +1270,7 @@ repeat:
       error("unexpected character '!'");
 #endif
     default:
-#if FEATURE_MAKE_COMPAT
+#if MAKE_SHARED
     name:
 #endif
       if (!itemchar(c))
@@ -1353,8 +1355,8 @@ readcmd(void)
   return act;
 }
 
-#if FEATURE_MAKE_COMPAT
-/* bmake/gmake compat: a dependency with glob characters stands for the
+#if MAKE_SHARED
+/* bmake and gmake compat: a dependency with glob characters stands for the
  * files that match. one that matches nothing stays as it is and fails as
  * a missing file would */
 static int
@@ -1390,8 +1392,8 @@ rule(char *targets[], int ntargets)
   struct action *acts;
   char         **deps = NULL;
 
-#if FEATURE_MAKE_COMPAT
-  // bmake/gmake compat: a name that expands to nothing, as ${SO}: does when
+#if MAKE_SHARED
+  // bmake and gmake compat: a name that expands to nothing, as ${SO}: does when
   // SO is unset, makes a rule that is not there
 #else
   if (ntargets == 0)
@@ -1405,7 +1407,7 @@ rule(char *targets[], int ntargets)
   if (tok != '\n' && tok != ';')
     error("garbage at the end of the line");
 
-#if FEATURE_MAKE_COMPAT
+#if MAKE_SHARED
   ndeps = globdeps(&deps, ndeps);
 #endif
 
@@ -1422,8 +1424,8 @@ rule(char *targets[], int ntargets)
       comment();
       continue;
     }
-#if FEATURE_MAKE_COMPAT
-    /* bmake/gmake compat: a blank line does not end the commands */
+#if MAKE_SHARED
+    /* bmake and gmake compat: a blank line does not end the commands */
     if (c == '\n')
       continue;
 #endif
@@ -1468,8 +1470,8 @@ assign(char *macros[], int where, int n)
   free(defs);
 }
 
-/* bmake/gmake compat: += := ?= and != */
-#if FEATURE_MAKE_COMPAT
+#if MAKE_SHARED
+/* bmake and gmake compat: += */
 static void
 assign_append(char *macros[], int where, int n)
 {
@@ -1496,7 +1498,10 @@ assign_append(char *macros[], int where, int n)
   free(defs);
 }
 
-/* := reads the text as it is now, so what a later line sets does not move it */
+#endif
+
+#if FEATURE_MAKE_GMAKE
+/* gmake compat: := reads the text as it is now, so what a later line sets does not move it */
 static void
 assign_immediate(char *macros[], int where, int n)
 {
@@ -1513,7 +1518,10 @@ assign_immediate(char *macros[], int where, int n)
   free(defs);
 }
 
-/* ?= sets a macro only when nothing, the environment included, has */
+#endif
+
+#if MAKE_SHARED
+/* bmake and gmake compat: ?= sets a macro only when nothing, the environment included, has */
 static void
 assign_default(char *macros[], int where, int n)
 {
@@ -1529,6 +1537,10 @@ assign_default(char *macros[], int where, int n)
   free(defs);
 }
 
+#endif
+
+#if FEATURE_MAKE_BMAKE
+/* bmake compat: != reads a macro from a command's output */
 static void
 assign_shell(char *macros[], int where, int n)
 {
@@ -1598,16 +1610,20 @@ parseinput(int where)
       case '=':
         assign(targets, where, n);
         break;
-#if FEATURE_MAKE_COMPAT
+#if FEATURE_MAKE_GMAKE
       case IMMED:
         assign_immediate(targets, where, n);
         break;
+#endif
+#if MAKE_SHARED
       case '+':
         assign_append(targets, where, n);
         break;
       case '?':
         assign_default(targets, where, n);
         break;
+#endif
+#if FEATURE_MAKE_BMAKE
       case '!':
         assign_shell(targets, where, n);
         break;

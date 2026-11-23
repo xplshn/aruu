@@ -56,11 +56,16 @@
 #ifndef FEATURE_HEAD_NEGATIVE
 #define FEATURE_HEAD_NEGATIVE 1
 #endif
-/* what makefiles written for bmake or gmake use and POSIX does not say:
- * += ?= != := assignments, nested macro names, globs in dependencies,
- * g++ style names, a bare -j, a blank line inside a recipe */
-#ifndef FEATURE_MAKE_COMPAT
-#define FEATURE_MAKE_COMPAT 1
+/* what makefiles written for bmake use and POSIX does not say: != and what
+ * bmake has in common with gmake (+= ?= globs in dependencies, a blank line
+ * inside a recipe, a rule whose target expands to nothing) */
+#ifndef FEATURE_MAKE_BMAKE
+#define FEATURE_MAKE_BMAKE 1
+#endif
+/* the same for gmake: := nested macro names and a bare -j, and what it has
+ * in common with bmake */
+#ifndef FEATURE_MAKE_GMAKE
+#define FEATURE_MAKE_GMAKE 1
 #endif
 #ifndef FEATURE_SED_INPLACE
 #define FEATURE_SED_INPLACE 1

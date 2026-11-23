@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <time.h>
 
+#include "config.h"
 #include "util.h"
 #include "wexec.h"
 
@@ -84,3 +85,6 @@ extern volatile sig_atomic_t stop;
 
 /* defaults.c */
 extern char defaults[];
+
+/* what both bmake and gmake do and POSIX does not say: either gate lets it in */
+#define MAKE_SHARED (FEATURE_MAKE_BMAKE || FEATURE_MAKE_GMAKE)
