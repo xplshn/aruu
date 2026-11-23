@@ -9,13 +9,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config.h"
 #include "make.h"
 
 #define MAXREPL  256
 #define TABSIZ   64
 #define MAXTOKEN FILENAME_MAX
 #define ITEM     128
-#define IMMED    129
+#define IMMED    129 /* bmake/gmake compat: := */
 
 typedef struct macro Macro;
 
@@ -736,16 +737,20 @@ validchar(int c)
 }
 
 /* what a target, a dependency or a macro name in a rule line may hold.
- * + and ? only end a name when they start += or ?=, so g++ and
- * the glob patterns of other makes are names */
+ * bmake/gmake compat: * [ ] ~ , and + ? that do not start += or ?= are
+ * names too, as in g++ and the glob patterns of those makes */
 static int
 itemchar(int c)
 {
   if (validchar(c))
     return 1;
+#if FEATURE_MAKE_COMPAT
   if (c == '*' || c == '[' || c == ']' || c == '~' || c == ',')
     return 1;
   return (c == '+' || c == '?') && ahead() != '=';
+#else
+  return 0;
+#endif
 }
 
 static char *
@@ -915,9 +920,10 @@ dirbase(char *name, int which)
   return r;
 }
 
-/* a macro name that holds a macro, as in $(tag-static-$(static)): the inner
+/* bmake/gmake compat: a macro name that holds a macro, as in $(tag-static-$(static)): the inner
  * one is read to its closing bracket and its value joins the name. the
  * pieces of a $(name:from=to) hold them too, kept as text until used */
+#if FEATURE_MAKE_COMPAT
 static int
 rawref(char *dst, int di, int max)
 {
@@ -956,6 +962,7 @@ nested(char *name, int namei, Target *tp)
   free(val);
   return namei + n;
 }
+#endif
 
 static void
 expansion(Target *tp)
@@ -1008,11 +1015,18 @@ expansion(Target *tp)
           break;
         }
 
+#if FEATURE_MAKE_COMPAT
         if (c == '$') {
           namei = nested(name, namei, tp);
           break;
         }
-        if (!validchar(c) && c != '+')
+        // g++ in CXXFLAGS-g++
+        if (c == '+') {
+          name[namei++] = c;
+          break;
+        }
+#endif
+        if (!validchar(c))
           error("invalid macro name in expansion");
         name[namei++] = c;
         break;
@@ -1037,10 +1051,12 @@ expansion(Target *tp)
               "invalid replacement pattern in "
               "expansion"
           );
+#if FEATURE_MAKE_COMPAT
         if (c == '$') {
           repli = rawref(repl, repli, MAXREPL);
           break;
         }
+#endif
         if (repli == MAXREPL - 1)
           error("macro replacement too big");
         repl[repli++] = c;
@@ -1051,10 +1067,12 @@ expansion(Target *tp)
           break;
         }
 
+#if FEATURE_MAKE_COMPAT
         if (c == '$') {
           toi = rawref(to, toi, MAXREPL);
           break;
         }
+#endif
         if (toi == MAXREPL - 1)
           error("macro substiturion too big");
         to[toi++] = c;
@@ -1069,7 +1087,11 @@ expansion(Target *tp)
   to[toi]     = '\0';
 
   erepl = expandstring(repl, tp, getloc());
-  eto   = expandstring(to, tp, getloc());
+#if FEATURE_MAKE_COMPAT
+  eto = expandstring(to, tp, getloc());
+#else
+  eto = estrdup(to);
+#endif
   replace(s, erepl, eto);
 
   free(eto);
@@ -1187,12 +1209,10 @@ repeat:
       back(c);
       expansion(NULL);
       goto repeat;
-    case '#':
-      comment();
-      c = '\n';
-      /* fallthrough */
     case ':':
-      /* := and ::= expand their text where they are read */
+#if FEATURE_MAKE_COMPAT
+      /* bmake/gmake compat: := and ::= expand their text where they are
+       * read */
       if (ahead() == ':')
         nextc();
       if (ahead() == '=') {
@@ -1201,7 +1221,12 @@ repeat:
         tok = IMMED;
         break;
       }
+#endif
       goto single;
+    case '#':
+      comment();
+      c = '\n';
+      /* fallthrough */
     case ';':
     case '=':
     case '\n':
@@ -1210,6 +1235,8 @@ repeat:
       token[1] = '\0';
       tok      = c;
       break;
+#if FEATURE_MAKE_COMPAT
+    /* bmake/gmake compat: += ?= and != */
     case '+':
       if (ahead() == '=') {
         nextc();
@@ -1239,8 +1266,11 @@ repeat:
         break;
       }
       error("unexpected character '!'");
+#endif
     default:
+#if FEATURE_MAKE_COMPAT
     name:
+#endif
       if (!itemchar(c))
         error("unexpected character '%c'", c);
       back(c);
@@ -1323,9 +1353,10 @@ readcmd(void)
   return act;
 }
 
-/* a dependency with glob characters stands for the files that match,
- * as it does in the other makes. one that matches nothing stays as it
- * is and fails as a missing file would */
+#if FEATURE_MAKE_COMPAT
+/* bmake/gmake compat: a dependency with glob characters stands for the
+ * files that match. one that matches nothing stays as it is and fails as
+ * a missing file would */
 static int
 globdeps(char ***deps, int n)
 {
@@ -1350,6 +1381,7 @@ globdeps(char ***deps, int n)
   *deps = out;
   return m;
 }
+#endif
 
 static void
 rule(char *targets[], int ntargets)
@@ -1358,8 +1390,13 @@ rule(char *targets[], int ntargets)
   struct action *acts;
   char         **deps = NULL;
 
-  // a name that expands to nothing, as ${SO}: does when SO is unset, makes
-  // a rule that is not there
+#if FEATURE_MAKE_COMPAT
+  // bmake/gmake compat: a name that expands to nothing, as ${SO}: does when
+  // SO is unset, makes a rule that is not there
+#else
+  if (ntargets == 0)
+    error("missing target");
+#endif
   for (ndeps = 0; next() == ITEM; ++ndeps) {
     deps        = erealloc(deps, (ndeps + 1) * sizeof(char *));
     deps[ndeps] = estrdup(token);
@@ -1368,7 +1405,9 @@ rule(char *targets[], int ntargets)
   if (tok != '\n' && tok != ';')
     error("garbage at the end of the line");
 
+#if FEATURE_MAKE_COMPAT
   ndeps = globdeps(&deps, ndeps);
+#endif
 
   nactions = 0;
   acts     = NULL;
@@ -1383,10 +1422,11 @@ rule(char *targets[], int ntargets)
       comment();
       continue;
     }
-    /* a blank line does not end the commands: the makefiles of
-     * other makes put one between two of them */
+#if FEATURE_MAKE_COMPAT
+    /* bmake/gmake compat: a blank line does not end the commands */
     if (c == '\n')
       continue;
+#endif
     if (c != '\t')
       break;
     nactions++;
@@ -1428,6 +1468,8 @@ assign(char *macros[], int where, int n)
   free(defs);
 }
 
+/* bmake/gmake compat: += := ?= and != */
+#if FEATURE_MAKE_COMPAT
 static void
 assign_append(char *macros[], int where, int n)
 {
@@ -1526,6 +1568,7 @@ assign_shell(char *macros[], int where, int n)
   free(out);
   free(cmd);
 }
+#endif
 
 void
 parseinput(int where)
@@ -1555,6 +1598,7 @@ parseinput(int where)
       case '=':
         assign(targets, where, n);
         break;
+#if FEATURE_MAKE_COMPAT
       case IMMED:
         assign_immediate(targets, where, n);
         break;
@@ -1567,6 +1611,7 @@ parseinput(int where)
       case '!':
         assign_shell(targets, where, n);
         break;
+#endif
       default:
         error("unexpected token '%s'(%d)", token, tok);
     }

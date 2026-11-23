@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "config.h"
 #include "make.h"
 
 #ifndef SIGINT
@@ -149,16 +150,22 @@ hasargs(int c)
   return c == 'f' || c == 'j';
 }
 
-// a bare -j, with nothing after it or something that is not a count, asks
-// for as many jobs as there can be and takes no argument
+// bmake/gmake compat: a bare -j, with nothing after it or something that is
+// not a count, asks for as many jobs as there can be and takes no argument
 static int
 takesarg(int c, char **args, char ***argv)
 {
-  if (c != 'j')
-    return hasargs(c);
-  if ((*args)[1])
-    return 1;
-  return argv && (*argv)[1] && isdigit((unsigned char)(*argv)[1][0]);
+#if FEATURE_MAKE_COMPAT
+  if (c == 'j') {
+    if ((*args)[1])
+      return 1;
+    return argv && (*argv)[1] && isdigit((unsigned char)(*argv)[1][0]);
+  }
+#else
+  (void)args;
+  (void)argv;
+#endif
+  return hasargs(c);
 }
 
 static void

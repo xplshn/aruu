@@ -52,6 +52,16 @@
 #ifndef FEATURE_FIND_PRINT0
 #define FEATURE_FIND_PRINT0 1
 #endif
+/* head -n -N: all but the last N lines, a GNU extension */
+#ifndef FEATURE_HEAD_NEGATIVE
+#define FEATURE_HEAD_NEGATIVE 1
+#endif
+/* what makefiles written for bmake or gmake use and POSIX does not say:
+ * += ?= != := assignments, nested macro names, globs in dependencies,
+ * g++ style names, a bare -j, a blank line inside a recipe */
+#ifndef FEATURE_MAKE_COMPAT
+#define FEATURE_MAKE_COMPAT 1
+#endif
 #ifndef FEATURE_SED_INPLACE
 #define FEATURE_SED_INPLACE 1
 #endif
