@@ -1119,6 +1119,15 @@ repeat:
         break;
       }
       error("unexpected character '+'");
+    case '?':
+      if (nextc() == '=') {
+        token[0] = '?';
+        token[1] = '=';
+        token[2] = '\0';
+        tok      = '?';
+        break;
+      }
+      error("unexpected character '?'");
     case '!':
       if (nextc() == '=') {
         token[0] = '!';
@@ -1309,6 +1318,22 @@ assign_append(char *macros[], int where, int n)
   free(defs);
 }
 
+/* ?= sets a macro only when nothing, the environment included, has */
+static void
+assign_default(char *macros[], int where, int n)
+{
+  char *defs;
+
+  if (n != 1)
+    error("invalid macro definition");
+
+  skipspaces();
+  defs = readmacrodef();
+  if (*getmacro(*macros) == '\0')
+    setmacro(*macros, defs, where, NOEXPORT);
+  free(defs);
+}
+
 static void
 assign_shell(char *macros[], int where, int n)
 {
@@ -1379,6 +1404,9 @@ parseinput(int where)
         break;
       case '+':
         assign_append(targets, where, n);
+        break;
+      case '?':
+        assign_default(targets, where, n);
         break;
       case '!':
         assign_shell(targets, where, n);
