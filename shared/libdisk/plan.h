@@ -78,6 +78,22 @@ int plan_check(const struct plan *p, unsigned need, char *why, size_t n);
  * ("delete /dev/vda2", "create 512 MiB EFI system", "format /dev/vda3 as ext4"). how many */
 int plan_changes(const struct plan *before, const struct plan *now, void (*fn)(const char *line, void *arg), void *arg);
 
+/* the layout an installer makes of a whole disk when it is not asked for another: a 1 MiB BIOS boot
+ * partition, a 512 MiB EFI system one at /boot/efi, swap when swap_mib is not 0, and the rest the
+ * root filesystem root_fs. 0, or -1 for a disk that cannot hold it */
+#define PLAN_BIOS_MIB 1
+#define PLAN_ESP_MIB  512
+int plan_guided(struct plan *p, const char *disk, uint64_t swap_mib, const char *root_fs);
+
+/* a part of the plan by its role: "esp", "root" and "swap" the device (/dev/vda2), "bios" the number
+ * of the BIOS boot partition, "rootfs" the filesystem at /. false when the plan has none */
+int plan_role(const struct plan *p, const char *role, char *buf, size_t n);
+/* the slots that have a place to be mounted, in the order to mount them: / before /boot before
+ * /boot/efi. how many, at most max */
+int plan_mount_order(const struct plan *p, int *slots, int max);
+/* waits for the devices of the partitions to be there after the table is written, up to tenths of a second */
+int plan_wait_nodes(const struct plan *p, int tenths);
+
 /* the table written to the disk, the filesystems left for the caller */
 int plan_write_table(const struct plan *p);
 /* the command that makes the filesystem of slot: its argv into argv (at most max words,

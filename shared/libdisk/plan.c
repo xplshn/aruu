@@ -5,6 +5,8 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 #include <string.h>
 #include <strings.h>
 
@@ -292,8 +294,14 @@ plan_mkfs_argv(const struct plan *p, int slot, char **argv, int max, char *store
     return -1;
   argv[0] = NULL;
   if (strcmp(a->fs, "ext4") == 0) {
-    rc |= put(argv, &n, max, store, store_n, &used, "mkfs.ext4");
-    rc |= put(argv, &n, max, store, store_n, &used, "-F");
+    char size[32];
+
+    /* MICE's ext4 maker, which is told the size of what it makes */
+    snprintf(size, sizeof size, "%llu",
+             (unsigned long long)((p->label.part[slot].end - p->label.part[slot].start + 1) * p->label.sec_size));
+    rc |= put(argv, &n, max, store, store_n, &used, "make_ext4fs");
+    rc |= put(argv, &n, max, store, store_n, &used, "-l");
+    rc |= put(argv, &n, max, store, store_n, &used, size);
     if (a->label[0]) {
       rc |= put(argv, &n, max, store, store_n, &used, "-L");
       rc |= put(argv, &n, max, store, store_n, &used, a->label);
@@ -432,4 +440,117 @@ plan_load(struct plan *p, FILE *f, char *why, size_t n)
       return bad(why, n, line);
   }
   return p->disk[0] ? 0 : (snprintf(why, n, "a plan names a disk"), -1);
+}
+
+int
+plan_guided(struct plan *p, const char *disk, uint64_t swap_mib, const char *root_fs)
+{
+  struct BlockDev dev;
+  uint64_t        mib;
+  int             rc = 0;
+
+  memset(p, 0, sizeof *p);
+  snprintf(p->disk, sizeof p->disk, "%s", disk);
+  if (!plan_filesystem(root_fs) || !plan_filesystem(root_fs)->bootable || blockdev_open(&dev, disk, 0) < 0)
+    return -1;
+  if (label_init(&p->label, &dev, LABEL_GPT) < 0) {
+    blockdev_close(&dev);
+    return -1;
+  }
+  mib = 1048576 / dev.sec_size;
+  blockdev_close(&dev);
+  /* the BIOS boot partition first, then the system partition, which limine and the firmware read */
+  rc |= plan_add(p, 0, PLAN_BIOS_MIB * mib, "ef02", "BIOS", "", "", "") < 0;
+  rc |= plan_add(p, 0, PLAN_ESP_MIB * mib, "ef00", "ESP", "vfat", "/boot/efi", "ESP") < 0;
+  if (swap_mib)
+    rc |= plan_add(p, 0, swap_mib * mib, "8200", "SWAP", "swap", "", "") < 0;
+  rc |= plan_add(p, 0, 0, "8300", "ROOT", root_fs, "/", "root") < 0;
+  return rc ? -1 : 0;
+}
+
+int
+plan_role(const struct plan *p, const char *role, char *buf, size_t n)
+{
+  int i;
+
+  for (i = 0; i < p->label.slots; i++) {
+    const struct label_part *l = &p->label.part[i];
+    const struct plan_part  *a = &p->attr[i];
+
+    if (!l->used)
+      continue;
+    if (strcmp(role, "esp") == 0 && strcmp(a->mount, "/boot/efi") == 0) {
+      plan_part_path(p->disk, i, buf, n);
+      return 1;
+    }
+    if (strcmp(role, "root") == 0 && strcmp(a->mount, "/") == 0) {
+      plan_part_path(p->disk, i, buf, n);
+      return 1;
+    }
+    if (strcmp(role, "swap") == 0 && strcmp(a->fs, "swap") == 0) {
+      plan_part_path(p->disk, i, buf, n);
+      return 1;
+    }
+    if (strcmp(role, "bios") == 0 && strcmp(l->type, "ef02") == 0) {
+      snprintf(buf, n, "%d", i + 1);
+      return 1;
+    }
+    if (strcmp(role, "rootfs") == 0 && strcmp(a->mount, "/") == 0) {
+      snprintf(buf, n, "%s", a->fs);
+      return 1;
+    }
+  }
+  return 0;
+}
+
+int
+plan_mount_order(const struct plan *p, int *slots, int max)
+{
+  int i, j, n = 0;
+
+  for (i = 0; i < p->label.slots && n < max; i++)
+    if (p->label.part[i].used && p->attr[i].mount[0])
+      slots[n++] = i;
+  /* fewest path parts first: a mount point is made inside the ones above it */
+  for (i = 1; i < n; i++) {
+    int s = slots[i], k;
+
+    for (j = i - 1; j >= 0; j--) {
+      int a = 0, b = 0;
+
+      for (k = 0; p->attr[slots[j]].mount[k]; k++)
+        a += p->attr[slots[j]].mount[k] == '/' && p->attr[slots[j]].mount[k + 1];
+      for (k = 0; p->attr[s].mount[k]; k++)
+        b += p->attr[s].mount[k] == '/' && p->attr[s].mount[k + 1];
+      if (a <= b)
+        break;
+      slots[j + 1] = slots[j];
+    }
+    slots[j + 1] = s;
+  }
+  return n;
+}
+
+int
+plan_wait_nodes(const struct plan *p, int tenths)
+{
+  int t, i;
+
+  for (t = 0; t <= tenths; t++) {
+    int all = 1;
+
+    for (i = 0; i < p->label.slots; i++) {
+      char path[PLAN_PATH + 8];
+
+      if (!p->label.part[i].used)
+        continue;
+      plan_part_path(p->disk, i, path, sizeof path);
+      if (access(path, F_OK) != 0)
+        all = 0;
+    }
+    if (all)
+      return 0;
+    nanosleep(&(struct timespec){0, 100000000L}, NULL);
+  }
+  return -1;
 }
