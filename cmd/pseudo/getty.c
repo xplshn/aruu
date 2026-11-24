@@ -23,8 +23,7 @@
 #include "util.h"
 #include "wexec.h"
 
-static char *tty         = "/dev/tty1";
-static char *defaultterm = "linux";
+static const char *tty;
 
 static void
 usage(void)
@@ -56,7 +55,8 @@ main(int argc, char *argv[])
   }
   ARGEND;
 
-  strlcpy(term, defaultterm, sizeof(term));
+  tty = ttyconsole();
+  strlcpy(term, ttyconsterm(), sizeof(term));
   if (argc > 0) {
     tty = argv[0];
     if (argc > 1)

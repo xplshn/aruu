@@ -1,5 +1,6 @@
 /* see LICENSE file for copyright and license details */
 #include "../filesystem.h"
+#include "../paths.h"
 #include "../util.h"
 
 #include <stddef.h>
@@ -24,5 +25,17 @@ ttytostr(int tty_maj, int tty_min, char *str, size_t n)
   str[0] = '?';
   str[1] = '\0';
   return 0;
+}
+
+const char *
+ttyconsole(void)
+{
+  return ARUU_PATH_DEVCONSOLE;
+}
+
+const char *
+ttyconsterm(void)
+{
+  return "vt100";
 }
 #endif

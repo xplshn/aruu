@@ -99,4 +99,17 @@ err0:
 
   return r;
 }
+
+/* the first virtual console, and the TERM it speaks */
+const char *
+ttyconsole(void)
+{
+  return ARUU_PATH_DEV "/tty1";
+}
+
+const char *
+ttyconsterm(void)
+{
+  return "linux";
+}
 #endif
