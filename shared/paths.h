@@ -6,11 +6,9 @@
  * portable paths. override at compile time for non-fhs systems:
  * -daruu_path_etc="/config"
  *
- * os-specific paths (procfs, sysfs) are prefixed ARUU_LINUX_PATH_*
- * and only defined under __linux__. a util that reads /proc/modules
- * will fail to compile on BSD because ARUU_LINUX_PATH_PROC is not
- * defined there. this is intentional: the BSD code path must use
- * a different mechanism (sysctl, getmntinfo, etc)
+ * a path only one kernel has (procfs, sysfs) is prefixed with its name,
+ * ARUU_LINUX_PATH_*, and named only by a file tagged for that kernel
+ * (a <noun>_linux.c in libutil, or a tool under cmd/linux)
  */
 
 #ifndef ARUU_PATH_ETC
@@ -75,7 +73,6 @@
 #define ARUU_PATH_DEFPATH ARUU_PATH_BIN ":" ARUU_PATH_USR_BIN
 #endif
 
-#if defined(__linux__)
 #define ARUU_LINUX_PATH_PROC            "/proc"
 #define ARUU_LINUX_PATH_SYS             "/sys"
 #ifndef ARUU_LINUX_PATH_PROC_MOUNTS
@@ -93,16 +90,8 @@
 #define ARUU_LINUX_PATH_SYS_CLASS_NET   ARUU_LINUX_PATH_SYS "/class/net"
 #define ARUU_LINUX_PATH_SYS_KERNEL      ARUU_LINUX_PATH_SYS "/kernel"
 #define ARUU_LINUX_PATH_SYS_BUS_USB     ARUU_LINUX_PATH_SYS "/bus/usb/devices"
-#elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
-/* BSD systems do not have procfs or sysfs. utils that need this data
- * must use sysctl(3), getmntinfo(3), or kvm(3) instead */
-#else
-#error "paths.h: unsupported platform. define ARUU_LINUX_PATH_* or ARUU_BSD_PATH_* manually"
-#endif
 
-#if defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
 #define ARUU_BSD_PATH_MASTER_PASSWD ARUU_PATH_ETC "/master.passwd"
 #define ARUU_BSD_PATH_PWD_MKDB      ARUU_PATH_USR_SBIN "/pwd_mkdb"
-#endif
 
 #endif
