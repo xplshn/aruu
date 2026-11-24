@@ -52,6 +52,7 @@
         "reboot_linux.c" "reboot_other.c"
         "session_linux.c" "session_other.c"
         "sysinfo_linux.c" "sysinfo_other.c"
+        "timer_linux.c" "timer_other.c"
         "tty_linux.c" "tty_other.c")
   (dep $(MATCH) FEATURES_H)
   (after NOFORK_LIST_H)
@@ -89,11 +90,13 @@
         "shared/libutil/session_other.c"
         "shared/libutil/sysinfo_linux.c"
         "shared/libutil/sysinfo_other.c"
+        "shared/libutil/timer_linux.c"
+        "shared/libutil/timer_other.c"
         "shared/libutil/tty_linux.c"
         "shared/libutil/tty_other.c")
   (dep $(MATCH) "shared/diskutil.h" "shared/filesystem.h" "shared/net.h" "shared/passwd.h"
-       "shared/proc.h" "shared/reboot.h" "shared/session.h" "shared/sysinfo.h" "shared/util.h"
-       FEATURES_H)
+       "shared/proc.h" "shared/reboot.h" "shared/session.h" "shared/sysinfo.h"
+       "shared/timer.h" "shared/util.h" FEATURES_H)
   (after NOFORK_LIST_H)
   (out "shared/libutil/$(BASESTEM).o")
   (exec $(CC) $(CPPFLAGS_LIBUTIL) -Ishared -Ishared/libutil $(CFLAGS) -c -o $(OUT) $(MATCH)))
