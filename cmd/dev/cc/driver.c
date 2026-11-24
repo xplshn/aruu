@@ -17,6 +17,7 @@
 
 #include "util.h"
 #include "paths.h"
+#include "proc.h"
 
 enum filetype {
   NONE,   /* detect based on file extension */
@@ -357,7 +358,7 @@ resolvepath(const char *arg0, const char *binname, const char *devrelpath)
   size_t      n;
   struct stat st;
 
-  n = readlink("/proc/self/exe", self, sizeof(self) - 1);
+  n = proc_selfexe(self, sizeof(self) - 1);
   if (n == -1) {
     n = strlen(arg0);
     if (n > sizeof(self) - 1)

@@ -90,4 +90,13 @@ proc_ttyname(unsigned major, unsigned minor, char *buf, size_t n)
     strlcpy(buf, "?", n);
 }
 
+ssize_t
+proc_selfexe(char *buf, size_t n)
+{
+  (void)buf;
+  (void)n;
+  errno = ENOTSUP;
+  return -1;
+}
+
 #endif

@@ -83,5 +83,8 @@ int proc_args(pid_t pid, char *buf, size_t n);
 int proc_cwd(pid_t pid, char *buf, size_t n);
 /* the terminal's name as ps shows it: pts/3, tty1 or ? for none */
 void proc_ttyname(unsigned major, unsigned minor, char *buf, size_t n);
+/* the path of the running program's own file, readlink style: not
+ * terminated, -1 where the kernel does not tell */
+ssize_t proc_selfexe(char *buf, size_t n);
 
 #endif

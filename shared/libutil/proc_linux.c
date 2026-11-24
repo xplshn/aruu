@@ -264,4 +264,10 @@ proc_ttyname(unsigned major, unsigned minor, char *buf, size_t n)
     snprintf(buf, n, "?");
 }
 
+ssize_t
+proc_selfexe(char *buf, size_t n)
+{
+  return readlink(ARUU_LINUX_PATH_PROC "/self/exe", buf, n);
+}
+
 #endif

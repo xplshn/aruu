@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include "util.h"
 #include "cc.h"
+#include "proc.h"
 
 struct macroparam {
   char *name;
@@ -135,7 +136,7 @@ include(void)
   if (!f) {
     static const char *const rel[] = {"include", "../lib/aruu/include"};
     char                     self[FILENAME_MAX];
-    ssize_t n = readlink("/proc/self/exe", self, sizeof(self) - 1);
+    ssize_t n = proc_selfexe(self, sizeof(self) - 1);
     if (n == -1) {
       n = strlen(argv0);
       if (n > (ssize_t)sizeof(self) - 1)
