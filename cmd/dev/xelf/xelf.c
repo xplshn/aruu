@@ -33,7 +33,6 @@
 #define REC_BINARY (1024 * 1024)
 #define TOTAL_MAX  (5 * 1024 * 1024)
 #define PAGE_MIN   4096
-#define QX_MAGIC   "qxi\001"
 
 enum { T_DEAD, T_MANIFEST, T_PLUMB, T_ICON, T_SVG };
 
@@ -456,22 +455,23 @@ write_out(const struct elf *e, const char *path, const unsigned char *extra, siz
   }
 }
 
-/* the width a qx file says it has: the varint after its ten fixed bytes,
- * 0 when the bytes are not qx */
+/* the width a qx file says it has, the third field of its first line,
+ * "QX version width height ...", 0 when the bytes are not qx */
 static unsigned long
 qx_width(const unsigned char *b, size_t n)
 {
   unsigned long w = 0;
-  size_t i;
+  size_t i = 3;
 
-  if (n < 12 || memcmp(b, QX_MAGIC, 4))
+  if (n < 4 || memcmp(b, "QX ", 3))
     return 0;
-  for (i = 0; i < 9 && 10 + i < n; i++) {
-    w |= (unsigned long)(b[10 + i] & 0x7F) << (7 * i);
-    if (!(b[10 + i] & 0x80))
-      return w;
-  }
-  return 0;
+  while (i < n && b[i] >= '0' && b[i] <= '9')
+    i++;
+  if (i == 3 || i >= n || b[i++] != ' ')
+    return 0;
+  for (; i < n && b[i] >= '0' && b[i] <= '9' && w < 1UL << 30; i++)
+    w = w * 10 + (unsigned long)(b[i] - '0');
+  return i < n && b[i] == ' ' ? w : 0;
 }
 
 /* an icon file as a record: svg as it is, anything else must be qx, whose
