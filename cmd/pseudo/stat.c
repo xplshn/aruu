@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/vfs.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -240,68 +239,33 @@ print_custom(const char *file, struct stat *st, const char *fmt)
 #endif
 
 #if FEATURE_STAT_FILESYSTEM
-static const char *
-fs_type_name(long type)
-{
-  switch (type) {
-    case 0x9fa0:
-      return "proc";
-    case 0x62656567:
-      return "beegfs";
-    case 0xef53:
-      return "ext2/ext3";
-    case 0x1cd1:
-      return "devpctld";
-    case 0xf15f:
-      return "ecryptfs";
-    case 0x65737566:
-      return "fuse";
-    case 0x4d44:
-      return "msdos";
-    case 0x564c:
-      return "novell";
-    case 0x6969:
-      return "nfs";
-    case 0x534f4654:
-      return "overlay";
-    case 0x73717368:
-      return "squashfs";
-    case 0x01021994:
-      return "tmpfs";
-    case 0x858458f6:
-      return "ramfs";
-    default:
-      return "unknown";
-  }
-}
-
 static void
-show_statfs(const char *file, struct statfs *st)
+show_statfs(const char *file, struct FilesystemInfo *st)
 {
   printf("  File: \"%s\"\n", file);
   printf(
       "    ID: %llx Namelen: %ld Type: %s\n",
-      (unsigned long long)st->f_fsid.__val[0] | ((unsigned long long)st->f_fsid.__val[1] << 32),
-      (long)st->f_namelen,
-      fs_type_name(st->f_type)
+      st->id,
+      (long)st->namelen,
+      fs_type_name(st->type)
   );
   printf(
       "Block size: %-10ld Fundamental block size: %ld\n",
-      (long)st->f_bsize,
-      (long)st->f_frsize ? (long)st->f_frsize : (long)st->f_bsize
+      (long)st->bsize,
+      (long)st->frsize ? (long)st->frsize : (long)st->bsize
   );
   printf(
       "Blocks: Total: %-10lld Free: %-10lld Available: %lld\n",
-      (long long)st->f_blocks,
-      (long long)st->f_bfree,
-      (long long)st->f_bavail
+      (long long)st->blocks,
+      (long long)st->bfree,
+      (long long)st->bavail
   );
-  printf("Inodes: Total: %-10lld Free: %lld\n", (long long)st->f_files, (long long)st->f_ffree);
+  printf("Inodes: Total: %-10lld Free: %lld\n", (long long)st->files, (long long)st->ffree);
 }
 
 #if FEATURE_STAT_FORMAT
 static void
-print_fs_custom(const char *file, struct statfs *st, const char *fmt)
+print_fs_custom(const char *file, struct FilesystemInfo *st, const char *fmt)
 {
   const char *p;
   char        fmt_spec[64];
@@ -367,35 +331,35 @@ print_fs_custom(const char *file, struct statfs *st, const char *fmt)
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long long)st->f_bavail);
+        printf(fmt_spec, (long long)st->bavail);
         break;
       case 'b':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long long)st->f_blocks);
+        printf(fmt_spec, (long long)st->blocks);
         break;
         case 'c':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long long)st->f_files);
+        printf(fmt_spec, (long long)st->files);
         break;
       case 'd':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long long)st->f_ffree);
+        printf(fmt_spec, (long long)st->ffree);
         break;
       case 'f':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long long)st->f_bfree);
+        printf(fmt_spec, (long long)st->bfree);
         break;
       case 'i':
         fmt_spec[fmt_len++] = 'l';
@@ -404,15 +368,14 @@ print_fs_custom(const char *file, struct statfs *st, const char *fmt)
         fmt_spec[fmt_len]   = '\0';
         printf(
             fmt_spec,
-            (unsigned long long)st->f_fsid.__val[0]
-                | ((unsigned long long)st->f_fsid.__val[1] << 32)
+            st->id
         );
         break;
       case 'l':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long)st->f_namelen);
+        printf(fmt_spec, (long)st->namelen);
         break;
       case 'n':
         fmt_spec[fmt_len++] = 's';
@@ -423,24 +386,24 @@ print_fs_custom(const char *file, struct statfs *st, const char *fmt)
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long)st->f_bsize);
+        printf(fmt_spec, (long)st->bsize);
         break;
       case 'S':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'd';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long)st->f_frsize ? (long)st->f_frsize : (long)st->f_bsize);
+        printf(fmt_spec, (long)st->frsize ? (long)st->frsize : (long)st->bsize);
         break;
         case 't':
         fmt_spec[fmt_len++] = 'l';
         fmt_spec[fmt_len++] = 'x';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, (long)st->f_type);
+        printf(fmt_spec, (long)st->type);
         break;
       case 'T':
         fmt_spec[fmt_len++] = 's';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, fs_type_name(st->f_type));
+        printf(fmt_spec, fs_type_name(st->type));
         break;
       default:
         putchar('%');
@@ -522,8 +485,8 @@ main(int argc, char *argv[])
 {
   struct stat st;
 #if FEATURE_STAT_FILESYSTEM
-  struct statfs stfs;
-  int           fflag = 0;
+  struct FilesystemInfo stfs;
+  int                   fflag = 0;
 #endif
 #if FEATURE_STAT_FORMAT
   char *format = NULL;
@@ -562,7 +525,7 @@ main(int argc, char *argv[])
   if (argc == 0) {
 #if FEATURE_STAT_FILESYSTEM
     if (fflag) {
-      if (fstatfs(0, &stfs) < 0)
+      if (fs_get_info(NULL, 0, &stfs) < 0)
         eprintf("fstatfs <stdin>:");
 #if FEATURE_STAT_FORMAT
       if (format)
@@ -588,7 +551,7 @@ main(int argc, char *argv[])
   for (i = 0; i < argc; i++) {
 #if FEATURE_STAT_FILESYSTEM
     if (fflag) {
-      if (statfs(argv[i], &stfs) == -1) {
+      if (fs_get_info(argv[i], -1, &stfs) == -1) {
         weprintf("statfs %s:", argv[i]);
         ret = 1;
         continue;
