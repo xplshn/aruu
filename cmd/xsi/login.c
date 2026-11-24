@@ -6,6 +6,7 @@
 
 #include "config.h"
 #include "passwd.h"
+#include "session.h"
 #include "util.h"
 #include "wexec.h"
 
@@ -16,9 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
-#include <time.h>
 #include <unistd.h>
-#include <utmp.h>
 
 static void
 usage(void)
@@ -62,51 +61,6 @@ readline(const char *prompt, int echo)
     buf[--n] = '\0';
 
   return buf;
-}
-
-/* best effort utmp record for the controlling tty: getty already
- * cleared any stale entry for this line before exec-ing us. only
- * ut_line, ut_name (musl aliases this to ut_user), and ut_time
- * (aliased to ut_tv.tv_sec) exist on both linux and bsd utmp
- * layouts; ut_type/ut_pid do not exist at all on bsd, so those two
- * fields are the one genuinely platform-specific part of this record */
-static void
-write_utmp(const char *user)
-{
-  struct utmp usr;
-  char       *line;
-  FILE       *fp;
-
-  memset(&usr, 0, sizeof(usr));
-#if defined(__linux__)
-  usr.ut_type = USER_PROCESS;
-  usr.ut_pid  = getpid();
-#endif
-  line = ttyname(STDIN_FILENO);
-  if (line) {
-    if (!strncmp(line, "/dev/", 5))
-      line += 5;
-    strlcpy(usr.ut_line, line, sizeof(usr.ut_line));
-  }
-  strlcpy(usr.ut_name, user, sizeof(usr.ut_name));
-  usr.ut_time = time(NULL);
-
-  /* utmp: a live table, so this overwrites/appends the one entry for
- * this session */
-  fp = fopen(UTMP_PATH, "r+");
-  if (fp) {
-    fseek(fp, 0, SEEK_END);
-    fwrite(&usr, sizeof(usr), 1, fp);
-    fclose(fp);
-  }
-
-  /* wtmp: an ever-growing append-only log of the same record, same
- * portable field subset, just opened differently */
-  fp = fopen(WTMP_PATH, "a");
-  if (fp) {
-    fwrite(&usr, sizeof(usr), 1, fp);
-    fclose(fp);
-  }
 }
 
 // ?man login: authenticate a user and start a session
@@ -182,7 +136,7 @@ main(int argc, char *argv[])
   if (setuid(pw->pw_uid) < 0)
     eprintf("setuid:");
 
-  write_utmp(pw->pw_name);
+  session_record(pw->pw_name);
 
   if (chdir(pw->pw_dir) < 0)
     weprintf("chdir %s:", pw->pw_dir);
