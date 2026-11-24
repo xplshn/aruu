@@ -2,7 +2,7 @@
 #include "../diskutil.h"
 #include "../util.h"
 
-#if defined(__FreeBSD__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__FreeBSD__) && !defined(ARUU_FORCE_POSIX)
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>

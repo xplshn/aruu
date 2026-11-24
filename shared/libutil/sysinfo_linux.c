@@ -7,7 +7,7 @@
 #include "../sysinfo.h"
 #include "../util.h"
 
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>

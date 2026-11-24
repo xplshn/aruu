@@ -6,7 +6,7 @@
 
 /* getpwnam already returns the hash to root, master.passwd holds it and
  * pwd_mkdb rebuilds the databases from it */
-#if defined(__OpenBSD__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__OpenBSD__) && !defined(ARUU_FORCE_POSIX)
 char *
 pw_shadow_hash(const char *name)
 {

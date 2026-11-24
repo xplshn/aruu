@@ -3,7 +3,7 @@
 
 #include <unistd.h>
 
-#if defined(__APPLE__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__APPLE__) && !defined(ARUU_FORCE_POSIX)
 extern int optreset;
 
 void

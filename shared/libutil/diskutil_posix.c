@@ -4,7 +4,7 @@
 /* a kernel with no backend: a device's size is what fstat says, and the
  * list of disks is what opens under the names most systems give them */
 #if !(defined(__linux__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__))  \
-    || defined(ARUU_FORCE_OTHER)
+    || defined(ARUU_FORCE_POSIX)
 void
 blockdev_sys_size(struct BlockDev *dev)
 {

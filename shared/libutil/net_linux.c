@@ -5,7 +5,7 @@
 #include "../paths.h"
 #include "../util.h"
 
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
 #include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>

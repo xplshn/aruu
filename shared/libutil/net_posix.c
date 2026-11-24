@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <stddef.h>
 
-#if !defined(__linux__) || defined(ARUU_FORCE_OTHER)
+#if !defined(__linux__) || defined(ARUU_FORCE_POSIX)
 int
 net_get_interfaces(struct NetInterface **ifaces, int *count)
 {

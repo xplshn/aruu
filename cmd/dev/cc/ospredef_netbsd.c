@@ -3,7 +3,7 @@
 #include "util.h"
 #include "cc.h"
 
-#if defined(__NetBSD__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__NetBSD__) && !defined(ARUU_FORCE_POSIX)
 const char ospredef[] = "#define __NetBSD__ 1\n"
                         "#define __unix__ 1\n";
 #endif

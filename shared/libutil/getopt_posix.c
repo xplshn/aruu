@@ -6,7 +6,7 @@
 /* the one reset posix names */
 #if !(defined(__linux__) || defined(__DragonFly__) || defined(__FreeBSD__) || defined(__NetBSD__) \
       || defined(__OpenBSD__) || defined(__APPLE__))                                             \
-    || defined(ARUU_FORCE_OTHER)
+    || defined(ARUU_FORCE_POSIX)
 void
 getopt_reset(void)
 {

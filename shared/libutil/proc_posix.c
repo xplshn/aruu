@@ -8,7 +8,7 @@
 
 /* a kernel with no backend yet: its process table is not read, and every
  * tool that wants it says why. proc_linux.c is the one that reads it */
-#if !defined(__linux__) || defined(ARUU_FORCE_OTHER)
+#if !defined(__linux__) || defined(ARUU_FORCE_POSIX)
 
 int
 parsecmdline(pid_t pid, char *buf, size_t siz)

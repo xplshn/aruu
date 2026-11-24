@@ -1,7 +1,7 @@
 /* see LICENSE file for copyright and license details */
 #include "../timer.h"
 
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
 #include <errno.h>
 #include <poll.h>
 #include <stdint.h>

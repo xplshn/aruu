@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <string.h>
 
-#if !defined(__linux__) || defined(ARUU_FORCE_OTHER)
+#if !defined(__linux__) || defined(ARUU_FORCE_POSIX)
 int
 get_uptime(long *uptime_secs)
 {

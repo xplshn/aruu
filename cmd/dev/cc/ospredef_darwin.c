@@ -3,7 +3,7 @@
 #include "util.h"
 #include "cc.h"
 
-#if defined(__APPLE__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__APPLE__) && !defined(ARUU_FORCE_POSIX)
 const char ospredef[] = "#define __APPLE__ 1\n"
                         "#define __unix__ 1\n";
 #endif

@@ -7,7 +7,7 @@
 
 /* a kernel with no backend: the numbers are the ones its dev_t holds,
  * and no name is known for them */
-#if !defined(__linux__) || defined(ARUU_FORCE_OTHER)
+#if !defined(__linux__) || defined(ARUU_FORCE_POSIX)
 void
 devtotty(int dev, int *tty_maj, int *tty_min)
 {

@@ -52,7 +52,7 @@ int pidfile(const char *file);
 
 /* the process table, as every kernel's tools want it: one row per process in
  * words that are not any kernel's. proc_linux.c reads it from /proc, and
- * proc_other.c says a kernel has no backend yet, so ps, pgrep and pkill
+ * proc_posix.c says a kernel has no backend yet, so ps, pgrep and pkill
  * are the same code everywhere and a port is one file */
 struct procinfo {
   pid_t              pid, ppid, pgid, sid;

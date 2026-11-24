@@ -2,7 +2,7 @@
 #include "../diskutil.h"
 #include "../util.h"
 
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
 #include <linux/fs.h>
 #include <stdio.h>
 #include <stdlib.h>

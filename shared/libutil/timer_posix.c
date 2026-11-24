@@ -3,7 +3,7 @@
 
 /* deadlines on the monotonic clock posix has, which may stop while the
  * machine sleeps */
-#if !defined(__linux__) || defined(ARUU_FORCE_OTHER)
+#if !defined(__linux__) || defined(ARUU_FORCE_POSIX)
 #include <errno.h>
 #include <poll.h>
 #include <string.h>

@@ -6,7 +6,7 @@
 
 /* the numbers are the ones linux gives ttys, and the dev the encoding
  * of tty_nr in /proc/<pid>/stat */
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
 #include <sys/types.h>

@@ -16,7 +16,7 @@
 #include <dirent.h>
 #include <time.h>
 
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
 
 int
 parsecmdline(pid_t pid, char *buf, size_t siz)

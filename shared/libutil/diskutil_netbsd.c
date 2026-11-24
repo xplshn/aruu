@@ -1,7 +1,7 @@
 /* see LICENSE file for copyright and license details */
 #include "../diskutil.h"
 
-#if defined(__NetBSD__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__NetBSD__) && !defined(ARUU_FORCE_POSIX)
 #include <sys/types.h>
 #include <sys/disklabel.h>
 #include <sys/dkio.h>

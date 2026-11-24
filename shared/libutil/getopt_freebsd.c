@@ -3,7 +3,7 @@
 
 #include <unistd.h>
 
-#if defined(__FreeBSD__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__FreeBSD__) && !defined(ARUU_FORCE_POSIX)
 extern int optreset;
 
 void

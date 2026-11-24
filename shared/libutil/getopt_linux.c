@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 /* glibc and musl both start over when optind is 0 */
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
+#if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
 void
 getopt_reset(void)
 {

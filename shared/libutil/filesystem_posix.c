@@ -5,7 +5,7 @@
 #include <sys/statvfs.h>
 #include <sys/types.h>
 
-#if !defined(__linux__) || defined(ARUU_FORCE_OTHER)
+#if !defined(__linux__) || defined(ARUU_FORCE_POSIX)
 int
 fs_get_status(const char *path, struct FilesystemStatus *status)
 {
