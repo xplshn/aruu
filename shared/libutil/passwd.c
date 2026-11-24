@@ -1,4 +1,7 @@
 /* see LICENSE file for copyright and license details */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700 /* crypt in unistd.h */
+#endif
 #if FEATURE_PASSWD_EXT
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE /* musl declares fgetpwent/putpwent only under it */
@@ -24,19 +27,6 @@
 #include <unistd.h>
 
 #include "../config.h"
-
-#if defined(__linux__) || defined(__GLIBC__)
-#include <crypt.h>
-#endif
-
-#if defined(__linux__) && !defined(__ANDROID__)
-#define HAVE_SHADOW 1
-#include <shadow.h>
-#endif
-
-#if defined(__OpenBSD__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
-#define HAVE_MASTER_PASSWD 1
-#endif
 
 int
 pw_init(void)
@@ -69,19 +59,16 @@ pw_check(const struct passwd *pw, const char *pass)
     return 0;
   }
 
-#if defined(HAVE_SHADOW)
   if (stored[0] == 'x' && stored[1] == '\0') {
-    struct spwd *spw;
-    errno = 0;
-    spw   = getspnam(pw->pw_name);
-    if (!spw) {
+    errno  = 0;
+    stored = pw_shadow_hash(pw->pw_name);
+    if (!stored) {
       if (errno)
         weprintf("getspnam: %s:", pw->pw_name);
       else
         weprintf("who are you?\n");
       return -1;
     }
-    stored = spw->sp_pwdp;
     if (stored[0] == '!' || stored[0] == '*') {
       weprintf("denied\n");
       return -1;
@@ -97,7 +84,6 @@ pw_check(const struct passwd *pw, const char *pass)
       return 0;
     }
   }
-#endif
 
   cryptpass = crypt(pass, stored);
   if (!cryptpass) {
@@ -135,15 +121,11 @@ pwdb_lookup(struct pwdb_entry *ent, const char *name)
   ent->gid  = pw->pw_gid;
   hash      = pw->pw_passwd;
 
-#if defined(HAVE_SHADOW)
   if (hash[0] == 'x' && hash[1] == '\0') {
-    struct spwd *spw;
-    errno = 0;
-    spw   = getspnam(name);
-    if (spw)
-      hash = spw->sp_pwdp;
+    const char *shadow = pw_shadow_hash(name);
+    if (shadow)
+      hash = shadow;
   }
-#endif
 
   ent->hash = estrdup(hash);
   return 0;
@@ -152,10 +134,8 @@ pwdb_lookup(struct pwdb_entry *ent, const char *name)
 static int
 fill_random(void *buf, size_t n)
 {
-#if defined(__linux__)
   if (getentropy(buf, n) == 0)
     return 0;
-#endif
   {
     int    fd;
     size_t off;
@@ -251,76 +231,8 @@ pw_gensalt(char *salt, size_t salt_sz)
   return pw_gensalt_cipher(salt, salt_sz, PW_CIPHER, 16);
 }
 
-#if defined(HAVE_SHADOW)
-static int
-update_shadow(const char *name, const char *newhash)
-{
-  struct spwd *spw, cur;
-  FILE        *fp, *tfp;
-  int          wrote = 0;
-  char         path[256];
-
-  snprintf(path, sizeof(path), ARUU_PATH_ETC "/tcb/%s/shadow", name);
-  fp = fopen(path, "r+");
-  if (!fp) {
-    memcpy(path, ARUU_PATH_SHADOW, sizeof(ARUU_PATH_SHADOW));
-    fp = fopen(path, "r+");
-  }
-  if (!fp) {
-    weprintf("fopen %s:", path);
-    return -1;
-  }
-
-  tfp = tmpfile();
-  if (!tfp) {
-    weprintf("tmpfile:");
-    fclose(fp);
-    return -1;
-  }
-
-  /* fgetspent(fp) reads from the stream we already opened above;
- * getspent() reads an implicit global shadow stream that musl
- * never actually backs with this (or any) file and always
- * returns null for, silently turning every update into a
- * "no matching entry" failure */
-  while ((spw = fgetspent(fp))) {
-    cur = *spw;
-    if (strcmp(cur.sp_namp, name) == 0) {
-      cur.sp_pwdp = (char *)newhash;
-      wrote       = 1;
-    }
-    errno = 0;
-    if (putspent(&cur, tfp) == -1) {
-      weprintf("putspent:");
-      fclose(tfp);
-      fclose(fp);
-      return -1;
-    }
-  }
-  if (!wrote) {
-    weprintf("shadow: no matching entry\n");
-    fclose(tfp);
-    fclose(fp);
-    return -1;
-  }
-  fflush(tfp);
-  rewind(tfp);
-  rewind(fp);
-  fconcat(tfp, "tmpfile", fp, "shadow");
-  ftruncate(fileno(fp), ftell(tfp));
-  fclose(tfp);
-  {
-    int fd = fileno(fp);
-    if (fd >= 0)
-      fsync(fd);
-  }
-  fclose(fp);
-  return 0;
-}
-#endif
-
-static int
-update_passwd_file(const char *path, const char *name, const char *newhash)
+int
+pw_update_file(const char *path, const char *name, const char *newhash)
 {
   struct passwd *pw, cur;
   FILE          *fp, *tfp;
@@ -372,15 +284,14 @@ update_passwd_file(const char *path, const char *name, const char *newhash)
   return 0;
 }
 
-#if defined(HAVE_MASTER_PASSWD)
-static int
-update_master_passwd(const char *name, const char *newhash)
+int
+pw_update_master(const char *name, const char *newhash)
 {
   int   r;
   pid_t pid, wr;
   int   st;
 
-  r = update_passwd_file(ARUU_BSD_PATH_MASTER_PASSWD, name, newhash);
+  r = pw_update_file(ARUU_BSD_PATH_MASTER_PASSWD, name, newhash);
   if (r != 0)
     return r;
   pid = fork();
@@ -410,21 +321,13 @@ update_master_passwd(const char *name, const char *newhash)
   }
   return 0;
 }
-#endif
 
 int
 pwdb_update(const char *name, const char *newhash)
 {
-#if defined(HAVE_SHADOW)
-  {
-    struct spwd *spw;
-    errno = 0;
-    spw   = getspnam(name);
-    if (spw)
-      return update_shadow(name, newhash);
-  }
-#elif defined(HAVE_MASTER_PASSWD)
-  return update_master_passwd(name, newhash);
-#endif
-  return update_passwd_file(ARUU_PATH_PASSWD, name, newhash);
+  int r;
+
+  if ((r = pw_shadow_update(name, newhash)) != 1)
+    return r;
+  return pw_update_file(ARUU_PATH_PASSWD, name, newhash);
 }

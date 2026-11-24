@@ -20,5 +20,13 @@ int pwdb_lookup(struct pwdb_entry *ent, const char *name);
 int pw_gensalt(char *salt, size_t salt_sz);
 int pw_gensalt_cipher(char *salt, size_t salt_sz, const char *prefix, size_t rand_len);
 int pwdb_update(const char *name, const char *newhash);
+int pw_update_file(const char *path, const char *name, const char *newhash);
+int pw_update_master(const char *name, const char *newhash);
+
+/* a backend per system: where the hash is when the passwd entry holds x.
+ * pw_shadow_hash returns null with errno 0 when there is no entry;
+ * pw_shadow_update returns 1 when the hash belongs in the passwd file */
+char *pw_shadow_hash(const char *name);
+int   pw_shadow_update(const char *name, const char *newhash);
 
 #endif
