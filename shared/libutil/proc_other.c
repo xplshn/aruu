@@ -2,6 +2,7 @@
 #include "../proc.h"
 
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 
 /* a kernel with no backend yet: its process table is not read, and every
