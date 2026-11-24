@@ -97,7 +97,21 @@
   (feature core-lib)
   (exec $(AR) $(ARFLAGS) $(OUT) $(IN)))
 
-  (group lib LIBUTF LIBUTIL LIBREDLINE LIBBLAKE3)
+  (rule LIBDISK_OBJ
+  (glob "shared/libdisk/*.c")
+  (skip "label_test.c" "plan_test.c")
+  (dep $(MATCH) FEATURES_H)
+  (out "$(STEM).o")
+  (exec $(CC) $(CPPFLAGS) -Ishared -Ishared/libdisk $(CFLAGS) -c -o $(OUT) $(MATCH)))
+
+  (rule LIBDISK
+  (dep LIBDISK_OBJ)
+  (out "shared/libdisk/libdisk.a")
+  (description "partition tables: the GPT and MBR as a list of partitions, for fdisk and for a partitioner")
+  (feature core-lib)
+  (exec $(AR) $(ARFLAGS) $(OUT) $(IN)))
+
+  (group lib LIBUTF LIBUTIL LIBREDLINE LIBBLAKE3 LIBDISK)
 
   ; perfile: every *.c directly inside one of these dirs becomes its
   ; own binary of the same name, individually gated by
@@ -142,7 +156,7 @@
   ; compiled and linked in one step, so the header that every compile
   ; -includes is order-only: as a dep it would land in $(IN) and be
   ; passed to the linker. its path still makes a change rebuild
-  (dep $(MATCH) LIBUTIL LIBUTF LIBBLAKE3)
+  (dep $(MATCH) LIBDISK LIBUTIL LIBUTF LIBBLAKE3)
   (after "scripts/mk/features.h" $(EXTRA_AFTER))
   (out $(STEM))
   (description $(DESC))
@@ -827,7 +841,7 @@
   ; instead, same as LIBUTIL/LIBUTF/LIBREDLINE
   ;
   (rule BOX
-  (dep BOX_DISPATCH BOX_OBJ POSIX_BC_BOX POSIX_AWK_BOX POSIX_SH_BOX POSIX_MAKE_BOX EXTRA_YAP_BOX NINQU_BOX LIBUTIL LIBUTF LIBREDLINE LIBBLAKE3)
+  (dep BOX_DISPATCH BOX_OBJ POSIX_BC_BOX POSIX_AWK_BOX POSIX_SH_BOX POSIX_MAKE_BOX EXTRA_YAP_BOX NINQU_BOX LIBDISK LIBUTIL LIBUTF LIBREDLINE LIBBLAKE3)
   (out "aruu-box")
   (description "single multi-call binary, one dispatch table for every enabled tool")
   (shell "$(CC) $(CPPFLAGS) $(CFLAGS) -o $(OUT) $(IN) $(LDFLAGS) $(LDLIBS) $(BOX_EXTRA_LIBS)")

@@ -1,5 +1,6 @@
 /* see LICENSE file for copyright and license details */
 #include "diskutil.h"
+#include "libdisk/gpt.h"
 #include "util.h"
 
 #include <fcntl.h>
@@ -8,47 +9,6 @@
 #include <string.h>
 #include <strings.h>
 #include <unistd.h>
-
-struct MbrPartition {
-  uint8_t  boot;
-  uint8_t  start_chs[3];
-  uint8_t  type;
-  uint8_t  end_chs[3];
-  uint32_t start_lba;
-  uint32_t size;
-} __attribute__((packed));
-
-struct MbrHeader {
-  uint8_t             code[446];
-  struct MbrPartition parts[4];
-  uint8_t             sig[2];
-} __attribute__((packed));
-
-struct GptHeader {
-  uint8_t  sig[8];
-  uint32_t rev;
-  uint32_t size;
-  uint32_t crc;
-  uint32_t reserved;
-  uint64_t current_lba;
-  uint64_t backup_lba;
-  uint64_t first_usable;
-  uint64_t last_usable;
-  uint8_t  disk_guid[16];
-  uint64_t partition_lba;
-  uint32_t num_parts;
-  uint32_t part_size;
-  uint32_t parts_crc;
-} __attribute__((packed));
-
-struct GptPartition {
-  uint8_t  type_guid[16];
-  uint8_t  part_guid[16];
-  uint64_t start_lba;
-  uint64_t end_lba;
-  uint64_t flags;
-  uint16_t name[36];
-} __attribute__((packed));
 
 struct BsdPartition {
   uint32_t size;
@@ -91,142 +51,6 @@ struct BsdDisklabel {
   struct BsdPartition d_partitions[16];
 } __attribute__((packed));
 
-static uint32_t crc32_table[256];
-static int      crc32_table_initialized = 0;
-
-static void
-init_crc32_table(void)
-{
-  uint32_t i, j, c;
-  for (i = 0; i < 256; i++) {
-    c = i;
-    for (j = 0; j < 8; j++) {
-      if (c & 1)
-        c = 0xedb88320U ^ (c >> 1);
-      else
-        c = c >> 1;
-    }
-    crc32_table[i] = c;
-  }
-  crc32_table_initialized = 1;
-}
-
-static uint32_t
-crc32(uint32_t crc, const void *buf, size_t len)
-{
-  const uint8_t *p = buf;
-  if (!crc32_table_initialized)
-    init_crc32_table();
-  while (len--)
-    crc = (crc >> 8) ^ crc32_table[(crc ^ *p++) & 0xFF];
-  return crc;
-}
-
-/* short two-byte codes match gdisk/sgdisk's own convention, since
- * every caller already writing "-t ef00" etc against those tools
- * expects the same codes here */
-static const struct {
-  const char *code;
-  uint8_t     guid[16];
-} gpt_type_table[] = {
-    /* ef00: efi system partition */
-    {"ef00",
-     {0x28, 0x73, 0x2a, 0xc1, 0x1f, 0xf8, 0xd2, 0x11, 0xba, 0x4b, 0x00, 0xa0, 0xc9, 0x3e, 0xc9,
-      0x3b}                                                                                    },
-    /* ef02: bios boot partition */
-    {"ef02",
-     {0x48, 0x61, 0x68, 0x21, 0x49, 0x64, 0x6f, 0x6e, 0x74, 0x4e, 0x65, 0x65, 0x64, 0x45, 0x46,
-      0x49}                                                                                    },
-    /* 8200: linux swap */
-    {"8200",
-     {0x6d, 0xfd, 0x57, 0x06, 0xab, 0xa4, 0xc4, 0x43, 0x84, 0xe5, 0x09, 0x33, 0xc8, 0x4b, 0x4f,
-      0x4f}                                                                                    },
-    /* 8300: linux filesystem data */
-    {"8300",
-     {0xaf, 0x3d, 0xc6, 0x0f, 0x83, 0x84, 0x72, 0x47, 0x8e, 0x79, 0x3d, 0x69, 0xd8, 0x47, 0x7d,
-      0xe4}                                                                                    },
-};
-#define GPT_TYPE_TABLE_LEN (int)(sizeof(gpt_type_table) / sizeof(gpt_type_table[0]))
-
-/* canonical XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX form: the first three
- * groups store little-endian, the last two store big-endian, the same
- * mixed layout every other GUID field in this file already uses */
-static int
-parse_guid_string(const char *s, uint8_t out[16])
-{
-  static const int  group_len[5] = {8, 4, 4, 4, 12};
-  static const int  group_le[5]  = {1, 1, 1, 0, 0};
-  int               g, i, hi, lo, byte_idx = 0;
-  const char       *p = s;
-
-  for (g = 0; g < 5; g++) {
-    uint8_t bytes[6];
-    int     nbytes = group_len[g] / 2;
-    for (i = 0; i < nbytes; i++) {
-      hi = hexval(p[i * 2]);
-      lo = hexval(p[i * 2 + 1]);
-      if (hi < 0 || lo < 0)
-        return -1;
-      bytes[i] = (uint8_t)((hi << 4) | lo);
-    }
-    if (group_le[g]) {
-      for (i = nbytes - 1; i >= 0; i--)
-        out[byte_idx++] = bytes[i];
-    } else {
-      for (i = 0; i < nbytes; i++)
-        out[byte_idx++] = bytes[i];
-    }
-    p += group_len[g];
-    if (g < 4) {
-      if (*p != '-')
-        return -1;
-      p++;
-    }
-  }
-  return *p == '\0' ? 0 : -1;
-}
-
-/* opt_type is a short gdisk-style code (see gpt_type_table above), a
- * full canonical GUID string, or unset: unset (or unrecognized, with
- * a warning) keeps the long-standing default of "linux filesystem
- * data", matching what every caller got before -t existed */
-static void
-gpt_type_guid(const char *type, uint8_t out[16])
-{
-  int i;
-
-  if (type) {
-    for (i = 0; i < GPT_TYPE_TABLE_LEN; i++) {
-      if (strcasecmp(type, gpt_type_table[i].code) == 0) {
-        memcpy(out, gpt_type_table[i].guid, 16);
-        return;
-      }
-    }
-    if (parse_guid_string(type, out) == 0)
-      return;
-    weprintf("unrecognized GPT type '%s', using linux filesystem data\n", type);
-  }
-  memcpy(out, gpt_type_table[GPT_TYPE_TABLE_LEN - 1].guid, 16);
-}
-
-/* a random GUID, version 4: the disk and each partition must have a
- * GUID of their own, and a loader such as limine ignores a partition
- * whose GUID is zero */
-static int
-gpt_random_guid(uint8_t out[16])
-{
-  int     fd = open(ARUU_PATH_DEVURANDOM, O_RDONLY);
-  ssize_t n  = fd < 0 ? -1 : read(fd, out, 16);
-
-  if (fd >= 0)
-    close(fd);
-  if (n != 16)
-    return -1;
-  out[6] = (out[6] & 0x0f) | 0x40;
-  out[8] = (out[8] & 0x3f) | 0x80;
-  return 0;
-}
-
 /* resolves -b for a GPT add: a plain sector number, or 0/unset for
  * the first free sector right after every existing partition's own
  * end_lba (gpt_hdr.first_usable if the table is still empty), the
@@ -268,21 +92,6 @@ gpt_resolve_end(struct GptHeader *hdr, size_t sec_size, uint64_t start, const ch
     return start + sectors - 1;
   }
   return (uint64_t)estrtoul(s, 10);
-}
-
-/* GPT partition names are UTF-16LE, 36 code units, null-padded: every
- * caller so far only ever needs a plain ASCII label, so this widens
- * each byte rather than pulling in a real UTF-8 decoder for it */
-static void
-gpt_set_name(uint16_t name[36], const char *s)
-{
-  size_t i;
-
-  memset(name, 0, 36 * sizeof(uint16_t));
-  if (!s)
-    return;
-  for (i = 0; i < 35 && s[i]; i++)
-    name[i] = (uint16_t)(unsigned char)s[i];
 }
 
 static int         opt_list           = 0;
@@ -375,79 +184,6 @@ gpt_print(struct GptHeader *hdr, struct GptPartition *parts, const char *path)
         guid
     );
   }
-}
-
-static int
-gpt_read(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *parts)
-{
-  unsigned char sector[512];
-  size_t        part_sectors;
-
-  if (blockdev_read(dev, 1, sector, 1) < 0)
-    return -1;
-
-  memcpy(hdr, sector, sizeof(*hdr));
-
-  if (memcmp(hdr->sig, "EFI PART", 8) != 0)
-    return -1;
-
-  part_sectors = (hdr->num_parts * hdr->part_size + dev->sec_size - 1) / dev->sec_size;
-  if (blockdev_read(dev, hdr->partition_lba, parts, part_sectors) < 0)
-    return -1;
-
-  return 0;
-}
-
-static int
-gpt_write(struct BlockDev *dev, struct GptHeader *hdr, struct GptPartition *parts)
-{
-  unsigned char    sector[512];
-  struct MbrHeader pmbr;
-  struct GptHeader backup_hdr;
-  uint64_t         limit;
-  size_t           part_sectors;
-
-  part_sectors = (hdr->num_parts * hdr->part_size + dev->sec_size - 1) / dev->sec_size;
-
-  hdr->parts_crc = crc32(~0U, parts, hdr->num_parts * hdr->part_size) ^ ~0U;
-
-  hdr->crc = 0;
-  hdr->crc = crc32(~0U, hdr, hdr->size) ^ ~0U;
-
-  memset(&pmbr, 0, sizeof(pmbr));
-  pmbr.parts[0].type      = 0xEE;
-  pmbr.parts[0].start_lba = 1;
-  limit                   = dev->size / dev->sec_size - 1;
-  pmbr.parts[0].size      = limit > 0xFFFFFFFFU ? 0xFFFFFFFFU : (uint32_t)limit;
-  pmbr.sig[0]             = 0x55;
-  pmbr.sig[1]             = 0xAA;
-  if (blockdev_write(dev, 0, &pmbr, 1) < 0)
-    return -1;
-
-  memset(sector, 0, sizeof(sector));
-  memcpy(sector, hdr, sizeof(*hdr));
-  if (blockdev_write(dev, 1, sector, 1) < 0)
-    return -1;
-  if (blockdev_write(dev, hdr->partition_lba, parts, part_sectors) < 0)
-    return -1;
-
-  backup_hdr               = *hdr;
-  backup_hdr.current_lba   = hdr->backup_lba;
-  backup_hdr.backup_lba    = hdr->current_lba;
-  backup_hdr.partition_lba = backup_hdr.current_lba - part_sectors;
-
-  backup_hdr.crc = 0;
-  backup_hdr.crc = crc32(~0U, &backup_hdr, backup_hdr.size) ^ ~0U;
-
-  if (blockdev_write(dev, backup_hdr.partition_lba, parts, part_sectors) < 0)
-    return -1;
-
-  memset(sector, 0, sizeof(sector));
-  memcpy(sector, &backup_hdr, sizeof(backup_hdr));
-  if (blockdev_write(dev, backup_hdr.current_lba, sector, 1) < 0)
-    return -1;
-
-  return 0;
 }
 
 static uint16_t
