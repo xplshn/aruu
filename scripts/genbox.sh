@@ -75,6 +75,9 @@ for category in $categories; do
                 if [ "$tool" = "test" ]; then
                         printf '\t{ "[", %s, "%s" },\n' "$sym" "$category"
                 fi
+                if [ "$tool" = "pgrep" ]; then
+                        printf '\t{ "pkill", %s, "%s" },\n' "$sym" "$category"
+                fi
                 if [ "$tool" = "grep" ]; then
                         printf '\t{ "egrep", %s, "%s" },\n' "$sym" "$category"
                         printf '\t{ "fgrep", %s, "%s" },\n' "$sym" "$category"

@@ -1,11 +1,13 @@
 /* see LICENSE file for copyright and license details */
 #include <sys/types.h>
 
+#include <ctype.h>
 #include <errno.h>
 #include <libgen.h>
 #include <limits.h>
 #include <pwd.h>
 #include <regex.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +15,7 @@
 
 #include "paths.h"
 #include "proc.h"
+#include "sig.h"
 #include "util.h"
 
 enum {
@@ -29,6 +32,10 @@ struct hit {
   unsigned long long starttime;
 };
 
+/* pkill is pgrep that sends a signal to what it finds instead of listing it:
+ * the one program, as grep is egrep and fgrep, so what is a match is written
+ * once */
+static int         killing, signo = SIGTERM;
 static int         flags;
 static regex_t     preg;
 static uid_t       user_uid;
@@ -76,6 +83,11 @@ show(pid_t pid, const char *comm)
   char cmdline[BUFSIZ];
 
   count++;
+  if (killing) {
+    if (kill(pid, signo) < 0)
+      weprintf("kill %d:", pid);
+    return;
+  }
   if (flags & PGREP_cflag)
     return;
   if (flags & PGREP_aflag) {
@@ -90,67 +102,59 @@ show(pid_t pid, const char *comm)
   }
 }
 
-static void
-pgrepr(const char *file)
+static int
+pgrepr(const struct procinfo *p, void *arg)
 {
-  char              path[PATH_MAX], *p;
-  struct procstat   ps;
-  struct procstatus pstatus;
-  char              cmdline[BUFSIZ];
-  const char       *target;
-  pid_t             pid;
-  int               matched;
+  struct procstat ps;
+  char            cmdline[BUFSIZ];
+  const char     *target = p->comm;
+  int             matched;
 
-  if (strlcpy(path, file, sizeof(path)) >= sizeof(path))
-    eprintf("path too long\n");
-  p = basename(path);
-  if (pidfile(p) == 0)
-    return;
-  pid = estrtol(p, 10);
-  if (pid == self)
-    return;
-  if (parsestat(pid, &ps) < 0)
-    return;
-
-  if (have_user) {
-    if (parsestatus(pid, &pstatus) < 0)
-      return;
-    if (pstatus.euid != user_uid)
-      return;
-  }
-
-  if (flags & PGREP_fflag) {
-    if (parsecmdline(pid, cmdline, sizeof(cmdline)) < 0)
-      target = ps.comm;
-    else
-      target = cmdline;
-  } else {
-    target = ps.comm;
-  }
+  (void)arg;
+  if (p->pid == self)
+    return 0;
+  if (have_user && p->euid != user_uid)
+    return 0;
+  if ((flags & PGREP_fflag) && proc_args(p->pid, cmdline, sizeof(cmdline)) == 0)
+    target = cmdline;
 
   matched = matches(target);
   if (flags & PGREP_vflag)
     matched = !matched;
   if (!matched)
-    return;
+    return 0;
 
+  ps.starttime = (unsigned long long)p->start;
   if (select_mode != PGREP_NONE)
-    record(pid, ps.starttime);
+    record(p->pid, ps.starttime);
   else
-    show(pid, ps.comm);
+    show(p->pid, p->comm);
+  return 0;
 }
 
 static void
 usage(void)
 {
+  if (killing)
+    eprintf("usage: %s [-signal] [-fxv] [-u user] [-n | -o] pattern\n", argv0);
   eprintf("usage: %s [-flaxvc] [-u user] [-n | -o] pattern\n", argv0);
+}
+
+/* what the program was started as, without its directory */
+static int
+invoked_as(const char *name)
+{
+  const char *base = strrchr(argv0, '/');
+
+  return strcmp(base ? base + 1 : argv0, name) == 0;
 }
 
 // ?man pgrep: list processes by name
 // ?man arguments: pattern
 // ?man pgrep matches pattern, a POSIX extended regular expression,
 // ?man against each running process's name (or full command line
-// ?man with -f) and prints the pid of every match, one per line
+// ?man with -f) and prints the pid of every match, one per line. run as
+// ?man pkill it sends them a signal instead, TERM unless -signal names one
 int
 main(int argc, char *argv[])
 {
@@ -159,6 +163,21 @@ main(int argc, char *argv[])
   struct passwd  *pw;
   const char     *user = NULL;
   size_t          i, pick;
+
+  argv0 = argv[0];
+  if (invoked_as("pkill")) {
+    killing = 1;
+    // a leading -TERM or -9 is the signal, as kill takes it
+    if (argc > 1 && argv[1][0] == '-' && argv[1][1] && (isdigit((unsigned char)argv[1][1]) || isupper((unsigned char)argv[1][1]))) {
+      if (isdigit((unsigned char)argv[1][1]))
+        signo = (int)estrtonum(argv[1] + 1, 0, INT_MAX);
+      else if (str2sig(argv[1] + 1, &signo) < 0)
+        eprintf("%s: bad signal name\n", argv[1] + 1);
+      argc--;
+      argv++;
+      argv[0] = argv[-1];
+    }
+  }
 
   ARGBEGIN
   {
@@ -222,7 +241,8 @@ main(int argc, char *argv[])
   eregcomp(&preg, argv[0], REG_EXTENDED);
 
   self = getpid();
-  recurse_dir(ARUU_LINUX_PATH_PROC, pgrepr);
+  if (proc_each(pgrepr, NULL) < 0)
+    eprintf("the process table cannot be read:");
 
   if (select_mode != PGREP_NONE && nhits > 0) {
     pick = 0;

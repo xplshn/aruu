@@ -42,6 +42,7 @@
   (glob "shared/libutil/*.c")
   (skip "filesystem_linux.c" "filesystem_other.c"
         "net_linux.c" "net_other.c"
+        "proc_linux.c" "proc_other.c"
         "sysinfo_linux.c" "sysinfo_other.c")
   (dep $(MATCH) FEATURES_H)
   (after NOFORK_LIST_H)
@@ -53,9 +54,11 @@
         "shared/libutil/filesystem_other.c"
         "shared/libutil/net_linux.c"
         "shared/libutil/net_other.c"
+        "shared/libutil/proc_linux.c"
+        "shared/libutil/proc_other.c"
         "shared/libutil/sysinfo_linux.c"
         "shared/libutil/sysinfo_other.c")
-  (dep $(MATCH) "shared/filesystem.h" "shared/net.h"
+  (dep $(MATCH) "shared/filesystem.h" "shared/net.h" "shared/proc.h"
        "shared/sysinfo.h" FEATURES_H)
   (after NOFORK_LIST_H)
   (out "shared/libutil/$(BASESTEM).o")

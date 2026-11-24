@@ -13,6 +13,11 @@
 #include "../proc.h"
 #include "../util.h"
 
+#include <dirent.h>
+#include <time.h>
+
+#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
+
 int
 parsecmdline(pid_t pid, char *buf, size_t siz)
 {
@@ -133,3 +138,117 @@ pidfile(const char *file)
     return 0;
   return 1;
 }
+
+/* the terminal of a process as stat gives it: a device number in the
+ * kernel's own encoding */
+static void
+tty_split(int nr, unsigned *major, unsigned *minor)
+{
+  unsigned dev = (unsigned)nr;
+
+  *major = (dev & 0xfff00) >> 8;
+  *minor = (dev & 0xff) | ((dev >> 12) & 0xfff00);
+}
+
+/* when the system started, seconds since the epoch, from stat's btime */
+static time_t
+boot_time(void)
+{
+  static time_t boot;
+  char          line[256];
+  FILE         *fp;
+
+  if (boot)
+    return boot;
+  if ((fp = fopen(ARUU_LINUX_PATH_PROC "/stat", "r"))) {
+    while (fgets(line, sizeof line, fp)) {
+      long long t;
+
+      if (sscanf(line, "btime %lld", &t) == 1) {
+        boot = (time_t)t;
+        break;
+      }
+    }
+    fclose(fp);
+  }
+  return boot;
+}
+
+int
+proc_info(pid_t pid, struct procinfo *p)
+{
+  struct procstat   ps;
+  struct procstatus st;
+  long              hz = sysconf(_SC_CLK_TCK);
+  long              page = sysconf(_SC_PAGESIZE);
+
+  if (parsestat(pid, &ps) < 0)
+    return -1;
+  memset(&st, 0, sizeof st);
+  parsestatus(pid, &st);
+  if (hz <= 0)
+    hz = 100;
+  memset(p, 0, sizeof *p);
+  p->pid       = pid;
+  p->ppid      = ps.ppid;
+  p->pgid      = ps.pgrp;
+  p->sid       = ps.sid;
+  p->ruid      = st.uid;
+  p->euid      = st.euid;
+  p->rgid      = st.gid;
+  p->egid      = st.egid;
+  p->state     = (char)ps.state;
+  p->nice      = ps.nice;
+  p->priority  = ps.priority;
+  p->nthreads  = ps.num_threads;
+  p->start     = boot_time() + (time_t)(ps.starttime / (unsigned long long)hz);
+  p->cpu       = (ps.utime + ps.stime) / (unsigned long)hz;
+  p->vsize_kib = ps.vsize / 1024;
+  p->rss_kib   = ps.rss * (page > 0 ? page / 1024 : 4);
+  if (ps.tty_nr)
+    tty_split(ps.tty_nr, &p->tty_major, &p->tty_minor);
+  strlcpy(p->comm, ps.comm, sizeof p->comm);
+  return 0;
+}
+
+int
+proc_each(proc_fn *fn, void *arg)
+{
+  struct dirent *e;
+  struct procinfo p;
+  DIR           *d = opendir(ARUU_LINUX_PATH_PROC);
+
+  if (!d)
+    return -1;
+  while ((e = readdir(d))) {
+    if (!pidfile(e->d_name) || proc_info((pid_t)strtol(e->d_name, NULL, 10), &p) < 0)
+      continue;
+    if (fn(&p, arg))
+      break;
+  }
+  closedir(d);
+  return 0;
+}
+
+int
+proc_args(pid_t pid, char *buf, size_t n)
+{
+  return parsecmdline(pid, buf, n);
+}
+
+void
+proc_ttyname(unsigned major, unsigned minor, char *buf, size_t n)
+{
+  if (major == 136)
+    snprintf(buf, n, "pts/%u", minor);
+  else if (major == 4 && minor < 64)
+    snprintf(buf, n, "tty%u", minor);
+  else if (major == 4)
+    snprintf(buf, n, "ttyS%u", minor - 64);
+  else if (major == 5 && minor == 0)
+    snprintf(buf, n, "tty");
+  else
+    snprintf(buf, n, "?");
+}
+
+#endif
