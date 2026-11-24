@@ -1,8 +1,5 @@
 /* see LICENSE file for copyright and license details */
 
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,10 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#if defined(__linux__)
-#include <linux/fs.h>
-#endif
-
+#include "diskutil.h"
 #include "util.h"
 
 #define SWAP_UUID_LENGTH  16
@@ -44,9 +38,9 @@ int
 main(int argc, char *argv[])
 {
   int              fd;
+  struct BlockDev  dev;
   unsigned int     pages;
   long             pagesize;
-  struct stat      sb;
   char            *buf;
   struct swap_hdr *hdr;
   uint64_t         bytes = 0;
@@ -77,26 +71,11 @@ main(int argc, char *argv[])
       eprintf("can't determine pagesize\n");
   }
 
-  fd = open(argv[0], O_RDWR);
-  if (fd < 0)
+  if (blockdev_open(&dev, argv[0], 1) < 0)
     eprintf("open %s:", argv[0]);
-  if (fstat(fd, &sb) < 0)
-    eprintf("stat %s:", argv[0]);
-
-  if (S_ISBLK(sb.st_mode) || S_ISCHR(sb.st_mode)) {
-#if defined(BLKGETSIZE64)
-    if (ioctl(fd, BLKGETSIZE64, &bytes) < 0)
-      bytes = 0;
-#endif
-    if (bytes == 0) {
-      off_t end = lseek(fd, 0, SEEK_END);
-      if (end != (off_t)-1)
-        bytes = (uint64_t)end;
-      lseek(fd, 0, SEEK_SET);
-    }
-  } else if (S_ISREG(sb.st_mode)) {
-    bytes = (uint64_t)sb.st_size;
-  } else {
+  fd    = dev.fd;
+  bytes = dev.size;
+  if (bytes == 0) {
     off_t end = lseek(fd, 0, SEEK_END);
     if (end != (off_t)-1)
       bytes = (uint64_t)end;
