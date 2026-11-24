@@ -6,6 +6,7 @@
 #endif
 
 #include "arg.h"
+#include "filesystem.h"
 
 #include <assert.h>
 #include <cpio.h>
@@ -25,7 +26,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/sysmacros.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <sys/wait.h>
@@ -677,7 +677,7 @@ readustar(struct bufio *f, struct header *h)
 
       major   = octnum(buf + 329, 8);
       minor   = octnum(buf + 337, 8);
-      h->rdev = makedev(major, minor);
+      h->rdev = fs_makedev(major, minor);
     }
   }
   return 1;
@@ -1225,13 +1225,13 @@ writeustar(FILE *f, struct header *h)
   if (strlen(h->gname) > 31)
     fatal("group name is too long: %s\n", h->gname);
   strncpy(buf + 297, h->gname, 32);
-  if (major(h->rdev) > 07777777)
-    fatal("device major is too large: %ju\n", (uintmax_t)major(h->rdev));
-  snprintf(tmp, sizeof(tmp), "%.7lo", (unsigned long)major(h->rdev) & 07777777);
+  if (fs_devmajor(h->rdev) > 07777777)
+    fatal("device major is too large: %ju\n", (uintmax_t)fs_devmajor(h->rdev));
+  snprintf(tmp, sizeof(tmp), "%.7lo", (unsigned long)fs_devmajor(h->rdev) & 07777777);
   memcpy(buf + 329, tmp, 8);
-  if (minor(h->rdev) > 07777777)
-    fatal("device minor is too large: %ju\n", (uintmax_t)minor(h->rdev));
-  snprintf(tmp, sizeof(tmp), "%.7lo", (unsigned long)minor(h->rdev) & 07777777);
+  if (fs_devminor(h->rdev) > 07777777)
+    fatal("device minor is too large: %ju\n", (uintmax_t)fs_devminor(h->rdev));
+  snprintf(tmp, sizeof(tmp), "%.7lo", (unsigned long)fs_devminor(h->rdev) & 07777777);
   memcpy(buf + 337, tmp, 8);
   memset(buf + 500, 0, 12);
   sum = 0;
@@ -1920,7 +1920,7 @@ listhdr(FILE *f, struct header *h)
     fatal("localtime:");
   strftime(time, sizeof time, timefmt, tm);
   if (h->type == CHRTYPE || h->type == BLKTYPE)
-    snprintf(info, sizeof info, "%u, %u", major(h->rdev), minor(h->rdev));
+    snprintf(info, sizeof info, "%u, %u", fs_devmajor(h->rdev), fs_devminor(h->rdev));
   else
     snprintf(info, sizeof info, "%ju", (uintmax_t)h->size);
   printf(

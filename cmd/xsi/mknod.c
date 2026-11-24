@@ -13,11 +13,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "filesystem.h"
 #include "util.h"
-
-#ifndef makedev
-#include <sys/sysmacros.h>
-#endif
 
 static void
 usage(void)
@@ -78,7 +75,7 @@ main(int argc, char *argv[])
   } else {
     if (argc != 4)
       usage();
-    dev = makedev(estrtonum(argv[2], 0, LLONG_MAX), estrtonum(argv[3], 0, LLONG_MAX));
+    dev = fs_makedev(estrtonum(argv[2], 0, LLONG_MAX), estrtonum(argv[3], 0, LLONG_MAX));
   }
 
   if (mknod(argv[0], mode, dev) == -1)

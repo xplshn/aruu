@@ -7,10 +7,6 @@
 #endif
 #include <sys/stat.h>
 #include <sys/types.h>
-#ifndef major
-#include <sys/sysmacros.h>
-#endif
-
 #include <dirent.h>
 #include <grp.h>
 #include <pwd.h>
@@ -20,6 +16,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "filesystem.h"
 #include "utf.h"
 #include "util.h"
 
@@ -396,7 +393,7 @@ output(const struct entry *ent)
     printf("%-8.8s ", grname);
 
   if (S_ISBLK(ent->mode) || S_ISCHR(ent->mode))
-    printf("%4u, %4u ", major(ent->rdev), minor(ent->rdev));
+    printf("%4u, %4u ", fs_devmajor(ent->rdev), fs_devminor(ent->rdev));
   else if (hflag)
     printf("%10s ", humansize(ent->size));
   else

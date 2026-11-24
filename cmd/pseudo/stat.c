@@ -5,6 +5,7 @@
 #endif
 
 #include "config.h"
+#include "filesystem.h"
 #include "util.h"
 
 #include <grp.h>
@@ -13,7 +14,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <sys/sysmacros.h>
 #include <sys/types.h>
 #include <sys/vfs.h>
 #include <time.h>
@@ -188,12 +188,12 @@ print_custom(const char *file, struct stat *st, const char *fmt)
         case 't':
         fmt_spec[fmt_len++] = 'x';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, major(st->st_rdev));
+        printf(fmt_spec, fs_devmajor(st->st_rdev));
         break;
       case 'T':
         fmt_spec[fmt_len++] = 'x';
         fmt_spec[fmt_len]   = '\0';
-        printf(fmt_spec, minor(st->st_rdev));
+        printf(fmt_spec, fs_devminor(st->st_rdev));
         break;
       case 'u':
         fmt_spec[fmt_len++] = 'u';
@@ -466,7 +466,7 @@ show_stat_terse(const char *file, struct stat *st)
   printf("%04o %u %u ", st->st_mode & 0777, st->st_uid, st->st_gid);
   printf("%llx ", (unsigned long long)st->st_dev);
   printf("%lu %lu ", (unsigned long)st->st_ino, (unsigned long)st->st_nlink);
-  printf("%d %d ", major(st->st_rdev), minor(st->st_rdev));
+  printf("%d %d ", fs_devmajor(st->st_rdev), fs_devminor(st->st_rdev));
   printf("%ld %ld %ld ", st->st_atime, st->st_mtime, st->st_ctime);
   printf("%lu\n", (unsigned long)st->st_blksize);
 }
@@ -485,8 +485,8 @@ show_stat(const char *file, struct stat *st)
   );
   printf(
       "Device: %xh/%ud\tInode: %lu\tLinks %lu\n",
-      major(st->st_dev),
-      minor(st->st_dev),
+      fs_devmajor(st->st_dev),
+      fs_devminor(st->st_dev),
       (unsigned long)st->st_ino,
       (unsigned long)st->st_nlink
   );

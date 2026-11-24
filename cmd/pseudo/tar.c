@@ -7,6 +7,7 @@
 #endif
 
 #include "config.h"
+#include "filesystem.h"
 #include "fs.h"
 #include "utf.h"
 #include "util.h"
@@ -23,7 +24,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <sys/sysmacros.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -443,8 +443,8 @@ archive(const char *path)
     h->linkname[r] = '\0';
   } else if (S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode)) {
     h->type = S_ISCHR(st.st_mode) ? CHARDEV : BLOCKDEV;
-    putoctal(h->major, (unsigned)major(st.st_dev), sizeof(h->major));
-    putoctal(h->minor, (unsigned)minor(st.st_dev), sizeof(h->minor));
+    putoctal(h->major, (unsigned)fs_devmajor(st.st_dev), sizeof(h->major));
+    putoctal(h->minor, (unsigned)fs_devminor(st.st_dev), sizeof(h->minor));
   } else if (S_ISFIFO(st.st_mode)) {
     h->type = FIFO;
   }
@@ -548,7 +548,7 @@ unarchive(char *fname, ssize_t l, char b[BLKSIZ])
         if ((minor = strtol(h->minor, &p, 8)) < 0 || *p != '\0')
           eprintf("strtol %s: invalid minor device\n", h->minor);
         type = (h->type == CHARDEV) ? S_IFCHR : S_IFBLK;
-        if (mknod(fname, type | mode, makedev(major, minor)) < 0)
+        if (mknod(fname, type | mode, fs_makedev(major, minor)) < 0)
           eprintf("mknod %s:", fname);
 #else
         eprintf("tar: device extraction not supported\n");

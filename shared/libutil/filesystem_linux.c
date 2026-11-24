@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/statvfs.h>
+#include <sys/sysmacros.h>
 
 int
 fs_get_status(const char *path, struct FilesystemStatus *status)
@@ -65,5 +66,23 @@ fs_free_mounts(struct FilesystemMount *mounts, size_t count)
     free(mounts[i].path);
   }
   free(mounts);
+}
+
+unsigned int
+fs_devmajor(dev_t dev)
+{
+  return major(dev);
+}
+
+unsigned int
+fs_devminor(dev_t dev)
+{
+  return minor(dev);
+}
+
+dev_t
+fs_makedev(unsigned int ma, unsigned int mi)
+{
+  return makedev(ma, mi);
 }
 #endif

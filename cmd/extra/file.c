@@ -1,14 +1,11 @@
 /* see LICENSE file for copyright and license details */
 #include "../../shared/libmagic/magic.h"
 #include "arg.h"
+#include "filesystem.h"
 #include "util.h"
 
 #include <sys/stat.h>
 #include <sys/types.h>
-#ifndef major
-#include <sys/sysmacros.h>
-#endif
-
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -216,8 +213,8 @@ file(const char *name)
           buf,
           sizeof(buf),
           "character special (%ld/%ld)",
-          (long)major(st.st_rdev),
-          (long)minor(st.st_rdev)
+          (long)fs_devmajor(st.st_rdev),
+          (long)fs_devminor(st.st_rdev)
       );
       put_fs(name, prefix, buf, "inode/chardevice", 1);
       return 0;
@@ -226,8 +223,8 @@ file(const char *name)
           buf,
           sizeof(buf),
           "block special (%ld/%ld)",
-          (long)major(st.st_rdev),
-          (long)minor(st.st_rdev)
+          (long)fs_devmajor(st.st_rdev),
+          (long)fs_devminor(st.st_rdev)
       );
       put_fs(name, prefix, buf, "inode/blockdevice", 1);
       return 0;
