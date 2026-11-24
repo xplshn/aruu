@@ -1,7 +1,7 @@
 #ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
 #endif
-#if defined(__linux__)
+#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
 #include "../filesystem.h"
 #include "../paths.h"
 #include "../util.h"

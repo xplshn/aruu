@@ -1,4 +1,4 @@
-#if defined(__linux__)
+#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
 #ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
 #endif
