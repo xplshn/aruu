@@ -23,13 +23,6 @@ net_get_routes(struct NetRoute **routes, int *count)
 }
 
 int
-net_show_routes(void)
-{
-  errno = ENOTSUP;
-  return -1;
-}
-
-int
 net_get_stats(const char *ifname, struct NetStats *stats)
 {
   (void)ifname;
