@@ -49,6 +49,7 @@
         "passwd_dragonfly.c" "passwd_freebsd.c" "passwd_linux.c"
         "passwd_netbsd.c" "passwd_openbsd.c" "passwd_other.c"
         "proc_linux.c" "proc_other.c"
+        "reboot_linux.c" "reboot_other.c"
         "session_linux.c" "session_other.c"
         "sysinfo_linux.c" "sysinfo_other.c"
         "tty_linux.c" "tty_other.c")
@@ -82,6 +83,8 @@
         "shared/libutil/passwd_other.c"
         "shared/libutil/proc_linux.c"
         "shared/libutil/proc_other.c"
+        "shared/libutil/reboot_linux.c"
+        "shared/libutil/reboot_other.c"
         "shared/libutil/session_linux.c"
         "shared/libutil/session_other.c"
         "shared/libutil/sysinfo_linux.c"
@@ -89,7 +92,7 @@
         "shared/libutil/tty_linux.c"
         "shared/libutil/tty_other.c")
   (dep $(MATCH) "shared/diskutil.h" "shared/filesystem.h" "shared/net.h" "shared/passwd.h"
-       "shared/proc.h" "shared/session.h" "shared/sysinfo.h" "shared/util.h"
+       "shared/proc.h" "shared/reboot.h" "shared/session.h" "shared/sysinfo.h" "shared/util.h"
        FEATURES_H)
   (after NOFORK_LIST_H)
   (out "shared/libutil/$(BASESTEM).o")

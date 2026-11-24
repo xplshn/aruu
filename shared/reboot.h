@@ -1,3 +1,15 @@
+#ifndef ARUU_REBOOT_H
+#define ARUU_REBOOT_H
+
+enum {
+  REBOOT_HALT,
+  REBOOT_POWEROFF,
+  REBOOT_RESTART,
+};
+
+/* a backend per kernel: stop or restart the machine */
+int machine_reboot(int how);
+
 /*
  * magic values required to use _reboot() system call
  */
@@ -29,3 +41,5 @@
 #define LINUX_REBOOT_CMD_RESTART2   0xA1B2C3D4
 #define LINUX_REBOOT_CMD_SW_SUSPEND 0xD000FCE2
 #define LINUX_REBOOT_CMD_KEXEC      0x45584543
+
+#endif

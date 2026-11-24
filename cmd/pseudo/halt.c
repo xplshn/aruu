@@ -9,8 +9,6 @@
 #endif
 #endif
 
-#include <sys/syscall.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -30,7 +28,7 @@ int
 main(int argc, char *argv[])
 {
   int pflag = 0, rflag = 0;
-  int cmd = LINUX_REBOOT_CMD_HALT;
+  int how = REBOOT_HALT;
 
   ARGBEGIN
   {
@@ -60,12 +58,12 @@ main(int argc, char *argv[])
     usage();
 
   if (pflag)
-    cmd = LINUX_REBOOT_CMD_POWER_OFF;
+    how = REBOOT_POWEROFF;
   if (rflag)
-    cmd = LINUX_REBOOT_CMD_RESTART;
+    how = REBOOT_RESTART;
 
 #if FEATURE_LINUX_SYSCALL
-  if (syscall(__NR_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, cmd, NULL) < 0)
+  if (machine_reboot(how) < 0)
     eprintf("reboot:");
 #endif
   return 0;
