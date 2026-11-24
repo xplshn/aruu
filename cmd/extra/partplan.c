@@ -14,7 +14,7 @@
 static void
 usage(void)
 {
-  eprintf("usage: %s guided [-s swap_mib] [-f root_fs] disk | show plan | check [-rb] plan | write plan |\n"
+  eprintf("usage: %s guided [-s swap_mib] [-f root_fs] disk | disks | layout | show plan | check [-rb] plan | write plan |\n"
           "       mkfs plan | mounts plan | fstab plan | get plan esp|root|swap|bios|rootfs\n",
           argv0);
 }
@@ -31,6 +31,47 @@ load(struct plan *p, const char *path)
     eprintf("%s: %s: %s\n", argv0, path, why);
   if (f != stdin)
     fclose(f);
+  return 0;
+}
+
+/* the disks a system can be put on, a line each: name, bytes, model, and 1 when a
+ * partition of it is mounted (the media the system came from). not the devices that are
+ * no disk: loop, ram, optical, floppy and the mappers */
+static int
+do_disks(void)
+{
+  static const char *const skip[] = {"loop", "ram", "zram", "sr", "fd", "dm-", "md", "nbd"};
+  struct BlockDevInfo     *list = blockdev_get_list(), *d;
+
+  for (d = list; d; d = d->next) {
+    char   path[96], model[64] = "";
+    int    busy = d->mountpoint[0] != '\0', skipped = 0;
+    size_t i;
+    FILE  *f;
+    struct BlockDevInfo *part;
+
+    for (i = 0; i < sizeof skip / sizeof skip[0]; i++)
+      if (strncmp(d->name, skip[i], strlen(skip[i])) == 0)
+        skipped = 1;
+    if (skipped || !d->size)
+      continue;
+    for (part = d->parts; part; part = part->next)
+      if (part->mountpoint[0])
+        busy = 1;
+    snprintf(path, sizeof path, "/sys/block/%s/device/model", d->name);
+    if ((f = fopen(path, "r"))) {
+      if (fgets(model, sizeof model, f)) {
+        size_t n;
+
+        model[strcspn(model, "\n")] = '\0';
+        for (n = strlen(model); n > 0 && model[n - 1] == ' '; n--)
+          model[n - 1] = '\0';
+      }
+      fclose(f);
+    }
+    printf("%s\t%llu\t%s\t%d\n", d->name, (unsigned long long)d->size, model, busy);
+  }
+  blockdev_free_list(list);
   return 0;
 }
 
@@ -231,11 +272,13 @@ do_fstab(struct plan *p)
 }
 
 // ?man partplan: a disk's layout as a plan, made, checked and applied
-// ?man arguments: guided [-s swap_mib] [-f root_fs] disk | show plan | check [-rb] plan | write plan | mkfs plan | mounts plan | fstab plan | get plan role
+// ?man arguments: guided [-s swap_mib] [-f root_fs] disk | disks | layout | show plan | check [-rb] plan | write plan | mkfs plan | mounts plan | fstab plan | get plan role
 // ?man partplan works on a plan, the text a partitioner and an installer
 // ?man share: the disk, its partition table, and for each partition the
 // ?man filesystem it holds, where it is mounted and whether it is made
-// ?man anew. guided prints the layout for a whole disk, show reads one,
+// ?man anew. disks lists the disks a system can go on, a line each: name, bytes,
+// ?man model and 1 for one in use. guided prints the layout for a whole disk, layout
+// ?man the partitions it puts ahead of the root, show reads one,
 // ?man check says whether it can be installed to (-r a root, -b a way to start),
 // ?man write clears the start of the disk and writes the table, mkfs makes
 // ?man the filesystems, mounts and fstab say where each goes, and get tells
@@ -255,6 +298,13 @@ main(int argc, char *argv[])
     return do_guided(argc - 1, argv + 1);
   if (strcmp(argv[1], "check") == 0)
     return do_check(argc - 1, argv + 1);
+  if (strcmp(argv[1], "disks") == 0)
+    return do_disks();
+  /* what the guided layout puts ahead of the root, for a question to show */
+  if (strcmp(argv[1], "layout") == 0) {
+    printf("BIOS boot|%d MiB\nEFI system|%d MiB\n", PLAN_BIOS_MIB, PLAN_ESP_MIB);
+    return 0;
+  }
   if (argc < 3)
     usage();
   p = ecalloc(1, sizeof *p);
