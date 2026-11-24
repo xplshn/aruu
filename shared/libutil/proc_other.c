@@ -1,5 +1,6 @@
 /* see LICENSE file for copyright and license details */
 #include "../proc.h"
+#include "../util.h"
 
 #include <errno.h>
 #include <stdlib.h>
