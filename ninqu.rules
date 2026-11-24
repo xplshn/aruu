@@ -40,7 +40,9 @@
 
   (rule LIBUTIL_OBJ
   (glob "shared/libutil/*.c")
-  (skip "filesystem_linux.c" "filesystem_other.c"
+  (skip "diskutil_freebsd.c" "diskutil_linux.c" "diskutil_netbsd.c"
+        "diskutil_openbsd.c" "diskutil_other.c"
+        "filesystem_linux.c" "filesystem_other.c"
         "net_linux.c" "net_other.c"
         "passwd_dragonfly.c" "passwd_freebsd.c" "passwd_linux.c"
         "passwd_netbsd.c" "passwd_openbsd.c" "passwd_other.c"
@@ -52,7 +54,12 @@
   (exec $(CC) $(CPPFLAGS_LIBUTIL) -Ishared/libutil $(CFLAGS) -c -o $(OUT) $(MATCH)))
 
   (rule LIBUTIL_OS_OBJ
-  (glob "shared/libutil/filesystem_linux.c"
+  (glob "shared/libutil/diskutil_freebsd.c"
+        "shared/libutil/diskutil_linux.c"
+        "shared/libutil/diskutil_netbsd.c"
+        "shared/libutil/diskutil_openbsd.c"
+        "shared/libutil/diskutil_other.c"
+        "shared/libutil/filesystem_linux.c"
         "shared/libutil/filesystem_other.c"
         "shared/libutil/net_linux.c"
         "shared/libutil/net_other.c"
@@ -66,7 +73,7 @@
         "shared/libutil/proc_other.c"
         "shared/libutil/sysinfo_linux.c"
         "shared/libutil/sysinfo_other.c")
-  (dep $(MATCH) "shared/filesystem.h" "shared/net.h" "shared/passwd.h"
+  (dep $(MATCH) "shared/diskutil.h" "shared/filesystem.h" "shared/net.h" "shared/passwd.h"
        "shared/proc.h" "shared/sysinfo.h" FEATURES_H)
   (after NOFORK_LIST_H)
   (out "shared/libutil/$(BASESTEM).o")

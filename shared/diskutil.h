@@ -46,4 +46,11 @@ int blockdev_detect_fs(
 struct BlockDevInfo *blockdev_get_list(void);
 void                 blockdev_free_list(struct BlockDevInfo *list);
 
+/* a backend per kernel: the size of a device, rereading a table written
+ * to it, and the list of disks. blockdev_probe_list opens the names most
+ * systems give disks, for a kernel that has no way to list them */
+void                 blockdev_sys_size(struct BlockDev *dev);
+void                 blockdev_sys_reread(struct BlockDev *dev);
+struct BlockDevInfo *blockdev_probe_list(void);
+
 #endif
