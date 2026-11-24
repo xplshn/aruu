@@ -1,4 +1,9 @@
 /* see LICENSE file for copyright and license details */
+#include "../util.h"
+
+/* the numbers are the ones linux gives ttys, and the dev the encoding
+ * of tty_nr in /proc/<pid>/stat */
+#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
 #include <sys/types.h>
@@ -12,7 +17,6 @@
 #include <unistd.h>
 
 #include "../paths.h"
-#include "../util.h"
 
 void
 devtotty(int dev, int *tty_maj, int *tty_min)
@@ -95,3 +99,4 @@ err0:
 
   return r;
 }
+#endif

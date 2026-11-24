@@ -50,7 +50,8 @@
         "passwd_netbsd.c" "passwd_openbsd.c" "passwd_other.c"
         "proc_linux.c" "proc_other.c"
         "session_linux.c" "session_other.c"
-        "sysinfo_linux.c" "sysinfo_other.c")
+        "sysinfo_linux.c" "sysinfo_other.c"
+        "tty_linux.c" "tty_other.c")
   (dep $(MATCH) FEATURES_H)
   (after NOFORK_LIST_H)
   (out "$(STEM).o")
@@ -84,7 +85,9 @@
         "shared/libutil/session_linux.c"
         "shared/libutil/session_other.c"
         "shared/libutil/sysinfo_linux.c"
-        "shared/libutil/sysinfo_other.c")
+        "shared/libutil/sysinfo_other.c"
+        "shared/libutil/tty_linux.c"
+        "shared/libutil/tty_other.c")
   (dep $(MATCH) "shared/diskutil.h" "shared/filesystem.h" "shared/net.h" "shared/passwd.h"
        "shared/proc.h" "shared/session.h" "shared/sysinfo.h" "shared/util.h"
        FEATURES_H)
