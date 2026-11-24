@@ -487,6 +487,38 @@ process_module(struct Module *m)
     free(opts);
 }
 
+/* a modalias, such as pci:v00008086d00009A49sv...bc03sc00i00, is a device's
+ * own name and names no module: the modules.alias lines that match it as a
+ * glob do. true when one did */
+static int
+probe_pattern(const char *name)
+{
+  struct Module  *pm;
+  struct StrNode *alias;
+  struct Module  *am;
+  int             hit = 0;
+  unsigned int    i;
+
+  for (i = 0; i < HASH_SIZE; i++) {
+    for (pm = mod_db[i]; pm; pm = pm->next) {
+      if (!pm->aliases || !strpbrk(pm->name, "*?[") || fnmatch(pm->name, name, 0) != 0)
+        continue;
+      for (alias = pm->aliases; alias; alias = alias->next) {
+        am = get_module(alias->str, 1);
+#if FEATURE_MODPROBE_BLACKLIST
+        if (bflag && (am->flags & MOD_BLACKLISTED))
+          continue;
+#endif
+        if (vflag)
+          pr_info("probing alias %s -> %s", name, alias->str);
+        process_module(am);
+        hit = 1;
+      }
+    }
+  }
+  return hit;
+}
+
 static void
 do_probe(const char *name)
 {
@@ -503,6 +535,9 @@ do_probe(const char *name)
 #endif
 
   if (!m->aliases) {
+    // a modalias, or a name that is a module's own
+    if (!m->path && probe_pattern(norm))
+      return;
     if (vflag)
       pr_info("probing %s by name", norm);
     process_module(m);
