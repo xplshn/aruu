@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <utmp.h>
 
 #include "paths.h"
+#include "session.h"
 #include "text.h"
 #include "util.h"
 
@@ -19,9 +19,8 @@ static FILE *last;
 static void
 lastlog(char *user)
 {
-  struct passwd *pwd;
-  struct lastlog ll;
-  time_t         lltime;
+  struct passwd      *pwd;
+  struct SessionEntry e;
 
   errno = 0;
   if ((pwd = getpwnam(user)) == NULL) {
@@ -32,16 +31,9 @@ lastlog(char *user)
     return;
   }
 
-  fseek(last, pwd->pw_uid * sizeof(struct lastlog), 0);
-  fread(&ll, sizeof(struct lastlog), 1, last);
-
-  if (ferror(last))
+  if (session_lastlog(last, pwd->pw_uid, &e) < 0)
     eprintf("%s: read error:", ARUU_PATH_LASTLOG);
-
-  /* on glibc `ll_time' can be an int32_t with compat32
- * avoid compiler warning when calling ctime() */
-  lltime = ll.ll_time;
-  printf("%-8.8s %-8.8s %-16.16s %s", user, ll.ll_line, ll.ll_host, ctime(&lltime));
+  printf("%-8.8s %-8.8s %-16.16s %s", user, e.line, e.host, ctime(&e.time));
 }
 
 // ?man lastlog: report recent logins

@@ -17,9 +17,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <utmp.h>
 
 #include "config.h"
+#include "session.h"
 #include "util.h"
 #include "wexec.h"
 
@@ -39,14 +39,10 @@ main(int argc, char *argv[])
 {
   char             term[128], logname[LOGIN_NAME_MAX], c;
   char             hostname[HOST_NAME_MAX + 1];
-  char             ut_line_buf[UT_LINESIZE + 1];
-  struct utmp      usr;
   struct sigaction sa;
-  FILE            *fp;
   int              fd;
   unsigned int     i = 0;
   ssize_t          n;
-  long             pos;
 
   ARGBEGIN
   {
@@ -106,28 +102,7 @@ main(int argc, char *argv[])
   sigemptyset(&sa.sa_mask);
   sigaction(SIGHUP, &sa, NULL);
 
-  /* clear all utmp entries for this tty */
-  fp = fopen(UTMP_PATH, "r+");
-  if (fp) {
-    do {
-      pos = ftell(fp);
-      if (fread(&usr, sizeof(usr), 1, fp) != 1)
-        break;
-      if (usr.ut_line[0] == '\0')
-        continue;
-      memcpy(ut_line_buf, usr.ut_line, UT_LINESIZE);
-      ut_line_buf[UT_LINESIZE] = '\0';
-      if (strcmp(ut_line_buf, tty) != 0)
-        continue;
-      memset(&usr, 0, sizeof(usr));
-      fseek(fp, pos, SEEK_SET);
-      if (fwrite(&usr, sizeof(usr), 1, fp) != 1)
-        break;
-    } while (1);
-    if (ferror(fp))
-      weprintf("%s: I/O error:", UTMP_PATH);
-    fclose(fp);
-  }
+  session_clear(tty);
 
   if (argc > 2) {
     wexecvp_self(argv[2], argv + 2);

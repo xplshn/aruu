@@ -5,10 +5,13 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <utmp.h>
 
 #include "config.h"
+#include "session.h"
 #include "util.h"
+
+static int   mflag, lflag;
+static char *tty;
 
 static void
 usage(void)
@@ -16,19 +19,31 @@ usage(void)
   eprintf("usage: %s [-ml]\n", argv0);
 }
 
+static int
+show(const struct SessionEntry *e, void *arg)
+{
+  char   timebuf[sizeof "yyyy-mm-dd hh:mm"];
+  time_t t;
+
+  (void)arg;
+  if (!*e->user || !*e->line || e->line[0] == '~')
+    return 0;
+  if (mflag != 0 && strcmp(e->line, tty) != 0)
+    return 0;
+  if (!!strcmp(e->user, "LOGIN") == lflag)
+    return 0;
+  t = e->time;
+  strftime(timebuf, sizeof timebuf, "%Y-%m-%d %H:%M", localtime(&t));
+  printf("%-8s %-12s %-16s\n", e->user, e->line, timebuf);
+  return 0;
+}
+
 // ?man who: show logged in users
 // ?man display a list of users currently logged into the system
 int
 main(int argc, char *argv[])
 {
-  struct utmp usr;
-  FILE       *ufp;
-  char        timebuf[sizeof "yyyy-mm-dd hh:mm"];
-  char        line_buf[sizeof(usr.ut_line) + 1];
-  char        name_buf[sizeof(usr.ut_name) + 1];
-  char       *tty, *ttmp;
-  int         mflag = 0, lflag = 0;
-  time_t      t;
+  char *ttmp;
 
   ARGBEGIN
   {
@@ -53,25 +68,7 @@ main(int argc, char *argv[])
   if (argc > 0)
     usage();
 
-  if (!(ufp = fopen(UTMP_PATH, "r")))
+  if (session_each(UTMP_PATH, show, NULL) < 0)
     eprintf("fopen: %s:", UTMP_PATH);
-
-  while (fread(&usr, sizeof(usr), 1, ufp) == 1) {
-    memcpy(line_buf, usr.ut_line, sizeof(usr.ut_line));
-    line_buf[sizeof(usr.ut_line)] = '\0';
-    memcpy(name_buf, usr.ut_name, sizeof(usr.ut_name));
-    name_buf[sizeof(usr.ut_name)] = '\0';
-
-    if (!*name_buf || !*line_buf || line_buf[0] == '~')
-      continue;
-    if (mflag != 0 && strcmp(line_buf, tty) != 0)
-      continue;
-    if (!!strcmp(name_buf, "LOGIN") == lflag)
-      continue;
-    t = usr.ut_time;
-    strftime(timebuf, sizeof timebuf, "%Y-%m-%d %H:%M", localtime(&t));
-    printf("%-8s %-12s %-16s\n", name_buf, line_buf, timebuf);
-  }
-  fclose(ufp);
   return 0;
 }
