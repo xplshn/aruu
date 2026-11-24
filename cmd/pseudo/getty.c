@@ -1,11 +1,5 @@
 /* see LICENSE file for copyright and license details */
 
-#if FEATURE_GTTY_VHANGUP
-#ifndef _DEFAULT_SOURCE
-#define _DEFAULT_SOURCE
-#endif
-#endif
-
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -78,7 +72,7 @@ main(int argc, char *argv[])
   if (ioctl(fd, TIOCSCTTY, (void *)1) != 0)
     weprintf("TIOCSCTTY: could not set controlling tty\n");
 #if FEATURE_GTTY_VHANGUP
-  vhangup();
+  ttyhangup();
 #else
   eprintf("getty: vhangup support not built\n");
 #endif

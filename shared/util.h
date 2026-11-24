@@ -116,6 +116,7 @@ void        devtotty(int, int *, int *);
 int         ttytostr(int, int, char *, size_t);
 const char *ttyconsole(void);
 const char *ttyconsterm(void);
+void        ttyhangup(void);
 
 /* getopt starts over on a new argument list, the way each system's libc
  * is told to: a getopt_<os>.c per system */

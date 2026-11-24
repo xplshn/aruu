@@ -38,4 +38,9 @@ ttyconsterm(void)
 {
   return "vt100";
 }
+
+void
+ttyhangup(void)
+{
+}
 #endif

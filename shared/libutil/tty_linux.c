@@ -1,4 +1,7 @@
 /* see LICENSE file for copyright and license details */
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE /* vhangup */
+#endif
 #include "../util.h"
 
 /* the numbers are the ones linux gives ttys, and the dev the encoding
@@ -111,5 +114,12 @@ const char *
 ttyconsterm(void)
 {
   return "linux";
+}
+
+/* every process with the controlling tty open loses it */
+void
+ttyhangup(void)
+{
+  vhangup();
 }
 #endif
