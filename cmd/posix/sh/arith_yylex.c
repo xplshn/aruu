@@ -38,8 +38,6 @@
 #if __has_include(<sys/cdefs.h>)
 #include <sys/cdefs.h>
 #endif
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
-#include <sys/cdefs.h>
 #endif
 #include "arith_yacc.h"
 #include "error.h"

@@ -52,9 +52,7 @@
 #include <unistd.h>
 
 #ifndef tcsetsid
-#if defined(__linux__) || defined(__CYGWIN__)
 #define tcsetsid(fd, pid) ioctl((fd), TIOCSCTTY, 0)
-#endif
 #endif
 
 #ifndef ALIGN
@@ -157,8 +155,6 @@ typedef void *pointer;
 #if __has_include(<sys/cdefs.h>)
 #include <sys/cdefs.h>
 #endif
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
-#include <sys/cdefs.h>
 #endif
 
 extern char nullstr[1]; /* null string */
