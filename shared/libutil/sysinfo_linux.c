@@ -3,11 +3,11 @@
 #define _DEFAULT_SOURCE
 #endif
 #endif
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
 #include "../paths.h"
 #include "../sysinfo.h"
 #include "../util.h"
 
+#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
