@@ -59,50 +59,6 @@
 #include <wchar.h>
 #include <wctype.h>
 
-#if defined(__linux__) || defined(__CYGWIN__)
-struct fwopen_cookie {
-  void *cookie;
-  int (*writefn)(void *, const char *, int);
-};
-
-static ssize_t
-compat_fwopen_write(void *cookie, const char *buf, size_t size)
-{
-  struct fwopen_cookie *c = cookie;
-  return c->writefn(c->cookie, buf, (int)size);
-}
-
-static int
-compat_fwopen_close(void *cookie)
-{
-  free(cookie);
-  return 0;
-}
-
-static FILE *
-fwopen(void *cookie, int (*writefn)(void *, const char *, int))
-{
-  struct fwopen_cookie *c;
-  cookie_io_functions_t io_funcs = {
-      .read = NULL, .write = compat_fwopen_write, .seek = NULL, .close = compat_fwopen_close
-  };
-  FILE *fp;
-
-  c = malloc(sizeof(struct fwopen_cookie));
-  if (c == NULL)
-    return NULL;
-  c->cookie  = cookie;
-  c->writefn = writefn;
-
-  fp = fopencookie(c, "w", io_funcs);
-  if (fp == NULL) {
-    free(c);
-    return NULL;
-  }
-  return fp;
-}
-#endif
-
 #include "error.h"
 #include "memalloc.h"
 #include "output.h"
@@ -113,8 +69,6 @@ fwopen(void *cookie, int (*writefn)(void *, const char *, int))
 #define OUTBUFSIZ  BUFSIZ
 #define MEM_OUT    -2 /* output to dynamically allocated memory */
 #define OUTPUT_ERR 01 /* error occurred on output */
-
-static int doformat_wr(void *, const char *, int);
 
 struct output  output = {NULL, NULL, NULL, OUTBUFSIZ, 1, 0};
 struct output  errout = {NULL, NULL, NULL, 256, 2, 0};
@@ -351,32 +305,27 @@ fmtstr(char *outbuf, int length, const char *fmt, ...)
   INTON;
 }
 
-static int
-doformat_wr(void *cookie, const char *buf, int len)
-{
-  struct output *o;
-
-  o = (struct output *)cookie;
-  outbin(buf, len, o);
-
-  return (len);
-}
-
 void
 doformat(struct output *dest, const char *f, va_list ap)
 {
-  FILE *fp;
+  char    buf[BUFSIZ], *s;
+  va_list aq;
+  int     len;
 
-  if ((fp = fwopen(dest, doformat_wr)) != NULL) {
-    vfprintf(fp, f, ap);
-    fclose(fp);
+  va_copy(aq, ap);
+  len = vsnprintf(buf, sizeof(buf), f, aq);
+  va_end(aq);
+  if (len < 0)
+    return;
+  if ((size_t)len < sizeof(buf)) {
+    outbin(buf, len, dest);
+    return;
   }
-}
-
-FILE *
-out1fp(void)
-{
-  return fwopen(out1, doformat_wr);
+  if ((s = malloc(len + 1)) == NULL)
+    return;
+  vsnprintf(s, len + 1, f, ap);
+  outbin(s, len, dest);
+  free(s);
 }
 
 /*
