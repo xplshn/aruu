@@ -6,6 +6,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "proc.h"
 #include "util.h"
 
 static void
@@ -20,10 +21,8 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-  int     ret = 0;
-  char    path[PATH_MAX];
-  char    target[PATH_MAX + sizeof(" (deleted)")];
-  ssize_t n;
+  int  ret = 0;
+  char target[PATH_MAX + sizeof(" (deleted)")];
 
   ARGBEGIN
   {
@@ -36,16 +35,11 @@ main(int argc, char *argv[])
     usage();
 
   for (; argc > 0; argc--, argv++) {
-    n = snprintf(path, sizeof(path), "/proc/%s/cwd", *argv);
-    if (n < 0 || (size_t)n >= sizeof(path)) {
-      errno = ESRCH;
-    } else {
-      n = readlink(path, target, sizeof(target) - 1);
-      if (n >= 0) {
-        target[n] = '\0';
-        printf("%s: %s\n", *argv, target);
-        continue;
-      }
+    pid_t pid = (pid_t)estrtonum(*argv, 1, INT_MAX);
+
+    if (proc_cwd(pid, target, sizeof(target)) == 0) {
+      printf("%s: %s\n", *argv, target);
+      continue;
     }
     if (errno == ENOENT)
       errno = ESRCH;

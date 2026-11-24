@@ -71,6 +71,16 @@ proc_args(pid_t pid, char *buf, size_t n)
   return parsecmdline(pid, buf, n);
 }
 
+int
+proc_cwd(pid_t pid, char *buf, size_t n)
+{
+  (void)pid;
+  (void)buf;
+  (void)n;
+  errno = ENOTSUP;
+  return -1;
+}
+
 void
 proc_ttyname(unsigned major, unsigned minor, char *buf, size_t n)
 {

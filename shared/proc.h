@@ -78,6 +78,9 @@ int proc_info(pid_t pid, struct procinfo *p);
 /* the command line, its words joined by spaces. -1 for a process with none,
  * a kernel thread or a zombie */
 int proc_args(pid_t pid, char *buf, size_t n);
+/* the working directory of a process, -1 when it cannot be told: it is gone,
+ * it is another user's, or the kernel keeps no such thing */
+int proc_cwd(pid_t pid, char *buf, size_t n);
 /* the terminal's name as ps shows it: pts/3, tty1 or ? for none */
 void proc_ttyname(unsigned major, unsigned minor, char *buf, size_t n);
 

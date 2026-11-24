@@ -360,6 +360,9 @@ sinclude(char *s)
   free(fil);
 }
 
+#if FEATURE_MAKE_BMAKE
+/* bmake compat: .if .ifdef .ifndef .elif .else .endif and .error .warning
+ * conditionals, which POSIX 2024 does not have */
 #define MAXCOND 32
 static struct {
   int active;
@@ -497,12 +500,23 @@ eval_if(char *expr)
   return neg ? !result : result;
 }
 
+#else
+static int
+cond_active(void)
+{
+  return 1;
+}
+#endif
+
 static char *
 nextline(void)
 {
   int   c;
   FILE *fp;
-  char *s, *lim, d[BUFSIZ];
+  char *s, *lim;
+#if FEATURE_MAKE_BMAKE
+  char  d[BUFSIZ];
+#endif
 
   assert(input->type == FTFILE);
 
@@ -532,7 +546,8 @@ repeat:
   if (!strcmp(input->buf, ""))
     goto repeat;
 
-  /* bmake style .include / .sinclude / .-include */
+#if FEATURE_MAKE_BMAKE
+  /* bmake compat: .include .sinclude .-include and the conditionals */
   if (input->buf[0] == '.') {
     size_t dl;
     /* copy and strip trailing whitespace/newline so strcmp works */
@@ -622,6 +637,8 @@ repeat:
     }
   }
 
+#endif
+
   /* POSIX include */
   if (!strncmp(input->buf, "include", 7) && isblank(input->buf[7])) {
     input->pos = input->siz;
@@ -630,9 +647,12 @@ repeat:
     goto repeat;
   }
 
-  /* sinclude / -include (GNU/POSIX style without dot) */
-  if ((!strncmp(input->buf, "sinclude", 8) && isblank(input->buf[8]))
-      || (!strncmp(input->buf, "-include", 8) && isblank(input->buf[8]))) {
+  /* -include is POSIX 2024's, sinclude is gmake's */
+  if ((!strncmp(input->buf, "-include", 8) && isblank(input->buf[8]))
+#if FEATURE_MAKE_GMAKE
+      || (!strncmp(input->buf, "sinclude", 8) && isblank(input->buf[8]))
+#endif
+  ) {
     input->pos = input->siz;
     if (cond_active())
       sinclude(input->buf + 8);

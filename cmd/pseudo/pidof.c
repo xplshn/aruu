@@ -27,31 +27,71 @@ usage(void)
   eprintf("usage: %s [-o pid1,pid2,...pidN] [-s] [program...]\n", argv0);
 }
 
+/* what main sets for the walk of the process table */
+struct pidof {
+  int    argc;
+  char **argv;
+  int    sflag, oflag, found;
+};
+
+static int
+each(const struct procinfo *p, void *arg)
+{
+  struct pidof    *w = arg;
+  struct pidentry *pe;
+  char             cmdline[BUFSIZ], *cmd, *cmdbase, *sp;
+  char             word[16];
+  int              i;
+
+  if (w->oflag) {
+    SLIST_FOREACH(pe, &omitpid_head, entry)
+    if (pe->pid == p->pid)
+      return 0;
+  }
+  if (proc_args(p->pid, cmdline, sizeof(cmdline)) < 0) {
+    cmd     = (char *)p->comm;
+    cmdbase = cmd;
+  } else {
+    if ((sp = strchr(cmdline, ' ')))
+      *sp = '\0';
+    cmd     = cmdline;
+    cmdbase = basename(cmdline);
+  }
+  /* workaround for login shells */
+  if (cmd[0] == '-')
+    cmd++;
+  snprintf(word, sizeof(word), "%d", (int)p->pid);
+  for (i = 0; i < w->argc; i++) {
+    if (strcmp(cmd, w->argv[i]) == 0 || strcmp(cmdbase, w->argv[i]) == 0) {
+      putword(stdout, word);
+      w->found++;
+      if (w->sflag)
+        return 1;
+    }
+  }
+  return 0;
+}
+
 // ?man pidof: find process ids
 // ?man arguments: -o pid1
 // ?man find the process identity numbers of running programs
 int
 main(int argc, char *argv[])
 {
-  DIR             *dp;
-  struct dirent   *entry;
-  pid_t            pid;
-  struct procstat  ps;
-  char             cmdline[BUFSIZ], *cmd, *cmdbase = NULL, *p, *arg = NULL;
-  int              i, found = 0;
-  int              sflag = 0, oflag = 0;
+  char            *p, *arg = NULL;
+  struct pidof     w = {0};
   struct pidentry *pe;
 
   ARGBEGIN
   {
     // ?man -s: silent mode or print summary
     case 's':
-      sflag = 1;
+      w.sflag = 1;
       break;
     // ?man -o:str: specify output file
     case 'o':
-      oflag = 1;
-      arg   = EARGF(usage());
+      w.oflag = 1;
+      arg     = EARGF(usage());
       break;
     default:
       usage();
@@ -60,10 +100,12 @@ main(int argc, char *argv[])
 
   if (!argc)
     return 1;
+  w.argc = argc;
+  w.argv = argv;
 
   SLIST_INIT(&omitpid_head);
 
-  if (oflag) {
+  if (w.oflag) {
     for (p = strtok(arg, ","); p; p = strtok(NULL, ",")) {
       pe = emalloc(sizeof(*pe));
       if (strcmp(p, "%PPID") == 0)
@@ -74,49 +116,10 @@ main(int argc, char *argv[])
     }
   }
 
-  if (!(dp = opendir("/proc")))
-    eprintf("opendir /proc:");
-
-  while ((entry = readdir(dp))) {
-    if (!pidfile(entry->d_name))
-      continue;
-    pid = estrtol(entry->d_name, 10);
-    if (oflag) {
-      SLIST_FOREACH(pe, &omitpid_head, entry)
-      if (pe->pid == pid)
-        break;
-      if (pe)
-        continue;
-    }
-    if (parsestat(pid, &ps) < 0)
-      continue;
-    if (parsecmdline(ps.pid, cmdline, sizeof(cmdline)) < 0) {
-      cmd     = ps.comm;
-      cmdbase = cmd;
-    } else {
-      if ((p = strchr(cmdline, ' ')))
-        *p = '\0';
-      cmd     = cmdline;
-      cmdbase = basename(cmdline);
-    }
-    /* workaround for login shells */
-    if (cmd[0] == '-')
-      cmd++;
-    for (i = 0; i < argc; i++) {
-      if (strcmp(cmd, argv[i]) == 0 || strcmp(cmdbase, argv[i]) == 0) {
-        putword(stdout, entry->d_name);
-        found++;
-        if (sflag)
-          goto out;
-      }
-    }
-  }
-
-out:
-  if (found)
+  if (proc_each(each, &w) < 0)
+    eprintf("the process table cannot be read:");
+  if (w.found)
     putchar('\n');
 
-  closedir(dp);
-
-  return found ? 0 : 1;
+  return w.found ? 0 : 1;
 }

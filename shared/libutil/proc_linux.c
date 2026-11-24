@@ -236,6 +236,19 @@ proc_args(pid_t pid, char *buf, size_t n)
   return parsecmdline(pid, buf, n);
 }
 
+int
+proc_cwd(pid_t pid, char *buf, size_t n)
+{
+  char    path[PATH_MAX];
+  ssize_t k;
+
+  snprintf(path, sizeof(path), ARUU_LINUX_PATH_PROC "/%d/cwd", (int)pid);
+  if (n == 0 || (k = readlink(path, buf, n - 1)) < 0)
+    return -1;
+  buf[k] = '\0';
+  return 0;
+}
+
 void
 proc_ttyname(unsigned major, unsigned minor, char *buf, size_t n)
 {

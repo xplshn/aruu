@@ -1,6 +1,5 @@
 /* see LICENSE file for copyright and license details */
 
-#include <dirent.h>
 #include <limits.h>
 #include <signal.h>
 #include <stdio.h>
@@ -37,6 +36,27 @@ usage(void)
   eprintf("usage: %s [-o pid1,pid2,..,pidN] [-s signal]\n", argv0);
 }
 
+struct killall {
+  int sig, oflag;
+};
+
+static int
+each(const struct procinfo *p, void *arg)
+{
+  struct killall  *w = arg;
+  struct pidentry *pe;
+
+  if (p->pid == 1 || p->pid == getpid() || getsid(p->pid) == getsid(0) || getsid(p->pid) == 0)
+    return 0;
+  if (w->oflag) {
+    SLIST_FOREACH(pe, &omitpid_head, entry)
+    if (pe->pid == p->pid)
+      return 0;
+  }
+  kill(p->pid, w->sig);
+  return 0;
+}
+
 // ?man killall5: send signal to all processes
 // ?man arguments: -o pid1
 // ?man send a signal to all processes except kernel threads
@@ -44,26 +64,22 @@ int
 main(int argc, char *argv[])
 {
   struct pidentry *pe;
-  struct dirent   *entry;
-  DIR             *dp;
+  struct killall   w = {SIGTERM, 0};
   char            *p, *arg = NULL;
   char            *end, *v;
-  int              oflag = 0;
-  int              sig   = SIGTERM;
-  pid_t            pid;
   size_t           i;
 
   ARGBEGIN
   {
     // ?man -s:str: silent mode or print summary
     case 's':
-      v   = EARGF(usage());
-      sig = strtol(v, &end, 0);
+      v     = EARGF(usage());
+      w.sig = strtol(v, &end, 0);
       if (*end == '\0')
         break;
       for (i = 0; i < LEN(sigs); i++) {
         if (strcasecmp(v, sigs[i].name) == 0) {
-          sig = sigs[i].sig;
+          w.sig = sigs[i].sig;
           break;
         }
       }
@@ -72,8 +88,8 @@ main(int argc, char *argv[])
       break;
     // ?man -o:str: specify output file
     case 'o':
-      oflag = 1;
-      arg   = EARGF(usage());
+      w.oflag = 1;
+      arg     = EARGF(usage());
       break;
     default:
       usage();
@@ -82,7 +98,7 @@ main(int argc, char *argv[])
 
   SLIST_INIT(&omitpid_head);
 
-  if (oflag) {
+  if (w.oflag) {
     for (p = strtok(arg, ","); p; p = strtok(NULL, ",")) {
       pe      = emalloc(sizeof(*pe));
       pe->pid = estrtol(p, 10);
@@ -90,29 +106,13 @@ main(int argc, char *argv[])
     }
   }
 
-  if (sig != SIGSTOP && sig != SIGCONT)
+  if (w.sig != SIGSTOP && w.sig != SIGCONT)
     kill(-1, SIGSTOP);
 
-  if (!(dp = opendir("/proc")))
-    eprintf("opendir /proc:");
-  while ((entry = readdir(dp))) {
-    if (pidfile(entry->d_name) == 0)
-      continue;
-    pid = estrtol(entry->d_name, 10);
-    if (pid == 1 || pid == getpid() || getsid(pid) == getsid(0) || getsid(pid) == 0)
-      continue;
-    if (oflag == 1) {
-      SLIST_FOREACH(pe, &omitpid_head, entry)
-      if (pe->pid == pid)
-        break;
-      if (pe)
-        continue;
-    }
-    kill(pid, sig);
-  }
-  closedir(dp);
+  if (proc_each(each, &w) < 0)
+    eprintf("the process table cannot be read:");
 
-  if (sig != SIGSTOP && sig != SIGCONT)
+  if (w.sig != SIGSTOP && w.sig != SIGCONT)
     kill(-1, SIGCONT);
 
   return 0;
