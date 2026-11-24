@@ -2,6 +2,8 @@
 #define NET_H
 
 #include <netinet/in.h>
+#include <stddef.h>
+#include <sys/types.h>
 
 #define NET_IFNAME_MAX       16
 #define NET_ROUTE_ADDRSTRLEN 16
@@ -74,5 +76,9 @@ int net_del_route(const char *, const char *, const char *, int, int);
 int net_flush_addrs(const char *);
 int net_set_txqueuelen(const char *, int);
 int net_set_name(const char *, const char *);
+int net_tun_open(void);
+int net_tun_attach(int, char *, size_t, int);
+int net_tun_persist(int, int);
+int net_tun_owner(int, uid_t);
 
 #endif

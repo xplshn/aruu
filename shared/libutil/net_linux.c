@@ -9,7 +9,9 @@
 #include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <ifaddrs.h>
+#include <linux/if_tun.h>
 #include <net/if.h>
 #include <net/route.h>
 #include <netpacket/packet.h>
@@ -659,5 +661,38 @@ net_set_name(const char *name, const char *newname)
   }
   close(sock);
   return 0;
+}
+
+int
+net_tun_open(void)
+{
+  return open("/dev/net/tun", O_RDWR);
+}
+
+/* name is the one to ask for, or empty, and comes back as the one given */
+int
+net_tun_attach(int fd, char *name, size_t namesz, int tap)
+{
+  struct ifreq ifr;
+
+  memset(&ifr, 0, sizeof(ifr));
+  ifr.ifr_flags = (tap ? IFF_TAP : IFF_TUN) | IFF_NO_PI;
+  strlcpy(ifr.ifr_name, name, sizeof(ifr.ifr_name));
+  if (ioctl(fd, TUNSETIFF, (void *)&ifr) < 0)
+    return -1;
+  strlcpy(name, ifr.ifr_name, namesz);
+  return 0;
+}
+
+int
+net_tun_persist(int fd, int on)
+{
+  return ioctl(fd, TUNSETPERSIST, (void *)(long)on) < 0 ? -1 : 0;
+}
+
+int
+net_tun_owner(int fd, uid_t uid)
+{
+  return ioctl(fd, TUNSETOWNER, (void *)(long)uid) < 0 ? -1 : 0;
 }
 #endif

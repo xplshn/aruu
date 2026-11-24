@@ -171,4 +171,40 @@ net_set_name(const char *name, const char *newname)
   errno = ENOTSUP;
   return -1;
 }
+
+int
+net_tun_open(void)
+{
+  errno = ENOTSUP;
+  return -1;
+}
+
+int
+net_tun_attach(int fd, char *name, size_t namesz, int tap)
+{
+  (void)fd;
+  (void)name;
+  (void)namesz;
+  (void)tap;
+  errno = ENOTSUP;
+  return -1;
+}
+
+int
+net_tun_persist(int fd, int on)
+{
+  (void)fd;
+  (void)on;
+  errno = ENOTSUP;
+  return -1;
+}
+
+int
+net_tun_owner(int fd, uid_t uid)
+{
+  (void)fd;
+  (void)uid;
+  errno = ENOTSUP;
+  return -1;
+}
 #endif

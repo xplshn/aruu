@@ -1,11 +1,7 @@
 /* see LICENSE file for copyright and license details */
 
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
 #include <sys/types.h>
 
-#include <fcntl.h>
 #include <limits.h>
 #include <pwd.h>
 #include <stdio.h>
@@ -13,10 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <linux/if.h>
-#include <linux/if_tun.h>
-
-#include "paths.h"
+#include "net.h"
 #include "util.h"
 
 static int   dflag;
@@ -36,7 +29,7 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-  struct ifreq   ifr;
+  char           name[NET_IFNAME_MAX] = "";
   struct passwd *pw;
   uid_t          owner_uid = 0;
   int            fd;
@@ -74,31 +67,28 @@ main(int argc, char *argv[])
       owner_uid = pw->pw_uid;
   }
 
-  fd = open("/dev/net/tun", O_RDWR);
+  fd = net_tun_open();
   if (fd < 0)
     eprintf("open /dev/net/tun:");
 
-  memset(&ifr, 0, sizeof(ifr));
-  ifr.ifr_flags = (Tflag ? IFF_TAP : IFF_TUN) | IFF_NO_PI;
-
   if (argc > 0)
-    estrlcpy(ifr.ifr_name, argv[0], sizeof(ifr.ifr_name));
+    estrlcpy(name, argv[0], sizeof(name));
 
-  if (ioctl(fd, TUNSETIFF, (void *)&ifr) < 0)
+  if (net_tun_attach(fd, name, sizeof(name), Tflag) < 0)
     eprintf("ioctl TUNSETIFF:");
 
   if (tflag) {
-    if (ioctl(fd, TUNSETPERSIST, (void *)1) < 0)
+    if (net_tun_persist(fd, 1) < 0)
       eprintf("ioctl TUNSETPERSIST:");
     if (owner) {
-      if (ioctl(fd, TUNSETOWNER, (void *)(long)owner_uid) < 0)
+      if (net_tun_owner(fd, owner_uid) < 0)
         eprintf("ioctl TUNSETOWNER:");
     }
-    printf("Set '%s' persistent and owned by %u\n", ifr.ifr_name, owner_uid);
+    printf("Set '%s' persistent and owned by %u\n", name, owner_uid);
   } else if (dflag) {
-    if (ioctl(fd, TUNSETPERSIST, (void *)0) < 0)
+    if (net_tun_persist(fd, 0) < 0)
       eprintf("ioctl TUNSETPERSIST:");
-    printf("Set '%s' non-persistent\n", ifr.ifr_name);
+    printf("Set '%s' non-persistent\n", name);
   }
 
   close(fd);
