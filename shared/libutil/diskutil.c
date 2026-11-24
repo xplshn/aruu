@@ -132,6 +132,28 @@ blockdev_close(struct BlockDev *dev)
   }
 }
 
+#if defined(__linux__)
+/* the model the disk reports, without the blanks firmware pads it with */
+static void
+disk_model(const char *name, char *out, size_t n)
+{
+  char  path[128];
+  FILE *f;
+  size_t len;
+
+  out[0] = '\0';
+  snprintf(path, sizeof(path), "/sys/block/%s/device/model", name);
+  if (!(f = fopen(path, "r")))
+    return;
+  if (fgets(out, (int)n, f)) {
+    out[strcspn(out, "\n")] = '\0';
+    for (len = strlen(out); len > 0 && out[len - 1] == ' '; len--)
+      out[len - 1] = '\0';
+  }
+  fclose(f);
+}
+#endif
+
 struct BlockDevInfo *
 blockdev_get_list(void)
 {
@@ -199,6 +221,7 @@ blockdev_get_list(void)
 
     if (!is_part) {
       strlcpy(info->type, "disk", sizeof(info->type));
+      disk_model(info->name, info->model, sizeof(info->model));
       if (!head) {
         head = info;
       } else {

@@ -23,6 +23,7 @@ struct BlockDevInfo {
   int                  minor;
   char                 mountpoint[256];
   char                 fstype[32];
+  char                 model[64]; // what the disk calls itself, "" when it does not say
   struct BlockDevInfo *parts;
   struct BlockDevInfo *next;
 };

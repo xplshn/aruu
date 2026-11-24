@@ -44,10 +44,8 @@ do_disks(void)
   struct BlockDevInfo     *list = blockdev_get_list(), *d;
 
   for (d = list; d; d = d->next) {
-    char   path[96], model[64] = "";
-    int    busy = d->mountpoint[0] != '\0', skipped = 0;
-    size_t i;
-    FILE  *f;
+    int                  busy = d->mountpoint[0] != '\0', skipped = 0;
+    size_t               i;
     struct BlockDevInfo *part;
 
     for (i = 0; i < sizeof skip / sizeof skip[0]; i++)
@@ -58,18 +56,7 @@ do_disks(void)
     for (part = d->parts; part; part = part->next)
       if (part->mountpoint[0])
         busy = 1;
-    snprintf(path, sizeof path, "/sys/block/%s/device/model", d->name);
-    if ((f = fopen(path, "r"))) {
-      if (fgets(model, sizeof model, f)) {
-        size_t n;
-
-        model[strcspn(model, "\n")] = '\0';
-        for (n = strlen(model); n > 0 && model[n - 1] == ' '; n--)
-          model[n - 1] = '\0';
-      }
-      fclose(f);
-    }
-    printf("%s\t%llu\t%s\t%d\n", d->name, (unsigned long long)d->size, model, busy);
+    printf("%s\t%llu\t%s\t%d\n", d->name, (unsigned long long)d->size, d->model, busy);
   }
   blockdev_free_list(list);
   return 0;
