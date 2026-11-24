@@ -9,7 +9,6 @@
 #include "passwd.h"
 #include "util.h"
 
-#include <crypt.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
