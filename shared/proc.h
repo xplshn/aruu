@@ -1,4 +1,13 @@
 /* see LICENSE file for copyright and license details */
+#ifndef ARUU_PROC_H
+#define ARUU_PROC_H
+
+#include <sys/types.h>
+
+#include <limits.h>
+#include <stddef.h>
+#include <time.h>
+
 struct procstat {
   int                pid;
   char               comm[PATH_MAX + 2]; /* + 2 for '(' and ')' */
@@ -71,3 +80,5 @@ int proc_info(pid_t pid, struct procinfo *p);
 int proc_args(pid_t pid, char *buf, size_t n);
 /* the terminal's name as ps shows it: pts/3, tty1 or ? for none */
 void proc_ttyname(unsigned major, unsigned minor, char *buf, size_t n);
+
+#endif
