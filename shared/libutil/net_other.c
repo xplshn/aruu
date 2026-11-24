@@ -207,4 +207,40 @@ net_tun_owner(int fd, uid_t uid)
   errno = ENOTSUP;
   return -1;
 }
+
+int
+net_bind_device(int fd, const char *name)
+{
+  (void)fd;
+  (void)name;
+  errno = ENOTSUP;
+  return -1;
+}
+
+int
+net_get_hwaddr(int fd, const char *name, unsigned char *mac, size_t n)
+{
+  (void)fd;
+  (void)name;
+  (void)mac;
+  (void)n;
+  errno = ENOTSUP;
+  return -1;
+}
+
+int
+net_set_lease(
+    const char         *name,
+    const unsigned char ip[4],
+    const unsigned char mask[4],
+    const unsigned char gw[4]
+)
+{
+  (void)name;
+  (void)ip;
+  (void)mask;
+  (void)gw;
+  errno = ENOTSUP;
+  return -1;
+}
 #endif

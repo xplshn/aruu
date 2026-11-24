@@ -80,5 +80,8 @@ int net_tun_open(void);
 int net_tun_attach(int, char *, size_t, int);
 int net_tun_persist(int, int);
 int net_tun_owner(int, uid_t);
+int net_bind_device(int, const char *);
+int net_get_hwaddr(int, const char *, unsigned char *, size_t);
+int net_set_lease(const char *, const unsigned char[4], const unsigned char[4], const unsigned char[4]);
 
 #endif

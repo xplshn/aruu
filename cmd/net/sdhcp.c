@@ -7,24 +7,21 @@
 #endif
 
 #include "arg.h"
+#include "net.h"
+#include "timer.h"
 #include "util.h"
 #include "wexec.h"
 
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
-#include <net/if.h>
-#include <net/route.h>
 #include <netinet/in.h>
-#include <poll.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <sys/timerfd.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -107,7 +104,7 @@ static time_t        starttime;
 static char         *ifname = "eth0";
 static unsigned char cid[16];
 static char         *program = "";
-static int           sock, timers[3];
+static int           sock;
 /* negotiated lease values */
 static unsigned char server[4];
 static unsigned char client[4];
@@ -176,35 +173,6 @@ udprecv(unsigned char ip[4], int fd, void *data, size_t n)
     eprintf("recvfrom:");
 
   return r;
-}
-
-static void
-setip(unsigned char ip[4], unsigned char mask[4], unsigned char gateway[4])
-{
-  struct ifreq   ifreq;
-  struct rtentry rtreq;
-  int            fd;
-
-  memset(&ifreq, 0, sizeof(ifreq));
-  memset(&rtreq, 0, sizeof(rtreq));
-
-  strlcpy(ifreq.ifr_name, ifname, IF_NAMESIZE);
-  iptoaddr(&(ifreq.ifr_addr), ip, 0);
-  if ((fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) == -1)
-    eprintf("can't set ip, socket:");
-  ioctl(fd, SIOCSIFADDR, &ifreq);
-  iptoaddr(&(ifreq.ifr_netmask), mask, 0);
-  ioctl(fd, SIOCSIFNETMASK, &ifreq);
-  ifreq.ifr_flags = IFF_UP | IFF_RUNNING | IFF_BROADCAST | IFF_MULTICAST;
-  ioctl(fd, SIOCSIFFLAGS, &ifreq);
-  /* default gw */
-  rtreq.rt_flags = RTF_UP | RTF_GATEWAY;
-  iptoaddr(&(rtreq.rt_gateway), gateway, 0);
-  iptoaddr(&(rtreq.rt_genmask), IP(0, 0, 0, 0), 0);
-  iptoaddr(&(rtreq.rt_dst), IP(0, 0, 0, 0), 0);
-  ioctl(fd, SIOCADDRT, &rtreq);
-
-  close(fd);
 }
 
 /* copy contents of src path into dfd; silently skips missing files */
@@ -324,39 +292,28 @@ dhcpsend(int type, int how)
   udpsend(ip, sock, &bp, p - (unsigned char *)&bp);
 }
 
-/* block on poll; return DHCP message type or a TIMEOUT* sentinel */
+/* block until a message or a timer; return DHCP message type or a
+ * TIMEOUT* sentinel */
 static int
 dhcprecv(void)
 {
   unsigned char type = 0;
-  uint64_t      n;
-  struct pollfd pfd[] = {
-      {.fd = sock, .events = POLLIN},
-      {.fd = timers[0], .events = POLLIN},
-      {.fd = timers[1], .events = POLLIN},
-      {.fd = timers[2], .events = POLLIN},
-  };
+  int           fired;
 
-  if (poll(pfd, LEN(pfd), -1) == -1)
+  if ((fired = timer_wait(sock)) == -1)
     eprintf("poll:");
-  if (pfd[0].revents) {
+  if (!fired) {
     memset(&bp, 0, sizeof(bp));
     udprecv(IP(255, 255, 255, 255), sock, &bp, sizeof(bp));
     optget(&bp, &type, OD_TYPE, sizeof(type));
     return type;
   }
-  if (pfd[1].revents) {
+  if (fired & 1)
     type = TIMEOUT0;
-    read(timers[0], &n, sizeof(n));
-  }
-  if (pfd[2].revents) {
+  if (fired & 2)
     type = TIMEOUT1;
-    read(timers[1], &n, sizeof(n));
-  }
-  if (pfd[3].revents) {
+  if (fired & 4)
     type = TIMEOUT2;
-    read(timers[2], &n, sizeof(n));
-  }
   return type;
 }
 
@@ -366,7 +323,8 @@ acceptlease(void)
   char buf[128];
 
   if (iflag)
-    setip(client, mask, router);
+    if (net_set_lease(ifname, client, mask, router) < 0)
+      eprintf("can't set ip, socket:");
   if (dflag)
     setdns(dns);
   if (*program) {
@@ -385,25 +343,25 @@ acceptlease(void)
 }
 
 static void
-settimeout(int n, const struct itimerspec *ts)
+settimeout(int n, const struct timespec *ts)
 {
-  if (timerfd_settime(timers[n], 0, ts, NULL) < 0)
-    eprintf("timerfd_settime:");
+  if (timer_set(n, ts) < 0)
+    eprintf("timer_set:");
 }
 
 /* set ts to expire halfway to the remaining time on timer n, minimum 60s */
 static void
-calctimeout(int n, struct itimerspec *ts)
+calctimeout(int n, struct timespec *ts)
 {
-  if (timerfd_gettime(timers[n], ts) < 0)
-    eprintf("timerfd_gettime:");
-  ts->it_value.tv_nsec /= 2;
-  if (ts->it_value.tv_sec % 2)
-    ts->it_value.tv_nsec += 500000000;
-  ts->it_value.tv_sec /= 2;
-  if (ts->it_value.tv_sec < 60) {
-    ts->it_value.tv_sec  = 60;
-    ts->it_value.tv_nsec = 0;
+  if (timer_left(n, ts) < 0)
+    eprintf("timer_left:");
+  ts->tv_nsec /= 2;
+  if (ts->tv_sec % 2)
+    ts->tv_nsec += 500000000;
+  ts->tv_sec /= 2;
+  if (ts->tv_sec < 60) {
+    ts->tv_sec  = 60;
+    ts->tv_nsec = 0;
   }
 }
 
@@ -411,15 +369,15 @@ calctimeout(int n, struct itimerspec *ts)
 static void
 run(void)
 {
-  int               forked = 0, t;
-  pid_t             pid;
-  struct itimerspec timeout = {0};
-  uint32_t          renewaltime, rebindingtime, lease;
+  int             forked = 0, t;
+  pid_t           pid;
+  struct timespec timeout = {0};
+  uint32_t        renewaltime, rebindingtime, lease;
 
 Init:
   dhcpsend(DHCP_DISCOVER, BROADCAST);
-  timeout.it_value.tv_sec  = 1;
-  timeout.it_value.tv_nsec = 0;
+  timeout.tv_sec  = 1;
+  timeout.tv_nsec = 0;
   settimeout(0, &timeout);
   goto Selecting;
 Selecting:
@@ -436,7 +394,7 @@ Selecting:
 Requesting:
   for (t = 4; t <= 64; t *= 2) {
     dhcpsend(DHCP_REQUEST, BROADCAST);
-    timeout.it_value.tv_sec = t;
+    timeout.tv_sec = t;
     settimeout(0, &timeout);
     for (;;) {
       switch (dhcprecv()) {
@@ -474,11 +432,11 @@ Bound:
       exit(0);
     forked = 1;
   }
-  timeout.it_value.tv_sec = renewaltime;
+  timeout.tv_sec = renewaltime;
   settimeout(0, &timeout);
-  timeout.it_value.tv_sec = rebindingtime;
+  timeout.tv_sec = rebindingtime;
   settimeout(1, &timeout);
-  timeout.it_value.tv_sec = lease;
+  timeout.tv_sec = lease;
   settimeout(2, &timeout);
   for (;;) {
     switch (dhcprecv()) {
@@ -544,11 +502,9 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-  struct ifreq    ifreq;
   struct sockaddr addr;
   int             bcast = 1;
   int             rnd;
-  size_t          i;
 
   ARGBEGIN
   {
@@ -575,7 +531,6 @@ main(int argc, char *argv[])
   if (argc >= 2)
     strlcpy((char *)cid, argv[1], sizeof(cid));
 
-  memset(&ifreq, 0, sizeof(ifreq));
   signal(SIGTERM, cleanexit);
 
   if (gethostname(hostname, sizeof(hostname)) == -1)
@@ -586,15 +541,12 @@ main(int argc, char *argv[])
   if (setsockopt(sock, SOL_SOCKET, SO_BROADCAST, &bcast, sizeof(bcast)) == -1)
     eprintf("setsockopt SO_BROADCAST:");
 
-  strlcpy(ifreq.ifr_name, ifname, IF_NAMESIZE);
-  ioctl(sock, SIOCGIFINDEX, &ifreq);
-  if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, &ifreq, sizeof(ifreq)) == -1)
+  if (net_bind_device(sock, ifname) == -1)
     eprintf("setsockopt SO_BINDTODEVICE:");
   iptoaddr(&addr, IP(255, 255, 255, 255), 68);
   if (bind(sock, &addr, sizeof(addr)) != 0)
     eprintf("bind:");
-  ioctl(sock, SIOCGIFHWADDR, &ifreq);
-  memcpy(hwaddr, ifreq.ifr_hwaddr.sa_data, sizeof(ifreq.ifr_hwaddr.sa_data));
+  net_get_hwaddr(sock, ifname, hwaddr, sizeof(hwaddr));
   if (!cid[0])
     memcpy(cid, hwaddr, sizeof(cid));
 
@@ -604,11 +556,8 @@ main(int argc, char *argv[])
     eprintf("read /dev/urandom:");
   close(rnd);
 
-  for (i = 0; i < LEN(timers); ++i) {
-    timers[i] = timerfd_create(CLOCK_BOOTTIME, TFD_CLOEXEC);
-    if (timers[i] == -1)
-      eprintf("timerfd_create:");
-  }
+  if (timer_init(3) == -1)
+    eprintf("timer_init:");
 
   starttime = time(NULL);
   run();

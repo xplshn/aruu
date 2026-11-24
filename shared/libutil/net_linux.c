@@ -14,6 +14,7 @@
 #include <linux/if_tun.h>
 #include <net/if.h>
 #include <net/route.h>
+#include <netinet/in.h>
 #include <netpacket/packet.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -694,5 +695,78 @@ int
 net_tun_owner(int fd, uid_t uid)
 {
   return ioctl(fd, TUNSETOWNER, (void *)(long)uid) < 0 ? -1 : 0;
+}
+
+/* only packets that came in on name reach fd */
+int
+net_bind_device(int fd, const char *name)
+{
+  struct ifreq ifr;
+
+  memset(&ifr, 0, sizeof(ifr));
+  strlcpy(ifr.ifr_name, name, IF_NAMESIZE);
+  ioctl(fd, SIOCGIFINDEX, &ifr);
+  return setsockopt(fd, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
+}
+
+int
+net_get_hwaddr(int fd, const char *name, unsigned char *mac, size_t n)
+{
+  struct ifreq ifr;
+
+  memset(&ifr, 0, sizeof(ifr));
+  strlcpy(ifr.ifr_name, name, IF_NAMESIZE);
+  if (ioctl(fd, SIOCGIFHWADDR, &ifr) < 0)
+    return -1;
+  memcpy(mac, ifr.ifr_hwaddr.sa_data, MIN(n, sizeof(ifr.ifr_hwaddr.sa_data)));
+  return 0;
+}
+
+static struct sockaddr *
+lease_addr(struct sockaddr *sa, const unsigned char ip[4])
+{
+  struct sockaddr_in *in = (struct sockaddr_in *)sa;
+
+  in->sin_family = AF_INET;
+  in->sin_port   = 0;
+  memcpy(&in->sin_addr, ip, sizeof(in->sin_addr));
+  return sa;
+}
+
+/* the address, mask and default route of a dhcp lease; the interface is
+ * brought up with only the flags a lease needs */
+int
+net_set_lease(
+    const char         *name,
+    const unsigned char ip[4],
+    const unsigned char mask[4],
+    const unsigned char gw[4]
+)
+{
+  static const unsigned char any[4] = {0, 0, 0, 0};
+  struct ifreq               ifr;
+  struct rtentry             rt;
+  int                        fd;
+
+  memset(&ifr, 0, sizeof(ifr));
+  memset(&rt, 0, sizeof(rt));
+
+  strlcpy(ifr.ifr_name, name, IF_NAMESIZE);
+  lease_addr(&ifr.ifr_addr, ip);
+  if ((fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) == -1)
+    return -1;
+  ioctl(fd, SIOCSIFADDR, &ifr);
+  lease_addr(&ifr.ifr_netmask, mask);
+  ioctl(fd, SIOCSIFNETMASK, &ifr);
+  ifr.ifr_flags = IFF_UP | IFF_RUNNING | IFF_BROADCAST | IFF_MULTICAST;
+  ioctl(fd, SIOCSIFFLAGS, &ifr);
+  rt.rt_flags = RTF_UP | RTF_GATEWAY;
+  lease_addr(&rt.rt_gateway, gw);
+  lease_addr(&rt.rt_genmask, any);
+  lease_addr(&rt.rt_dst, any);
+  ioctl(fd, SIOCADDRT, &rt);
+
+  close(fd);
+  return 0;
 }
 #endif
