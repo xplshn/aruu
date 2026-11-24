@@ -115,6 +115,10 @@ void recurse_dir(const char *, void (*)(const char *));
 void devtotty(int, int *, int *);
 int  ttytostr(int, int, char *, size_t);
 
+/* getopt starts over on a new argument list, the way each system's libc
+ * is told to: a getopt_<os>.c per system */
+void getopt_reset(void);
+
 #if FEATURE_NOEXEC || FEATURE_NOFORK
 #include "wexec.h"
 #define exit(code)  wexec_exit(code)

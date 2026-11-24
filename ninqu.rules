@@ -43,6 +43,8 @@
   (skip "diskutil_freebsd.c" "diskutil_linux.c" "diskutil_netbsd.c"
         "diskutil_openbsd.c" "diskutil_other.c"
         "filesystem_linux.c" "filesystem_other.c"
+        "getopt_darwin.c" "getopt_dragonfly.c" "getopt_freebsd.c"
+        "getopt_linux.c" "getopt_netbsd.c" "getopt_openbsd.c" "getopt_other.c"
         "net_linux.c" "net_other.c"
         "passwd_dragonfly.c" "passwd_freebsd.c" "passwd_linux.c"
         "passwd_netbsd.c" "passwd_openbsd.c" "passwd_other.c"
@@ -61,6 +63,13 @@
         "shared/libutil/diskutil_other.c"
         "shared/libutil/filesystem_linux.c"
         "shared/libutil/filesystem_other.c"
+        "shared/libutil/getopt_darwin.c"
+        "shared/libutil/getopt_dragonfly.c"
+        "shared/libutil/getopt_freebsd.c"
+        "shared/libutil/getopt_linux.c"
+        "shared/libutil/getopt_netbsd.c"
+        "shared/libutil/getopt_openbsd.c"
+        "shared/libutil/getopt_other.c"
         "shared/libutil/net_linux.c"
         "shared/libutil/net_other.c"
         "shared/libutil/passwd_dragonfly.c"
@@ -74,7 +83,7 @@
         "shared/libutil/sysinfo_linux.c"
         "shared/libutil/sysinfo_other.c")
   (dep $(MATCH) "shared/diskutil.h" "shared/filesystem.h" "shared/net.h" "shared/passwd.h"
-       "shared/proc.h" "shared/sysinfo.h" FEATURES_H)
+       "shared/proc.h" "shared/sysinfo.h" "shared/util.h" FEATURES_H)
   (after NOFORK_LIST_H)
   (out "shared/libutil/$(BASESTEM).o")
   (exec $(CC) $(CPPFLAGS_LIBUTIL) -Ishared -Ishared/libutil $(CFLAGS) -c -o $(OUT) $(MATCH)))

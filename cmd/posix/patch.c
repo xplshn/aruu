@@ -157,7 +157,6 @@ static char       end_defined[128];
 /* function declarations */
 static void    reinitialize_almost_everything(void);
 static void    get_some_switches(void);
-static void    reset_getopt_state(void);
 static LINENUM locate_hunk(LINENUM);
 static void    rej_line(int, LINENUM);
 static void    abort_hunk(void);
@@ -576,17 +575,6 @@ main(int argc, char *argv[])
 }
 
 static void
-reset_getopt_state(void)
-{
-#if defined(__GLIBC__) || defined(__linux__)
-  optind = 0;
-#else
-  optreset = 1;
-  optind   = 1;
-#endif
-}
-
-static void
 reinitialize_almost_everything(void)
 {
   re_patch();
@@ -653,7 +641,7 @@ get_some_switches(void)
   Argv_last  = Argv;
   if (!Argc)
     return;
-  reset_getopt_state();
+  getopt_reset();
   while ((ch = getopt_long(Argc, Argv, options, longopts, NULL)) != -1) {
     switch (ch) {
       case 'b':
