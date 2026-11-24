@@ -7,12 +7,12 @@
 #define _DEFAULT_SOURCE
 #endif
 #endif
-#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
 #include "../passwd.h"
 #include "../paths.h"
 #include "../text.h"
 #include "../util.h"
 
+#if defined(__linux__) && !defined(ARUU_FORCE_OTHER)
 #include <errno.h>
 #include <shadow.h>
 #include <stdio.h>
