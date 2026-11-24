@@ -107,16 +107,9 @@ aruu_sig2str(int signo, char *str)
 {
   const char *name;
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)  \
-    || defined(__APPLE__)
-  if (signo <= 0 || signo >= sys_nsig)
-    return -1;
-  name = sys_signame[signo];
-#else
   if (signo <= 0 || signo >= aruu_sys_nsig)
     return -1;
   name = aruu_sys_signame[signo];
-#endif
 
   if (name == NULL)
     return -1;
@@ -132,14 +125,8 @@ aruu_str2sig(const char *str, int *signop)
   const char *const *table;
   int                limit;
 
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)  \
-    || defined(__APPLE__)
-  table = sys_signame;
-  limit = sys_nsig;
-#else
   table = aruu_sys_signame;
   limit = aruu_sys_nsig;
-#endif
 
   if (strncasecmp(s, "SIG", 3) == 0)
     s += 3;
