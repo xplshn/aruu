@@ -1,12 +1,7 @@
 /* see LICENSE file for copyright and license details */
 
-#if FEATURE_LINUX_SYSCALL
-#ifndef _DEFAULT_SOURCE
-#define _DEFAULT_SOURCE
-#endif
 #ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 500
-#endif
+#define _XOPEN_SOURCE 500 /* sync */
 #endif
 
 #include <stdio.h>
@@ -48,11 +43,7 @@ main(int argc, char *argv[])
   if (argc > 0)
     usage();
 
-#if FEATURE_LINUX_SYSCALL
   sync();
-#else
-  eprintf("halt: support not built\n");
-#endif
 
   if (pflag && rflag)
     usage();
@@ -62,9 +53,7 @@ main(int argc, char *argv[])
   if (rflag)
     how = REBOOT_RESTART;
 
-#if FEATURE_LINUX_SYSCALL
   if (machine_reboot(how) < 0)
     eprintf("reboot:");
-#endif
   return 0;
 }
