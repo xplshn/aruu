@@ -396,6 +396,9 @@ extern const struct target *targ;
 
 void targinit(const char *);
 
+/* the macros that name the system, from the ospredef file tagged for it */
+extern const char ospredef[];
+
 /* attr */
 
 enum attrkind {

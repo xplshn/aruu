@@ -65,24 +65,7 @@ main(int argc, char *argv[])
     p += sprintf(p, "#define __riscv 1\n");
 #endif
 
-#if defined(__linux__)
-    p += sprintf(p, "#define __linux__ 1\n");
-    p += sprintf(p, "#define __unix__ 1\n");
-#elif defined(__FreeBSD__)
-    p += sprintf(p, "#define __FreeBSD__ 1\n");
-    p += sprintf(p, "#define __unix__ 1\n");
-#elif defined(__NetBSD__)
-    p += sprintf(p, "#define __NetBSD__ 1\n");
-    p += sprintf(p, "#define __unix__ 1\n");
-#elif defined(__OpenBSD__)
-    p += sprintf(p, "#define __OpenBSD__ 1\n");
-    p += sprintf(p, "#define __unix__ 1\n");
-#elif defined(__APPLE__)
-    p += sprintf(p, "#define __APPLE__ 1\n");
-    p += sprintf(p, "#define __unix__ 1\n");
-#elif defined(__unix__)
-    p += sprintf(p, "#define __unix__ 1\n");
-#endif
+    p += sprintf(p, "%s", ospredef);
 
     predefs_len = p - predefs;
     cmdline_cap = predefs_len + 2048;
