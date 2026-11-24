@@ -37,12 +37,6 @@
 #define O_SEARCH 0
 #endif
 
-#if __APPLE__ /* macos lacks st_*tim from posix.1-2008 */
-#define st_atim st_atimespec
-#define st_ctim st_ctimespec
-#define st_mtim st_mtimespec
-#endif
-
 #ifndef HAVE_REALLOCARRAY
 static void *
 pax_reallocarray(void *p, size_t n, size_t m)
