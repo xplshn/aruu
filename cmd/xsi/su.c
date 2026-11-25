@@ -60,19 +60,21 @@ readpass(const char *prompt)
 }
 
 // ?man su: become another user
-// ?man arguments: [-l] [-s shell] [-c command] [name]
+// ?man arguments: [-l] [-s shell] [-c command] [name [arg ...]]
 // ?man authenticate as name (default: root) and start a shell as them
 // ?man with -l, also chdir to their home directory and run a login shell,
-// ?man same as login would. with -c, the shell runs command and ends
+// ?man same as login would. with -c, the shell runs command and ends.
+// ?man args after name go to the shell as they are, so su name -c cmd
+// ?man runs cmd as on the BSDs and util-linux
 int
 main(int argc, char *argv[])
 {
   struct passwd *pw;
   char           shellbuf[PATH_MAX];
   char          *name, *pass, *base;
-  char          *shargv[4];
+  char         **shargv;
   char          *shell = NULL, *command = NULL;
-  int            n, lflag = 0;
+  int            i, n, lflag = 0;
   uid_t          uid;
 
   ARGBEGIN
@@ -127,6 +129,7 @@ main(int argc, char *argv[])
   base = strrchr(shellbuf, '/');
   base = base ? base + 1 : shellbuf;
 
+  shargv = emalloc((size_t)(argc + 4) * sizeof *shargv);
   if (lflag) {
     shargv[0]    = emalloc(strlen(base) + 2);
     shargv[0][0] = '-';
@@ -139,6 +142,10 @@ main(int argc, char *argv[])
     shargv[n++] = "-c";
     shargv[n++] = command;
   }
+  // a -c after the name is the shell's own, the way scripts written for
+  // other systems call su
+  for (i = 1; i < argc; i++)
+    shargv[n++] = argv[i];
   shargv[n] = NULL;
 
   wexecv_self(shellbuf, shargv);
