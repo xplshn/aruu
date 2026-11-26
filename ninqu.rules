@@ -619,6 +619,11 @@
       cp \"$f\" \"$m/$sec/$name\"
     done
 
+    # the keyboard layouts kmap reads, kept as they were written once
+    printf '  INSTALL %s/share/kmap\n' '$(PREFIX)'
+    mkdir -p \"$d/share\"
+    cp -R share/kmap \"$d/share/kmap\"
+
     printf '  INSTALL %s/lib/libaruu.a\n' '$(PREFIX)'
     cp shared/libutil/libutil.a \"$d/lib/libaruu.a\"
     chmod 644 \"$d/lib/libaruu.a\"
@@ -660,6 +665,11 @@
       name=${f##*/}
       cp \"$f\" \"$m/$sec/$name\"
     done
+
+    # the keyboard layouts kmap reads, kept as they were written once
+    printf '  INSTALL %s/share/kmap\n' '$(PREFIX)'
+    mkdir -p \"$d/share\"
+    cp -R share/kmap \"$d/share/kmap\"
 
     printf '  INSTALL %s/lib/libaruu.a\n' '$(PREFIX)'
     cp shared/libutil/libutil.a \"$d/lib/libaruu.a\"
