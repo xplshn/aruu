@@ -86,16 +86,21 @@ static void printname_colored(const char *, mode_t);
 static void printcols(const struct entry *, size_t);
 static void output(const struct entry *);
 
-static void
+/* -1 when path cannot be looked at: it is said, ls goes on with the rest and
+ * ends unsuccessfully, as POSIX has it */
+static int
 mkent(struct entry *ent, char *path, int dostat, int follow)
 {
   struct stat st;
 
   ent->name = path;
   if (!dostat)
-    return;
-  if ((follow ? stat : lstat)(path, &st) < 0)
-    eprintf("%s %s:", follow ? "stat" : "lstat", path);
+    return 0;
+  if ((follow ? stat : lstat)(path, &st) < 0) {
+    weprintf("%s %s:", follow ? "stat" : "lstat", path);
+    ret = 1;
+    return -1;
+  }
   ent->mode  = st.st_mode;
   ent->nlink = st.st_nlink;
   ent->uid   = st.st_uid;
@@ -119,6 +124,7 @@ mkent(struct entry *ent, char *path, int dostat, int follow)
       ent->tmode = ent->tino = 0;
     }
   }
+  return 0;
 }
 
 static char *
@@ -459,12 +465,14 @@ lsdir(const char *path, const struct entry *dir)
         continue;
 
     ents = ereallocarray(ents, ++n, sizeof(*ents));
-    mkent(
-        &ents[n - 1],
-        estrdup(d->d_name),
-        Fflag || iflag || lflag || pflag || Rflag || sort || should_color(),
-        Lflag
-    );
+    /* an entry gone between reading the directory and looking at it is left out */
+    if (mkent(
+            &ents[n - 1],
+            estrdup(d->d_name),
+            Fflag || iflag || lflag || pflag || Rflag || sort || should_color(),
+            Lflag
+        ) < 0)
+      n--;
   }
 
   closedir(dp);
@@ -768,7 +776,8 @@ main(int argc, char *argv[])
       *--argv = ".", ++argc;
       /* fallthrough */
     case 1:
-      mkent(&ent, argv[0], 1, Hflag || Lflag);
+      if (mkent(&ent, argv[0], 1, Hflag || Lflag) < 0)
+        break;
       ls("",
          &ent,
          (!dflag && S_ISDIR(ent.mode))
@@ -777,7 +786,8 @@ main(int argc, char *argv[])
       break;
     default:
       for (i = ds = fs = 0, fents = dents = NULL; i < (size_t)argc; ++i) {
-        mkent(&ent, argv[i], 1, Hflag || Lflag);
+        if (mkent(&ent, argv[i], 1, Hflag || Lflag) < 0)
+          continue;
 
         if ((!dflag && S_ISDIR(ent.mode))
             || (S_ISLNK(ent.mode) && S_ISDIR(ent.tmode) && !(dflag || Fflag || lflag))) {
