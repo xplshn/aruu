@@ -194,6 +194,16 @@ escape(struct scanner *s)
       if (isodigit(s->chr))
         nextchar(s);
     }
+  } else if (s->chr == 'u' || s->chr == 'U') {
+    /* a universal character name: four or eight hexadecimal digits */
+    int n = s->chr == 'u' ? 4 : 8;
+
+    nextchar(s);
+    while (n-- > 0) {
+      if (!isxdigit(s->chr))
+        error(&s->loc, "invalid universal character name");
+      nextchar(s);
+    }
   } else if (strchr("'\"?\\abfnrtv", s->chr)) {
     nextchar(s);
   } else {
