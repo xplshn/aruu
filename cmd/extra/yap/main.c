@@ -127,7 +127,7 @@ sigquit(int signo)
  */
 
 void
-suspend()
+suspend(void)
 {
   nflush();
   resettty();
@@ -168,7 +168,7 @@ suspsig(int signo)
  */
 
 int
-quit()
+quit(void)
 {
   clrbline();
   resettty();

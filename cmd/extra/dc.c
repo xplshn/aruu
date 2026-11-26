@@ -93,7 +93,7 @@ static int col;
 /* error is not called from the implementation of the
  * arithmetic functions because that can drive to memory
  * leaks very easily */
-static void
+static void __attribute__((noreturn))
 error(char *fmt, ...)
 {
   va_list va;
@@ -665,7 +665,7 @@ divmod(struct num *odivd, struct num *odivr, struct num **remp)
 {
   struct num *acc, *divd, *divr, *res;
   int         divsign, remsign;
-  int         under, magic, ndig, diff;
+  int         under, magic, diff;
   int         d, q, carry, divcarry;
   long        dr, dd, cc;
 
@@ -706,7 +706,7 @@ divmod(struct num *odivd, struct num *odivr, struct num **remp)
     dr /= 25;
   }
 
-  for (ndig = 0; diff >= 0; ++ndig) {
+  while (diff >= 0) {
     last(divd);
     dd = peek(divd);
     dd = dd * 100 + (prev(divd) ? peek(divd) : 0);
@@ -1831,7 +1831,6 @@ aryidx(void)
 {
   int         n;
   int         i;
-  struct val *vp;
   struct reg *rp = lookup(regname());
   struct ary *ap = &rp->ary;
 
@@ -1903,7 +1902,6 @@ static void
 relational(int ch)
 {
   int         r;
-  char       *s;
   struct num *a, *b;
   struct reg *rp = lookup(regname());
 

@@ -2101,7 +2101,6 @@ nawk_convert(const char *s, int (*fun_c)(int), wint_t (*fun_wc)(wint_t))
   size_t       n    = 0;
   wchar_t      wc;
   const size_t sz = awk_mb_cur_max;
-  int          unused;
 
   if (sz == 1) {
     buf = tostring(s);
@@ -2115,14 +2114,8 @@ nawk_convert(const char *s, int (*fun_c)(int), wint_t (*fun_wc)(wint_t))
     buf = tostringN(s, strlen(s) * sz + 1);
 
     (void)mbtowc(NULL, NULL, 0); /* reset internal state */
-    /*
- * reset internal state here too
- * assign result to avoid a compiler warning. (casting to void
- * doesnt work.)
- * increment said variable to avoid a different warning
- */
-    unused = wctomb(NULL, L'\0');
-    unused++;
+    /* the ! keeps warn_unused_result quiet, as (void) alone does not */
+    (void)!wctomb(NULL, L'\0'); /* reset internal state */
 
     ps   = s;
     pbuf = buf;

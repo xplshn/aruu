@@ -107,7 +107,7 @@ parsetime(char *str)
   return mktime(&t);
 }
 
-static void
+static void __attribute__((noreturn))
 usage(void)
 {
   eprintf(

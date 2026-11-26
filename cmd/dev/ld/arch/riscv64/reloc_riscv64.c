@@ -5,7 +5,6 @@
 void
 ld_riscv_reloc_apply(struct ld_reloc *r)
 {
-  unsigned long addr;
   long          off;
   long          hi, lo;
   unsigned int *insn;

@@ -47,8 +47,8 @@ void enfshut(int, FILE *, const char *);
 void efshut(FILE *, const char *);
 int  fshut(FILE *, const char *);
 
-void enprintf(int, const char *, ...);
-void eprintf(const char *, ...);
+void enprintf(int, const char *, ...) __attribute__((noreturn));
+void eprintf(const char *, ...) __attribute__((noreturn));
 void weprintf(const char *, ...);
 void xvprintf(const char *, va_list);
 

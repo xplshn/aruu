@@ -202,11 +202,11 @@ main(int argc, char *argv[])
     OPT_VERSION,
   };
   static const struct option options[] = {
-      {"o", required_argument}, /* specify output filename */
+      {"o", required_argument, 'o'}, /* specify output filename */
       {"-help", no_argument, OPT_HELP},
       {"v", no_argument, OPT_VERSION},
       {"-version", no_argument, OPT_VERSION},
-      {NULL},
+      {NULL, 0, 0},
   };
 
   const char *ofn = NULL;

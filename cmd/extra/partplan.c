@@ -11,7 +11,7 @@
 
 #define SECTORS_ZEROED 16384 /* 8 MiB at 512 byte sectors: old signatures that would be seen again */
 
-static void
+static void __attribute__((noreturn))
 usage(void)
 {
   eprintf("usage: %s guided [-s swap_mib] [-f root_fs] disk | disks | layout | show plan | check [-rb] plan | write plan |\n"

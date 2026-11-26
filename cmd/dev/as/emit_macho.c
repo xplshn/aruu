@@ -558,4 +558,7 @@ emit_macho_obj(
   construct_load_commands(&work, off_p, section_count);
   return output_to_file(ofn, &work);
 }
+#else
+/* ISO C wants a declaration in every file, and off Apple this has none */
+extern int emit_macho_none;
 #endif

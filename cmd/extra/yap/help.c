@@ -23,7 +23,7 @@ static struct state *origin; /* keep track of startstate */
  */
 
 static void
-pr_comm()
+pr_comm(void)
 {
   struct state *p = origin;
   char         *pb;

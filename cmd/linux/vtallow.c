@@ -17,7 +17,7 @@
 #define VT_LOCKSWITCH   0x560B /* disallow vt switching */
 #define VT_UNLOCKSWITCH 0x560C /* allow vt switching */
 
-static void
+static void __attribute__((noreturn))
 usage(void)
 {
   eprintf("usage: %s n | y\n", argv0);

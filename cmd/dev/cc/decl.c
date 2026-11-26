@@ -314,7 +314,7 @@ tagspec(struct scope *s)
           else if (!typehasint(et, value, e->type->u.arith.issigned))
             goto invalid;
         } else if (
-            value == 0 && !et->u.arith.issigned || value == 1ull << 63 && et->u.arith.issigned
+            (value == 0 && !et->u.arith.issigned) || (value == 1ull << 63 && et->u.arith.issigned)
         ) {
           error(
               &tok.loc,
@@ -334,12 +334,12 @@ tagspec(struct scope *s)
             );
           }
           sign = et->u.arith.issigned;
-          for (i = 0; i < countof(inttypes); ++i) {
+          for (i = 0; (size_t)i < countof(inttypes); ++i) {
             et = inttypes[i][sign];
             if (typehasint(et, value, sign))
               break;
           }
-          assert(i < countof(inttypes));
+          assert((size_t)i < countof(inttypes));
         }
         d              = mkdecl(name, DECLCONST, et, QUALNONE, LINKNONE);
         d->u.enumconst = value;
@@ -362,7 +362,7 @@ tagspec(struct scope *s)
           t->base = min ? &typeint : &typeuint;
         } else {
           sign = min > 0;
-          for (i = 0; i < countof(inttypes); ++i) {
+          for (i = 0; (size_t)i < countof(inttypes); ++i) {
             et = inttypes[i][sign];
             if (typehasint(et, max, false) && typehasint(et, -min, true))
               break;
@@ -382,6 +382,8 @@ tagspec(struct scope *s)
         t->u.arith.issigned = t->base->u.arith.issigned;
         t->u.arith.width    = t->base->u.arith.width;
       }
+    default:
+      break;
   }
   t->incomplete = false;
 
@@ -532,7 +534,7 @@ declspecs(struct scope *s, enum storageclass *sc, enum funcspec *fs, int *align)
         i     = other ? other->align : intconstexpr(s, false);
         if (i & i - 1 || i > INT_MAX)
           error(&tok.loc, "invalid alignment: %llu", i);
-        if (i > *align)
+        if (i > (unsigned long long)*align)
           *align = i;
         expect(TRPAREN, "to close 'alignas' specifier");
         break;
@@ -653,7 +655,7 @@ done:
     if (other->base->kind == TYPEFUNC)
       error(&tok.loc, "'restrict' applied to function pointer");
   }
-  if (!t && (tq || sc && *sc || fs && *fs))
+  if (!t && (tq || (sc && *sc) || (fs && *fs)))
     error(&tok.loc, "declaration has no type specifier");
   /*
  * TODO: consider delaying attribute parsing to declarator(),
@@ -924,6 +926,8 @@ declarator(
           }
         }
         break;
+      default:
+        break;
     }
     base.type = t;
     base.qual = tq;
@@ -985,7 +989,7 @@ addmember(
   if (mt.type->prop & PROPVM)
     error(&tok.loc, "struct member '%s' has variably modified type", name);
   assert(mt.type->align > 0);
-  if (name || width == -1) {
+  if (name || width == -1ull) {
     m        = xmalloc(sizeof(*m));
     m->type  = mt.type;
     m->qual  = mt.qual;
@@ -996,7 +1000,7 @@ addmember(
   } else {
     m = NULL;
   }
-  if (width == -1) {
+  if (width == -1ull) {
     m->bits.before = 0;
     m->bits.after  = 0;
     if (align < mt.type->align) {
@@ -1038,7 +1042,7 @@ addmember(
           "declarator",
           name
       );
-    if (width > mt.type->u.arith.width)
+    if (width > (unsigned long long)mt.type->u.arith.width)
       error(&tok.loc, "bit-field '%s' exceeds width of underlying type", name);
     align = mt.type->align;
     if (t->kind == TYPESTRUCT) {
@@ -1459,6 +1463,8 @@ decl(struct scope *s, struct func *f)
         } else if (funcscope) {
           delscope(funcscope);
         }
+        break;
+      default:
         break;
     }
     if (consume(TSEMICOLON))

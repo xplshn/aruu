@@ -58,7 +58,7 @@ handle(cc_t *c)
  */
 
 void
-inittty()
+inittty(void)
 {
   struct termios *p = &_tty;
 
@@ -78,73 +78,73 @@ inittty()
 }
 
 void
-backspace()
+backspace(void)
 {
   putline(BC);
 }
 
 void
-clrscreen()
+clrscreen(void)
 {
   tputs(CL, LINES, fputch);
 }
 
 void
-clrtoeol()
+clrtoeol(void)
 {
   tputs(CE, 1, fputch);
 }
 
 void
-scrollreverse()
+scrollreverse(void)
 {
   tputs(SR, LINES, fputch);
 }
 
 void
-standout()
+standout(void)
 {
   tputs(SO, 1, fputch);
 }
 
 void
-standend()
+standend(void)
 {
   tputs(SE, 1, fputch);
 }
 
 void
-underline()
+underline(void)
 {
   tputs(US, 1, fputch);
 }
 
 void
-end_underline()
+end_underline(void)
 {
   tputs(UE, 1, fputch);
 }
 
 void
-bold()
+bold(void)
 {
   tputs(MD, 1, fputch);
 }
 
 void
-end_bold()
+end_bold(void)
 {
   tputs(ME, 1, fputch);
 }
 
 void
-underchar()
+underchar(void)
 {
   tputs(UC, 1, fputch);
 }
 
 void
-givetab()
+givetab(void)
 {
   tputs(TA, 1, fputch);
 }
@@ -154,7 +154,7 @@ givetab()
  */
 
 void
-resettty()
+resettty(void)
 {
   tcsetattr(0, TCSANOW, &_svtty);
   putline(TE);
@@ -200,7 +200,7 @@ getnumcap(char *cap)
  */
 
 void
-ini_terminal()
+ini_terminal(void)
 {
   char            *s;
   struct linelist *lp, *lp1;
@@ -388,7 +388,7 @@ mgoto(int n)
  */
 
 void
-clrbline()
+clrbline(void)
 {
   if (stupid) {
     putline("\r\n");
@@ -412,13 +412,13 @@ ins_line(int l)
 }
 
 void
-home()
+home(void)
 {
   tputs(HO, 1, fputch);
 }
 
 void
-bottom()
+bottom(void)
 {
   tputs(BO, 1, fputch);
   if (!*BO)
@@ -426,7 +426,7 @@ bottom()
 }
 
 int
-window()
+window(void)
 {
 #ifdef TIOCGWINSZ
   if (ioctl(1, TIOCGWINSZ, &w) < 0)

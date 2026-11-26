@@ -25,7 +25,7 @@ struct value {
   } kind;
   unsigned id;
   union {
-    char              *name;
+    const char        *name;
     unsigned long long i;
     double             f;
   } u;
@@ -304,7 +304,7 @@ funcbits(struct func *f, struct type *t, struct value *v, struct bitfield b)
   if (!bits && t->kind == TYPEBITINT)
     bits = t->size * 8 - t->u.arith.width;
   if (bits) {
-    bits += (t->size + 3 & -4) - t->size << 3;
+    bits += (((t->size + 3) & -4) - t->size) << 3;
     v = funcinst(f, ISHL, class, v, mkintconst(bits));
   }
   bits += b.before;
@@ -872,7 +872,7 @@ funcstore(struct func *f, struct type *t, enum typequal tq, struct lvalue lval, 
       qt   = qbetype(t);
       bits = lval.bits.before + lval.bits.after;
       if (bits) {
-        mask = 0xffffffffffffffffu >> 64 - t->size * 8 + bits << lval.bits.before;
+        mask = 0xffffffffffffffffu >> (64 - t->size * 8 + bits) << lval.bits.before;
         v    = funcinst(f, ISHL, qt.base, v, mkintconst(lval.bits.before));
         r    = funcbits(f, t, v, lval.bits);
         v    = funcinst(f, IAND, qt.base, v, mkintconst(mask));
@@ -905,6 +905,8 @@ funcload(struct func *f, struct type *t, struct lvalue lval)
     case TYPEINT128:
     case TYPECOMPLEX:
       return lval.addr;
+    default:
+      break;
   }
   qt = qbetype(t);
   v  = funcinst(f, qt.load, qt.base, lval.addr, NULL);
@@ -938,7 +940,7 @@ mkfunc(struct decl *decl, char *name, struct type *t, struct scope *s)
       d->value = v;
     } else {
       funcalloc(f, d);
-      funcstore(f, d->type, QUALNONE, (struct lvalue){d->value}, v);
+      funcstore(f, d->type, QUALNONE, (struct lvalue){.addr = d->value}, v);
     }
   }
 
@@ -960,7 +962,7 @@ delfunc(struct func *f)
   struct block *b;
   struct inst **inst;
 
-  while (b = f->start) {
+  while ((b = f->start)) {
     f->start = b->next;
     arrayforeach(&b->insts, inst) free(*inst);
     free(b->insts.val);
@@ -1140,12 +1142,16 @@ funcbranch(struct func *f, struct expr *e, struct block *bt, struct block *bf)
           funclabel(f, b);
           funcbranch(f, r, bt, bf);
           return &one;
+        default:
+          break;
       }
       break;
     case EXPRCOMMA:
       for (e = e->base; e->next; e = e->next)
         funcexpr(f, e);
       return funcbranch(f, e, bt, bf);
+    default:
+      break;
   }
   v = funcexpr(f, e);
   funcjnz(f, v, e->type, bt, bf);
@@ -1170,7 +1176,7 @@ funcexpr(struct func *f, struct expr *e)
       d = e->u.ident.decl;
       switch (d->kind) {
         case DECLOBJECT:
-          return funcload(f, e->type, (struct lvalue){d->value});
+          return funcload(f, e->type, (struct lvalue){.addr = d->value});
         case DECLCONST:
           return d->value;
         default:
@@ -1248,7 +1254,7 @@ funcexpr(struct func *f, struct expr *e)
           return lval.addr;
         case TMUL:
           r = funcexpr(f, e->base);
-          return funcload(f, e->type, (struct lvalue){r});
+          return funcload(f, e->type, (struct lvalue){.addr = r});
         case TSUB:
           r = funcexpr(f, e->base);
           if (e->type->kind == TYPEINT128) {
@@ -1275,6 +1281,8 @@ funcexpr(struct func *f, struct expr *e)
             );
           }
           return funcinst(f, INEG, qbetype(e->type).base, r, NULL);
+        default:
+          break;
       }
       fatal("internal error; unknown unary expression");
       break;
@@ -1566,6 +1574,8 @@ funcexpr(struct func *f, struct expr *e)
           else
             op = t->prop & PROPFLOAT ? ICNED : ICNEL;
           break;
+        default:
+          break;
       }
       if (op == INONE)
         fatal(
@@ -1714,6 +1724,8 @@ funcexpr(struct func *f, struct expr *e)
       if (e->base)
         funcexpr(f, e->base);
       return t->u.array.size;
+    default:
+      break;
   }
   fatal("unimplemented expression %d", e->kind);
   return NULL;
@@ -1860,7 +1872,7 @@ emitname(struct value *v)
   int kind;
 
   kind = v->kind & 0xf;
-  if (kind >= countof(sigil) || !sigil[kind])
+  if ((size_t)kind >= countof(sigil) || !sigil[kind])
     fatal("invalid value");
   putchar(sigil[kind]);
   if (kind == VALUE_GLOBAL && v->id)
@@ -1942,8 +1954,8 @@ emittype(struct type *t)
   unsigned long long off;
 
   if (t->value
-      || t->kind != TYPESTRUCT && t->kind != TYPEUNION && t->kind != TYPEINT128
-             && t->kind != TYPECOMPLEX)
+      || (t->kind != TYPESTRUCT && t->kind != TYPEUNION && t->kind != TYPEINT128
+             && t->kind != TYPECOMPLEX))
     return;
   if (t->kind == TYPEINT128) {
     emitpairtype(t, t->u.arith.issigned ? "i128" : "u128", 'l');

@@ -126,7 +126,7 @@ compile(char *map, struct keymap *commtable)
  */
 
 void
-initkeys()
+initkeys(void)
 {
   char                *p;
   static struct keymap xx[2];

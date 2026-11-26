@@ -359,7 +359,7 @@ resolvepath(const char *arg0, const char *binname, const char *devrelpath)
   struct stat st;
 
   n = proc_selfexe(self, sizeof(self) - 1);
-  if (n == -1) {
+  if (n == (size_t)-1) {
     n = strlen(arg0);
     if (n > sizeof(self) - 1)
       n = sizeof(self) - 1;
@@ -650,7 +650,7 @@ main(int argc, char *argv[])
   {
     if (!(input->stages & 1 << last))
       continue;
-    input->stages &= (1 << last + 1) - 1;
+    input->stages &= (1 << (last + 1)) - 1;
     buildobj(input, output);
   }
   if (last == LINK) {

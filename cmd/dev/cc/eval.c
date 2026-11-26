@@ -16,7 +16,7 @@ cast(struct expr *expr)
     if (t->size == 4)
       expr->u.constant.f = (float)expr->u.constant.f;
   } else if (t->prop & PROPINT) {
-    m = 1ull << t->u.arith.width - 1;
+    m = 1ull << (t->u.arith.width - 1);
     expr->u.constant.u &= m | m - 1;
     if (t->u.arith.issigned)
       expr->u.constant.u = (expr->u.constant.u ^ m) - m;
@@ -29,7 +29,8 @@ unary(struct expr *expr, enum tokenkind op, struct expr *l)
   expr->kind = EXPRCONST;
   if (l->type->prop & PROPFLOAT)
     op |= F;
-  switch (op) {
+  /* op carries flags beside the token: its cases are not the enum's */
+  switch ((int)op) {
     case TSUB:
       expr->u.constant.u = -l->u.constant.u;
       break;
@@ -50,7 +51,8 @@ binary(struct expr *expr, enum tokenkind op, struct expr *l, struct expr *r)
     op |= F;
   else if (l->type->prop & PROPINT && l->type->u.arith.issigned)
     op |= S;
-  switch (op) {
+  /* op carries flags beside the token: its cases are not the enum's */
+  switch ((int)op) {
     case TMUL:
     case TMUL | S:
       expr->u.constant.u = l->u.constant.u * r->u.constant.u;
@@ -204,6 +206,8 @@ eval(struct expr *expr)
               l->kind         = EXPRIDENT;
               expr->base      = l;
               break;
+            default:
+              break;
           }
           break;
         case TMUL:
@@ -261,7 +265,7 @@ eval(struct expr *expr)
  * other forms of constant expressions (6.6p10), and some
  * programs expect this functionality
  */
-        if (t->kind == TYPEPOINTER || t->prop & PROPINT && t->size == typelong.size)
+        if (t->kind == TYPEPOINTER || (t->prop & PROPINT && t->size == typelong.size))
           expr = l;
       }
       break;
@@ -303,6 +307,8 @@ eval(struct expr *expr)
             break;
           binary(expr, expr->op, l, r);
       }
+      break;
+    default:
       break;
   }
 

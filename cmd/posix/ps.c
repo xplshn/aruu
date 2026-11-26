@@ -72,7 +72,6 @@ static void put_user(const struct procinfo *p, char *o, size_t n)   { username(p
 static void put_ruser(const struct procinfo *p, char *o, size_t n)  { username(p->ruid, o, n); }
 static void put_group(const struct procinfo *p, char *o, size_t n)  { groupname(p->egid, o, n); }
 static void put_rgroup(const struct procinfo *p, char *o, size_t n) { groupname(p->rgid, o, n); }
-static void put_uid(const struct procinfo *p, char *o, size_t n)    { snprintf(o, n, "%u", (unsigned)p->euid); }
 static void put_pid(const struct procinfo *p, char *o, size_t n)    { snprintf(o, n, "%d", (int)p->pid); }
 static void put_ppid(const struct procinfo *p, char *o, size_t n)   { snprintf(o, n, "%d", (int)p->ppid); }
 static void put_pgid(const struct procinfo *p, char *o, size_t n)   { snprintf(o, n, "%d", (int)p->pgid); }

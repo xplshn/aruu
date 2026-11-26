@@ -170,7 +170,7 @@ struct Expr {
 #ifndef __NO_FLONUM
     Flonum flonum;
 #endif
-  };
+  } u;
 };
 
 int  parse_line(struct Line *line, struct ParseInfo *info);

@@ -780,7 +780,7 @@ WARNING(const char *fmt, ...)
 }
 
 void
-error()
+error(void)
 {
   extern Node *curnode;
 

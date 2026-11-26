@@ -131,7 +131,7 @@ mkbitinttype(int width, bool sign)
 
   /* calculate byte size */
   t->size = 1;
-  while (t->size * 8 < width)
+  while (t->size * 8 < (unsigned long long)width)
     t->size <<= 1;
   t->align = t->size;
 
@@ -160,13 +160,15 @@ typerank(struct type *t)
     case TYPEINT:
       return 0x201;
     case TYPELONG:
-      return t->size << 3 + 4 | 0x1;
+      return t->size << (3 + 4) | 0x1;
     case TYPELLONG:
       return 0x402;
     case TYPEBITINT:
       return t->u.arith.width << 4;
     case TYPEINT128:
       return 128 << 4;
+    default:
+      break;
   }
   fatal("internal error; unhandled integer type");
   return -1;
@@ -186,7 +188,7 @@ typecompatible(struct type *t1, struct type *t2)
  * type, but not with each other (unless they are the
  * same type)
  */
-    return t1->kind == TYPEENUM && t2 == t1->base || t2->kind == TYPEENUM && t1 == t2->base;
+    return (t1->kind == TYPEENUM && t2 == t1->base) || (t2->kind == TYPEENUM && t1 == t2->base);
   }
   switch (t1->kind) {
     case TYPEBITINT:
@@ -214,6 +216,8 @@ typecompatible(struct type *t1, struct type *t2)
       goto derived;
     derived:
       return t1->qual == t2->qual && typecompatible(t1->base, t2->base);
+    default:
+      break;
   }
   return false;
 }
@@ -228,6 +232,7 @@ typesame(struct type *t1, struct type *t2)
 struct type *
 typecomposite(struct type *t1, struct type *t2)
 {
+  (void)t2;
   /* XXX: implement 6.2.7 */
   /* XXX: merge with typecompatible? */
   return t1;
@@ -241,7 +246,7 @@ typepromote(struct type *t, unsigned width)
   if (t->kind == TYPEBITINT)
     return t;
   if (t->prop & PROPINT && (typerank(t) <= typerank(&typeint) || width <= typeint.size * 8)) {
-    if (width == -1)
+    if (width == -1u)
       width = t->size * 8;
     return width - t->u.arith.issigned < typeint.size * 8 ? &typeint : &typeuint;
   }
@@ -284,6 +289,8 @@ typecommonreal(struct type *t1, unsigned w1, struct type *t2, unsigned w2)
       return &typeulong;
     case TYPELLONG:
       return &typellong;
+    default:
+      break;
   }
   fatal("internal error; could not find common real type");
   return NULL;
@@ -304,6 +311,8 @@ typeadjust(struct type *t, enum typequal *tq)
     case TYPEFUNC:
       assert(*tq == QUALNONE);
       t = mkpointertype(t, QUALNONE);
+      break;
+    default:
       break;
   }
 
@@ -338,6 +347,6 @@ typehasint(struct type *t, unsigned long long i, bool sign)
 {
   assert(t->prop & PROPINT);
   if (sign && i >= -1ull << 63)
-    return t->u.arith.issigned && i >= -1ull << (t->size << 3) - 1;
-  return i <= 0xffffffffffffffffull >> (8 - t->size << 3) + t->u.arith.issigned;
+    return t->u.arith.issigned && i >= -1ull << ((t->size << 3) - 1);
+  return i <= 0xffffffffffffffffull >> (((8 - t->size) << 3) + t->u.arith.issigned);
 }

@@ -53,7 +53,7 @@ tokenget(const void *str, size_t len)
       fatal("token is too long");
     if (INT_MAX < tokstr.len / sizeof(void *))
       fatal("too many tokens");
-    if (!pos || end - pos < len + 1) {
+    if (!pos || (size_t)(end - pos) < len + 1) {
       buf = xmalloc(8192);
       pos = buf;
       end = buf + 8192;

@@ -33,7 +33,7 @@ copy(char *p, const char *ep, char *s)
  */
 
 void
-give_prompt()
+give_prompt(void)
 {
   char           **name;
   struct scr_info *p = &scr_info;
@@ -140,7 +140,7 @@ error(char *str)
 }
 
 void
-ret_to_continue()
+ret_to_continue(void)
 { /* obvious */
   int         c;
   static char buf[2];

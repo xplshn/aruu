@@ -767,7 +767,7 @@ xt(int argc, char *argv[], int mode)
  * NULL) */
     if (!q) {
       m = sizeof h->prefix, n = sizeof h->name;
-      p = "/" + !h->prefix[0];
+      p = h->prefix[0] ? "/" : "";
       snprintf(fname, sizeof fname, "%.*s%s%.*s", m, h->prefix, p, n, h->name);
     }
     q = NULL;

@@ -41,7 +41,8 @@ struct UnresolvedInfo {
   uintptr_t           offset;
   struct SectionInfo *src_section;
   int                 add;
-  enum UnresolvedKind kind;
+  /* an enum UnresolvedKind, or an architecture's own from UNRES_ARCH_BASE */
+  int                 kind;
 };
 
 struct Data {
@@ -76,7 +77,7 @@ struct IR {
     size_t zero;
     int    align;
     int    section;
-  };
+  } u;
   uint64_t address;
 };
 

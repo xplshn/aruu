@@ -680,7 +680,7 @@ iden(int ch)
 		{"else", ELSE},
 		{"halt", HALT},
 		{"read", READ},
-		{NULL}
+		{NULL, 0}
 	};
 	struct keyword *p;
 	char *bp;

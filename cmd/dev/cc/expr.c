@@ -35,7 +35,7 @@ delexpr(struct expr *e)
   switch (e->kind) {
     case EXPRCALL:
       delexpr(e->base);
-      while (sub = e->u.call.args) {
+      while ((sub = e->u.call.args)) {
         e->u.call.args = sub->next;
         delexpr(sub);
       }
@@ -66,10 +66,12 @@ delexpr(struct expr *e)
  * break;
  */
     case EXPRCOMMA:
-      while (sub = e->base) {
+      while ((sub = e->base)) {
         e->base = sub->next;
         delexpr(sub);
       }
+      break;
+    default:
       break;
   }
   free(e);
@@ -113,6 +115,8 @@ decay(struct expr *e)
     case TYPEFUNC:
       e          = mkunaryexpr(TBAND, e);
       e->decayed = true;
+      break;
+    default:
       break;
   }
 
@@ -162,6 +166,8 @@ mkunaryexpr(enum tokenkind op, struct expr *base)
         expr->op     = op;
       }
       return decay(expr);
+    default:
+      break;
   }
   /* other unary operators get compiled as equivalent binary ones */
   fatal("internal error: unknown unary operator %d", op);
@@ -431,7 +437,7 @@ mkbinaryexpr(struct location *loc, enum tokenkind op, struct expr *l, struct exp
         t = commonreal(&l, &r);
         break;
       }
-      if (l->type->kind != TYPEPOINTER || !(rp & PROPINT) && r->type->kind != TYPEPOINTER)
+      if (l->type->kind != TYPEPOINTER || (!(rp & PROPINT) && r->type->kind != TYPEPOINTER))
         error(loc, "invalid operands to '-' operator");
       if (l->type->base->incomplete || l->type->base->kind == TYPEFUNC)
         error(
@@ -542,7 +548,7 @@ inttype(unsigned long long val, bool decimal, char *suffix)
       invalid:
         error(&tok.loc, "invalid integer constant suffix '%s'", suffix);
     }
-    if (flags & new || flags & ~U &&new & ~U)
+    if (flags & new || (flags & ~U && new & ~U))
       goto invalid;
     flags |= new;
   }
@@ -553,14 +559,14 @@ inttype(unsigned long long val, bool decimal, char *suffix)
     for (i = 1;; ++i) {
       if (i > 64 - sign)
         goto notype;
-      if (val <= 0xffffffffffffffff >> 64 - i)
+      if (val <= 0xffffffffffffffff >> (64 - i))
         break;
     }
     return mkbitinttype(i + sign, sign);
   }
-  assert(flags < countof(types));
+  assert((size_t)flags < countof(types));
   step = !sign || decimal ? 2 : 1;
-  for (i = flags; i < countof(types); i += step) {
+  for (i = flags; (size_t)i < countof(types); i += step) {
     t = types[i];
     if (typehasint(t, val, false))
       return t;
@@ -703,6 +709,7 @@ encodechar16(void *dst, uint_least32_t chr, bool hexoct)
 static size_t
 encodechar32(void *dst, uint_least32_t chr, bool hexoct)
 {
+  (void)hexoct;
   *(uint_least32_t *)dst = chr;
   return sizeof(uint_least32_t);
 }
@@ -1625,6 +1632,8 @@ precedence(enum tokenkind t)
     case TDIV:
     case TMOD:
       return 9;
+    default:
+      break;
   }
   return -1;
 }

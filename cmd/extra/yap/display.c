@@ -666,7 +666,7 @@ exgmark(long cnt)
 }
 
 void
-d_clean()
+d_clean(void)
 { /* clean up */
   struct scr_info *p = &scr_info;
 

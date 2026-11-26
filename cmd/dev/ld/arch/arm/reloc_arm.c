@@ -5,8 +5,6 @@
 void
 ld_arm_reloc_apply(struct ld_reloc *r)
 {
-  unsigned long addr;
-
   switch (r->type) {
     case R_ARM_NONE:
       break;

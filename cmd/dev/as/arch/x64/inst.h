@@ -667,7 +667,7 @@ struct Operand {
       enum RegType         reg;
       struct ExprWithFlag  offset;
     } segment;
-  };
+  } u;
 };
 
 struct Inst {

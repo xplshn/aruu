@@ -20,7 +20,7 @@ new_ir_label(const struct Name *label)
 {
   struct IR *ir = calloc_or_die(sizeof(*ir));
   ir->kind      = IR_LABEL;
-  ir->label     = label;
+  ir->u.label     = label;
   return ir;
 }
 
@@ -29,7 +29,7 @@ new_ir_code(const struct Code *code)
 {
   struct IR *ir = calloc_or_die(sizeof(*ir));
   ir->kind      = IR_CODE;
-  ir->code      = *code;
+  ir->u.code      = *code;
   return ir;
 }
 
@@ -38,8 +38,8 @@ new_ir_data(const void *data, size_t size)
 {
   struct IR *ir = calloc_or_die(sizeof(*ir));
   ir->kind      = IR_DATA;
-  ir->data.len  = size;
-  ir->data.buf  = (unsigned char *)data;
+  ir->u.data.len  = size;
+  ir->u.data.buf  = (unsigned char *)data;
   return ir;
 }
 
@@ -48,7 +48,7 @@ new_ir_bss(size_t size)
 {
   struct IR *ir = calloc_or_die(sizeof(*ir));
   ir->kind      = IR_BSS;
-  ir->bss       = size;
+  ir->u.bss       = size;
   return ir;
 }
 
@@ -57,7 +57,7 @@ new_ir_zero(size_t size)
 {
   struct IR *ir = calloc_or_die(sizeof(*ir));
   ir->kind      = IR_ZERO;
-  ir->zero      = size;
+  ir->u.zero      = size;
   return ir;
 }
 
@@ -66,7 +66,7 @@ new_ir_align(int align)
 {
   struct IR *ir = calloc_or_die(sizeof(*ir));
   ir->kind      = IR_ALIGN;
-  ir->align     = align;
+  ir->u.align     = align;
   return ir;
 }
 
@@ -75,8 +75,8 @@ new_ir_expr(enum IrKind kind, const struct Expr *expr)
 {
   struct IR *ir   = calloc_or_die(sizeof(*ir));
   ir->kind        = kind;
-  ir->expr.expr   = expr;
-  ir->expr.addend = 0;
+  ir->u.expr.expr   = expr;
+  ir->u.expr.addend = 0;
   return ir;
 }
 
@@ -146,29 +146,29 @@ calc_label_address(uint64_t start_address, struct Vector *sections, struct Table
       switch (ir->kind) {
         case IR_LABEL: {
           struct LabelInfo *info;
-          if (!table_try_get(label_table, ir->label, (void **)&info)) {
-            fprintf(stderr, "[%.*s] not found\n", NAMES(ir->label));
+          if (!table_try_get(label_table, ir->u.label, (void **)&info)) {
+            fprintf(stderr, "[%.*s] not found\n", NAMES(ir->u.label));
             assert(!"unexpected");
           } else {
             info->address = address;
           }
         } break;
         case IR_CODE:
-          address += ir->code.len;
+          address += ir->u.code.len;
           break;
         case IR_DATA:
-          address += ir->data.len;
+          address += ir->u.data.len;
           break;
         case IR_BSS:
-          address += ir->bss;
+          address += ir->u.bss;
           break;
         case IR_ZERO:
-          address += ir->zero;
+          address += ir->u.zero;
           break;
         case IR_ALIGN:
-          ir->address = address = ALIGN(address, ir->align);
-          if ((size_t)ir->align > section->align) {
-            section->align = ir->align;
+          ir->address = address = ALIGN(address, ir->u.align);
+          if ((size_t)ir->u.align > section->align) {
+            section->align = ir->u.align;
             settle         = 0;
           }
           break;
@@ -191,15 +191,6 @@ calc_label_address(uint64_t start_address, struct Vector *sections, struct Table
 }
 
 /* relative address resolution */
-
-static void
-put_value(unsigned char *p, int64_t value, int size)
-{
-  for (int i = 0; i < size; ++i) {
-    *p++ = value;
-    value >>= 8;
-  }
-}
 
 int
 resolve_relative_address(
@@ -226,7 +217,7 @@ resolve_relative_address(
         case IR_EXPR_SHORT:
         case IR_EXPR_LONG:
         case IR_EXPR_QUAD: {
-          struct Value value = calc_expr(label_table, ir->expr.expr);
+          struct Value value = calc_expr(label_table, ir->u.expr.expr);
           assert(value.label != NULL);
           struct UnresolvedInfo *info = malloc_or_die(sizeof(*info));
           info->kind                  = UNRES_ABS64;
@@ -234,7 +225,7 @@ resolve_relative_address(
           info->src_section           = section;
           info->offset                = address - start_address;
           info->add                   = value.offset;
-          ir->expr.addend             = value.offset;
+          ir->u.expr.addend             = value.offset;
           vec_push(unresolved, info);
         } break;
         case IR_LABEL:
@@ -264,31 +255,31 @@ emit_irs(struct Vector *sections)
         case IR_LABEL:
           break;
         case IR_CODE:
-          sec_add_code(section, ir->code.buf, ir->code.len);
+          sec_add_code(section, ir->u.code.buf, ir->u.code.len);
           break;
         case IR_DATA:
-          sec_add_data(section, ir->data.buf, ir->data.len);
+          sec_add_data(section, ir->u.data.buf, ir->u.data.len);
           break;
         case IR_BSS:
-          sec_add_bss(section, ir->bss);
+          sec_add_bss(section, ir->u.bss);
           break;
         case IR_ZERO:
           if (section->flag & SF_BSS) {
-            sec_add_bss(section, ir->zero);
+            sec_add_bss(section, ir->u.zero);
           } else {
-            void *buf = calloc_or_die(ir->zero);
-            sec_add_data(section, buf, ir->zero);
+            void *buf = calloc_or_die(ir->u.zero);
+            sec_add_data(section, buf, ir->u.zero);
           }
           break;
         case IR_ALIGN:
-          sec_align_size(section, ir->align);
+          sec_align_size(section, ir->u.align);
           break;
         case IR_EXPR_BYTE:
         case IR_EXPR_SHORT:
         case IR_EXPR_LONG:
         case IR_EXPR_QUAD: {
 #if TC_TARGET_PLATFORM == TC_PLATFORM_APPLE
-          int64_t value = ir->expr.addend;
+          int64_t value = ir->u.expr.addend;
 #else
           int64_t value = 0;
 #endif

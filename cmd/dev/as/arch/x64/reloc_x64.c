@@ -23,17 +23,17 @@ put_value(unsigned char *p, int64_t value, int size)
 static int
 make_jmp_long(struct IR *ir)
 {
-  if (ir->code.flag & INST_LONG_OFFSET)
+  if (ir->u.code.flag & INST_LONG_OFFSET)
     return 0;
 
-  struct Inst *inst = ir->code.inst;
+  struct Inst *inst = ir->u.code.inst;
   /* change to long offset and recalculate */
-  ir->code.flag |= INST_LONG_OFFSET;
-  ir->code.len = 0;
+  ir->u.code.flag |= INST_LONG_OFFSET;
+  ir->u.code.len = 0;
   if (inst->op == JMP_D)
-    MAKE_CODE(inst, &ir->code, 0xe9, IM32(-1));
+    MAKE_CODE(inst, &ir->u.code, 0xe9, IM32(-1));
   else
-    MAKE_CODE(inst, &ir->code, 0x0f, 0x80 + (inst->op - JO), IM32(-1));
+    MAKE_CODE(inst, &ir->u.code, 0x0f, 0x80 + (inst->op - JO), IM32(-1));
   return 1;
 }
 
@@ -47,21 +47,21 @@ resolve_direct_mov(
     struct Vector      *unresolved
 )
 {
-  struct Inst           *inst  = ir->code.inst;
+  struct Inst           *inst  = ir->u.code.inst;
   struct Operand        *mem   = inst->op == MOV_DR ? &inst->opr[0] : &inst->opr[1];
-  struct Reg            *reg   = inst->op == MOV_DR ? &inst->opr[1].reg : &inst->opr[0].reg;
-  struct Value           value = calc_expr(label_table, mem->direct.expr);
+  struct Reg            *reg   = inst->op == MOV_DR ? &inst->opr[1].u.reg : &inst->opr[0].u.reg;
+  struct Value           value = calc_expr(label_table, mem->u.direct.expr);
   struct UnresolvedInfo *info;
 
   if (value.label == NULL) {
-    put_value(ir->code.buf + ir->code.len - 4, value.offset, sizeof(int32_t));
+    put_value(ir->u.code.buf + ir->u.code.len - 4, value.offset, sizeof(int32_t));
     return;
   }
   info        = malloc_or_die(sizeof(*info));
   info->kind  = inst->op == MOV_DR && reg->size == REG32 ? UNRES_X64_ABS32S : UNRES_X64_ABS32;
   info->label = value.label;
   info->src_section    = section;
-  info->offset         = address + ir->code.len - 4 - start_address;
+  info->offset         = address + ir->u.code.len - 4 - start_address;
   info->add            = value.offset;
   vec_push(unresolved, info);
 }
@@ -77,7 +77,7 @@ x64_resolve_code_reloc(
     int                *size_upgraded
 )
 {
-  struct Inst *inst = ir->code.inst;
+  struct Inst *inst = ir->u.code.inst;
   switch (inst->op) {
     case MOV_DR:
     case MOV_RD:
@@ -88,8 +88,8 @@ x64_resolve_code_reloc(
          %reg), not sym's address, so it needs a relocation even when
          sym is local. unlike lea_ir there is no direct-address
          fallback to patch in place */
-      if (inst->opr[0].indirect.reg.no == RIP) {
-        struct Value value = calc_expr(label_table, inst->opr[0].indirect.offset.expr);
+      if (inst->opr[0].u.indirect.reg.no == RIP) {
+        struct Value value = calc_expr(label_table, inst->opr[0].u.indirect.offset.expr);
         if (value.label != NULL) {
           struct UnresolvedInfo *info = malloc_or_die(sizeof(*info));
           info->kind                  = UNRES_X64_GOT_LOAD;
@@ -105,11 +105,11 @@ x64_resolve_code_reloc(
       /* addq sym@gottpoff(%rip), %reg: the second half of qbe's
          initial-exec tls sequence (movq %fs:0, %reg first). it loads a
          got-resident tp-offset, otherwise the same shape as mov_ir */
-      if (inst->opr[0].indirect.reg.no == RIP) {
-        struct Value value = calc_expr(label_table, inst->opr[0].indirect.offset.expr);
+      if (inst->opr[0].u.indirect.reg.no == RIP) {
+        struct Value value = calc_expr(label_table, inst->opr[0].u.indirect.offset.expr);
         if (value.label != NULL) {
           struct UnresolvedInfo *info = malloc_or_die(sizeof(*info));
-          info->kind = (inst->opr[0].indirect.offset.flag & LF_GOTTPOFF) ? UNRES_X64_GOTTPOFF
+          info->kind = (inst->opr[0].u.indirect.offset.flag & LF_GOTTPOFF) ? UNRES_X64_GOTTPOFF
                                                                           : UNRES_X64_GOT_LOAD;
           info->label        = value.label;
           info->src_section  = section;
@@ -120,9 +120,9 @@ x64_resolve_code_reloc(
       }
       break;
     case LEA_IR:
-      if (inst->opr[0].indirect.reg.no == RIP
-          && inst->opr[0].indirect.offset.expr->kind != EX_FIXNUM) {
-        struct Value value = calc_expr(label_table, inst->opr[0].indirect.offset.expr);
+      if (inst->opr[0].u.indirect.reg.no == RIP
+          && inst->opr[0].u.indirect.offset.expr->kind != EX_FIXNUM) {
+        struct Value value = calc_expr(label_table, inst->opr[0].u.indirect.offset.expr);
         if (value.label != NULL) {
           struct UnresolvedInfo *info = malloc_or_die(sizeof(*info));
           info->kind                  = UNRES_EXTERN_PC32;
@@ -132,11 +132,11 @@ x64_resolve_code_reloc(
           info->add                   = value.offset - 4;
           vec_push(unresolved, info);
 #if TC_TARGET_PLATFORM == TC_PLATFORM_APPLE
-          put_value(ir->code.buf + 3, value.offset, sizeof(int32_t));
+          put_value(ir->u.code.buf + 3, value.offset, sizeof(int32_t));
 #endif
         } else {
-          int64_t offset = value.offset - (address + ir->code.len);
-          put_value(ir->code.buf + 3, offset, sizeof(int32_t));
+          int64_t offset = value.offset - (address + ir->u.code.len);
+          put_value(ir->u.code.buf + 3, offset, sizeof(int32_t));
         }
       }
       break;
@@ -145,9 +145,9 @@ x64_resolve_code_reloc(
          pc-relative, so no address math here. the linker computes it
          once the tls layout is known, like ir_asm.c's unres_abs64
          registration for .quad label */
-      if (inst->opr[0].segment.offset.flag & LF_TPOFF) {
-        struct Value value = calc_expr(label_table, inst->opr[0].segment.offset.expr);
-        int          reloc_offset = ir->code.len - 4;
+      if (inst->opr[0].u.segment.offset.flag & LF_TPOFF) {
+        struct Value value = calc_expr(label_table, inst->opr[0].u.segment.offset.expr);
+        int          reloc_offset = ir->u.code.len - 4;
         struct UnresolvedInfo *info = malloc_or_die(sizeof(*info));
         info->kind         = UNRES_X64_TPOFF32;
         info->label        = value.label;
@@ -168,10 +168,10 @@ x64_resolve_code_reloc(
       /* rip-relative with a symbolic offset: disp32 is the last 4
          bytes, but unlike lea_ir these encodings may or may not have a
          rex byte, so derive the offset from the encoded length */
-      if (inst->opr[0].indirect.reg.no == RIP
-          && inst->opr[0].indirect.offset.expr->kind != EX_FIXNUM) {
-        struct Value value        = calc_expr(label_table, inst->opr[0].indirect.offset.expr);
-        int          reloc_offset = ir->code.len - 4;
+      if (inst->opr[0].u.indirect.reg.no == RIP
+          && inst->opr[0].u.indirect.offset.expr->kind != EX_FIXNUM) {
+        struct Value value        = calc_expr(label_table, inst->opr[0].u.indirect.offset.expr);
+        int          reloc_offset = ir->u.code.len - 4;
         if (value.label != NULL) {
           struct UnresolvedInfo *info = malloc_or_die(sizeof(*info));
           info->kind                  = UNRES_EXTERN_PC32;
@@ -181,8 +181,8 @@ x64_resolve_code_reloc(
           info->add                   = value.offset - 4;
           vec_push(unresolved, info);
         } else {
-          int64_t offset = value.offset - (address + ir->code.len);
-          put_value(ir->code.buf + reloc_offset, offset, sizeof(int32_t));
+          int64_t offset = value.offset - (address + ir->u.code.len);
+          put_value(ir->u.code.buf + reloc_offset, offset, sizeof(int32_t));
         }
       }
       break;
@@ -204,7 +204,7 @@ x64_resolve_code_reloc(
     case JLE:
     case JG:
       if (inst->opr[0].type == DIRECT) {
-        struct Value value = calc_expr(label_table, inst->opr[0].direct.expr);
+        struct Value value = calc_expr(label_table, inst->opr[0].u.direct.expr);
         if (value.label != NULL) {
           struct LabelInfo *label_info = table_get(label_table, value.label);
           if (label_info == NULL) {
@@ -223,26 +223,26 @@ x64_resolve_code_reloc(
           }
         }
 
-        int64_t offset      = value.offset - (address + ir->code.len);
-        int     long_offset = ir->code.flag & INST_LONG_OFFSET;
+        int64_t offset      = value.offset - (address + ir->u.code.len);
+        int     long_offset = ir->u.code.flag & INST_LONG_OFFSET;
         if (!long_offset) {
           if (!is_im8(offset)) {
             *size_upgraded |= make_jmp_long(ir);
           } else {
-            put_value(ir->code.buf + 1, offset, sizeof(int8_t));
+            put_value(ir->u.code.buf + 1, offset, sizeof(int8_t));
           }
         } else {
           if (!is_im32(offset))
             error("jump offset too far (over 32bit)");
 
           int d = inst->op == JMP_D ? 1 : 2;
-          put_value(ir->code.buf + d, offset, sizeof(int32_t));
+          put_value(ir->u.code.buf + d, offset, sizeof(int32_t));
         }
       }
       break;
     case CALL_D:
       if (inst->opr[0].type == DIRECT) {
-        struct Value value = calc_expr(label_table, inst->opr[0].direct.expr);
+        struct Value value = calc_expr(label_table, inst->opr[0].u.direct.expr);
         if (value.label != NULL) {
           struct UnresolvedInfo *info = malloc_or_die(sizeof(*info));
           info->kind                  = UNRES_CALL;
@@ -253,8 +253,8 @@ x64_resolve_code_reloc(
           vec_push(unresolved, info);
           break;
         }
-        int64_t offset = value.offset - (address + ir->code.len);
-        put_value(ir->code.buf + 1, offset, sizeof(int32_t));
+        int64_t offset = value.offset - (address + ir->u.code.len);
+        put_value(ir->u.code.buf + 1, offset, sizeof(int32_t));
       }
       break;
     default:

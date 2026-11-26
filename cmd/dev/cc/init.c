@@ -43,7 +43,7 @@ initadd(struct initparser *p, struct init *new)
   struct init **init, *old;
 
   init = p->last;
-  for (; old = *init; init = &old->next) {
+  for (; (old = *init); init = &old->next) {
     if (old->end * 8 - old->bits.after <= new->start * 8 + new->bits.before)
       continue;
     /* no overlap, insert before `old` */
@@ -202,6 +202,8 @@ advance(struct initparser *p)
           subobj(p, p->sub->u.mem->type, p->sub->u.mem->offset);
           return;
         }
+        break;
+      default:
         break;
     }
     if (p->sub == p->cur)

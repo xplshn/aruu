@@ -63,7 +63,7 @@ static int            pairs = 1;
 static size_t         seplen;
 static struct outlist output;
 
-static void
+static void __attribute__((noreturn))
 usage(void)
 {
   eprintf(

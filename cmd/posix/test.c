@@ -297,7 +297,7 @@ static struct test unary[] = {
     {"-x", {.u = unary_x}},
     {"-z", {.u = unary_z}},
 
-    {NULL},
+    {NULL, {0}},
 };
 
 static struct test binary[] = {
@@ -313,7 +313,7 @@ static struct test binary[] = {
     {"-ot", {.b = binary_ot}},
     {"-nt", {.b = binary_nt}},
 
-    {NULL},
+    {NULL, {0}},
 };
 
 static struct test *

@@ -5,8 +5,6 @@
 void
 ld_aarch64_reloc_apply(struct ld_reloc *r)
 {
-  unsigned long addr;
-
   switch (r->type) {
     case R_AARCH64_NONE:
       break;

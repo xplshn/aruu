@@ -635,13 +635,13 @@ again:
         t = framenext(f);
         assert(t);
         i = macroparam(m, t);
-        assert(i != -1);
+        assert(i != (size_t)-1);
         f = ctxpush(&m->arg[i].str, 1, NULL, space);
         break;
       default:
         if (f->token->kind >= TPPIDENT) {
           i = macroparam(m, f->token);
-          if (i == -1)
+          if (i == (size_t)-1)
             break;
           framenext(f);
           if (m->arg[i].ntoken == 0)
@@ -712,12 +712,12 @@ define(void)
       );
     if (m->kind != MACROFUNC)
       continue;
-    if (i != -1)
+    if (i != (size_t)-1)
       m->param[i].flags |= PARAMTOK;
     i = macroparam(m, t);
     if (prev == THASH) {
       tokencheck(t, TPPIDENT, "after '#' operator");
-      if (i == -1)
+      if (i == (size_t)-1)
         error(&t->loc, "'%s' is not a macro parameter name", t->lit);
       m->param[i].flags |= PARAMSTR;
       i = -1;
@@ -1165,7 +1165,7 @@ expandfunc(struct macro *m)
         /* adjust current macro depth, in case it got
  * shallower */
         depth = macrodepth;
-        if (paren == 0 && (t->kind == TRPAREN || t->kind == TCOMMA && !(p->flags & PARAMVAR)))
+        if (paren == 0 && (t->kind == TRPAREN || (t->kind == TCOMMA && !(p->flags & PARAMVAR))))
           break;
         switch (t->kind) {
           case TLPAREN:
@@ -1173,6 +1173,8 @@ expandfunc(struct macro *m)
             break;
           case TRPAREN:
             --paren;
+            break;
+          default:
             break;
         }
         if (p->flags & PARAMSTR)
@@ -1213,7 +1215,7 @@ next(void)
 
   do
     t = rawnext();
-  while (expand(t) || t->kind == TNEWLINE && !(ppflags & PPNEWLINE));
+  while (expand(t) || (t->kind == TNEWLINE && !(ppflags & PPNEWLINE)));
   tok = *t;
 
   /* keyword aliases */
@@ -1251,6 +1253,8 @@ next(void)
       break;
     case ALIAS__ASM:
       tok.kind = T__ASM__;
+      break;
+    default:
       break;
   }
 }

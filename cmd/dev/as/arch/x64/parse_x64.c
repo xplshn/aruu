@@ -771,7 +771,7 @@ parse_direct_register(struct ParseInfo *info, struct Operand *operand)
     enum RegXmmType regxmm = find_xmm_register(&info->p);
     if (regxmm != NOREGXMM) {
       operand->type   = REG_XMM;
-      operand->regxmm = regxmm;
+      operand->u.regxmm = regxmm;
       return XMM;
     }
   }
@@ -789,9 +789,9 @@ parse_direct_register(struct ParseInfo *info, struct Operand *operand)
       }
     }
     operand->type                = SEGMENT_OFFSET;
-    operand->segment.reg         = reg;
-    operand->segment.offset.expr = offset;
-    operand->segment.offset.flag = flag;
+    operand->u.segment.reg         = reg;
+    operand->u.segment.offset.expr = offset;
+    operand->u.segment.offset.flag = flag;
     return SEG;
   }
 
@@ -815,9 +815,9 @@ parse_direct_register(struct ParseInfo *info, struct Operand *operand)
   }
 
   operand->type     = REG;
-  operand->reg.size = size;
-  operand->reg.no   = no & 7;
-  operand->reg.x    = no >> 3;
+  operand->u.reg.size = size;
+  operand->u.reg.no   = no & 7;
+  operand->u.reg.x    = no >> 3;
   return (R8 << (size - REG8)) | (reg == CL ? R8CL : 0);
 }
 
@@ -897,26 +897,26 @@ parse_indirect_register(
   if (index_reg == NOREG) {
     char no                    = base_reg - RAX;
     operand->type              = INDIRECT;
-    operand->indirect.reg.size = REG64;
-    operand->indirect.reg.no   = base_reg != RIP ? no & 7 : RIP;
-    operand->indirect.reg.x    = (no & 8) >> 3;
-    operand->indirect.offset   = *offset;
+    operand->u.indirect.reg.size = REG64;
+    operand->u.indirect.reg.no   = base_reg != RIP ? no & 7 : RIP;
+    operand->u.indirect.reg.x    = (no & 8) >> 3;
+    operand->u.indirect.offset   = *offset;
     return IND;
   } else {
     if (!is_reg64(index_reg))
       parse_error(info, "register expected");
 
     operand->type                               = INDIRECT_WITH_INDEX;
-    operand->indirect_with_index.offset         = offset->expr;
-    operand->indirect_with_index.scale          = scale;
+    operand->u.indirect_with_index.offset         = offset->expr;
+    operand->u.indirect_with_index.scale          = scale;
     char base_no                                = base_reg - RAX;
-    operand->indirect_with_index.base_reg.size  = REG64;
-    operand->indirect_with_index.base_reg.no    = base_no & 7;
-    operand->indirect_with_index.base_reg.x     = (base_no & 8) >> 3;
+    operand->u.indirect_with_index.base_reg.size  = REG64;
+    operand->u.indirect_with_index.base_reg.no    = base_no & 7;
+    operand->u.indirect_with_index.base_reg.x     = (base_no & 8) >> 3;
     char index_no                               = index_reg - RAX;
-    operand->indirect_with_index.index_reg.size = REG64;
-    operand->indirect_with_index.index_reg.no   = index_no & 7;
-    operand->indirect_with_index.index_reg.x    = (index_no & 8) >> 3;
+    operand->u.indirect_with_index.index_reg.size = REG64;
+    operand->u.indirect_with_index.index_reg.no   = index_no & 7;
+    operand->u.indirect_with_index.index_reg.x    = (index_no & 8) >> 3;
     return IIND;
   }
 }
@@ -930,9 +930,9 @@ parse_deref_register(struct ParseInfo *info, struct Operand *operand)
 
   char no           = reg - RAX;
   operand->type     = DEREF_REG;
-  operand->reg.size = REG64;
-  operand->reg.no   = no & 7;
-  operand->reg.x    = (no & 8) >> 3;
+  operand->u.reg.size = REG64;
+  operand->u.reg.no   = no & 7;
+  operand->u.reg.x    = (no & 8) >> 3;
   return 1;
 }
 
@@ -980,26 +980,26 @@ parse_deref_indirect(struct ParseInfo *info, struct Operand *operand)
 
   if (index_reg == NOREG) {
     operand->type                 = DEREF_INDIRECT;
-    operand->indirect.offset.expr = offset;
-    operand->indirect.offset.flag = 0;
+    operand->u.indirect.offset.expr = offset;
+    operand->u.indirect.offset.flag = 0;
     char reg_no                   = base_reg - RAX;
-    operand->indirect.reg.size    = REG64;
-    operand->indirect.reg.no      = reg_no & 7;
-    operand->indirect.reg.x       = (reg_no & 8) >> 3;
+    operand->u.indirect.reg.size    = REG64;
+    operand->u.indirect.reg.no      = reg_no & 7;
+    operand->u.indirect.reg.x       = (reg_no & 8) >> 3;
     return DEI;
   } else {
     operand->type                               = DEREF_INDIRECT_WITH_INDEX;
-    operand->indirect_with_index.offset         = offset;
-    operand->indirect_with_index.scale          = scale;
+    operand->u.indirect_with_index.offset         = offset;
+    operand->u.indirect_with_index.scale          = scale;
     char base_no                                = base_reg - RAX;
-    operand->indirect_with_index.base_reg.size  = REG64;
-    operand->indirect_with_index.base_reg.no    = base_no & 7;
-    operand->indirect_with_index.base_reg.x     = (base_no & 8) >> 3;
-    operand->indirect_with_index.index_reg.size = REG64;
+    operand->u.indirect_with_index.base_reg.size  = REG64;
+    operand->u.indirect_with_index.base_reg.no    = base_no & 7;
+    operand->u.indirect_with_index.base_reg.x     = (base_no & 8) >> 3;
+    operand->u.indirect_with_index.index_reg.size = REG64;
     char index_no                               = index_reg - RAX;
-    operand->indirect_with_index.index_reg.size = REG64;
-    operand->indirect_with_index.index_reg.no   = index_no & 7;
-    operand->indirect_with_index.index_reg.x    = (index_no & 8) >> 3;
+    operand->u.indirect_with_index.index_reg.size = REG64;
+    operand->u.indirect_with_index.index_reg.no   = index_no & 7;
+    operand->u.indirect_with_index.index_reg.x    = (index_no & 8) >> 3;
     return DEII;
   }
 }
@@ -1034,7 +1034,7 @@ parse_operand(struct ParseInfo *info, unsigned int opr_flag, struct Operand *ope
   if (opr_flag & IMM) {
     if (*p == '$') {
       info->p = p + 1;
-      if (!immediate(&info->p, &operand->immediate))
+      if (!immediate(&info->p, &operand->u.immediate))
         parse_error(info, "syntax error");
       operand->type = IMMEDIATE;
       return IMM;
@@ -1064,7 +1064,7 @@ parse_operand(struct ParseInfo *info, unsigned int opr_flag, struct Operand *ope
       if (expr_with_flag.expr->kind == EX_LABEL || expr_with_flag.expr->kind == EX_FIXNUM
           || expr_with_flag.expr->kind == EX_ADD || expr_with_flag.expr->kind == EX_SUB) {
         operand->type        = DIRECT;
-        operand->direct.expr = expr_with_flag.expr;
+        operand->u.direct.expr = expr_with_flag.expr;
         return EXP;
       }
       parse_error(info, "direct number not implemented");
@@ -1075,7 +1075,7 @@ parse_operand(struct ParseInfo *info, unsigned int opr_flag, struct Operand *ope
       if (expr_with_flag.expr == NULL) {
         struct Expr *expr   = calloc_or_die(sizeof(*expr));
         expr->kind          = EX_FIXNUM;
-        expr->fixnum        = 0;
+        expr->u.fixnum        = 0;
         expr_with_flag.expr = expr;
       }
       return parse_indirect_register(info, &expr_with_flag, operand);
@@ -1307,9 +1307,9 @@ const struct ParseInstTable kParseInstTable[] = {
              &(struct ParseOpArray){TEST, {R32, R32}},
              &(struct ParseOpArray){TEST, {R64, R64}},
          }},
-    [R_CWTL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CWTL}}},
-    [R_CLTD] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLTD}}},
-    [R_CQTO] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CQTO}}},
+    [R_CWTL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CWTL, {0}}}},
+    [R_CLTD] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLTD, {0}}}},
+    [R_CQTO] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CQTO, {0}}}},
     [R_BSR] =
         {3,
          (const struct ParseOpArray *[]){
@@ -1388,7 +1388,7 @@ const struct ParseInstTable kParseInstTable[] = {
              &(struct ParseOpArray){CALL_D, {EXP}},
              &(struct ParseOpArray){CALL_DER, {DER}},
          }},
-    [R_RET] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){RET}}},
+    [R_RET] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){RET, {0}}}},
     [R_PUSH] =
         {2,
          (const struct ParseOpArray *[]){
@@ -1397,7 +1397,7 @@ const struct ParseInstTable kParseInstTable[] = {
          }},
     [R_POP]     = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){POP, {R64}}}},
     [R_INT]     = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){INT, {IMM}}}},
-    [R_SYSCALL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SYSCALL}}},
+    [R_SYSCALL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SYSCALL, {0}}}},
 
     [R_MOVSD] =
         {3,
@@ -1528,32 +1528,32 @@ const struct ParseInstTable kParseInstTable[] = {
     [R_ENDBR64] =
         {1,
          (const struct ParseOpArray *[]){
-             &(struct ParseOpArray){ENDBR64},
+             &(struct ParseOpArray){ENDBR64, {0}},
          }},
 
     /* no-operand instructions */
-    [R_NOP]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){NOP}}},
-    [R_PUSHFQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){PUSHFQ}}},
-    [R_POPFQ]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){POPFQ}}},
-    [R_PUSHF]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){PUSHF}}},
-    [R_POPF]   = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){POPF}}},
-    [R_CPUID]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CPUID}}},
-    [R_RDTSC]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){RDTSC}}},
-    [R_UD2]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){UD2}}},
-    [R_PAUSE]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){PAUSE}}},
-    [R_HLT]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){HLT}}},
-    [R_CMC]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMC}}},
-    [R_CLC]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLC}}},
-    [R_STC]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STC}}},
-    [R_CLI]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLI}}},
-    [R_STI]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STI}}},
-    [R_CLD]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLD}}},
-    [R_STD]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STD}}},
-    [R_CLTS]   = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLTS}}},
-    [R_WBINVD] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){WBINVD}}},
-    [R_MFENCE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MFENCE}}},
-    [R_LFENCE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LFENCE}}},
-    [R_SFENCE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SFENCE}}},
+    [R_NOP]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){NOP, {0}}}},
+    [R_PUSHFQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){PUSHFQ, {0}}}},
+    [R_POPFQ]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){POPFQ, {0}}}},
+    [R_PUSHF]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){PUSHF, {0}}}},
+    [R_POPF]   = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){POPF, {0}}}},
+    [R_CPUID]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CPUID, {0}}}},
+    [R_RDTSC]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){RDTSC, {0}}}},
+    [R_UD2]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){UD2, {0}}}},
+    [R_PAUSE]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){PAUSE, {0}}}},
+    [R_HLT]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){HLT, {0}}}},
+    [R_CMC]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMC, {0}}}},
+    [R_CLC]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLC, {0}}}},
+    [R_STC]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STC, {0}}}},
+    [R_CLI]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLI, {0}}}},
+    [R_STI]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STI, {0}}}},
+    [R_CLD]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLD, {0}}}},
+    [R_STD]    = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STD, {0}}}},
+    [R_CLTS]   = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CLTS, {0}}}},
+    [R_WBINVD] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){WBINVD, {0}}}},
+    [R_MFENCE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MFENCE, {0}}}},
+    [R_LFENCE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LFENCE, {0}}}},
+    [R_SFENCE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SFENCE, {0}}}},
 
     /* register instructions */
     [R_IMUL] =
@@ -1594,7 +1594,7 @@ const struct ParseInstTable kParseInstTable[] = {
              &(struct ParseOpArray){CMPXCHG_RR, {R64, R64}},
              &(struct ParseOpArray){CMPXCHG_RI, {R32 | R64, IND}},
          }},
-    [R_LEAVE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LEAVE}}},
+    [R_LEAVE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LEAVE, {0}}}},
     [R_ENTER] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){ENTER, {IMM, IMM}}}},
     [R_XCHG] =
         {5,
@@ -1755,31 +1755,31 @@ const struct ParseInstTable kParseInstTable[] = {
          }},
 
     /* string operations */
-    [R_MOVSB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MOVSB}}},
-    [R_MOVSW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MOVSW}}},
-    [R_MOVSL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MOVSL}}},
-    [R_MOVSQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MOVSQ}}},
-    [R_STOSB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STOSB}}},
-    [R_STOSW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STOSW}}},
-    [R_STOSL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STOSL}}},
-    [R_STOSQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STOSQ}}},
-    [R_LODSB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LODSB}}},
-    [R_LODSW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LODSW}}},
-    [R_LODSL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LODSL}}},
-    [R_LODSQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LODSQ}}},
-    [R_SCASB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SCASB}}},
-    [R_SCASW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SCASW}}},
-    [R_SCASL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SCASL}}},
-    [R_SCASQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SCASQ}}},
-    [R_CMPSB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMPSB}}},
-    [R_CMPSW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMPSW}}},
-    [R_CMPSL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMPSL}}},
-    [R_CMPSQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMPSQ}}},
+    [R_MOVSB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MOVSB, {0}}}},
+    [R_MOVSW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MOVSW, {0}}}},
+    [R_MOVSL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MOVSL, {0}}}},
+    [R_MOVSQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){MOVSQ, {0}}}},
+    [R_STOSB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STOSB, {0}}}},
+    [R_STOSW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STOSW, {0}}}},
+    [R_STOSL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STOSL, {0}}}},
+    [R_STOSQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){STOSQ, {0}}}},
+    [R_LODSB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LODSB, {0}}}},
+    [R_LODSW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LODSW, {0}}}},
+    [R_LODSL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LODSL, {0}}}},
+    [R_LODSQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){LODSQ, {0}}}},
+    [R_SCASB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SCASB, {0}}}},
+    [R_SCASW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SCASW, {0}}}},
+    [R_SCASL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SCASL, {0}}}},
+    [R_SCASQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){SCASQ, {0}}}},
+    [R_CMPSB] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMPSB, {0}}}},
+    [R_CMPSW] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMPSW, {0}}}},
+    [R_CMPSL] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMPSL, {0}}}},
+    [R_CMPSQ] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CMPSQ, {0}}}},
 
     /* gas conversion aliases */
-    [R_CBW]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CBW}}},
-    [R_CDQE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CDQE}}},
-    [R_CWD]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CWD}}},
+    [R_CBW]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CBW, {0}}}},
+    [R_CDQE] = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CDQE, {0}}}},
+    [R_CWD]  = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){CWD, {0}}}},
 
     /* condition code aliases */
     [R_JC]   = {1, (const struct ParseOpArray *[]){&(struct ParseOpArray){JB, {EXP}}}},

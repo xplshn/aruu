@@ -101,6 +101,8 @@ parseattr(struct attr *a, enum attrkind allowed, enum attrprefix prefix)
         case TRPAREN:
           --paren;
           break;
+        default:
+          break;
       }
     }
   }

@@ -6,6 +6,9 @@
 #define noreturn [[noreturn]]
 #elif __STDC_VERSION__ >= 201112L
 #define noreturn _Noreturn
+/* C99 has no word for it: the compilers that build us have their own */
+#elif defined(__GNUC__)
+#define noreturn __attribute__((noreturn))
 #else
 #define noreturn
 #endif

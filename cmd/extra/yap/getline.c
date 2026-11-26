@@ -38,7 +38,7 @@ static char         *re_alloc(char *ptr, unsigned newsize);
 static struct block *getblock(long n, int disable_interrupt);
 
 static struct block *
-new_block()
+new_block(void)
 {
   struct block *pblock = maxblocklist - 1;
 
@@ -153,7 +153,7 @@ getline(long n, int disable_interrupt)
  */
 
 long
-to_lastline()
+to_lastline(void)
 {
   for (;;) {
     if (!getline(lastreadline + 1, 0)) {
@@ -352,7 +352,7 @@ nextblock(struct block *pblock)
  */
 
 void
-do_clean()
+do_clean(void)
 {
   struct block *pblock;
   char         *p;
@@ -382,7 +382,7 @@ do_clean()
  */
 
 int
-getch()
+getch(void)
 {
   int         flags, bytes_ready, bytes_read;
   struct stat buf;

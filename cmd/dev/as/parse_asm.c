@@ -349,7 +349,7 @@ struct Token {
 #ifndef __NO_FLONUM
     Flonum flonum;
 #endif
-  };
+  } u;
 };
 
 static struct Token *
@@ -375,7 +375,7 @@ read_flonum(struct ParseInfo *info, int base)
   Flonum val = strtold(start, &next);
 #endif
   struct Token *tok = new_token(TK_FLONUM);
-  tok->flonum       = val;
+  tok->u.flonum       = val;
   info->p           = next;
 
   if (base == 16) {
@@ -434,7 +434,7 @@ fetch_token(struct ParseInfo *info)
       }
 #endif
       struct Token *token = new_token(TK_FIXNUM);
-      token->fixnum       = v;
+      token->u.fixnum       = v;
       info->p             = q;
       return token;
     }
@@ -443,7 +443,7 @@ fetch_token(struct ParseInfo *info)
       const struct Name *label = parse_label(info);
       if (label != NULL) {
         struct Token *token = new_token(TK_LABEL);
-        token->label.name   = label;
+        token->u.label.name   = label;
         return token;
       }
     } break;
@@ -488,7 +488,7 @@ fetch_token(struct ParseInfo *info)
     while (c = *++p, is_label_chr(c))
       ;
     struct Token *token = new_token(TK_LABEL);
-    token->label.name   = alloc_name(label, p, 0);
+    token->u.label.name   = alloc_name(label, p, 0);
     info->p             = p;
     return token;
   }
@@ -527,14 +527,14 @@ prim(struct ParseInfo *info)
   const struct Token *tok;
   if ((tok = match(info, TK_LABEL)) != NULL) {
     expr             = new_expr(EX_LABEL);
-    expr->label.name = tok->label.name;
+    expr->u.label.name = tok->u.label.name;
   } else if ((tok = match(info, TK_FIXNUM)) != NULL) {
     expr         = new_expr(EX_FIXNUM);
-    expr->fixnum = tok->fixnum;
+    expr->u.fixnum = tok->u.fixnum;
 #ifndef __NO_FLONUM
   } else if ((tok = match(info, TK_FLONUM)) != NULL) {
     expr         = new_expr(EX_FLONUM);
-    expr->flonum = tok->flonum;
+    expr->u.flonum = tok->u.flonum;
 #endif
   }
   return expr;
@@ -554,7 +554,7 @@ unary(struct ParseInfo *info)
         return expr;
       default: {
         struct Expr *op = new_expr(EX_POS);
-        op->unary.sub   = expr;
+        op->u.unary.sub   = expr;
         return op;
       }
     }
@@ -566,16 +566,16 @@ unary(struct ParseInfo *info)
       return NULL;
     switch (expr->kind) {
       case EX_FIXNUM:
-        expr->fixnum = -expr->fixnum;
+        expr->u.fixnum = -expr->u.fixnum;
         return expr;
 #ifndef __NO_FLONUM
       case EX_FLONUM:
-        expr->flonum = -expr->flonum;
+        expr->u.flonum = -expr->u.flonum;
         return expr;
 #endif
       default: {
         struct Expr *op = new_expr(EX_NEG);
-        op->unary.sub   = expr;
+        op->u.unary.sub   = expr;
         return op;
       }
     }
@@ -603,10 +603,10 @@ parse_mul(struct ParseInfo *info)
     if (lhs->kind == EX_FIXNUM && rhs->kind == EX_FIXNUM) {
       switch (tok->kind) {
         case TK_MUL:
-          lhs->fixnum *= rhs->fixnum;
+          lhs->u.fixnum *= rhs->u.fixnum;
           break;
         case TK_DIV:
-          lhs->fixnum /= rhs->fixnum;
+          lhs->u.fixnum /= rhs->u.fixnum;
           break;
         default:
           assert(0);
@@ -615,8 +615,8 @@ parse_mul(struct ParseInfo *info)
     } else {
       expr = new_expr((enum ExprKind)(tok->kind + (EX_MUL - TK_MUL))); /* assume exprkind is same
  * order with tokenkind */
-      expr->bop.lhs = lhs;
-      expr->bop.rhs = rhs;
+      expr->u.bop.lhs = lhs;
+      expr->u.bop.rhs = rhs;
     }
   }
   return expr;
@@ -641,10 +641,10 @@ parse_add(struct ParseInfo *info)
     if (lhs->kind == EX_FIXNUM && rhs->kind == EX_FIXNUM) {
       switch (tok->kind) {
         case TK_ADD:
-          lhs->fixnum += rhs->fixnum;
+          lhs->u.fixnum += rhs->u.fixnum;
           break;
         case TK_SUB:
-          lhs->fixnum -= rhs->fixnum;
+          lhs->u.fixnum -= rhs->u.fixnum;
           break;
         default:
           assert(0);
@@ -653,8 +653,8 @@ parse_add(struct ParseInfo *info)
     } else {
       /* assume exprkind is same order with tokenkind */
       expr          = new_expr((enum ExprKind)(tok->kind + (EX_ADD - TK_ADD)));
-      expr->bop.lhs = lhs;
-      expr->bop.rhs = rhs;
+      expr->u.bop.lhs = lhs;
+      expr->u.bop.rhs = rhs;
     }
   }
   return expr;
@@ -1080,7 +1080,7 @@ dir_bytes(struct ParseInfo *info, enum DirectiveType dir)
   assert(expr->kind != EX_FLONUM);
   if (expr->kind == EX_FIXNUM) {
     /* TODO: target endian */
-    long           value = expr->fixnum;
+    long           value = expr->u.fixnum;
     int            size  = 1 << (dir - DT_BYTE);
     unsigned char *buf   = malloc_or_die(size);
     for (int i = 0; i < size; ++i)
@@ -1119,10 +1119,10 @@ dir_float(struct ParseInfo *info, enum DirectiveType dir)
   Flonum value;
   switch (expr->kind) {
     case EX_FIXNUM:
-      value = expr->fixnum;
+      value = expr->u.fixnum;
       break;
     case EX_FLONUM:
-      value = expr->flonum;
+      value = expr->u.flonum;
       break;
     default:
       assert(0);
@@ -1497,15 +1497,15 @@ calc_expr(struct Table *label_table, const struct Expr *expr)
   assert(expr != NULL);
   switch (expr->kind) {
     case EX_LABEL:
-      return (struct Value){.label = expr->label.name, .offset = 0};
+      return (struct Value){.label = expr->u.label.name, .offset = 0};
     case EX_FIXNUM:
-      return (struct Value){.label = NULL, .offset = expr->fixnum};
+      return (struct Value){.label = NULL, .offset = expr->u.fixnum};
     case EX_ADD:
     case EX_SUB:
     case EX_MUL:
     case EX_DIV: {
-      struct Value lhs = calc_expr(label_table, expr->bop.lhs);
-      struct Value rhs = calc_expr(label_table, expr->bop.rhs);
+      struct Value lhs = calc_expr(label_table, expr->u.bop.lhs);
+      struct Value rhs = calc_expr(label_table, expr->u.bop.rhs);
       if (rhs.label != NULL) {
         if (expr->kind == EX_SUB && lhs.label != NULL) {
           struct LabelInfo *llabel, *rlabel;
@@ -1553,7 +1553,7 @@ calc_expr(struct Table *label_table, const struct Expr *expr)
 
     case EX_POS:
     case EX_NEG: {
-      struct Value value = calc_expr(label_table, expr->unary.sub);
+      struct Value value = calc_expr(label_table, expr->u.unary.sub);
       if (value.label != NULL) {
         error("Illegal expression");
       }

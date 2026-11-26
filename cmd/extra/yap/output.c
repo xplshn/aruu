@@ -16,7 +16,7 @@ char *_optr;
 static char _outbuf[OBUFSIZ];
 
 void
-flush()
+flush(void)
 { /* flush output buffer, by writing it */
   char *p = _outbuf;
 
@@ -27,7 +27,7 @@ flush()
 }
 
 void
-nflush()
+nflush(void)
 { /* flush output buffer, ignoring it */
 
   _ocnt = OBUFSIZ;

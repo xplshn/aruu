@@ -9,7 +9,7 @@
 
 #include "util.h"
 
-static void
+static void __attribute__((noreturn))
 usage(void)
 {
   eprintf("usage: %s [n|y]\n", argv0);
