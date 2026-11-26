@@ -302,6 +302,10 @@ plan_mkfs_argv(const struct plan *p, int slot, char **argv, int max, char *store
     rc |= put(argv, &n, max, store, store_n, &used, "make_ext4fs");
     rc |= put(argv, &n, max, store, store_n, &used, "-l");
     rc |= put(argv, &n, max, store, store_n, &used, size);
+    /* its own UUID: the one make_ext4fs derives from the label is the same
+     * for two filesystems of one label, and fstab names them by it */
+    rc |= put(argv, &n, max, store, store_n, &used, "-U");
+    rc |= put(argv, &n, max, store, store_n, &used, "random");
     if (a->label[0]) {
       rc |= put(argv, &n, max, store, store_n, &used, "-L");
       rc |= put(argv, &n, max, store, store_n, &used, a->label);
