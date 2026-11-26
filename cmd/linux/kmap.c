@@ -363,8 +363,8 @@ nth(char *buf, size_t sz, const char *list, int n)
 // ?man kmap loads a kmap layout (see kmap.h: portable text, every layout
 // ?man alpine ships) into the console's keyboard: every console takes it.
 // ?man with no layout it loads what /etc/kmap names ("layout variant").
-// ?man -x writes the layouts as one xkb keymap instead, a group each, for
-// ?man wayland compositors and x: what wlde's keyboard is made from
+// ?man with -x it writes the layouts as one xkb keymap instead, a group
+// ?man each, for wayland compositors and x: what wlde's keyboard is made from
 int
 main(int argc, char *argv[])
 {

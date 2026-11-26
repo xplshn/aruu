@@ -3,8 +3,8 @@
 // ?man arguments: -G [-n] [-c comment] -p pubkey -s seckey | -S -s seckey -m message [-x sigfile] | -V [-q] -p pubkey -m message [-x sigfile]
 // ?man signify signs a file with an ed25519 key and checks such a signature,
 // ?man in the files openbsd's signify reads and writes. a secret key is kept
-// ?man without a passphrase. the signature of message is message.sig unless
-// ?man -x says otherwise
+// ?man without a passphrase. the signature of message is message.sig
+// ?man unless another file is named
 #include "arg.h"
 #include "signify.h"
 #include "util.h"
