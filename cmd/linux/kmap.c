@@ -253,7 +253,8 @@ load(const struct kmap *k)
   // the accent table: what each dead key of this layout makes, as many as
   // the kernel holds
   memset(&acc, 0, sizeof(acc));
-  for (j = 0; j < k->ncompose && acc.cnt < LEN(acc.d); j++) {
+  // the kernel takes one fewer than its table holds
+  for (j = 0; j < k->ncompose && acc.cnt < LEN(acc.d) - 1; j++) {
     const struct kmap_compose *cp = &k->compose[j];
     long base = char_of(cp->base), res = char_of(cp->result);
     int d = dead_of(cp->dead), used = 0;
