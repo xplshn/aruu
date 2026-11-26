@@ -19,6 +19,10 @@ enum NetInterfaceFlag {
   NET_IF_PROMISC     = 0x00000080,
   NET_IF_ALLMULTI    = 0x00000100,
   NET_IF_MULTICAST   = 0x00000200,
+  // no device behind it (a bridge, a tunnel); unknown is not virtual
+  NET_IF_VIRTUAL     = 0x00000400,
+  // a radio; unknown is not wireless
+  NET_IF_WIRELESS    = 0x00000800,
 };
 
 struct NetStats {

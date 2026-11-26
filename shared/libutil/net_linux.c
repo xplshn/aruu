@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <ifaddrs.h>
+#include <limits.h>
 #include <linux/if_tun.h>
 #include <net/if.h>
 #include <net/route.h>
@@ -49,6 +50,22 @@ interface_flags_to_linux(unsigned int flags)
   if (flags & NET_IF_MULTICAST)
     linux_flags |= IFF_MULTICAST;
   return linux_flags;
+}
+
+// what sysfs says the interface is: no device behind it, or a radio
+static unsigned int
+interface_kind(const char *name)
+{
+  char         path[PATH_MAX];
+  unsigned int flags = 0;
+
+  snprintf(path, sizeof(path), "%s/%s/device", ARUU_LINUX_PATH_SYS_CLASS_NET, name);
+  if (access(path, F_OK) != 0)
+    flags |= NET_IF_VIRTUAL;
+  snprintf(path, sizeof(path), "%s/%s/wireless", ARUU_LINUX_PATH_SYS_CLASS_NET, name);
+  if (access(path, F_OK) == 0)
+    flags |= NET_IF_WIRELESS;
+  return flags;
 }
 
 static unsigned int
@@ -129,7 +146,7 @@ net_get_interfaces(struct NetInterface **ifaces, int *count)
       iface = &list[found_count];
       memset(iface, 0, sizeof(*iface));
       strlcpy(iface->name, ifa->ifa_name, sizeof(iface->name));
-      iface->flags = interface_flags_from_linux(ifa->ifa_flags);
+      iface->flags = interface_flags_from_linux(ifa->ifa_flags) | interface_kind(iface->name);
       get_mtu_metric(iface->name, &iface->mtu, &iface->metric);
       found_count++;
     }

@@ -55,6 +55,10 @@ print_link_iface(const struct NetInterface *iface)
     printf("POINTOPOINT ");
   if (iface->flags & NET_IF_RUNNING)
     printf("RUNNING ");
+  if (iface->flags & NET_IF_VIRTUAL)
+    printf("VIRTUAL ");
+  if (iface->flags & NET_IF_WIRELESS)
+    printf("WIRELESS ");
   printf("\n");
   if (iface->has_mac) {
     printf(
