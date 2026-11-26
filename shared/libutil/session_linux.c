@@ -129,7 +129,7 @@ session_lastlog(FILE *fp, uid_t uid, struct SessionEntry *e)
   memset(e, 0, sizeof(*e));
   memcpy(e->line, ll.ll_line, MIN(sizeof(e->line) - 1, sizeof(ll.ll_line)));
   memcpy(e->host, ll.ll_host, MIN(sizeof(e->host) - 1, sizeof(ll.ll_host)));
-  /* on glibc ll_time can be an int32_t with compat32 */
+  /* some libcs make ll_time an int32_t with compat32 */
   e->time = ll.ll_time;
   return 0;
 }

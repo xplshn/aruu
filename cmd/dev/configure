@@ -8,7 +8,7 @@
 #
 # crt and runtime files are discovered, not assumed from the libc:
 # crt1 crti crtn exist everywhere, crtbegin crtend libgcc only with a
-# gcc runtime, so the same script works on musl and glibc
+# gcc runtime, so the same script works on musl and other libcs
 
 set -u
 
@@ -123,7 +123,7 @@ if [ -z "$crtdir" ]; then
 fi
 printf 'libc directory: %s\n' "$crtdir"
 
-# find the gcc runtime directory: glibc systems have one, musl does not,
+# find the gcc runtime directory: systems built with gcc have one, musl does not,
 # and crtbeginT.o is what marks it as usable
 if [ -n "$root" ] && [ -n "$gcclibdir" ]; then
 	if [ "$root" != / ]; then

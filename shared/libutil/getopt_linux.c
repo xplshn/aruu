@@ -3,7 +3,7 @@
 
 #include <unistd.h>
 
-/* glibc and musl both start over when optind is 0 */
+/* the Linux libcs, musl among them, start over when optind is 0 */
 #if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
 void
 getopt_reset(void)

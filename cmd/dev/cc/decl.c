@@ -748,7 +748,7 @@ declaratortypes(
       }
       /*
  * the aligned attribute is used in the definition of
- * max_align_t from gcc/clang (used with glibc),
+ * max_align_t from gcc/clang (used by other Linux libcs),
  * dragonflybsd, freebsd, and openbsd
  */
       allowedattr = align ? ATTRALIGNED : 0;

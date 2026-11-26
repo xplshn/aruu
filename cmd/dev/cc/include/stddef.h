@@ -26,7 +26,7 @@ void *alloca(size_t size);
 
 #endif
 
-/* older glibc require a wint_t from <stddef.h> (when requested
+/* some older libcs require a wint_t from <stddef.h> (when requested
  * by __need_wint_t, as otherwise stddef.h isnt allowed to
  * define this type). note that this must be outside the normal
  * _STDDEF_H guard, so that it works even when we've included the file
