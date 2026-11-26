@@ -1,0 +1,56 @@
+kmap 1
+id lv-ergonomic
+layout lv
+variant ergonomic
+name Latvian (ergonomic, ŪGJRMV)
+level3 ralt
+key TLDE ` ~ ´ ~
+key AE01 1 ! ¹ ¡
+key AE02 2 @ ģ Ģ
+key AE03 3 '#' ³ £
+key AE04 4 $ € ¢
+key AE05 5 % ½ ⅜
+key AE06 6 ^ ¾ ⅝
+key AE07 7 & { ⅞
+key AE08 8 * [ ™
+key AE09 9 ( ] ±
+key AE10 0 ) } °
+key AE11 - _ – —
+key AE12 f F = + caps
+key AD01 ū Ū q Q caps
+key AD02 g G g G caps
+key AD03 j J j J caps
+key AD04 r R ŗ Ŗ caps
+key AD05 m M m M caps
+key AD06 v V w W caps
+key AD07 n N y Y caps
+key AD08 z Z z Z caps
+key AD09 ē Ē ē Ē caps
+key AD10 č Č č Č caps
+key AD11 ž Ž [ { caps
+key AD12 h H ] } caps
+key BKSL ķ Ķ / \ caps
+key AC01 š Š š Š caps
+key AC02 u U u U caps
+key AC03 s S s S caps
+key AC04 i I i I caps
+key AC05 l L l L caps
+key AC06 d D d D caps
+key AC07 a A a A caps
+key AC08 t T t T caps
+key AC09 e E e E caps
+key AC10 c C c C caps
+key AC11 ISO_Level3_Latch " '''' "
+key LSGT ģ Ģ ģ Ģ caps
+key AB01 ņ Ņ ņ Ņ caps
+key AB02 b B x X caps
+key AB03 ī Ī ī Ī caps
+key AB04 k K k K caps
+key AB05 p P p P caps
+key AB06 o O ō Ō caps
+key AB07 ā Ā ā Ā caps
+key AB08 , ; < ×
+key AB09 . : > ÷
+key AB10 ļ Ļ ? / caps
+key SPCE space space '''' space
+key KPDL KP_Delete KP_Decimal

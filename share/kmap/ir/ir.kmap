@@ -1,0 +1,55 @@
+kmap 1
+id ir
+layout ir
+name Persian
+level3 ralt
+key TLDE U200D ÷ ~
+key AE01 ۱ ! ` 1
+key AE02 ۲ ٬ @ 2
+key AE03 ۳ ٫ '#' 3
+key AE04 ۴ ﷼ $ 4
+key AE05 ۵ ٪ % 5
+key AE06 ۶ × ^ 6
+key AE07 ۷ ، & 7
+key AE08 ۸ * enfilledcircbullet 8
+key AE09 ۹ ) U200E 9
+key AE10 ۰ ( U200F 0
+key AE11 - ـ _
+key AE12 = + −
+key AD01 ض ْ °
+key AD02 ص ٌ VoidSymbol
+key AD03 ث ٍ €
+key AD04 ق ً VoidSymbol
+key AD05 ف ُ VoidSymbol
+key AD06 غ ِ VoidSymbol
+key AD07 ع َ VoidSymbol
+key AD08 ه ّ ‭
+key AD09 خ ] ‮
+key AD10 ح [ ‬
+key AD11 ج } ‪
+key AD12 چ { ‫
+key BKSL \ | ‐
+key AC01 ش ؤ VoidSymbol
+key AC02 س ئ VoidSymbol
+key AC03 ی ي ى
+key AC04 ب إ VoidSymbol
+key AC05 ل أ ۀ
+key AC06 ا آ ٱ
+key AC07 ت ة VoidSymbol
+key AC08 ن » ﴾
+key AC09 م « ﴿
+key AC10 ک : ;
+key AC11 گ ؛ "
+key LSGT < > | ¦
+key AB01 ظ ك VoidSymbol
+key AB02 ط ٓ VoidSymbol
+key AB03 ز ژ VoidSymbol
+key AB04 ر ٰ ٖ
+key AB05 ذ U200C U200D
+key AB06 د ٔ ٕ
+key AB07 پ ء …
+key AB08 و > ,
+key AB09 . < ''''
+key AB10 / ؟ ?
+key SPCE space U200C nobreakspace  
+key KPDL KP_Delete KP_Decimal

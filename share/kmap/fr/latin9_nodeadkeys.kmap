@@ -1,0 +1,56 @@
+kmap 1
+id fr-latin9_nodeadkeys
+layout fr
+variant latin9_nodeadkeys
+name French (legacy, alt., no dead keys)
+level3 ralt
+key TLDE œ Œ “ ” caps
+key AE01 & 1 '''' ·
+key AE02 é 2 ~ É
+key AE03 " 3 '#' ¸
+key AE04 '''' 4 { ´
+key AE05 ( 5 [ ¨
+key AE06 - 6 | ¦
+key AE07 è 7 ` È
+key AE08 _ 8 \ ¯
+key AE09 ç 9 ^ Ç
+key AE10 à 0 @ À
+key AE11 ) ° ] ÿ
+key AE12 = + } dead_abovering
+key AD01 a A â ä caps
+key AD02 z Z å Å caps
+key AD03 e E € ¢ caps
+key AD04 r R ç Ç caps
+key AD05 t T þ Þ caps
+key AD06 y Y ý Ý caps
+key AD07 u U û ü caps
+key AD08 i I î ï caps
+key AD09 o O ô ö caps
+key AD10 p P ¶ ` caps
+key AD11 ^ ¨ ~ ''''
+key AD12 $ £ ê ë
+key BKSL * µ ³ ¥
+key AC01 q Q Â Ä caps
+key AC02 s S ø Ø caps
+key AC03 d D Ê Ë caps
+key AC04 f F ± ª caps
+key AC05 g G æ Æ caps
+key AC06 h H ð Ð caps
+key AC07 j J Û Ü caps
+key AC08 k K Î Ï caps
+key AC09 l L Ô Ö caps
+key AC10 m M ¹ º caps
+key AC11 ù % ² Ù
+key LSGT < > | ¦
+key AB01 w W « < caps
+key AB02 x X » > caps
+key AB03 c C © © caps
+key AB04 v V ® ‚ caps
+key AB05 b B ß ẞ caps
+key AB06 n N ¬ ’ caps
+key AB07 , ? ¿ º
+key AB08 ; . × ×
+key AB09 : / ÷ ÷
+key AB10 ! § ¡ dead_abovedot
+key SPCE space space nobreakspace
+key KPDL KP_Delete KP_Decimal KP_Delete KP_Decimal

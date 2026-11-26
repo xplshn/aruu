@@ -1,0 +1,55 @@
+kmap 1
+id cd
+layout cd
+name French (Democratic Republic of the Congo)
+level3 ralt
+key TLDE ` ~ combining_tilde
+key AE01 & 1 '#'
+key AE02 combining_acute 2 @
+key AE03 combining_grave 3 «
+key AE04 ( 4 [
+key AE05 { 5 <
+key AE06 } 6 >
+key AE07 ) 7 ]
+key AE08 U0302 8 »
+key AE09 U030C 9 U030D
+key AE10 U0308 0 @
+key AE11 - _ % °
+key AE12 = + × ÷
+key AD01 a A æ Æ caps type=FOUR_LEVEL
+key AD02 z Z caps type=FOUR_LEVEL
+key AD03 e E œ Œ caps type=FOUR_LEVEL
+key AD04 r R caps type=FOUR_LEVEL
+key AD05 t T caps type=FOUR_LEVEL
+key AD06 y Y caps type=FOUR_LEVEL
+key AD07 u U ʉ Ʉ caps type=FOUR_LEVEL
+key AD08 i I ɨ Ɨ caps type=FOUR_LEVEL
+key AD09 o O ø Ø caps type=FOUR_LEVEL
+key AD10 p P caps type=FOUR_LEVEL
+key AD11 ɛ Ɛ ^ caps type=FOUR_LEVEL
+key AD12 * ^ $
+key BKSL " \ |
+key AC01 q Q caps type=FOUR_LEVEL
+key AC02 s S caps type=FOUR_LEVEL
+key AC03 d D caps type=FOUR_LEVEL
+key AC04 f F caps type=FOUR_LEVEL
+key AC05 g G caps type=FOUR_LEVEL
+key AC06 h H caps type=FOUR_LEVEL
+key AC07 j J caps type=FOUR_LEVEL
+key AC08 k K caps type=FOUR_LEVEL
+key AC09 l L caps type=FOUR_LEVEL
+key AC10 m M caps type=FOUR_LEVEL
+key AC11 ɔ Ɔ caps type=FOUR_LEVEL
+key LSGT \ | | ¦
+key AB01 w W caps type=FOUR_LEVEL
+key AB02 x X caps type=FOUR_LEVEL
+key AB03 c C caps type=FOUR_LEVEL
+key AB04 v V caps type=FOUR_LEVEL
+key AB05 b B caps type=FOUR_LEVEL
+key AB06 n N ŋ Ŋ caps type=FOUR_LEVEL
+key AB07 , ? U0327
+key AB08 ; . type=FOUR_LEVEL
+key AB09 : / type=FOUR_LEVEL
+key AB10 ! '''' U2019
+key SPCE space space nobreakspace  
+key KPDL KP_Delete KP_Decimal

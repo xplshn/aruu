@@ -1,0 +1,55 @@
+kmap 1
+id cn-mon_trad_galik
+layout cn
+variant mon_trad_galik
+name Mongolian (Galik)
+key TLDE ᠍ ᠍
+key AE01 ᠑ ᠑
+key AE02 ᠒ ᠒
+key AE03 ᠓ ᠓
+key AE04 ᠔ ᠔
+key AE05 ᠕ ᠕
+key AE06 ᠖ U200C
+key AE07 ᠗ ᠗
+key AE08 ᠘ U200D
+key AE09 ᠙ ᤙ
+key AE10 ᠐ ᤐ
+key AE11   ᠎
+key AE12 VoidSymbol VoidSymbol
+key AD01 ᢀ ᠧ
+key AD02 ᢁ ᠣ
+key AD03 ᢂ ᠡ
+key AD04 ᢃ ᢃ
+key AD05 ᢄ ᢄ
+key AD06 ᢅ ᢅ
+key AD07 ᢆ ᠦ
+key AD08 ᢇ ᠢ
+key AD09 ᢈ ᢈ
+key AD10 ᢉ ᢉ
+key AD11 ᢊ ᢊ
+key AD12 ᢕ ᢕ
+key BKSL VoidSymbol VoidSymbol
+key AC01 ᢋ ᠠ
+key AC02 ᢌ ᢌ
+key AC03 ᢍ ᢍ
+key AC04 ᢎ ᢎ
+key AC05 ᢏ ᢏ
+key AC06 ᢐ ᢐ
+key AC07 ᢑ ᡓ
+key AC08 ᢒ ᡘ
+key AC09 ᢓ ᢓ
+key AC10 ᢔ ᢔ
+key AC11 ᠋ ᠌
+key LSGT < > | ¦
+key AB01 ᢖ ᡜ
+key AB02 ᢗ ᢗ
+key AB03 ᢦ ᢦ
+key AB04 ᢧ ᠤ
+key AB05 ᢩ ᢩ
+key AB06 ᠅ ᠅
+key AB07 ᠀ ᡛ
+key AB08 ᠂ ᠂
+key AB09 ᠃ ᠃
+key AB10 VoidSymbol VoidSymbol
+key SPCE space
+key KPDL KP_Delete KP_Decimal

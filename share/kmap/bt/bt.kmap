@@ -1,0 +1,55 @@
+kmap 1
+id bt
+layout bt
+name Dzongkha
+level3 ralt
+key TLDE ༉ ༊ ࿑ ࿐
+key AE01 ༡ ༄ 1 ࿓
+key AE02 ༢ ༅ 2 ࿔
+key AE03 ༣ ༆ 3 ༺
+key AE04 ༤ ཈ 4 ༻
+key AE05 ༥ ༎ 5 ྅
+key AE06 ༦ ༈ 6 ༁
+key AE07 ༧ ༸ 7 ྊ
+key AE08 ༨ ༴ 8 *
+key AE09 ༩ ༼ 9 (
+key AE10 ༠ ༽ 0 )
+key AE11 ༔ ཿ - ࿒
+key AE12 ། ༑ = +
+key AD01 ཀ ྐ ྈ ྍ
+key AD02 ཁ ྑ ྉ ྎ
+key AD03 ག ྒ ྌ ྏ
+key AD04 ང ྔ ྃ ྂ
+key AD05 ི ྀ ༚ ྋ
+key AD06 ུ ྄ ༛ VoidSymbol
+key AD07 ེ ཻ ༜ VoidSymbol
+key AD08 ོ ཽ ༝ ༗
+key AD09 ཅ ྕ ༞ ༘
+key AD10 ཆ ྖ ༟ ༙
+key AD11 ཇ ྗ ( ༿
+key AD12 ཉ ྙ ) ༾
+key BKSL ཝ ྭ \ ྺ
+key AC01 ཏ ྟ ཊ ྚ
+key AC02 ཐ ྠ ཋ ྛ
+key AC03 ད ྡ ཌ ྜ
+key AC04 ན ྣ ཎ ྞ
+key AC05 པ ྤ ‹ «
+key AC06 ཕ ྥ › »
+key AC07 བ ྦ ༷ ༵
+key AC08 མ ྨ ཾ ྇
+key AC09 ཙ ྩ ༹ ྆
+key AC10 ཚ ྪ ; :
+key AC11 ཛ ྫ '''' "
+key LSGT ། ༑ ༐ ༏
+key AB01 ཞ ྮ ༓ ༶
+key AB02 ཟ ྯ ྾ ྿
+key AB03 འ ཱ ༃ ྰ
+key AB04 ཡ ྱ ༏ ྻ
+key AB05 ར ྲ ཪ ྼ
+key AB06 ལ ླ ༒ VoidSymbol
+key AB07 ཤ ྴ ཥ ྵ
+key AB08 ས ྶ , ࿙
+key AB09 ཧ ྷ . ࿚
+key AB10 ཨ ྸ / ?
+key SPCE ་ space ༌ nobreakspace
+key KPDL KP_Delete KP_Decimal

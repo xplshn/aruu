@@ -1,0 +1,59 @@
+kmap 1
+id jp-mac
+layout jp
+variant mac
+name Japanese (Macintosh)
+key TLDE Zenkaku_Hankaku Kanji type=PC_ALT_LEVEL2
+key AE01 ヌ
+key AE02 フ
+key AE03 ア ァ
+key AE04 ウ ゥ
+key AE05 エ ェ
+key AE06 オ ォ
+key AE07 ヤ ャ
+key AE08 ユ ュ
+key AE09 ヨ ョ
+key AE10 ワ ヲ
+key AE11 ホ
+key AE12 ヘ
+key AE13 ー
+key AD01 タ
+key AD02 テ
+key AD03 イ ィ
+key AD04 ス
+key AD05 カ
+key AD06 ン
+key AD07 ナ
+key AD08 ニ
+key AD09 ラ
+key AD10 セ
+key AD11 ゛
+key AD12 ゜ 「
+key BKSL ム 」
+key AC01 チ
+key AC02 ト
+key AC03 シ
+key AC04 ハ
+key AC05 キ
+key AC06 ク
+key AC07 マ
+key AC08 ノ
+key AC09 リ
+key AC10 レ
+key AC11 ケ
+key LSGT < > | ¦
+key AB01 ツ ッ
+key AB02 サ
+key AB03 ソ
+key AB04 ヒ
+key AB05 コ
+key AB06 ミ
+key AB07 モ
+key AB08 ネ 、
+key AB09 ル 。
+key AB10 メ ・
+key AB11 ロ
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key HKTG Hiragana_Katakana Romaji type=PC_ALT_LEVEL2
+key PRSC Print Execute type=PC_ALT_LEVEL2

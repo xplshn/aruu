@@ -1,0 +1,56 @@
+kmap 1
+id al-plisi
+layout al
+variant plisi
+name Albanian (Plisi)
+level3 ralt
+key TLDE ` ~
+key AE01 1 ! ’
+key AE02 2 @ ²
+key AE03 3 '#' ³
+key AE04 4 $ €
+key AE05 5 % ¡
+key AE06 6 ^ ¿
+key AE07 7 & {
+key AE08 8 * }
+key AE09 9 ( [
+key AE10 0 ) ]
+key AE11 - _ ­
+key AE12 = + ®
+key AD01 q Q dead_grave caps
+key AD02 w W dead_caron caps
+key AD03 e E dead_circumflex caps
+key AD04 r R dead_diaeresis caps
+key AD05 t T dead_macron caps
+key AD06 y Y dead_doubleacute caps
+key AD07 u U dead_breve caps
+key AD08 i I dead_tilde ı caps
+key AD09 o O dead_abovering caps
+key AD10 p P dead_abovedot caps
+key AD11 ç Ç dead_acute caps
+key AD12 > < U031C
+key BKSL \ | U031B
+key AC01 a A U2264 caps
+key AC02 s S U2265 caps
+key AC03 d D ⌀ caps
+key AC04 f F U2032 caps
+key AC05 g G U2033 caps
+key AC06 h H § caps
+key AC07 j J dead_cedilla caps
+key AC08 k K dead_belowcomma caps
+key AC09 l L dead_ogonek caps
+key AC10 ë Ë dead_belowdot caps
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 z Z « caps
+key AB02 x X » caps
+key AB03 c C © caps
+key AB04 v V ‹ caps
+key AB05 b B › caps
+key AB06 n N – caps
+key AB07 m M — µ caps
+key AB08 , ; ʻ
+key AB09 . : U200C
+key AB10 / ? ‑
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,55 @@
+kmap 1
+id kh
+layout kh
+name Khmer (Cambodia)
+level3 ralt
+key TLDE « » U200D VoidSymbol
+key AE01 ១ ! U200C ៱
+key AE02 ២ ៗ @ ៲
+key AE03 ៣ " ៑ ៳
+key AE04 ៤ ៛ $ ៴
+key AE05 ៥ % € ៵
+key AE06 ៦ ៍ ៙ ៶
+key AE07 ៧ ័ ៚ ៷
+key AE08 ៨ ៏ * ៸
+key AE09 ៩ ( { ៹
+key AE10 ០ ) } ៰
+key AE11 ឥ ៌ x VoidSymbol
+key AE12 ឲ = ៎ VoidSymbol
+key AD01 ឆ ឈ ៜ ᧠
+key AD02 ឹ ឺ ៝ ᧡
+key AD03 េ ែ ឯ ᧢
+key AD04 រ ឬ ឫ ᧣
+key AD05 ត ទ ឨ ᧤
+key AD06 យ ួ VoidSymbol ᧥
+key AD07 ុ ូ VoidSymbol ᧦
+key AD08 ិ ី ឦ ᧧
+key AD09 ោ ៅ ឱ ᧨
+key AD10 ផ ភ ឰ ᧩
+key AD11 ៀ ឿ ឩ ᧪
+key AD12 ឪ ឧ ឳ ᧫
+key BKSL ឮ ឭ \ VoidSymbol
+key AC01 ា ៿ VoidSymbol ᧬
+key AC02 ស ៃ VoidSymbol ᧭
+key AC03 ដ ឌ VoidSymbol ᧮
+key AC04 ថ ធ VoidSymbol ᧯
+key AC05 ង អ VoidSymbol ᧰
+key AC06 ហ ះ VoidSymbol ᧱
+key AC07 ្ ញ VoidSymbol ᧲
+key AC08 ក គ ឝ ᧳
+key AC09 ល ឡ VoidSymbol ᧴
+key AC10 ើ ៾ ៖ ᧵
+key AC11 ់ ៉ ៈ ᧶
+key LSGT < > | ¦
+key AB01 ឋ ឍ VoidSymbol ᧷
+key AB02 ខ ឃ VoidSymbol ᧸
+key AB03 ច ជ VoidSymbol ᧹
+key AB04 វ ៽ VoidSymbol ᧺
+key AB05 ប ព ឞ ᧻
+key AB06 ន ណ VoidSymbol ᧼
+key AB07 ម ំ VoidSymbol ᧽
+key AB08 ៼ ៻ , ᧾
+key AB09 ។ ៕ . ᧿
+key AB10 ៊ ? / VoidSymbol
+key SPCE U200B space nobreakspace VoidSymbol
+key KPDL KP_Delete KP_Decimal

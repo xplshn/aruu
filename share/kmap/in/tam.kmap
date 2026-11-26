@@ -1,0 +1,51 @@
+kmap 1
+id in-tam
+layout in
+variant tam
+name Tamil (InScript, with Arabic numerals)
+key TLDE ொ ஒ
+key AE01 1
+key AE02 2
+key AE03 3
+key AE04 4 ₹
+key AE05 5
+key AE06 6
+key AE07 7
+key AE08 8
+key AE09 9 (
+key AE10 0 )
+key AE11 - ஃ
+key AE12 = +
+key AD01 ௌ ஔ
+key AD02 ை ஐ
+key AD03 ா ஆ
+key AD04 ீ ஈ
+key AD05 ூ ஊ
+key AD07 ஹ ங
+key AD10 ஜ
+key AD12 ஞ
+key BKSL \ |
+key AC01 ோ ஓ
+key AC02 ே ஏ
+key AC03 ் அ
+key AC04 ி இ
+key AC05 ு உ
+key AC06 ப
+key AC07 ர ற
+key AC08 க
+key AC09 த
+key AC10 ச
+key AC11 ட
+key LSGT < > | ¦
+key AB01 ெ எ
+key AB02 ஂ
+key AB03 ம ண
+key AB04 ந ன
+key AB05 வ ழ
+key AB06 ல ள
+key AB07 ஸ ஶ
+key AB08 , ஷ
+key AB09 . ।
+key AB10 ய ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

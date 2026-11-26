@@ -1,0 +1,56 @@
+kmap 1
+id in-tel-sarala
+layout in
+variant tel-sarala
+name Telugu (Sarala)
+level3 ralt
+key TLDE ృ ఋ ` ~
+key AE01 1 ! ౧ ౸
+key AE02 2 @ ౨ ౹
+key AE03 3 '#' ౩ ౺
+key AE04 4 $ ౪ ౻
+key AE05 5 % ౫ ౼
+key AE06 6 ^ ౬ ౽
+key AE07 7 & ౭ ౾
+key AE08 8 * ౮ ౿
+key AE09 9 ( ౯ ₹
+key AE10 0 ) ౦ ౕ
+key AE11 - _ none ౖ
+key AE12 = + type=FOUR_LEVEL
+key AD01 ె ఎ ౄ ఴ
+key AD02 స ష ౄ
+key AD03 ే ఏ ౄ
+key AD04 ర ఱ ౄ ౠ
+key AD05 త థ type=FOUR_LEVEL
+key AD06 ీ ఈ type=FOUR_LEVEL
+key AD07 ు ఉ type=FOUR_LEVEL
+key AD08 ి ఇ type=FOUR_LEVEL
+key AD09 ో ఓ type=FOUR_LEVEL
+key AD10 ప ఫ type=FOUR_LEVEL
+key AD11 జ ఝ [ {
+key AD12 ై ఐ ] }
+key BKSL ౌ ఔ । ॥
+key AC01 య ఽ type=FOUR_LEVEL
+key AC02 ం ః type=FOUR_LEVEL
+key AC03 ద ధ type=FOUR_LEVEL
+key AC04 ్ అ type=FOUR_LEVEL
+key AC05 గ ఘ type=FOUR_LEVEL
+key AC06 చ ఛ ౘ ౙ
+key AC07 ా ఆ type=FOUR_LEVEL
+key AC08 క ఖ ౢ ౣ
+key AC09 ల ళ ఌ ౡ
+key AC10 ట ఠ ; :
+key AC11 '''' " type=FOUR_LEVEL
+key LSGT < > | ¦
+key AB01 ొ ఒ type=FOUR_LEVEL
+key AB02 ూ ఊ type=FOUR_LEVEL
+key AB03 డ ఢ type=FOUR_LEVEL
+key AB04 వ హ type=FOUR_LEVEL
+key AB05 బ భ type=FOUR_LEVEL
+key AB06 న ణ type=FOUR_LEVEL
+key AB07 మ ఁ type=FOUR_LEVEL
+key AB08 , ఞ <
+key AB09 . ఙ >
+key AB10 శ ? /
+key SPCE space
+key KPDL KP_Delete KP_Decimal

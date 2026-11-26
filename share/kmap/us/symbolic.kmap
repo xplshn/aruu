@@ -1,0 +1,56 @@
+kmap 1
+id us-symbolic
+layout us
+variant symbolic
+name English (US, Symbolic)
+level3 ralt
+key TLDE ` ~ \ |
+key AE01 1 ! ¹ ¬
+key AE02 2 @ ² ∴
+key AE03 3 '#' ³ £
+key AE04 4 $ ⁴ €
+key AE05 5 % ⁵ ‰
+key AE06 6 ^ ⁶ squareroot
+key AE07 7 & ⁷ §
+key AE08 8 * ⁸ ∞
+key AE09 9 ( ⁹ ·
+key AE10 0 ) ⁰ °
+key AE11 - _ × ÷
+key AE12 = + ≠ ±
+key AD01 q Q ∀ ∃ caps
+key AD02 w W ∈ ∉ caps
+key AD03 e E ε Ε caps
+key AD04 r R ρ Ρ caps
+key AD05 t T τ Τ caps
+key AD06 y Y υ Υ caps
+key AD07 u U θ Θ caps
+key AD08 i I ι Ι caps
+key AD09 o O ο Ο caps
+key AD10 p P π Π caps
+key AD11 [ { ∪ ∩
+key AD12 ] } ⊂ ⊃
+key BKSL \ | ` ~
+key AC01 a A α Α caps
+key AC02 s S σ Σ caps
+key AC03 d D δ Δ caps
+key AC04 f F φ Φ caps
+key AC05 g G γ Γ caps
+key AC06 h H η Η caps
+key AC07 j J ξ Ξ caps
+key AC08 k K κ Κ caps
+key AC09 l L λ Λ caps
+key AC10 ; : ↓ ↑
+key AC11 '''' " → ←
+key LSGT U230A ⌋ U2308 ⌉
+key AB01 z Z ζ Ζ caps
+key AB02 x X χ Χ caps
+key AB03 c C ψ Ψ caps
+key AB04 v V ω Ω caps
+key AB05 b B β Β caps
+key AB06 n N ν Ν caps
+key AB07 m M μ Μ caps
+key AB08 , < ≤ «
+key AB09 . > ≥ »
+key AB10 / ? ‽ ❦
+key SPCE space
+key KPDL KP_Delete KP_Decimal

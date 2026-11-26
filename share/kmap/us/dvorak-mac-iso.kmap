@@ -1,0 +1,56 @@
+kmap 1
+id us-dvorak-mac-iso
+layout us
+variant dvorak-mac-iso
+name English (Dvorak, Macintosh, ISO)
+level3 ralt
+key TLDE § ± § ±
+key AE01 1 ! ¡ ⁄
+key AE02 2 @ ™ €
+key AE03 3 '#' £ ‹
+key AE04 4 $ ¢ ›
+key AE05 5 % ∞ ﬁ
+key AE06 6 ^ § ﬂ
+key AE07 7 & ¶ ‡
+key AE08 8 * enfilledcircbullet °
+key AE09 9 ( ª ·
+key AE10 0 ) º ‚
+key AE11 [ { “ ”
+key AE12 ] } ‘ ’
+key AD01 '''' " æ Æ
+key AD02 , < ≤ ¯
+key AD03 . > ≥ ˘
+key AD04 p P π ∏ caps
+key AD05 y Y ¥ Á caps
+key AD06 f F ƒ Ï caps
+key AD07 g G © ˝ caps
+key AD08 c C ç Ç caps
+key AD09 r R ® ‰ caps
+key AD10 l L ¬ Ò caps
+key AD11 / ? ÷ ¿
+key AD12 = + ≠ ±
+key BKSL \ | « »
+key AC01 a A å Å caps
+key AC02 o O ø Ø caps
+key AC03 e E dead_acute ´ caps
+key AC04 u U dead_diaeresis ¨ caps
+key AC05 i I dead_circumflex ^ caps
+key AC06 d D ∂ Î caps
+key AC07 h H ˙ Ó caps
+key AC08 t T † ˇ caps
+key AC09 n N dead_tilde ~ caps
+key AC10 s S ß Í caps
+key AC11 - _ – —
+key LSGT ` ~ dead_grave dead_horn
+key AB01 ; : … Ú
+key AB02 q Q œ Œ caps
+key AB03 j J ∆ Ô caps
+key AB04 k K dead_abovering  caps
+key AB05 x X ≈ ˛ caps
+key AB06 b B ∫ ı caps
+key AB07 m M µ Â caps
+key AB08 w W ∑ „ caps
+key AB09 v V squareroot ◊ caps
+key AB10 z Z Ω ¸ caps
+key SPCE space
+key KPDL KP_Delete KP_Decimal

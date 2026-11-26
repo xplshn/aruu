@@ -1,0 +1,56 @@
+kmap 1
+id ir-ku_f
+layout ir
+variant ku_f
+name Kurdish (Iran, F)
+level3 ralt
+key TLDE + * ¬ ±
+key AE01 1 ! ¹ ¡
+key AE02 2 " ² VoidSymbol
+key AE03 3 ^ '#' ³
+key AE04 4 $ ¼ VoidSymbol
+key AE05 5 % ½ ⅜
+key AE06 6 & ¾ VoidSymbol
+key AE07 7 '''' { VoidSymbol
+key AE08 8 ( [ VoidSymbol
+key AE09 9 ) ] ±
+key AE10 0 = } °
+key AE11 / ? \ ¿
+key AE12 - _ | VoidSymbol
+key AD01 f F @ VoidSymbol caps
+key AD02 g G VoidSymbol VoidSymbol caps
+key AD03 x X ğ Ğ caps
+key AD04 i I ¶ VoidSymbol caps
+key AD05 o O ô Ô caps
+key AD06 d D ¥ VoidSymbol caps
+key AD07 r R ® VoidSymbol caps
+key AD08 n N VoidSymbol VoidSymbol caps
+key AD09 h H ° VoidSymbol caps
+key AD10 p P £ VoidSymbol caps
+key AD11 q Q dead_diaeresis dead_abovering caps
+key AD12 w W ~ dead_breve caps
+key BKSL x X ` dead_grave caps
+key AC01 û Û ü Ü caps
+key AC02 î Î i İ caps
+key AC03 e E € VoidSymbol caps
+key AC04 a A â Â caps
+key AC05 u U ü Ü caps
+key AC06 t T ₺ VoidSymbol caps
+key AC07 k K VoidSymbol VoidSymbol caps
+key AC08 m M µ VoidSymbol caps
+key AC09 l L VoidSymbol VoidSymbol caps
+key AC10 y Y ´ dead_acute caps
+key AC11 ş Ş '#' dead_caron caps
+key LSGT < > | ¦
+key AB01 j J « < caps
+key AB02 ê Ê ö Ö caps
+key AB03 v V “ VoidSymbol caps
+key AB04 c C ¢ © caps
+key AB05 ç Ç ” VoidSymbol caps
+key AB06 z Z VoidSymbol VoidSymbol caps
+key AB07 s S § VoidSymbol caps
+key AB08 b B × nobreakspace caps
+key AB09 . : ÷ dead_abovedot
+key AB10 , ; · VoidSymbol
+key SPCE space
+key KPDL KP_Delete KP_Separator

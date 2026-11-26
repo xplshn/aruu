@@ -1,0 +1,56 @@
+kmap 1
+id lv-modern
+layout lv
+variant modern
+name Latvian (Modern Latin)
+level3 ralt
+key TLDE ` ~ ´ ©
+key AE01 1 ! ¹ ¡
+key AE02 2 @ ² ⅛
+key AE03 3 '#' ³ £
+key AE04 4 $ € ¢
+key AE05 5 % ½ ⅜
+key AE06 6 ^ ¾ ⅝
+key AE07 7 & { ⅞
+key AE08 8 * [ ™
+key AE09 9 ( ] ±
+key AE10 0 ) } °
+key AE11 - _ \ ¿
+key AE12 = + – —
+key AD01 ē Ē ē Ē caps
+key AD02 o O ō Ō caps
+key AD03 ā Ā ā Ā caps
+key AD04 p P ? P caps
+key AD05 b B ! B caps
+key AD06 j J — J caps
+key AD07 d D – D caps
+key AD08 ī Ī ī Ī caps
+key AD09 l L ļ Ļ caps
+key AD10 g G ģ Ģ caps
+key AD11 [ { « “
+key AD12 ] } » ”
+key BKSL / ? \ |
+key AC01 e E e E caps
+key AC02 u U ū Ū caps
+key AC03 a A a A caps
+key AC04 n N ņ Ņ caps
+key AC05 k K ķ Ķ caps
+key AC06 ISO_Level3_Latch " '''' "
+key AC07 s S š Š caps
+key AC08 i I i I caps
+key AC09 t T t T caps
+key AC10 r R ŗ Ŗ caps
+key AC11 m M m M caps
+key LSGT q Q q Q caps
+key AB01 x X q Q caps
+key AB02 z Z ž Ž caps
+key AB03 c C č Č caps
+key AB04 v V | V caps
+key AB05 w W \ W caps
+key AB06 f F . F caps
+key AB07 y Y ȳ Ȳ caps
+key AB08 h H ḩ Ḩ caps
+key AB09 , ; < ×
+key AB10 . : > ÷
+key SPCE space space ''''
+key KPDL KP_Delete KP_Decimal

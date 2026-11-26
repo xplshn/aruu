@@ -1,0 +1,55 @@
+kmap 1
+id cn-mon_manchu_galik
+layout cn
+variant mon_manchu_galik
+name Mongolian (Manchu Galik)
+key TLDE ᠍ ᠍
+key AE01 VoidSymbol VoidSymbol
+key AE02 VoidSymbol VoidSymbol
+key AE03 VoidSymbol VoidSymbol
+key AE04 VoidSymbol VoidSymbol
+key AE05 VoidSymbol VoidSymbol
+key AE06 VoidSymbol U200C
+key AE07 VoidSymbol VoidSymbol
+key AE08 VoidSymbol U200D
+key AE09 VoidSymbol VoidSymbol
+key AE10 VoidSymbol VoidSymbol
+key AE11    
+key AE12 VoidSymbol VoidSymbol
+key AD01 ᢀ ᢀ
+key AD02 ᢁ ᢁ
+key AD03 ᢂ ᡝ
+key AD04 ᢃ ᢃ
+key AD05 ᢄ ᢄ
+key AD06 ᢅ ᢅ
+key AD07 ᢆ ᡠ
+key AD08 ᢇ ᡳ
+key AD09 ᢈ ᠣ
+key AD10 ᢏ ᢏ
+key AD11 VoidSymbol VoidSymbol
+key AD12 VoidSymbol VoidSymbol
+key BKSL VoidSymbol VoidSymbol
+key AC01 ᢒ ᠠ
+key AC02 ᢚ ᢚ
+key AC03 ᢛ ᢛ
+key AC04 ᢜ ᢜ
+key AC05 ᢝ ᢝ
+key AC06 ᢞ ᢞ
+key AC07 ᢟ ᢟ
+key AC08 ᢠ ᢠ
+key AC09 ᢡ ᢡ
+key AC10 VoidSymbol VoidSymbol
+key AC11 ᠋ ᠌
+key LSGT < > | ¦
+key AB01 ᢢ ᢢ
+key AB02 ᢣ ᢣ
+key AB03 ᢤ ᢤ
+key AB04 ᢥ ᡡ
+key AB05 ᢨ ᢨ
+key AB06 ᢪ ᢪ
+key AB07 VoidSymbol VoidSymbol
+key AB08 ᠈ ᠈
+key AB09 ᠉ ᠉
+key AB10 VoidSymbol VoidSymbol
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,56 @@
+kmap 1
+id de-e1
+layout de
+variant e1
+name German (E1)
+level3 ralt
+key TLDE dead_circumflex ° × type=EIGHT_LEVEL
+key AE01 1 ! ’ none ¼ ◊ type=EIGHT_LEVEL
+key AE02 2 " ² none ½ ¦ type=EIGHT_LEVEL
+key AE03 3 § ³ none ¾ ¶ type=EIGHT_LEVEL
+key AE04 4 $ — none ¤ ℳ type=EIGHT_LEVEL
+key AE05 5 % ¡ none ‰ ₰ type=EIGHT_LEVEL
+key AE06 6 & ¿ none ⁄ ⁊ type=EIGHT_LEVEL
+key AE07 7 / { none ⌀ U2116 type=EIGHT_LEVEL
+key AE08 8 ( [ none ⟨ ⟪ type=EIGHT_LEVEL
+key AE09 9 ) ] none ⟩ ⟫ type=EIGHT_LEVEL
+key AE10 0 = } none ÷ ∅ type=EIGHT_LEVEL
+key AE11 ß ? \ none ≠ ¬ type=EIGHT_LEVEL
+key AE12 dead_acute dead_grave dead_abovedot none £ ¥ type=EIGHT_LEVEL
+key AD01 q Q @ none º U2642 caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD02 w W dead_macron none ª U2640 caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD03 e E € none ə Ə caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD04 r R dead_doubleacute none ™ ® caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD05 t T dead_caron none þ Þ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD06 z Z dead_diaeresis none ʒ Ʒ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD07 u U dead_breve none ↓ ↑ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD08 i I dead_tilde none ı ⚥ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD09 o O dead_abovering none ø Ø caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD10 p P dead_hook none → ← caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD11 ü Ü dead_horn none ↘ ↗ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AD12 + * ~ none ± ⁒ type=EIGHT_LEVEL
+key BKSL '#' '''' − none U2020 U2021 type=EIGHT_LEVEL
+key AC01 a A Multi_key caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC02 s S ″ none ſ ∑ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC03 d D ′ none ð Ð caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC04 f F ISO_Level5_Latch caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC05 g G ẞ none ʿ ☛ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC06 h H dead_belowmacron none ʾ ☚ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC07 j J dead_cedilla none ʹ ʺ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC08 k K dead_belowcomma caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC09 l L dead_ogonek none ł Ł caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC10 ö Ö dead_belowdot none œ Œ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AC11 ä Ä dead_stroke none æ Æ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key LSGT < > | ¦ ≤ ≥ type=EIGHT_LEVEL
+key AB01 y Y › none ␣ ⏑ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AB02 x X » none „ ‚ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AB03 c C   none ¢ © caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AB04 v V « none “ ‘ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AB05 b B ‹ none ” ’ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AB06 n N – none ŋ Ŋ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AB07 m M µ none U200C ∗ caps type=EIGHT_LEVEL_SEMIALPHABETIC
+key AB08 , ; ‑ none ʻ U2665 type=EIGHT_LEVEL
+key AB09 . : · none … U2713 type=EIGHT_LEVEL
+key AB10 - _ ­ none • ◦ type=EIGHT_LEVEL
+key SPCE space space nobreakspace none U200A U200A type=EIGHT_LEVEL
+key KPDL KP_Delete KP_Separator

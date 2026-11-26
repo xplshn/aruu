@@ -1,0 +1,55 @@
+kmap 1
+id in-ben_gitanjali
+layout in
+variant ben_gitanjali
+name Bangla (India, Gitanjali)
+key TLDE : ?
+key AE01 ১ ৎ
+key AE02 ২ ''''
+key AE03 ৩ '#'
+key AE04 ৪ ৳
+key AE05 ৫ /
+key AE06 ৬ .
+key AE07 ৭ &
+key AE08 ৮ *
+key AE09 ৯ (
+key AE10 ০ )
+key AE11 - ঃ
+key AE12 ৃ ঋ
+key AD01 ৗ ঔ
+key AD02 ৈ ঐ
+key AD03 া অ
+key AD04 ী ঈ
+key AD05 ূ ঊ
+key AD06 ব ভ
+key AD07 হ ঙ
+key AD08 গ ঘ
+key AD09 দ ধ
+key AD10 জ ঝ
+key AD11 ড ঢ
+key AD12 U200C ঞ
+key BKSL \ |
+key AC01 U200D ও
+key AC02 ে এ
+key AC03 ্
+key AC04 ি ই
+key AC05 ু উ
+key AC06 প ফ
+key AC07 র ৰ
+key AC08 ক খ
+key AC09 ত থ
+key AC10 চ ছ
+key AC11 ট ঠ
+key LSGT < > | ¦
+key AB01 ে এ
+key AB02 ং ঁ
+key AB03 ম ণ
+key AB04 ন ড়
+key AB05 ৱ ঢ়
+key AB06 ল
+key AB07 স শ
+key AB08 , ষ
+key AB09 । ৺
+key AB10 য য়
+key SPCE space
+key KPDL KP_Delete KP_Decimal

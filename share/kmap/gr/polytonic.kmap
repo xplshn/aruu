@@ -1,0 +1,56 @@
+kmap 1
+id gr-polytonic
+layout gr
+variant polytonic
+name Greek (polytonic)
+level3 ralt
+key TLDE ` ~ U2015
+key AE01 1 ! • ¹
+key AE02 2 @ ½ ²
+key AE03 3 '#' £ ³
+key AE04 4 $ ¼ ¾
+key AE05 5 % U2030 ‱
+key AE06 6 ^ ϰ ¶
+key AE07 7 & ϗ Ϗ
+key AE08 8 * ₯ ¤
+key AE09 9 ( ¦ ‘
+key AE10 0 ) ° ’
+key AE11 - _ ±
+key AE12 = +
+key AD01 ; : ·
+key AD02 ς Σ ϙ Ϙ caps type=FOUR_LEVEL
+key AD03 ε Ε € ϵ caps
+key AD04 ρ Ρ ® ϱ caps
+key AD05 τ Τ caps
+key AD06 υ Υ ϒ ¥ caps
+key AD07 θ Θ ϑ ϴ caps
+key AD08 ι Ι ͻ Ͻ caps
+key AD09 ο Ο ϙ Ϙ caps
+key AD10 π Π ϖ ϕ caps type=FOUR_LEVEL
+key AD11 dead_tilde dead_diaeresis dead_macron type=THREE_LEVEL
+key AD12 dead_iota VoidSymbol dead_breve type=THREE_LEVEL
+key BKSL \ | ¬
+key AC01 α Α caps
+key AC02 σ Σ ϛ Ϛ caps type=FOUR_LEVEL
+key AC03 δ Δ ↓ ↑ caps
+key AC04 φ Φ ϝ Ϝ caps type=FOUR_LEVEL
+key AC05 γ Γ ϝ Ϝ caps
+key AC06 η Η ϳ Ϳ caps
+key AC07 ξ Ξ ϳ Ϳ caps type=FOUR_LEVEL
+key AC08 κ Κ ϗ Ϗ caps type=FOUR_LEVEL
+key AC09 λ Λ ϲ Ϲ caps
+key AC10 dead_acute dead_abovecomma dead_acute type=THREE_LEVEL
+key AC11 dead_grave dead_abovereversedcomma '''' "
+key LSGT « » | ¦
+key AB01 ζ Ζ ͽ Ͽ caps
+key AB02 χ Χ → ← caps
+key AB03 ψ Ψ © caps
+key AB04 ω Ω ϖ caps
+key AB05 β Β ϡ Ϡ caps type=FOUR_LEVEL
+key AB06 ν Ν ʹ ͵ caps
+key AB07 μ Μ ϻ Ϻ caps
+key AB08 , < « …
+key AB09 . > » ·
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Separator

@@ -1,0 +1,56 @@
+kmap 1
+id fr-mac
+layout fr
+variant mac
+name French (Macintosh)
+level3 ralt
+key TLDE @ '#' · ÿ
+key AE01 & 1 VoidSymbol dead_acute
+key AE02 é 2 ë É
+key AE03 " 3 “ ”
+key AE04 '''' 4 ‘ ’
+key AE05 ( 5 { [
+key AE06 § 6 ¶ å
+key AE07 è 7 « »
+key AE08 ! 8 ¡ Û
+key AE09 ç 9 Ç Á
+key AE10 à 0 ø Ø
+key AE11 ) ° } ]
+key AE12 - _ — –
+key AD01 a A æ Æ caps
+key AD02 z Z Â Å caps
+key AD03 e E ê Ê caps
+key AD04 r R ® ¤ caps
+key AD05 t T † ™ caps
+key AD06 y Y Ú Ÿ caps
+key AD07 u U º ª caps
+key AD08 i I î ï caps
+key AD09 o O œ Œ caps
+key AD10 p P π Π caps
+key AD11 dead_circumflex dead_diaeresis ô Ô
+key AD12 $ * € ¥
+key BKSL dead_grave £ @ '#'
+key AC01 q Q â À caps
+key AC02 s S Ò VoidSymbol caps
+key AC03 d D δ Δ caps
+key AC04 f F U0192 · caps
+key AC05 g G ﬁ ﬂ caps
+key AC06 h H Ì Î caps
+key AC07 j J Ï Í caps
+key AC08 k K È Ë caps
+key AC09 l L ¬ | caps
+key AC10 m M µ Ó caps
+key AC11 ù % Ù û
+key LSGT < > ≤ ≥
+key AB01 w W ‹ › caps
+key AB02 x X ≃ ⁄ caps
+key AB03 c C © ¢ caps
+key AB04 v V ♦ √ caps
+key AB05 b B ß ∫ caps
+key AB06 n N dead_tilde ~ caps
+key AB07 , ? VoidSymbol ¿
+key AB08 ; . … ·
+key AB09 : / ÷ \
+key AB10 = + ≠ ±
+key SPCE space space nobreakspace nobreakspace
+key KPDL , KP_Decimal

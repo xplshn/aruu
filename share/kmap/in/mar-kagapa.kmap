@@ -1,0 +1,56 @@
+kmap 1
+id in-mar-kagapa
+layout in
+variant mar-kagapa
+name Marathi (KaGaPa, phonetic)
+level3 ralt
+key TLDE ` ~ U201C
+key AE01 1 ! १
+key AE02 2 @ २ ₨
+key AE03 3 '#' ३
+key AE04 4 $ ४ ₹
+key AE05 5 % ५
+key AE06 6 ^ ६ U200C
+key AE07 7 & ७ U200D
+key AE08 8 * ८ ँ
+key AE09 9 ( ९
+key AE10 0 ) ० ॰
+key AE11 - _ ॒
+key AE12 = + type=FOUR_LEVEL
+key AD01 ट ठ type=FOUR_LEVEL
+key AD02 ड ढ ड़ ढ़
+key AD03 ॆ े ऎ ए
+key AD04 र ृ ऋ ऱ
+key AD05 त थ type=FOUR_LEVEL
+key AD06 य ै ऐ य़
+key AD07 ु ू उ ऊ
+key AD08 ि ी इ ई
+key AD09 ॊ ो ऒ ओ
+key AD10 प फ फ़
+key AD11 [ { type=FOUR_LEVEL
+key AD12 ] } type=FOUR_LEVEL
+key BKSL \ | । ॥
+key AC01 ा आ अ ॲ
+key AC02 स श type=FOUR_LEVEL
+key AC03 द ध type=FOUR_LEVEL
+key AC04 ् ॄ ॠ
+key AC05 ग घ ग़
+key AC06 ह ः ᳵ ᳶ
+key AC07 ज झ ज़
+key AC08 क ख क़ ख़
+key AC09 ल ळ ॢ ऌ
+key AC10 ; : ᳲ ᳳ
+key AC11 '''' " ॑ U201D
+key LSGT < > | ¦
+key AB01 ञ ङ type=FOUR_LEVEL
+key AB02 ष ़ ऴ
+key AB03 च छ type=FOUR_LEVEL
+key AB04 व ौ औ
+key AB05 ब भ type=FOUR_LEVEL
+key AB06 न ण ऩ
+key AB07 म ं ऽ ॐ
+key AB08 , < ॅ ऍ
+key AB09 . > ॉ ऑ
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

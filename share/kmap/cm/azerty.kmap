@@ -1,0 +1,56 @@
+kmap 1
+id cm-azerty
+layout cm
+variant azerty
+name Cameroon (AZERTY, intl.)
+level3 ralt
+key TLDE $ U20AC ² ³
+key AE01 & KP_1 ¹ U2018
+key AE02 é KP_2 ~ U2019
+key AE03 " KP_3 %
+key AE04 '''' KP_4 {
+key AE05 ( KP_5 [ '#'
+key AE06 - KP_6 |
+key AE07 è KP_7 combining_grave
+key AE08 _ KP_8 \ ⃖
+key AE09 ç KP_9 ^
+key AE10 à KP_0 @ ⃗
+key AE11 ) ° ]
+key AE12 = + } ±
+key AD01 a A ɛ Ɛ caps
+key AD02 z Z U2026 U2020 caps
+key AD03 e E ə Ə caps
+key AD04 r R ◌ ® caps
+key AD05 t T U0153 U0152 caps
+key AD06 y Y ƴ Ƴ caps
+key AD07 u U ʉ Ʉ caps
+key AD08 i I ɨ Ɨ caps
+key AD09 o O ɔ Ɔ caps
+key AD10 p P ø Ø caps
+key AD11 combining_acute U030C dead_circumflex dead_diaeresis
+key AD12 U0330 combining_tilde U0304 U030D
+key BKSL ᷆ ᷇ * ¤
+key AC01 q Q U2014 U2013 caps
+key AC02 s S U201C U201D caps
+key AC03 d D ɗ Ɗ caps
+key AC04 f F æ Æ caps
+key AC05 g G ʼ Ꞌ caps
+key AC06 h H ɑ Ɑ caps
+key AC07 j J ← U2122 caps
+key AC08 k K ↓ ↑ caps
+key AC09 l L → £ caps
+key AC10 m M ù µ caps
+key AC11 combining_grave U0302 ᷅ ᷄
+key LSGT < > « »
+key AB01 w W ẅ Ẅ caps
+key AB02 x X ‹ › caps
+key AB03 c C U0327 © caps
+key AB04 v V ꞌ Ꞌ caps
+key AB05 b B ɓ Ɓ caps
+key AB06 n N U014B U014A caps
+key AB07 , ? none ×
+key AB08 ; . dead_acute dead_grave
+key AB09 : / combining_belowdot
+key AB10 ISO_Level3_Latch § ! §
+key SPCE space
+key KPDL KP_Delete KP_Decimal

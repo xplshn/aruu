@@ -1,0 +1,55 @@
+kmap 1
+id ge-ru
+layout ge
+variant ru
+name Russian (Georgia)
+key TLDE ^ ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 ;
+key AE05 5 :
+key AE06 6 ,
+key AE07 7 .
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 '#' |
+key AD01 ღ q
+key AD02 ც w
+key AD03 უ e
+key AD04 კ r
+key AD05 ე t
+key AD06 ნ y
+key AD07 გ u
+key AD08 შ i
+key AD09 წ o
+key AD10 ზ p
+key AD11 ხ [
+key AD12 ჯ ]
+key BKSL \ |
+key AC01 ფ a
+key AC02 თ s
+key AC03 ვ d
+key AC04 ა f
+key AC05 პ g
+key AC06 რ h
+key AC07 ო j
+key AC08 ლ k
+key AC09 დ l
+key AC10 ჟ ;
+key AC11 ძ %
+key LSGT « » | ¦
+key AB01 ჭ z
+key AB02 ჩ x
+key AB03 ს c
+key AB04 მ v
+key AB05 ი b
+key AB06 ტ n
+key AB07 ქ m
+key AB08 ბ <
+key AB09 ყ >
+key AB10 ჰ ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

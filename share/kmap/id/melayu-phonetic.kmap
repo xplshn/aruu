@@ -1,0 +1,56 @@
+kmap 1
+id id-melayu-phonetic
+layout id
+variant melayu-phonetic
+name Indonesian (Arab Melayu, phonetic)
+level3 ralt
+key TLDE ` ~ VoidSymbol VoidSymbol
+key AE01 ١ ! 1 VoidSymbol
+key AE02 ٢ @ 2 VoidSymbol
+key AE03 ٣ '#' 3 VoidSymbol
+key AE04 ٤ VoidSymbol 4 $
+key AE05 ٥ ٪ 5 %
+key AE06 ٦ ^ 6 VoidSymbol
+key AE07 ٧ & 7 VoidSymbol
+key AE08 ٨ * 8 VoidSymbol
+key AE09 ٩ ) 9 VoidSymbol
+key AE10 ٠ ( 0 VoidSymbol
+key AE11 - ـ VoidSymbol _
+key AE12 = + VoidSymbol VoidSymbol
+key AD01 ق آ VoidSymbol VoidSymbol
+key AD02 و VoidSymbol VoidSymbol VoidSymbol
+key AD03 ى ع VoidSymbol VoidSymbol
+key AD04 ر VoidSymbol VoidSymbol VoidSymbol
+key AD05 ت ة ط VoidSymbol
+key AD06 ي VoidSymbol VoidSymbol VoidSymbol
+key AD07 ؤ VoidSymbol VoidSymbol VoidSymbol
+key AD08 ئ إ VoidSymbol VoidSymbol
+key AD09 ء ٴ VoidSymbol VoidSymbol
+key AD10 ڤ VoidSymbol VoidSymbol VoidSymbol
+key AD11 ] } VoidSymbol VoidSymbol
+key AD12 [ { VoidSymbol VoidSymbol
+key BKSL \ | VoidSymbol VoidSymbol
+key AC01 ا أ VoidSymbol VoidSymbol
+key AC02 س ش ص ث
+key AC03 د VoidSymbol ض VoidSymbol
+key AC04 ف VoidSymbol VoidSymbol VoidSymbol
+key AC05 ݢ ڠ غ گ
+key AC06 ه ح VoidSymbol VoidSymbol
+key AC07 ج VoidSymbol VoidSymbol VoidSymbol
+key AC08 ک ك VoidSymbol VoidSymbol
+key AC09 ل VoidSymbol VoidSymbol VoidSymbol
+key AC10 ؛ : ; VoidSymbol
+key AC11 « » '''' "
+key LSGT | ¦ VoidSymbol VoidSymbol
+key AB01 ز ذ ظ VoidSymbol
+key AB02 خ VoidSymbol VoidSymbol VoidSymbol
+key AB03 چ VoidSymbol VoidSymbol VoidSymbol
+key AB04 ث VoidSymbol VoidSymbol ۏ
+key AB05 ب VoidSymbol VoidSymbol VoidSymbol
+key AB06 ن ڽ VoidSymbol VoidSymbol
+key AB07 م VoidSymbol VoidSymbol VoidSymbol
+key AB08 ، > , ٫
+key AB09 . < ۔ ٬
+key AB10 / ؟ ؍ ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

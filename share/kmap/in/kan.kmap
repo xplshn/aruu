@@ -1,0 +1,56 @@
+kmap 1
+id in-kan
+layout in
+variant kan
+name Kannada
+level3 ralt
+key TLDE ೊ ಒ
+key AE01 ೧
+key AE02 ೨
+key AE03 ೩
+key AE04 ೪ none ₹
+key AE05 ೫
+key AE06 ೬
+key AE07 ೭
+key AE08 ೮
+key AE09 ೯
+key AE10 ೦
+key AE11 ಃ
+key AE12 ೃ ಋ
+key AD01 ೌ ಔ
+key AD02 ೈ ಐ
+key AD03 ಾ ಆ
+key AD04 ೀ ಈ
+key AD05 ೂ ಊ
+key AD06 ಬ ಭ
+key AD07 ಹ ಙ
+key AD08 ಗ ಘ
+key AD09 ದ ಧ
+key AD10 ಜ ಝ
+key AD11 ಡ ಢ
+key AD12 ಼ ಞ
+key BKSL \ |
+key AC01 ೋ ಓ
+key AC02 ೇ ಏ
+key AC03 ್ ಅ
+key AC04 ಿ ಇ
+key AC05 ು ಉ
+key AC06 ಪ ಫ
+key AC07 ರ ಱ
+key AC08 ಕ ಖ
+key AC09 ತ ಥ
+key AC10 ಚ ಛ
+key AC11 ಟ ಠ
+key LSGT < > | ¦
+key AB01 ೆ ಎ
+key AB02 ಂ
+key AB03 ಮ ಣ
+key AB04 ನ
+key AB05 ವ ಴
+key AB06 ಲ ಳ
+key AB07 ಸ ಶ
+key AB08 , ಷ
+key AB09 .
+key AB10 ಯ @
+key SPCE space
+key KPDL KP_Delete KP_Decimal

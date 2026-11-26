@@ -1,0 +1,55 @@
+kmap 1
+id in-iipa
+layout in
+variant iipa
+name Indic IPA
+key TLDE ` ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 ₹
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 ʰ ʱ
+key AD02 æ q
+key AD03 a ʋ
+key AD04 i ɪ
+key AD05 u ɯ
+key AD06 b Y
+key AD07 h U014B
+key AD08 g ɣ
+key AD09 d ð
+key AD10 ʤ ʣ
+key AD11 ɖ ɽ
+key AD12 [ ]
+key BKSL \ |
+key AC01 o ɔ
+key AC02 e ɛ
+key AC03 ə U0361
+key AC04 i ɪ
+key AC05 u ɯ
+key AC06 p f
+key AC07 ɾ r
+key AC08 k x
+key AC09 t U03B8
+key AC10 ʧ ʦ
+key AC11 ʈ "
+key LSGT < > | ¦
+key AB01 U032A combining_tilde
+key AB02 U0306 X
+key AB03 m ɳ
+key AB04 n v
+key AB05 w z
+key AB06 l ɭ
+key AB07 s ʃ
+key AB08 , ʂ
+key AB09 . ː
+key AB10 j /
+key SPCE space
+key KPDL KP_Delete KP_Decimal

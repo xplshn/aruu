@@ -1,0 +1,21 @@
+kmap 1
+id brai-right_hand_invert
+layout brai
+variant right_hand_invert
+name Braille (one-handed, right, inverted thumb)
+key BKSL \ |
+key AC07 braille_dot_1
+key AC08 braille_dot_4
+key AC09 braille_dot_6
+key AC10 braille_dot_5
+key LSGT < > | ¦
+key AB05 braille_dot_2
+key AB06 braille_dot_3
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key KP4 braille_dot_1 KP_4
+key KP5 braille_dot_4 KP_5
+key KP6 braille_dot_5 KP_6
+key KPAD braille_dot_6 KP_Add KP_Add KP_Add XF86Next_VMode type=CTRL+ALT
+key KP1 braille_dot_2 KP_1
+key KP0 braille_dot_3 KP_0

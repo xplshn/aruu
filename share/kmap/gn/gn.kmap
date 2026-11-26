@@ -1,0 +1,55 @@
+kmap 1
+id gn
+layout gn
+name 'N''Ko (AZERTY)'
+level3 ralt
+key TLDE ߬ ~ ¬
+key AE01 ߱ ߁
+key AE02 ߫ ߂
+key AE03 ߵ ߃ '#' £
+key AE04 ߴ ߄ ⸜ $
+key AE05 ( ߅ ⸝
+key AE06 - ߆ |
+key AE07 ߬ ߇ `
+key AE08 ߺ ߈ \
+key AE09 ߭ ߉ ^ ±
+key AE10 ߮ ߀ @ °
+key AE11 )
+key AE12 = + }
+key AD01 ߊ
+key AD02 ߠ <
+key AD03 ߍ ߋ
+key AD04 ߙ ߚ
+key AD05 ߕ
+key AD06 ߦ ߧ
+key AD07 ߎ ߶
+key AD08 ߌ
+key AD09 ߐ ߏ
+key AD10 ߔ
+key AD11 ߳
+key AD12 $ £ ¤
+key BKSL ߑ *
+key AC01 ߫
+key AC02 ߛ
+key AC03 ߘ
+key AC04 ߝ
+key AC05 ߜ ߷
+key AC06 ߤ
+key AC07 ߖ ߨ
+key AC08 ߞ
+key AC09 ߟ ߪ
+key AC10 ߡ
+key AC11 ߯ ߸ %
+key LSGT < > | ¦
+key AB01 ߥ
+key AB02 U060C
+key AB03 ߗ ߩ
+key AB04 ߢ
+key AB05 ߓ
+key AB06 ߣ ߒ
+key AB07 ߸ U061F
+key AB08 U061B
+key AB09 U060C /
+key AB10 ߹
+key SPCE space
+key KPDL KP_Delete KP_Decimal

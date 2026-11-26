@@ -1,0 +1,56 @@
+kmap 1
+id in-tel-kagapa
+layout in
+variant tel-kagapa
+name Telugu (KaGaPa, phonetic)
+level3 ralt
+key TLDE ` ~ U201C
+key AE01 1 ! ౧
+key AE02 2 @ ౨ ₨
+key AE03 3 '#' ౩
+key AE04 4 $ ౪ ₹
+key AE05 5 % ౫
+key AE06 6 ^ ౬ U200C
+key AE07 7 & ౭ U200D
+key AE08 8 * ౮ ఁ
+key AE09 9 ( ౯
+key AE10 0 ) ౦
+key AE11 - _ ॒
+key AE12 = + type=FOUR_LEVEL
+key AD01 ట ఠ type=FOUR_LEVEL
+key AD02 డ ఢ type=FOUR_LEVEL
+key AD03 ె ే ఎ ఏ
+key AD04 ర ృ ఋ ఱ
+key AD05 త థ type=FOUR_LEVEL
+key AD06 య ై ఐ
+key AD07 ు ూ ఉ ఊ
+key AD08 ి ీ ఇ ఈ
+key AD09 ొ ో ఒ ఓ
+key AD10 ప ఫ type=FOUR_LEVEL
+key AD11 [ { type=FOUR_LEVEL
+key AD12 ] } type=FOUR_LEVEL
+key BKSL \ | । ॥
+key AC01 ా ఆ అ
+key AC02 స శ type=FOUR_LEVEL
+key AC03 ద ధ type=FOUR_LEVEL
+key AC04 ్ ౄ ౠ
+key AC05 గ ఘ type=FOUR_LEVEL
+key AC06 హ ః type=FOUR_LEVEL
+key AC07 జ ఝ type=FOUR_LEVEL
+key AC08 క ఖ type=FOUR_LEVEL
+key AC09 ల ళ ౢ ఌ
+key AC10 ; : type=FOUR_LEVEL
+key AC11 '''' " ॑ U201D
+key LSGT < > | ¦
+key AB01 ఞ ఙ type=FOUR_LEVEL
+key AB02 ష type=FOUR_LEVEL
+key AB03 చ ఛ type=FOUR_LEVEL
+key AB04 వ ౌ ఔ
+key AB05 బ భ type=FOUR_LEVEL
+key AB06 న ణ type=FOUR_LEVEL
+key AB07 మ ం ఽ ॐ
+key AB08 , < ౘ
+key AB09 . > ౙ
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

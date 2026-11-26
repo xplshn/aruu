@@ -1,0 +1,56 @@
+kmap 1
+id in-tel
+layout in
+variant tel
+name Telugu
+level3 ralt
+key TLDE ొ ఒ
+key AE01 ౧
+key AE02 ౨
+key AE03 ౩ '#'
+key AE04 ౪ $ ₹
+key AE05 ౫ %
+key AE06 ౬ ^
+key AE07 ౭ &
+key AE08 ౮ *
+key AE09 ౯ (
+key AE10 ౦ )
+key AE11 ః _
+key AE12 ృ ఋ
+key AD01 ౌ ఔ
+key AD02 ై ఐ
+key AD03 ా ఆ
+key AD04 ీ ఈ
+key AD05 ూ ఊ
+key AD06 బ భ
+key AD07 హ ఙ
+key AD08 గ ఘ
+key AD09 ద ధ
+key AD10 జ ఝ
+key AD11 డ ఢ
+key AD12 ఞ
+key BKSL \ |
+key AC01 ో ఓ
+key AC02 ే ఏ
+key AC03 ్ అ
+key AC04 ి ఇ
+key AC05 ు ఉ
+key AC06 ప ఫ
+key AC07 ర ఱ
+key AC08 క ఖ
+key AC09 త థ
+key AC10 చ ఛ
+key AC11 ట ఠ
+key LSGT < > | ¦
+key AB01 ె ఎ
+key AB02 ం ఁ
+key AB03 మ ణ
+key AB04 న
+key AB05 వ
+key AB06 ల ళ
+key AB07 స శ
+key AB08 , ష
+key AB09 .
+key AB10 య @
+key SPCE space
+key KPDL KP_Delete KP_Decimal

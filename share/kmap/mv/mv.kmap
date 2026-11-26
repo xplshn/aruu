@@ -1,0 +1,54 @@
+kmap 1
+id mv
+layout mv
+name Dhivehi
+key TLDE ` ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 ް ޤ
+key AD02 އ ޢ
+key AD03 ެ ޭ
+key AD04 ރ ޜ
+key AD05 ތ ޓ
+key AD06 ޔ ޠ
+key AD07 ު ޫ
+key AD08 ި ީ
+key AD09 ޮ ޯ
+key AD10 ޕ ÷
+key AD11 [ {
+key AD12 ] }
+key BKSL \ |
+key AC01 ަ ާ
+key AC02 ސ ށ
+key AC03 ދ ޑ
+key AC04 ފ ﷲ
+key AC05 ގ ޣ
+key AC06 ހ ޙ
+key AC07 ޖ ޛ
+key AC08 ކ ޚ
+key AC09 ލ ޅ
+key AC10 ; :
+key AC11 '''' "
+key LSGT | ¦ | ¦
+key AB01 ޒ ޡ
+key AB02 × ޘ
+key AB03 ޗ ޝ
+key AB04 ވ ޥ
+key AB05 ބ ޞ
+key AB06 ނ ޏ
+key AB07 މ ޟ
+key AB08 ، <
+key AB09 . >
+key AB10 / ؟
+key SPCE space
+key KPDL KP_Delete KP_Decimal

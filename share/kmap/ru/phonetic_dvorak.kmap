@@ -1,0 +1,56 @@
+kmap 1
+id ru-phonetic_dvorak
+layout ru
+variant phonetic_dvorak
+name Russian (phonetic, Dvorak)
+level3 ralt
+key TLDE ю Ю caps
+key AE01 1 !
+key AE02 2 @
+key AE03 3 ё
+key AE04 4 Ё
+key AE05 5 ъ
+key AE06 6 Ъ
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 ш Ш caps
+key AE12 щ Щ caps
+key AD01 '''' " dead_acute dead_diaeresis
+key AD02 , < dead_cedilla dead_caron
+key AD03 . > dead_abovedot ·
+key AD04 п П caps
+key AD05 ы Ы caps
+key AD06 ф Ф caps
+key AD07 г Г caps
+key AD08 ц Ц caps
+key AD09 р Р caps
+key AD10 л Л caps
+key AD11 / ?
+key AD12 ч Ч caps
+key BKSL э Э caps
+key AC01 а А caps
+key AC02 о О caps
+key AC03 е Е caps
+key AC04 у У caps
+key AC05 и И caps
+key AC06 д Д caps
+key AC07 х Х caps
+key AC08 т Т caps
+key AC09 н Н caps
+key AC10 с С caps
+key AC11 - _
+key LSGT < > | ¦
+key AB01 ; : dead_ogonek dead_doubleacute
+key AB02 я Я caps
+key AB03 й Й caps
+key AB04 к К caps
+key AB05 ь Ь caps
+key AB06 б Б caps
+key AB07 м М caps
+key AB08 в В caps
+key AB09 ж Ж caps
+key AB10 з З caps
+key SPCE space
+key KPDL KP_Delete KP_Decimal

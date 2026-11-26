@@ -1,0 +1,56 @@
+kmap 1
+id in-ben_bornona
+layout in
+variant ben_bornona
+name Bangla (India, Bornona)
+level3 ralt
+key TLDE U200D U200C
+key AE01 ১ !
+key AE02 ২ ঁ
+key AE03 ৩ '#'
+key AE04 ৪ ৳
+key AE05 ৫ %
+key AE06 ৬ ঃ
+key AE07 ৭ ৎ
+key AE08 ৮ *
+key AE09 ৯ (
+key AE10 ০ )
+key AE11 - _
+key AE12 = +
+key AD01 ং ঙ ৗ
+key AD02 ঢ ঠ ঊ
+key AD03 ে ৈ ঈ
+key AD04 র ৃ ঋ
+key AD05 ত ট
+key AD06 ধ থ এ
+key AD07 ু ূ উ
+key AD08 ি ী ই
+key AD09 ো ৌ ও
+key AD10 প ঐ ঔ
+key AD11 [ { ড়
+key AD12 ] }
+key BKSL ৱ ৰ
+key AC01 া অ ৴
+key AC02 স শ ৵
+key AC03 দ ড ৸
+key AC04 ফ
+key AC05 গ ঘ
+key AC06 ্ হ
+key AC07 জ ঝ
+key AC08 ক খ
+key AC09 ল ।
+key AC10 ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 য ড়
+key AB02 ষ ঢ় ৺
+key AB03 চ ছ
+key AB04 ভ
+key AB05 ব য়
+key AB06 ন ণ
+key AB07 ম ঞ
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

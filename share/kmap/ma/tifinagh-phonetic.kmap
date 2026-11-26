@@ -1,0 +1,56 @@
+kmap 1
+id ma-tifinagh-phonetic
+layout ma
+variant tifinagh-phonetic
+name Berber (Morocco, Tifinagh phonetic)
+level3 ralt
+key TLDE ²
+key AE01 & 1
+key AE02 none 2 ~
+key AE03 " 3 '#'
+key AE04 '''' 4 {
+key AE05 ( 5 [
+key AE06 - 6 |
+key AE07 none 7
+key AE08 _ 8 \
+key AE09 none 9 ^
+key AE10 none 0 @
+key AE11 ) ° ]
+key AE12 = + }
+key AD01 ⴰ
+key AD02 ⵣ ⵥ
+key AD03 ⴻ none U20AC
+key AD04 ⵔ ⵕ
+key AD05 ⵜ ⵟ
+key AD06 ⵢ
+key AD07 ⵓ
+key AD08 ⵉ
+key AD09 ⵄ
+key AD10 ⵃ
+key AD11 ⵯ
+key AD12 $ £ ¤
+key BKSL * µ
+key AC01 ⵇ
+key AC02 ⵙ ⵚ
+key AC03 ⴷ ⴹ
+key AC04 ⴼ
+key AC05 ⴳ ⴳ
+key AC06 ⵀ
+key AC07 ⵊ
+key AC08 ⴽ ⴽ
+key AC09 ⵍ
+key AC10 ⵎ
+key AC11 none %
+key LSGT < > | ¦
+key AB01 ⵡ ⵯ
+key AB02 ⵅ
+key AB03 ⵛ
+key AB04 ⵖ
+key AB05 ⴱ
+key AB06 ⵏ
+key AB07 , ?
+key AB08 ; .
+key AB09 : /
+key AB10 ! §
+key SPCE space
+key KPDL KP_Delete KP_Decimal

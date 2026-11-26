@@ -1,0 +1,56 @@
+kmap 1
+id pk-urd-nla
+layout pk
+variant urd-nla
+name Urdu (Pakistan, NLA)
+level3 ralt
+key TLDE ` ~ U200C
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 ٪
+key AE06 6 ^
+key AE07 7 ۖ
+key AE08 8 ٭
+key AE09 9 )
+key AE10 0 (
+key AE11 - _
+key AE12 = +
+key AD01 U0637 U0638 U200D
+key AD02 U0635 U0636 U200C
+key AD03 ھ U0630
+key AD04 U062F ڈ
+key AD05 ٹ U062B
+key AD06 پ U0651
+key AD07 U062A ۃ
+key AD08 U0628 U0640
+key AD09 U062C چ
+key AD10 U062D U062E
+key AD11 ] }
+key AD12 [ {
+key BKSL \ |
+key AC01 U0645 ژ
+key AC02 U0648 U0632
+key AC03 U0631 ڑ
+key AC04 U0646 ں
+key AC05 U0644 ۂ
+key AC06 ہ U0621
+key AC07 U0627 U0622
+key AC08 ک گ
+key AC09 ی U064A
+key AC10 U061B :
+key AC11 '''' "
+key LSGT | ¦ | ¦
+key AB01 U0642 U200D U200E
+key AB02 U0641 U200C ‪
+key AB03 ے ۓ ‭
+key AB04 U0633 U200E ‬
+key AB05 U0634 U0624 ‮
+key AB06 U063A U0626 ‫
+key AB07 U0639 U200F U200F
+key AB08 U060C >
+key AB09 ۔ <
+key AB10 / U061F
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,70 @@
+kmap 1
+id fr-bre
+layout fr
+variant bre
+name Breton (France)
+level3 ralt
+key TLDE ² dead_tilde dead_abovedot Γ
+key AE01 & 1 dead_macron Δ
+key AE02 é 2 dead_acute Θ
+key AE03 " 3 '#' Λ
+key AE04 '''' 4 { Ξ
+key AE05 ( 5 [ Π
+key AE06 - 6 | Σ
+key AE07 è 7 dead_grave Φ
+key AE08 _ 8 \ Ψ
+key AE09 ç 9 ± Ç
+key AE10 à 0 @ Ω
+key AE11 ) dead_abovering ] ß
+key AE12 = + } ¬
+key AD01 c_h C_h α Α C_H type=FOUR_LEVEL_PLUS_LOCK
+key AD02 w W ω Ω caps
+key AD03 e E € ε caps
+key AD04 r R ρ Ρ caps
+key AD05 t T τ Τ caps
+key AD06 y Y ψ Ψ caps
+key AD07 u U υ Υ caps
+key AD08 i I ı ι caps
+key AD09 o O œ Œ caps
+key AD10 p P π Π caps
+key AD11 dead_circumflex dead_diaeresis « ¥
+key AD12 / * » £
+key BKSL ? ! ¿ ¡
+key AC01 a A æ Æ caps
+key AC02 s S σ Σ caps
+key AC03 d D $ δ caps
+key AC04 f F φ Φ caps
+key AC05 g G γ Γ caps
+key AC06 h H η Η caps
+key AC07 j J ς ς caps
+key AC08 k K κ Κ caps
+key AC09 l L λ Λ caps
+key AC10 m M μ Μ caps
+key AC11 ù Ù ŭ ® caps
+key LSGT q Q < θ caps
+key AB01 z Z > ζ caps
+key AB02 x X ξ Ξ caps
+key AB03 c C ¢ ς caps
+key AB04 v V ο Ο caps
+key AB05 b B β Β caps
+key AB06 n N ν Ν caps
+key AB07 ch Ch χ Χ CH type=FOUR_LEVEL_PLUS_LOCK
+key AB08 ñ Ñ ~ dead_tilde caps
+key AB09 . : § ©
+key AB10 , ; % ‰
+key SPCE space nobreakspace space nobreakspace
+key KPDL KP_Delete . ,   type=FOUR_LEVEL_MIXED_KEYPAD
+key KPMU KP_Multiply ⋅ 0x010000d7 VoidSymbol XF86ClearGrab type=CTRL+ALT
+key KP7 KP_Home KP_7 ↖ ⇖ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP8 KP_Up KP_8 U2191 ⇑ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP9 KP_Prior KP_9 ↗ ⇗ type=FOUR_LEVEL_MIXED_KEYPAD
+key KPSU KP_Subtract − − VoidSymbol XF86Prev_VMode type=CTRL+ALT
+key KP4 KP_Left KP_4 U2190 ⇐ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP5 KP_Begin KP_5 ↔ U21D4 type=FOUR_LEVEL_MIXED_KEYPAD
+key KP6 KP_Right KP_6 U2192 U21D2 type=FOUR_LEVEL_MIXED_KEYPAD
+key KPAD KP_Add 0x0100002b 0x0100002b VoidSymbol XF86Next_VMode type=CTRL+ALT
+key KP1 KP_End KP_1 ↙ ⇙ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP2 KP_Down KP_2 U2193 ⇓ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP3 KP_Next KP_3 ↘ ⇘ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP0 KP_Insert KP_0 ↕ ⇕ type=FOUR_LEVEL_MIXED_KEYPAD
+key KPDV KP_Divide ∕ 0x010000f7 VoidSymbol XF86Ungrab type=CTRL+ALT

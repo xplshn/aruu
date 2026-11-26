@@ -1,0 +1,70 @@
+kmap 1
+id fr-bepo
+layout fr
+variant bepo
+name French (BEPO)
+level3 ralt
+key TLDE $ '#' – ¶
+key AE01 " 1 — „ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE02 « 2 < “ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE03 » 3 > ” type=FOUR_LEVEL_SEMIALPHABETIC
+key AE04 ( 4 [ ≤ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE05 ) 5 ] ≥ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE06 @ 6 ^ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE07 + 7 ± ¬ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE08 - 8 − ¼ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE09 / 9 ÷ ½ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE10 * 0 × ¾ type=FOUR_LEVEL_SEMIALPHABETIC
+key AE11 = ° ≠ ′
+key AE12 % ` ‰ ″
+key AD01 b B | ¦ caps
+key AD02 é É dead_acute dead_doubleacute caps
+key AD03 p P & § caps
+key AD04 o O œ Œ caps
+key AD05 è È dead_grave ` caps
+key AD06 dead_circumflex ! ¡
+key AD07 v V dead_caron caps
+key AD08 d D ð Ð caps
+key AD09 l L dead_stroke caps
+key AD10 j J ĳ Ĳ caps
+key AD11 z Z ə Ə caps
+key AD12 w W dead_breve caps
+key BKSL ç Ç dead_cedilla dead_belowcomma caps
+key AC01 a A æ Æ caps
+key AC02 u U ù Ù caps
+key AC03 i I dead_diaeresis dead_abovedot caps
+key AC04 e E € dead_currency caps
+key AC05 , ; ’ dead_horn
+key AC06 c C © ſ caps
+key AC07 t T þ Þ caps
+key AC08 s S ß ẞ caps
+key AC09 r R ® ™ caps
+key AC10 n N dead_tilde caps
+key AC11 m M dead_macron º caps
+key LSGT ê Ê / ¦ caps
+key AB01 à À \ caps
+key AB02 y Y { ‘ caps
+key AB03 x X } ’ caps
+key AB04 . : … ·
+key AB05 k K ~ caps
+key AB06 '''' ? ¿ dead_hook
+key AB07 q Q dead_abovering dead_belowdot caps
+key AB08 g G dead_greek caps
+key AB09 h H † ‡ caps
+key AB10 f F dead_ogonek ª caps
+key SPCE space nobreakspace _  
+key KPDL KP_Delete . ,   type=FOUR_LEVEL_MIXED_KEYPAD
+key KPMU KP_Multiply ⋅ 0x010000d7 VoidSymbol XF86ClearGrab type=CTRL+ALT
+key KP7 KP_Home KP_7 ↖ ⇖ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP8 KP_Up KP_8 U2191 ⇑ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP9 KP_Prior KP_9 ↗ ⇗ type=FOUR_LEVEL_MIXED_KEYPAD
+key KPSU KP_Subtract − − VoidSymbol XF86Prev_VMode type=CTRL+ALT
+key KP4 KP_Left KP_4 U2190 ⇐ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP5 KP_Begin KP_5 ↔ U21D4 type=FOUR_LEVEL_MIXED_KEYPAD
+key KP6 KP_Right KP_6 U2192 U21D2 type=FOUR_LEVEL_MIXED_KEYPAD
+key KPAD KP_Add 0x0100002b 0x0100002b VoidSymbol XF86Next_VMode type=CTRL+ALT
+key KP1 KP_End KP_1 ↙ ⇙ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP2 KP_Down KP_2 U2193 ⇓ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP3 KP_Next KP_3 ↘ ⇘ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP0 KP_Insert KP_0 ↕ ⇕ type=FOUR_LEVEL_MIXED_KEYPAD
+key KPDV KP_Divide ∕ 0x010000f7 VoidSymbol XF86Ungrab type=CTRL+ALT

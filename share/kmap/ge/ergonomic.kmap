@@ -1,0 +1,56 @@
+kmap 1
+id ge-ergonomic
+layout ge
+variant ergonomic
+name Georgian (ergonomic)
+level3 ralt
+key TLDE U201E '''' U201E ~
+key AE01 ! 1 !
+key AE02 U2116 2 @
+key AE03 , 3 '#' §
+key AE04 ; 4 $
+key AE05 % 5 €
+key AE06 : 6 ^
+key AE07 ? 7 &
+key AE08 . 8 * °
+key AE09 ( 9 ( «
+key AE10 ) 0 ) »
+key AE11 - + U2014 _
+key AE12 U201C = =
+key AD01 ჩ Q
+key AD02 პ ჭ
+key AD03 უ E ჱ
+key AD04 ძ ღ ® ®
+key AD05 ჭ თ none თ
+key AD06 ტ Y ჸ ჸ
+key AD07 თ U
+key AD08 ნ I ჼ I
+key AD09 ვ O ჳ
+key AD10 შ P
+key AD11 კ { [ {
+key AD12 ქ } ] }
+key BKSL / § \ |
+key AC01 ხ A ჴ
+key AC02 ი შ ჲ
+key AC03 ა D ჺ D
+key AC04 ე F ჱ
+key AC05 ო G ჹ
+key AC06 დ H ჵ
+key AC07 მ ჟ ჷ
+key AC08 ს K
+key AC09 რ L L
+key AC10 ბ : :
+key AC11 გ " ჹ "
+key LSGT « » | ¦
+key AB01 ჯ ძ
+key AB02 ჰ X ჵ X
+key AB03 ყ ჩ ჸ C
+key AB04 ღ V ჷ V
+key AB05 ჟ B
+key AB06 ზ N ჼ
+key AB07 ც M none M
+key AB08 ლ < « <
+key AB09 ფ > ჶ »
+key AB10 წ ? ჻
+key SPCE space
+key KPDL KP_Delete KP_Decimal

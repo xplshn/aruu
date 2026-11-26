@@ -1,0 +1,55 @@
+kmap 1
+id ca-ike
+layout ca
+variant ike
+name Inuktitut
+key TLDE ᕻ ᕵ
+key AE01 ᖕ 1
+key AE02 ᑉ 2
+key AE03 ᕐ 3
+key AE04 ᒃ 4
+key AE05 ᑦ 5
+key AE06 ᖅ 6
+key AE07 ᒻ 7
+key AE08 ᓐ 8
+key AE09 ᓪ 9
+key AE10 ᔾ 0
+key AE11 - _
+key AE12 ᕝ =
+key AD01 ᖏ ᒋ
+key AD02 ᐃ ᐱ
+key AD03 ᕿ ᕆ
+key AD04 ᑭ ᖖ
+key AD05 ᑎ ᙱ
+key AD06 ᓯ ᙳ
+key AD07 ᒥ ᙵ
+key AD08 ᓂ ᖤ
+key AD09 ᓕ ᖠ
+key AD10 ᔨ ᖦ
+key AD11 ᒡ ᔅ
+key AD12 dead_abovedot ᐞ
+key BKSL \ |
+key AC01 ᖑ ᒍ
+key AC02 ᐅ ᐳ
+key AC03 ᖁ ᕈ
+key AC04 ᑯ ᕕ
+key AC05 ᑐ (
+key AC06 ᓱ )
+key AC07 ᒧ ᔪ
+key AC08 ᓄ ᕗ
+key AC09 ᓗ ᖢ
+key AC10 ; :
+key AC11 '''' "
+key LSGT ᕹ ᕷ | ¦
+key AB01 ᖓ ᒐ
+key AB02 ᐊ ᐸ
+key AB03 ᖃ ᕋ
+key AB04 ᑲ ?
+key AB05 ᑕ ᕼ
+key AB06 ᓴ ᓇ
+key AB07 ᒪ ᓚ
+key AB08 , <
+key AB09 . >
+key AB10 ᔭ ᕙ
+key SPCE space
+key KPDL KP_Delete KP_Decimal

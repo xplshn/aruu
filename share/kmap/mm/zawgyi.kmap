@@ -1,0 +1,56 @@
+kmap 1
+id mm-zawgyi
+layout mm
+variant zawgyi
+name Burmese (Zawgyi)
+level3 ralt
+key TLDE ISO_Level3_Latch ~ `
+key AE01 ၁ ဍ ဎ ၯ
+key AE02 ၂ ႑ ၭ
+key AE03 ၃ ဋ ၬ
+key AE04 ၄ $ ၎ ဣ
+key AE05 ၅ % ဩ ဪ
+key AE06 ၆ ^
+key AE07 ၇ ရ ႐
+key AE08 ၈ ဂ ၢ
+key AE09 ၉ ( ဦ
+key AE10 ၀ )
+key AE11 - _ ႗
+key AE12 = + ၮ
+key AD01 ဆ ွ ၦ ၧ
+key AD02 တ ၽ ၱ ၲ
+key AD03 န ႏ ၷ ႖
+key AD04 မ ၽ ၼ
+key AD05 အ ႊ ဤ
+key AD06 ပ ႔ ၸ ၌
+key AD07 က ႕ ၠ ဉ
+key AD08 င ႈ ၍ ၪ
+key AD09 သ ဥ ႆ
+key AD10 စ ဏ ၥ ၰ
+key AD11 ဟ ဧ
+key AD12 ၏ ႒
+key BKSL ၏ ႒
+key AC01 ေ ဗ ဈ ၺ
+key AC02 ် ွ
+key AC03 ိ ီ ႎ ႌ
+key AC04 ္ ၤ
+key AC05 ါ ြ
+key AC06 ့ ံ
+key AC07 ျ ဲ ႃ ႄ
+key AC08 ု ဳ ႉ
+key AC09 ူ ဴ ႍ ႋ
+key AC10 း ၚ
+key AC11 ဒ ဓ ၵ ၶ
+key LSGT < > | ¦
+key AB01 ဖ ဇ ၹ ၨ
+key AB02 ထ ဌ ၳ ၴ
+key AB03 ခ ဃ ၡ ၣ
+key AB04 လ ဠ ႅ
+key AB05 ဘ ႀ ႓
+key AB06 ည ၿ ၫ ၩ
+key AB07 ာ ၾ ႁ ႂ
+key AB08 ယ ဝ
+key AB09 . ဈ
+key AB10 ။ ၊
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,55 @@
+kmap 1
+id th-pat
+layout th
+variant pat
+name Thai (Pattachote)
+key TLDE _ ฿
+key AE01 = +
+key AE02 ๒ "
+key AE03 ๓ /
+key AE04 ๔ ,
+key AE05 ๕ ?
+key AE06 ู ุ
+key AE07 ๗ _
+key AE08 ๘ .
+key AE09 ๙ (
+key AE10 ๐ )
+key AE11 ๑ -
+key AE12 ๖ %
+key AD01 ็ ๊
+key AD02 ต ฤ
+key AD03 ย ๆ
+key AD04 อ ญ
+key AD05 ร ษ
+key AD06 ่ ึ
+key AD07 ด ฝ
+key AD08 ม ซ
+key AD09 ว ถ
+key AD10 แ ฒ
+key AD11 ใ ฯ
+key AD12 ฌ ฦ
+key BKSL ๅ ํ
+key AC01 ้ ๋
+key AC02 ท ธ
+key AC03 ง ำ
+key AC04 ก ณ
+key AC05 ั ์
+key AC06 ี ื
+key AC07 า ผ
+key AC08 น ช
+key AC09 เ โ
+key AC10 ไ ฆ
+key AC11 ข ฑ
+key LSGT < > | ¦
+key AB01 บ ฎ
+key AB02 ป ฏ
+key AB03 ล ฐ
+key AB04 ห ภ
+key AB05 ิ ฺ
+key AB06 ค ศ
+key AB07 ส ฮ
+key AB08 ะ ฟ
+key AB09 จ ฉ
+key AB10 พ ฬ
+key SPCE space
+key KPDL KP_Delete KP_Decimal

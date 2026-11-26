@@ -1,0 +1,54 @@
+kmap 1
+id la
+layout la
+name Lao
+key TLDE U200D
+key AE01 ຢ ໑
+key AE02 ຟ ໒
+key AE03 ໂ ໓
+key AE04 ຖ ໔
+key AE05 ຸ ໌
+key AE06 ູ ຼ
+key AE07 ຄ ໕
+key AE08 ຕ ໖
+key AE09 ຈ ໗
+key AE10 ຂ ໘
+key AE11 ຊ ໙
+key AE12 ໍ
+key AD01 ົ
+key AD02 ໄ ໐
+key AD03 ຳ
+key AD04 ພ _
+key AD05 ະ +
+key AD06 ິ
+key AD07 ີ
+key AD08 ຣ ຮ
+key AD09 ນ
+key AD10 ຍ ຽ
+key AD11 ບ -
+key AD12 ລ }
+key BKSL ໜ ໝ
+key AC01 ັ
+key AC02 ຫ ;
+key AC03 ກ .
+key AC04 ດ ,
+key AC05 ເ :
+key AC06 ້ ໊
+key AC07 ່ ໋
+key AC08 າ !
+key AC09 ສ ?
+key AC10 ວ %
+key AC11 ງ =
+key LSGT < > | ¦
+key AB01 ຜ ₭
+key AB02 ປ (
+key AB03 ແ ຯ
+key AB04 ອ
+key AB05 ຶ
+key AB06 ື
+key AB07 ທ ໆ
+key AB08 ມ `
+key AB09 ໃ $
+key AB10 ຝ )
+key SPCE space
+key KPDL KP_Delete KP_Decimal

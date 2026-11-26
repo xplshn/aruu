@@ -1,0 +1,76 @@
+kmap 1
+id de-neo
+layout de
+variant neo
+name German (Neo 2)
+key TLDE dead_circumflex dead_caron ↻ ˞ dead_abovedot Pointer_EnableKeys dead_belowdot
+key AE01 1 ° ¹ ₁ ª none ¬
+key AE02 2 § ² ₂ º none ∨
+key AE03 3 ℓ ³ ₃ № none ∧
+key AE04 4 » › ♀ none none U22A5
+key AE05 5 « ‹ ♂ · none ∡
+key AE06 6 $ ¢ ⚥ £ none ∥
+key AE07 7 € ¥ ϰ ¤ none →
+key AE08 8 „ ‚ ⟨ Tab ISO_Left_Tab U221E
+key AE09 9 “ ‘ ⟩ KP_Divide KP_Divide ∝
+key AE10 0 ” ’ ₀ KP_Multiply KP_Multiply ∅
+key AE11 - — none ‑ KP_Subtract KP_Subtract ­
+key AE12 dead_grave dead_cedilla dead_abovering dead_abovereversedcomma dead_diaeresis none dead_macron
+key AD01 x X … ξ Prior Prior Ξ caps
+key AD02 v V _ none BackSpace BackSpace √ caps
+key AD03 l L [ λ Up Up Λ caps
+key AD04 c C ] χ Delete Delete ℂ caps
+key AD05 w W ^ ω Next Next Ω caps
+key AD06 k K ! κ ¡ none × caps
+key AD07 h H < ψ KP_7 KP_7 Ψ caps
+key AD08 g G > γ KP_8 KP_8 Γ caps
+key AD09 f F = φ KP_9 KP_9 Φ caps
+key AD10 q Q & ϕ KP_Add KP_Add ℚ caps
+key AD11 ß ẞ ſ ς − none ∘ caps
+key AD12 dead_acute dead_tilde dead_stroke dead_abovecomma dead_doubleacute none dead_breve
+key BKSL ISO_Level3_Shift
+key AC01 u U \ none Home Home ⊂ caps
+key AC02 i I / ι Left Left ∫ caps
+key AC03 a A { α Down Down ∀ caps
+key AC04 e E } ε Right Right ∃ caps
+key AC05 o O * ο End End ∈ caps
+key AC06 s S ? σ ¿ none Σ caps
+key AC07 n N ( ν KP_4 KP_4 ℕ caps
+key AC08 r R ) ρ KP_5 KP_5 ℝ caps
+key AC09 t T - τ KP_6 KP_6 ∂ caps
+key AC10 d D : δ KP_Separator , Δ caps
+key AC11 y Y @ υ . KP_Decimal ∇ caps
+key LSGT ISO_Level5_Shift ISO_Level5_Shift ISO_Level5_Shift ISO_Level5_Shift ISO_Level5_Lock ISO_Level5_Lock ISO_Level5_Lock ISO_Level5_Lock type=EIGHT_LEVEL
+key AB01 ü Ü '#' none Escape Escape ∪ caps
+key AB02 ö Ö $ ϵ Tab Tab ∩ caps
+key AB03 ä Ä | η Insert Insert ℵ caps
+key AB04 p P ~ π Return Return Π caps
+key AB05 z Z ` ζ Undo Redo ℤ caps
+key AB06 b B + β : none ⇐ caps
+key AB07 m M % μ KP_1 KP_1 ⇔ caps
+key AB08 , – " ϱ KP_2 KP_2 U21D2
+key AB09 . enfilledcircbullet '''' ϑ KP_3 KP_3 ↦
+key AB10 j J ; θ ; none Θ caps
+key SPCE space space space nobreakspace KP_0 KP_0  
+key KPDL KP_Separator . , ′ KP_Delete KP_Delete ″
+key TAB Tab ISO_Left_Tab Multi_key ISO_Level5_Lock none none none ISO_Level5_Lock
+key LFSH Shift_L Caps_Lock
+key RTSH Shift_R Caps_Lock
+key KPMU KP_Multiply KP_Multiply ⋅ ⊙ × none ⊗
+key CAPS ISO_Level3_Shift
+key NMLK Tab ISO_Left_Tab = ≈ ≠ Pointer_EnableKeys ≡
+key KP7 KP_7 ✔ ↕ ≪ KP_Home KP_Home ⌈
+key KP8 KP_8 ✘ ↑ ∩ KP_Up KP_Up ⋂
+key KP9 KP_9 † ⃗ ≫ KP_Prior KP_Prior ⌉
+key KPSU KP_Subtract KP_Subtract − ⊖ ∖ none ∸
+key KP4 KP_4 ♣ ← ⊂ KP_Left KP_Left ⊆
+key KP5 KP_5 € : ⊶ KP_Begin KP_Begin ⊷
+key KP6 KP_6 ‣ → ⊃ KP_Right KP_Right ⊇
+key KPAD KP_Add KP_Add ± ⊕ ∓ none ∔
+key KP1 KP_1 ♦ ↔ ≤ KP_End KP_End ⌊
+key KP2 KP_2 ♥ ↓ ∪ KP_Down KP_Down ⋃
+key KP3 KP_3 ♠ ⇌ ≥ KP_Next KP_Next ⌋
+key KP0 KP_0 ␣ % ‰ KP_Insert KP_Insert □
+key KPEN KP_Enter KP_Enter KP_Enter KP_Enter KP_Enter KP_Enter KP_Enter
+key KPDV KP_Divide KP_Divide ÷ ⌀ ⁄ none ∣
+key RALT ISO_Level5_Shift ISO_Level5_Shift ISO_Level5_Shift ISO_Level5_Shift ISO_Level5_Lock ISO_Level5_Lock ISO_Level5_Lock ISO_Level5_Lock type=EIGHT_LEVEL

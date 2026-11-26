@@ -1,0 +1,56 @@
+kmap 1
+id pk-pak_urdu_phonetic
+layout pk
+variant pak_urdu_phonetic
+name Urdu (Pak Urdu Phonetic)
+level3 ralt
+key TLDE U064D U064B ۤ .
+key AE01 1 ! ۱ ٱ
+key AE02 2 @ ۲ VoidSymbol
+key AE03 3 '#' ۳ VoidSymbol
+key AE04 4 $ ۴ VoidSymbol
+key AE05 5 ٪ ۵ ۬
+key AE06 6 ۂ ۶ ۮ
+key AE07 7 & ۷ ۧ
+key AE08 8 ٭ ۸ ۞
+key AE09 9 ) ۹ ﴾
+key AE10 0 ( ۰ ﴿
+key AE11 - U0640 ؀ VoidSymbol
+key AE12 ٓ ۤ ؂ VoidSymbol
+key AD01 U0642 ﷺ ۥ ڪ
+key AD02 U0648 U0624 U200D ۥ
+key AD03 U0639 ؑ ۠ VoidSymbol
+key AD04 U0631 ڑ ؓ VoidSymbol
+key AD05 U062A ٹ U200C VoidSymbol
+key AD06 ے ۓ ؁ ۦ
+key AD07 U0626 U0621 ٔ ٕ
+key AD08 ی ٰ U064A U0649
+key AD09 ہ ۃ U0647 U0629
+key AD10 پ U064F VoidSymbol ۗ
+key AD11 U064C ٗ ۩ ۖ
+key AD12 U0652 U0651 ٘ VoidSymbol
+key BKSL ؎ ؔ ؏ ؃
+key AC01 U0627 U0622 U0623 U0625
+key AC02 U0633 U0635 ۜ ۪
+key AC03 U062F ڈ VoidSymbol VoidSymbol
+key AC04 U0641 ٖ VoidSymbol VoidSymbol
+key AC05 گ U063A VoidSymbol VoidSymbol
+key AC06 ھ U062D VoidSymbol VoidSymbol
+key AC07 U062C U0636 ۚ ۭ
+key AC08 ک U062E U0643 VoidSymbol
+key AC09 U0644 ؒ ۙ VoidSymbol
+key AC10 U061B : U201C U2018
+key AC11 '''' " U201D U2019
+key LSGT < > | ¦
+key AB01 U0632 U0630 ۡ VoidSymbol
+key AB02 U0634 ژ VoidSymbol ﷻ
+key AB03 چ U062B ۣ VoidSymbol
+key AB04 U0637 U0638 ؕ VoidSymbol
+key AB05 U0628 ﷽ VoidSymbol VoidSymbol
+key AB06 U0646 ں ۨ ۿ
+key AB07 U0645 ؐ ۘ ۢ
+key AB08 U060C U0650 ۫ ؍
+key AB09 ۔ U064E ۯ ۝
+key AB10 / U061F VoidSymbol ۛ
+key SPCE space VoidSymbol VoidSymbol VoidSymbol
+key KPDL KP_Delete KP_Decimal

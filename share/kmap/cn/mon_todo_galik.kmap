@@ -1,0 +1,55 @@
+kmap 1
+id cn-mon_todo_galik
+layout cn
+variant mon_todo_galik
+name Mongolian (Todo Galik)
+key TLDE ᠍ ᠍
+key AE01 ᠑ ᠑
+key AE02 ᠒ ᠒
+key AE03 ᠓ ᠓
+key AE04 ᠔ ᡃ
+key AE05 ᠕ ᠕
+key AE06 ᠖ U200C
+key AE07 ᠗ ᠗
+key AE08 ᠘ U200D
+key AE09 ᠙ ᤙ
+key AE10 ᠐ ᤐ
+key AE11    
+key AE12 VoidSymbol VoidSymbol
+key AD01 ᢀ ᢀ
+key AD02 ᢁ ᡆ
+key AD03 ᢂ ᡄ
+key AD04 ᢃ ᢃ
+key AD05 ᢄ ᢄ
+key AD06 ᢅ ᢅ
+key AD07 ᢆ ᡉ
+key AD08 ᢉ ᡅ
+key AD09 ᢊ ᢊ
+key AD10 ᢇ ᢇ
+key AD11 VoidSymbol VoidSymbol
+key AD12 VoidSymbol VoidSymbol
+key BKSL VoidSymbol VoidSymbol
+key AC01 ᢋ ᠠ
+key AC02 ᢌ ᢌ
+key AC03 ᢍ ᢍ
+key AC04 ᢎ ᢎ
+key AC05 ᢏ ᢏ
+key AC06 ᢔ ᢔ
+key AC07 ᢖ ᢖ
+key AC08 ᢗ ᢗ
+key AC09 ᢘ ᢘ
+key AC10 ᢒ ᢒ
+key AC11 ᠋ ᠌
+key LSGT < > | ¦
+key AB01 ᢙ ᢙ
+key AB02 ᢧ ᢦ
+key AB03 ᢓ ᢓ
+key AB04 ᡇ ᡇ
+key AB05 ᢩ ᢩ
+key AB06 ᠅ ᠅
+key AB07 ᠀ ᡛ
+key AB08 ᠂ ᠂
+key AB09 ᠃ ᠃
+key AB10 VoidSymbol VoidSymbol
+key SPCE space
+key KPDL KP_Delete KP_Decimal

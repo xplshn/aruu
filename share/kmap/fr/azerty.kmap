@@ -1,0 +1,56 @@
+kmap 1
+id fr-azerty
+layout fr
+variant azerty
+name French (AZERTY)
+level3 ralt
+key TLDE ²
+key AE01 & 1
+key AE02 é 2 ~
+key AE03 " 3 '#'
+key AE04 '''' 4 {
+key AE05 ( 5 [
+key AE06 - 6 |
+key AE07 è 7 `
+key AE08 _ 8 \
+key AE09 ç 9 ^
+key AE10 à 0 @
+key AE11 ) ° ]
+key AE12 = + }
+key AD01 a A caps
+key AD02 z Z caps
+key AD03 e E € caps
+key AD04 r R caps
+key AD05 t T caps
+key AD06 y Y caps
+key AD07 u U caps
+key AD08 i I caps
+key AD09 o O caps
+key AD10 p P caps
+key AD11 dead_circumflex dead_diaeresis
+key AD12 $ £ ¤
+key BKSL * µ
+key AC01 q Q caps
+key AC02 s S caps
+key AC03 d D caps
+key AC04 f F caps
+key AC05 g G caps
+key AC06 h H caps
+key AC07 j J caps
+key AC08 k K caps
+key AC09 l L caps
+key AC10 m M caps
+key AC11 ù %
+key LSGT < > | ¦
+key AB01 w W caps
+key AB02 x X caps
+key AB03 c C caps
+key AB04 v V caps
+key AB05 b B caps
+key AB06 n N caps
+key AB07 , ?
+key AB08 ; .
+key AB09 : /
+key AB10 ! §
+key SPCE space
+key KPDL KP_Delete KP_Decimal

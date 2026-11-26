@@ -1,0 +1,57 @@
+kmap 1
+id lt-lekp
+layout lt
+variant lekp
+name Lithuanian (LEKP)
+level3 ralt
+key TLDE ` ~ ´
+key AE01 / '#' |
+key AE02 \ @ §
+key AE03 . {
+key AE04 , }
+key AE05 f F caps
+key AE06 ! –
+key AE07 w W caps
+key AE08 ų Ų caps
+key AE09 į Į caps
+key AE10 ( „ ®
+key AE11 ) “ ©
+key AE12 : & ™
+key AD01 q Q € caps
+key AD02 g G 7 caps
+key AD03 r R 8 caps
+key AD04 l L 9 caps
+key AD05 d D % caps
+key AD06 č Č caps
+key AD07 j J caps
+key AD08 u U . caps
+key AD09 ė Ė - caps
+key AD10 ę Ę / caps
+key AD11 ? [ ÷
+key AD12 = ]
+key BKSL '''' _
+key AC01 a A 0 caps
+key AC02 k K 4 caps
+key AC03 s S 5 caps
+key AC04 t T 6 caps
+key AC05 m M $ caps
+key AC06 p P caps
+key AC07 n N caps
+key AC08 e E , caps
+key AC09 i I + caps
+key AC10 o O * caps
+key AC11 y Y × caps
+key LSGT ; " £ ¦
+key AB01 z Z ^ caps
+key AB02 x X 1 caps
+key AB03 c C 2 caps
+key AB04 v V 3 caps
+key AB05 ž Ž caps
+key AB06 š Š caps
+key AB07 b B ° caps
+key AB08 ū Ū < caps
+key AB09 ą Ą > caps
+key AB10 h H caps
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key CAPS BackSpace

@@ -1,0 +1,56 @@
+kmap 1
+id de-ru
+layout de
+variant ru
+name Russian (Germany, phonetic)
+level3 ralt
+key TLDE ё Ё ~ U2033 caps
+key AE01 1 ! ¹ ¡
+key AE02 2 " ² ⅛
+key AE03 3 § ³ £
+key AE04 4 $ ¼ ¤
+key AE05 5 % ½ ⅜
+key AE06 6 & ¬ ⅝
+key AE07 7 / { ⅞
+key AE08 8 ( [ ™
+key AE09 9 ) ] ±
+key AE10 0 = } °
+key AE11 ß ? \ ¿ ẞ type=FOUR_LEVEL_PLUS_LOCK
+key AE12 ъ Ъ dead_cedilla dead_ogonek caps
+key AD01 я Я @ Ω caps
+key AD02 в В ſ § caps
+key AD03 е Е € € caps
+key AD04 р Р ¶ ® caps
+key AD05 т Т ŧ Ŧ caps
+key AD06 з З ← ¥ caps
+key AD07 у У ↓ ↑ caps
+key AD08 и И → ı caps
+key AD09 о О ø Ø caps
+key AD10 п П þ Þ caps
+key AD11 ш Ш dead_diaeresis dead_abovering caps
+key AD12 щ Щ + * caps
+key BKSL ю Ю '#' '''' caps
+key AC01 а А æ Æ caps
+key AC02 с С ſ ẞ caps
+key AC03 д Д ð Ð caps
+key AC04 ф Ф đ ª caps
+key AC05 г Г ŋ Ŋ caps
+key AC06 х Х ħ Ħ caps
+key AC07 й Й dead_belowdot dead_abovedot caps
+key AC08 к К ĸ & caps
+key AC09 л Л ł Ł caps
+key AC10 ч Ч dead_doubleacute dead_belowdot caps
+key AC11 э Э dead_circumflex dead_caron caps
+key LSGT < > | dead_belowmacron
+key AB01 ы Ы » › caps
+key AB02 ж Ж « ‹ caps
+key AB03 ц Ц ¢ © caps
+key AB04 ь Ь „ ‚ caps
+key AB05 б Б “ ‘ caps
+key AB06 н Н ” ’ caps
+key AB07 м М µ º caps
+key AB08 , ; · ×
+key AB09 . : U2026 ÷
+key AB10 - _ – —
+key SPCE space
+key KPDL KP_Delete KP_Separator

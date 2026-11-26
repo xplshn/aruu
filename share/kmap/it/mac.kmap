@@ -1,0 +1,56 @@
+kmap 1
+id it-mac
+layout it
+variant mac
+name Italian (Macintosh)
+level3 ralt
+key TLDE @ '#' ·
+key AE01 & 1 « »
+key AE02 " 2
+key AE03 '''' 3
+key AE04 ( 4 { [
+key AE05 ç 5 Ç Í
+key AE06 è 6 ¶ ·
+key AE07 ) 7 } ]
+key AE08 £ 8 ∞
+key AE09 à 9 ´ Ô
+key AE10 é 0 ` Ó
+key AE11 - _
+key AE12 = + ≠ ±
+key AD01 q Q caps
+key AD02 z Z caps
+key AD03 e E € caps
+key AD04 r R ® caps
+key AD05 t T caps
+key AD06 y Y Ú ÿ caps
+key AD07 u U caps
+key AD08 i I î ï caps
+key AD09 o O caps
+key AD10 p P caps
+key AD11 ì ^
+key AD12 $ *
+key BKSL § ° @ '#'
+key AC01 a A å Å caps
+key AC02 s S ß ẞ caps
+key AC03 d D caps
+key AC04 f F caps
+key AC05 g G caps
+key AC06 h H Ì Î caps
+key AC07 j J Ï Í caps
+key AC08 k K È Ë caps
+key AC09 l L ß | caps
+key AC10 m M µ Ó caps
+key AC11 ù % æ Æ
+key LSGT < > | ¦
+key AB01 w W caps
+key AB02 x X caps
+key AB03 c C © © caps
+key AB04 v V caps
+key AB05 b B caps
+key AB06 n N dead_tilde caps
+key AB07 , ? ¿
+key AB08 ; .
+key AB09 : / | \
+key AB10 ò ! ¡
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,55 @@
+kmap 1
+id th-tis
+layout th
+variant tis
+name Thai (TIS-820.2538)
+key TLDE ๏ ๛
+key AE01 ฿ ๅ
+key AE02 / ๑
+key AE03 - ๒
+key AE04 ภ ๓
+key AE05 ถ ๔
+key AE06 ุ ู
+key AE07 ึ ๎
+key AE08 ค ๕
+key AE09 ต ๖
+key AE10 จ ๗
+key AE11 ข ๘
+key AE12 ช ๙
+key AD01 ๆ ๐
+key AD02 ไ "
+key AD03 ำ ฎ
+key AD04 พ ฑ
+key AD05 ะ ธ
+key AD06 ั ํ
+key AD07 ี ๊
+key AD08 ร ณ
+key AD09 น ฯ ๚ type=THREE_LEVEL
+key AD10 ย ญ
+key AD11 บ ฐ
+key AD12 ล ,
+key BKSL ฅ ฃ
+key AC01 ฟ ฤ
+key AC02 ห ฆ
+key AC03 ก ฏ
+key AC04 ด โ
+key AC05 เ ฌ
+key AC06 ้ ็
+key AC07 ่ ๋
+key AC08 า ษ
+key AC09 ส ศ
+key AC10 ว ซ
+key AC11 ง .
+key LSGT < > | ¦
+key AB01 ผ (
+key AB02 ป )
+key AB03 แ ฉ
+key AB04 อ ฮ
+key AB05 ิ ฺ
+key AB06 ื ์
+key AB07 ท ?
+key AB08 ม ฒ
+key AB09 ใ ฬ
+key AB10 ฝ ฦ
+key SPCE space
+key KPDL KP_Delete KP_Decimal

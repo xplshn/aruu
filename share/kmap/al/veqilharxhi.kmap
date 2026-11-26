@@ -1,0 +1,56 @@
+kmap 1
+id al-veqilharxhi
+layout al
+variant veqilharxhi
+name Albanian (Veqilharxhi)
+level3 ralt
+key TLDE ` ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 𐖰 𐖉 caps
+key AD02 𐖟 𐕸 w W caps
+key AD03 𐖞 𐕷 caps
+key AD04 𐖱 𐖊 𐖲 𐖋 caps
+key AD05 𐖵 𐖎 𐖶 𐖏 caps
+key AD06 𐖻 𐖔 caps
+key AD07 𐖷 𐖐 caps
+key AD08 𐖥 𐕾 caps
+key AD09 𐖮 𐖇 caps
+key AD10 𐖯 𐖈 caps
+key AD11 [ {
+key AD12 ] }
+key BKSL \ |
+key AC01 𐖗 𐕰 caps
+key AC02 𐖳 𐖌 𐖴 𐖍 caps
+key AC03 𐖜 𐕵 𐖝 𐕶 caps
+key AC04 𐖠 𐕹 caps
+key AC05 𐖡 𐕺 𐖢 𐕻 caps
+key AC06 𐖣 𐕼 caps
+key AC07 𐖧 𐖀 caps
+key AC08 𐖨 𐖁 caps
+key AC09 𐖩 𐖂 𐖪 𐖃 caps
+key AC10 ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 𐖼 𐖕 𐖽 𐖖 caps
+key AB02 𐖹 𐖒 𐖺 𐖓 caps
+key AB03 𐖚 𐕳 𐖛 𐕴 caps
+key AB04 𐖸 𐖑 caps
+key AB05 𐖘 𐕱 caps
+key AB06 𐖬 𐖅 𐖭 𐖆 caps
+key AB07 𐖫 𐖄 caps
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

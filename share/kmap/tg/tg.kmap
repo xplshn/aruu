@@ -1,0 +1,55 @@
+kmap 1
+id tg
+layout tg
+name French (Togo)
+level3 ralt
+key TLDE ²
+key AE01 & 1
+key AE02 é 2 ~
+key AE03 " 3 '#'
+key AE04 '''' 4 {
+key AE05 ( 5 [
+key AE06 - 6 |
+key AE07 è 7 `
+key AE08 _ 8 \
+key AE09 ç 9 ^
+key AE10 à 0 @
+key AE11 ) ° ]
+key AE12 = + }
+key AD01 a A caps
+key AD02 z Z ʒ Ʒ caps
+key AD03 e E € caps
+key AD04 r R ɛ Ɛ caps
+key AD05 t T ɗ Ɗ caps
+key AD06 y Y ƴ Ƴ caps
+key AD07 u U ʊ Ʊ caps
+key AD08 i I ɩ Ɩ caps
+key AD09 o O ɔ Ɔ caps
+key AD10 p P caps
+key AD11 dead_circumflex dead_diaeresis dead_caron
+key AD12 $ £ ¤
+key BKSL * µ dead_acute
+key AC01 q Q ǝ Ǝ caps
+key AC02 s S caps
+key AC03 d D ɖ Ɖ caps
+key AC04 f F U0192 Ƒ caps
+key AC05 g G ɣ Ɣ caps
+key AC06 h H ɦ U0124 caps
+key AC07 j J ɨ Ɨ caps
+key AC08 k K caps
+key AC09 l L caps
+key AC10 m M ɲ Ɲ caps
+key AC11 ù % dead_grave
+key LSGT < > | ¦
+key AB01 w W caps
+key AB02 x X caps
+key AB03 c C caps
+key AB04 v V ʋ Ʋ caps
+key AB05 b B ɓ Ɓ caps
+key AB06 n N U014B U014A caps
+key AB07 , ?
+key AB08 ; .
+key AB09 : / dead_macron
+key AB10 ! § dead_tilde
+key SPCE space
+key KPDL KP_Delete KP_Decimal

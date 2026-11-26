@@ -1,0 +1,56 @@
+kmap 1
+id in-bolnagri
+layout in
+variant bolnagri
+name Hindi (Bolnagri)
+level3 ralt
+key TLDE ं ँ ` ~
+key AE01 1 ! १ !
+key AE02 2 @ २ @
+key AE03 3 '#' ३ '#'
+key AE04 4 $ ४ ₹
+key AE05 5 % ५ %
+key AE06 6 ^ ६ ^
+key AE07 7 & ७ &
+key AE08 8 * ८ *
+key AE09 9 ( ९ (
+key AE10 0 ) ० )
+key AE11 - _ type=FOUR_LEVEL
+key AE12 = + type=FOUR_LEVEL
+key AD01 U200C U200D type=FOUR_LEVEL
+key AD02 व ॐ type=FOUR_LEVEL
+key AD03 े ै ए ऐ
+key AD04 र ृ ऱ ऋ
+key AD05 त थ type=FOUR_LEVEL
+key AD06 य ञ type=FOUR_LEVEL
+key AD07 ु ू उ ऊ
+key AD08 ि ी इ ई
+key AD09 ो ौ ओ औ
+key AD10 प फ type=FOUR_LEVEL
+key AD11 [ { type=FOUR_LEVEL
+key AD12 ] } type=FOUR_LEVEL
+key BKSL । ॥ \ |
+key AC01 ा आ अ आ
+key AC02 स ष type=FOUR_LEVEL
+key AC03 द ध type=FOUR_LEVEL
+key AC04 ट ठ type=FOUR_LEVEL
+key AC05 ग घ type=FOUR_LEVEL
+key AC06 ह ः type=FOUR_LEVEL
+key AC07 ज झ type=FOUR_LEVEL
+key AC08 क ख type=FOUR_LEVEL
+key AC09 ल ळ ॢ ऌ
+key AC10 ; : type=FOUR_LEVEL
+key AC11 '''' " type=FOUR_LEVEL
+key LSGT < > | ¦
+key AB01 श ॅ श ऍ
+key AB02 ् ॉ ् ऑ
+key AB03 च छ type=FOUR_LEVEL
+key AB04 ड ढ type=FOUR_LEVEL
+key AB05 ब भ type=FOUR_LEVEL
+key AB06 न ण type=FOUR_LEVEL
+key AB07 म ङ म ऽ
+key AB08 , ॰ type=FOUR_LEVEL
+key AB09 . ़ type=FOUR_LEVEL
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

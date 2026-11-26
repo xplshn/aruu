@@ -1,0 +1,40 @@
+kmap 1
+id ie-ogam
+layout ie
+variant ogam
+name Ogham
+key TLDE ᚜
+key AD01 ᚊ
+key AD02 ᚕ
+key AD03 ᚓ
+key AD04 ᚏ
+key AD05 ᚈ
+key AD06 ᚘ
+key AD07 ᚒ
+key AD08 ᚔ
+key AD09 ᚑ
+key AD10 ᚚ
+key BKSL  
+key AC01 ᚐ
+key AC02 ᚄ
+key AC03 ᚇ
+key AC04 ᚃ
+key AC05 ᚌ
+key AC06 ᚆ
+key AC07 ᚗ
+key AC08 ᚖ
+key AC09 ᚂ
+key LSGT ᚛ ᚜
+key AB01 ᚎ
+key AB02 ᚙ
+key AB03 ᚉ
+key AB04 ᚍ
+key AB05 ᚁ
+key AB06 ᚅ
+key AB07 ᚋ
+key AB08 ᚜
+key AB09 ᚛
+key AB10  
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key RWIN Multi_key Multi_key

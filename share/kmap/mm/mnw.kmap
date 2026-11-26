@@ -1,0 +1,55 @@
+kmap 1
+id mm-mnw
+layout mm
+variant mnw
+name Mon
+key TLDE ၝ ဎ ` ~
+key AE01 ၁ ဍ 1 !
+key AE02 ၂ ၒ 2 @
+key AE03 ၃ ဋ 3 '#'
+key AE04 ၄ ၓ 4 $
+key AE05 ၅ % 5 %
+key AE06 ၆ ဵ 6 ^
+key AE07 ၇ ရ 7 &
+key AE08 ၈ ဂ 8 *
+key AE09 ၉ ( 9 (
+key AE10 ၀ ) 0 )
+key AE11 - × _ VoidSymbol
+key AE12 = + ÷ VoidSymbol
+key AD01 ဆ ၛ q Q
+key AD02 တ ဝ w W
+key AD03 န ဣ e E
+key AD04 မ ၟ r R
+key AD05 အ ဳ t T
+key AD06 ပ ၠ y Y
+key AD07 က ဥ u U
+key AD08 ၚ ၎ i I
+key AD09 သ ဿ o O
+key AD10 စ ဏ p P
+key AD11 ဟ ဨ [ {
+key AD12 ဩ / ] }
+key BKSL ၑ | \ |
+key AC01 ေ ဗ a A
+key AC02 ျ ှ s S
+key AC03 ိ ီ d D
+key AC04 ် ္ f F
+key AC05 ါ ွ g G
+key AC06 ဴ ံ h H
+key AC07 ြ ဲ j J
+key AC08 ု ဒ k K
+key AC09 ူ ဓ l L
+key AC10 း : ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ဖ ဇ z Z
+key AB02 ထ ဌ x X
+key AB03 ခ ဃ c C
+key AB04 လ ဠ v V
+key AB05 ဘ ၐ b B
+key AB06 ည ဉ n N
+key AB07 ာ ၔ m M
+key AB08 ယ ၞ , <
+key AB09 ၜ ၕ . >
+key AB10 ။ ၊ / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

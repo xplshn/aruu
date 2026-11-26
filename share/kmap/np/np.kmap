@@ -1,0 +1,54 @@
+kmap 1
+id np
+layout np
+name Nepali
+key TLDE ऽ ़
+key AE01 १ !
+key AE02 २ @
+key AE03 ३ '#'
+key AE04 ४ $
+key AE05 ५ %
+key AE06 ६ ^
+key AE07 ७ &
+key AE08 ८ *
+key AE09 ९ (
+key AE10 ० )
+key AE11 - ॒
+key AE12 U200D U200C
+key AD01 ट ठ
+key AD02 ौ औ
+key AD03 े ै
+key AD04 र ृ
+key AD05 त थ
+key AD06 य ञ
+key AD07 ु ू
+key AD08 ि ी
+key AD09 ो ओ
+key AD10 प फ
+key AD11 इ ई
+key AD12 ए ऐ
+key BKSL ॐ ः
+key AC01 ा आ
+key AC02 स श
+key AC03 द ध
+key AC04 उ ऊ
+key AC05 ग घ
+key AC06 ह अ
+key AC07 ज झ
+key AC08 क ख
+key AC09 ल ॥
+key AC10 ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ष ऋ
+key AB02 ड ढ
+key AB03 च छ
+key AB04 व ँ
+key AB05 ब भ
+key AB06 न ण
+key AB07 म ं
+key AB08 , ङ
+key AB09 । .
+key AB10 ् ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

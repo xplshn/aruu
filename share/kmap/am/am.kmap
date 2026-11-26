@@ -1,0 +1,54 @@
+kmap 1
+id am
+layout am
+name Armenian
+key TLDE ՝ ՜
+key AE01 ֆ Ֆ caps
+key AE02 ձ Ձ caps
+key AE03 ֊ U2014
+key AE04 , $
+key AE05 ։ U2026
+key AE06 ՞ %
+key AE07 ․ և
+key AE08 ՛ ՚
+key AE09 ) (
+key AE10 օ Օ caps
+key AE11 է Է caps
+key AE12 ղ Ղ caps
+key AD01 ճ Ճ caps
+key AD02 փ Փ caps
+key AD03 բ Բ caps
+key AD04 ս Ս caps
+key AD05 մ Մ caps
+key AD06 ո Ո caps
+key AD07 ւ Ւ caps
+key AD08 կ Կ caps
+key AD09 ը Ը caps
+key AD10 թ Թ caps
+key AD11 ծ Ծ caps
+key AD12 ց Ց caps
+key BKSL » «
+key AC01 ջ Ջ caps
+key AC02 վ Վ caps
+key AC03 գ Գ caps
+key AC04 ե Ե caps
+key AC05 ա Ա caps
+key AC06 ն Ն caps
+key AC07 ի Ի caps
+key AC08 տ Տ caps
+key AC09 հ Հ caps
+key AC10 պ Պ caps
+key AC11 ր Ր caps
+key LSGT ? ֊ | ¦
+key AB01 ժ Ժ caps
+key AB02 դ Դ caps
+key AB03 չ Չ caps
+key AB04 յ Յ caps
+key AB05 զ Զ caps
+key AB06 լ Լ caps
+key AB07 ք Ք caps
+key AB08 խ Խ caps
+key AB09 շ Շ caps
+key AB10 ռ Ռ caps
+key SPCE space
+key KPDL KP_Delete KP_Decimal

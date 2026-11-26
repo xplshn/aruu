@@ -1,0 +1,24 @@
+kmap 1
+id brai
+layout brai
+name Braille
+key BKSL \ |
+key AC01 braille_dot_7
+key AC02 braille_dot_3
+key AC03 braille_dot_2
+key AC04 braille_dot_1
+key AC07 braille_dot_4
+key AC08 braille_dot_5
+key AC09 braille_dot_6
+key AC10 braille_dot_8
+key LSGT < > | ¦
+key AB04 braille_dot_9
+key AB06 braille_dot_10
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key KP4 braille_dot_1 KP_4
+key KP5 braille_dot_4 KP_5
+key KP6 braille_dot_5 KP_6
+key KPAD braille_dot_6 KP_Add KP_Add KP_Add XF86Next_VMode type=CTRL+ALT
+key KP1 braille_dot_2 KP_1
+key KP0 braille_dot_3 KP_0

@@ -1,0 +1,56 @@
+kmap 1
+id ara-azerty
+layout ara
+variant azerty
+name Arabic (AZERTY)
+level3 ralt
+key TLDE ذ ّ ٪ ؉
+key AE01 & 1 ١
+key AE02 é 2 ٢
+key AE03 " 3 ٣
+key AE04 '''' 4 ٤
+key AE05 ( 5 ٥ U2030
+key AE06 - 6 ٦
+key AE07 è 7 ٧
+key AE08 _ 8 ٨
+key AE09 ç 9 ٩
+key AE10 à 0 ٠
+key AE11 ) ° – ‑
+key AE12 = + ≠ ≈
+key AD01 ض َ none ⁦
+key AD02 ص ً none ⁧
+key AD03 ث ُ none ⁨
+key AD04 ق ٌ none ⁩
+key AD05 ف ﻹ ڤ
+key AD06 غ إ none ‪
+key AD07 ع ` none ‫
+key AD08 ه ÷ none ‬
+key AD09 خ × type=FOUR_LEVEL
+key AD10 ح ؛ none U200E
+key AD11 ج < چ U200F
+key AD12 د > none ؜
+key BKSL \ | ⟨  
+key AC01 ش ِ type=FOUR_LEVEL
+key AC02 س ٍ type=FOUR_LEVEL
+key AC03 ي ] type=FOUR_LEVEL
+key AC04 ب [ پ
+key AC05 ل ﻷ type=FOUR_LEVEL
+key AC06 ا أ ٱ
+key AC07 ت ـ type=FOUR_LEVEL
+key AC08 ن ، ٫
+key AC09 م / type=FOUR_LEVEL
+key AC10 ك : گ
+key AC11 ط " ⟩ U200D
+key LSGT | … ¦ ¦
+key AB01 ئ ~ » ›
+key AB02 ء ْ « ‹
+key AB03 ؤ } type=FOUR_LEVEL
+key AB04 ر { type=FOUR_LEVEL
+key AB05 ﻻ ﻵ type=FOUR_LEVEL
+key AB06 ى آ ٰ
+key AB07 ة '''' type=FOUR_LEVEL
+key AB08 و , ٬
+key AB09 ز . ژ
+key AB10 ظ ؟ ٭ U200C
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,55 @@
+kmap 1
+id id-javanese
+layout id
+variant javanese
+name Javanese
+key TLDE ꧞ ꧟
+key AE01 ꧑ ꧆
+key AE02 ꧒ ꧏ
+key AE03 ꧓ ꧃
+key AE04 ꧔ ꧄
+key AE05 ꧕ ꧅
+key AE06 ꧖ ꦿ
+key AE07 ꧗ ꦽ
+key AE08 ꧘ ꦳
+key AE09 ꧙ ꧁
+key AE10 ꧐ ꧂
+key AE11 ꦎ _
+key AE12 ꦉ ꦋ
+key AD01 ꦐ ꦰ
+key AD02 ꦮ ꦍ
+key AD03 ꦼ ꦌ
+key AD04 ꦫ ꦬ
+key AD05 ꦠ ꦡ
+key AD06 ꦪ ꦾ
+key AD07 ꦸ ꦹ
+key AD08 ꦶ ꦷ
+key AD09 ꦺ ꦴ
+key AD10 ꦥ ꦦ
+key AD11 ꧊ ꧋
+key AD12 ꧌ ꧍
+key BKSL ꧀ ꦅ
+key AC01 ꦻ ꦄ
+key AC02 ꦱ ꦯ
+key AC03 ꦢ ꦣ
+key AC04 ꦝ ꦞ
+key AC05 ꦒ ꦓ
+key AC06 ꦲ ꦃ
+key AC07 ꦗ ꦙ
+key AC08 ꦏ ꦑ
+key AC09 ꦭ ꦊ
+key AC10 ꧇ ꦈ
+key AC11 ꦵ "
+key LSGT | ¦ | ¦
+key AB01 ꦔ ꦁ
+key AB02 ꦚ ꦘ
+key AB03 ꦕ ꦖ
+key AB04 ꦛ ꦜ
+key AB05 ꦧ ꦨ
+key AB06 ꦤ ꦟ
+key AB07 ꦩ ꦀ
+key AB08 ꧈ ꦆ
+key AB09 ꧉ ꦇ
+key AB10 ꦂ ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

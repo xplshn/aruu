@@ -1,0 +1,57 @@
+kmap 1
+id lk-us
+layout lk
+variant us
+name Sinhala (US)
+level3 ralt
+key TLDE ` ~ VoidSymbol
+key AE01 1 ! dead_macron
+key AE02 2 @ dead_belowdot
+key AE03 3 '#' dead_abovedot
+key AE04 4 $ ¤
+key AE05 5 % °
+key AE06 6 ^ ¼
+key AE07 7 & ½
+key AE08 8 * ¾
+key AE09 9 ( VoidSymbol
+key AE10 0 ) VoidSymbol
+key AE11 - _ —
+key AE12 = + VoidSymbol
+key AD01 d D q caps
+key AD02 æ ´ VoidSymbol
+key AD03 e é ë
+key AD04 r û VoidSymbol
+key AD05 t VoidSymbol VoidSymbol
+key AD06 y VoidSymbol VoidSymbol
+key AD07 u ú ü
+key AD08 i í ï
+key AD09 o ó ö
+key AD10 p VoidSymbol VoidSymbol
+key AD11 [ { VoidSymbol
+key AD12 ] } VoidSymbol
+key BKSL \ | VoidSymbol
+key AC01 a á ä
+key AC02 s VoidSymbol VoidSymbol
+key AC03 ð Ð VoidSymbol caps
+key AC04 þ f VoidSymbol
+key AC05 g G VoidSymbol caps
+key AC06 h VoidSymbol VoidSymbol
+key AC07 j ç VoidSymbol
+key AC08 k VoidSymbol VoidSymbol
+key AC09 l L ô caps
+key AC10 ; : VoidSymbol
+key AC11 '''' " VoidSymbol
+key LSGT < > | ¦
+key AB01 z VoidSymbol VoidSymbol
+key AB02 x VoidSymbol VoidSymbol
+key AB03 c ç VoidSymbol
+key AB04 v VoidSymbol VoidSymbol
+key AB05 b B VoidSymbol caps
+key AB06 n N ñ caps
+key AB07 m VoidSymbol VoidSymbol
+key AB08 , < «
+key AB09 . > »
+key AB10 / ? U200C
+key SPCE space nobreakspace VoidSymbol
+key KPDL KP_Delete KP_Decimal
+key LALT ISO_Level3_Shift

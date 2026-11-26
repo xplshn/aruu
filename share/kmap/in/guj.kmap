@@ -1,0 +1,55 @@
+kmap 1
+id in-guj
+layout in
+variant guj
+name Gujarati
+level3 ralt
+key AE01 ૧ ઍ
+key AE02 ૨ ૅ
+key AE03 ૩
+key AE04 ૪ none ₹
+key AE05 ૫
+key AE06 ૬
+key AE07 ૭
+key AE08 ૮
+key AE09 ૯ (
+key AE10 ૦ )
+key AE11 - ઃ
+key AE12 ઋ ૃ
+key AD01 ૌ ઔ
+key AD02 ૈ ઐ
+key AD03 ા આ
+key AD04 ી ઈ
+key AD05 ૂ ઊ
+key AD06 બ ભ
+key AD07 હ ઙ
+key AD08 ગ ઘ
+key AD09 દ ધ
+key AD10 જ ઝ
+key AD11 ડ ઢ
+key AD12 ઼ ઞ
+key BKSL ૉ ઑ
+key AC01 ો ઓ
+key AC02 ે એ
+key AC03 ્ અ
+key AC04 િ ઇ
+key AC05 ુ ઉ
+key AC06 પ ફ
+key AC07 ર ર
+key AC08 ક ખ
+key AC09 ત થ
+key AC10 ચ છ
+key AC11 ટ ઠ
+key LSGT < > | ¦
+key AB01 z Z caps
+key AB02 ં ઁ
+key AB03 મ ણ
+key AB04 ન ન
+key AB05 વ વ
+key AB06 લ ળ
+key AB07 સ શ
+key AB08 , ષ
+key AB09 . ।
+key AB10 ય ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

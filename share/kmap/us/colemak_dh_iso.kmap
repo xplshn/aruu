@@ -1,0 +1,56 @@
+kmap 1
+id us-colemak_dh_iso
+layout us
+variant colemak_dh_iso
+name English (Colemak-DH ISO)
+level3 ralt
+key TLDE ` ~ dead_tilde ~
+key AE01 1 ! ¡ ¹
+key AE02 2 @ º ²
+key AE03 3 '#' ª ³
+key AE04 4 $ ¢ £
+key AE05 5 % € ¥
+key AE06 6 ^ ħ Ħ
+key AE07 7 & ð Ð
+key AE08 8 * þ Þ
+key AE09 9 ( ‘ “
+key AE10 0 ) ’ ”
+key AE11 - _ – —
+key AE12 = + × ÷
+key AD01 q Q ä Ä caps
+key AD02 w W å Å caps
+key AD03 f F ã Ã caps
+key AD04 p P ø Ø caps
+key AD05 b B dead_breve ~ caps
+key AD06 j J đ Đ caps
+key AD07 l L ł Ł caps
+key AD08 u U ú Ú caps
+key AD09 y Y ü Ü caps
+key AD10 ; : ö Ö
+key AD11 [ { « ‹
+key AD12 ] } » ›
+key BKSL '#' ~ \ |
+key AC01 a A á Á caps
+key AC02 r R dead_grave ~ caps
+key AC03 s S ß ẞ caps
+key AC04 t T dead_acute dead_doubleacute caps
+key AC05 g G dead_ogonek ~ caps
+key AC06 m M dead_macron ~ caps
+key AC07 n N ñ Ñ caps
+key AC08 e E é É caps
+key AC09 i I í Í caps
+key AC10 o O ó Ó caps
+key AC11 '''' " õ Õ
+key LSGT z Z æ Æ caps
+key AB01 x X dead_circumflex ~ caps
+key AB02 c C ç Ç caps
+key AB03 d D dead_diaeresis ~ caps
+key AB04 v V œ Œ caps
+key AB05 \ | ~ ¦
+key AB06 k K dead_abovering ~ caps
+key AB07 h H dead_caron ~ caps
+key AB08 , < dead_cedilla ~
+key AB09 . > dead_abovedot ~
+key AB10 / ? ¿ ~
+key SPCE space space space nobreakspace
+key KPDL KP_Delete KP_Decimal

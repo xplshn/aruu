@@ -1,0 +1,54 @@
+kmap 1
+id by
+layout by
+name Belarusian
+key TLDE ё Ё caps
+key AE01 1 !
+key AE02 2 "
+key AE03 3 №
+key AE04 4 ;
+key AE05 5 %
+key AE06 6 :
+key AE07 7 ?
+key AE08 8 * ₽
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 й Й caps
+key AD02 ц Ц caps
+key AD03 у У caps
+key AD04 к К caps
+key AD05 е Е caps
+key AD06 н Н caps
+key AD07 г Г ґ Ґ caps
+key AD08 ш Ш caps
+key AD09 ў Ў caps
+key AD10 з З caps
+key AD11 х Х caps
+key AD12 '''' ''''
+key BKSL \ /
+key AC01 ф Ф caps
+key AC02 ы Ы caps
+key AC03 в В caps
+key AC04 а А caps
+key AC05 п П caps
+key AC06 р Р caps
+key AC07 о О caps
+key AC08 л Л caps
+key AC09 д Д caps
+key AC10 ж Ж caps
+key AC11 э Э caps
+key LSGT / | | ¦
+key AB01 я Я caps
+key AB02 ч Ч caps
+key AB03 с С caps
+key AB04 м М caps
+key AB05 і І caps
+key AB06 т Т caps
+key AB07 ь Ь caps
+key AB08 б Б caps
+key AB09 ю Ю caps
+key AB10 . ,
+key SPCE space
+key KPDL KP_Delete KP_Separator

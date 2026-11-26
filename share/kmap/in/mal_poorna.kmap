@@ -1,0 +1,56 @@
+kmap 1
+id in-mal_poorna
+layout in
+variant mal_poorna
+name Malayalam (Poorna, extended InScript)
+level3 ralt
+key TLDE ൊ ഒ ` ~
+key AE01 1 ! ൰ ൧
+key AE02 2 @ ൱ ൨
+key AE03 3 '#' ൲ ൩
+key AE04 4 $ ₹ ൪
+key AE05 5 % ൳ ൫
+key AE06 6 ^ ൴ ൬
+key AE07 7 & ൵ ൭
+key AE08 8 ൾ * ൮
+key AE09 9 ( { ൯
+key AE10 0 ) } ൦
+key AE11 - ഃ _ VoidSymbol
+key AE12 ൃ ഋ ൄ ൠ
+key AD01 ൗ ഔ ൌ ൞
+key AD02 ൈ ഐ VoidSymbol ൷
+key AD03 ാ ആ ൟ ൜
+key AD04 ീ ഈ ൣ ൡ
+key AD05 ൂ ഊ VoidSymbol ൶
+key AD06 ബ ഭ VoidSymbol ൛
+key AD07 ഹ ങ VoidSymbol ൙
+key AD08 ഗ ഘ VoidSymbol ൘
+key AD09 ദ ധ VoidSymbol ൸
+key AD10 ജ ഝ VoidSymbol ൝
+key AD11 ഡ ഢ [ ൚
+key AD12 U200D ഞ ] +
+key BKSL U200C ർ \ |
+key AC01 ോ ഓ VoidSymbol VoidSymbol
+key AC02 േ ഏ ഻ ഼
+key AC03 ് അ ഽ ഁ
+key AC04 ി ഇ ൢ ഌ
+key AC05 ു ഉ VoidSymbol VoidSymbol
+key AC06 പ ഫ ൏ VoidSymbol
+key AC07 ര റ ൎ ഺ
+key AC08 ക ഖ VoidSymbol ൿ
+key AC09 ത ഥ VoidSymbol VoidSymbol
+key AC10 ച ഛ ; :
+key AC11 ട ഠ '''' "
+key LSGT < > | ¦
+key AB01 െ എ VoidSymbol VoidSymbol
+key AB02 ം ൺ ഀ ഄ
+key AB03 മ ണ VoidSymbol ൔ
+key AB04 ന ൻ ൹ ഩ
+key AB05 വ ഴ VoidSymbol ൖ
+key AB06 ല ള VoidSymbol VoidSymbol
+key AB07 സ ശ VoidSymbol VoidSymbol
+key AB08 , ഷ < VoidSymbol
+key AB09 . ൽ > VoidSymbol
+key AB10 യ ? / ൕ
+key SPCE space
+key KPDL KP_Delete KP_Decimal

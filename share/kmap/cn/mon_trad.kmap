@@ -1,0 +1,55 @@
+kmap 1
+id cn-mon_trad
+layout cn
+variant mon_trad
+name Mongolian (Bichig)
+key TLDE ᠍ ~
+key AE01 1 !
+key AE02 2 ⁈
+key AE03 3 ⁉
+key AE04 4 4
+key AE05 5 %
+key AE06 6 U200C
+key AE07 7 ᠊
+key AE08 8 U200D
+key AE09 9 (
+key AE10 0 )
+key AE11   ᠎
+key AE12 = +
+key AD01 ᠣ ᡂ
+key AD02 ᠸ ᠸ
+key AD03 ᠡ ᠧ
+key AD04 ᠷ ᠿ
+key AD05 ᠲ ᠲ
+key AD06 ᠶ ᠶ
+key AD07 ᠦ ᠦ
+key AD08 ᠢ ᠢ
+key AD09 ᠥ ᠥ
+key AD10 ᠫ ᠫ
+key AD11 [ 〈
+key AD12 ] 〉
+key BKSL ᠁ U2014
+key AC01 ᠠ ᠠ
+key AC02 ᠰ ᠰ
+key AC03 ᠳ ᠳ
+key AC04 ᠹ ᠹ
+key AC05 ᠭ ᠭ
+key AC06 ᠬ ᠾ
+key AC07 ᠵ ᠵ
+key AC08 ᠺ ᠻ
+key AC09 ᠯ ᡀ
+key AC10 ; ᠄
+key AC11 ᠋ ᠌
+key LSGT < > | ¦
+key AB01 ᠽ ᡁ
+key AB02 ᠱ ᠱ
+key AB03 ᠴ ᠼ
+key AB04 ᠤ ᠤ
+key AB05 ᠪ ᠪ
+key AB06 ᠨ ᠩ
+key AB07 ᠮ ᠮ
+key AB08 ᠂ 《
+key AB09 ᠃ 》
+key AB10 · ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

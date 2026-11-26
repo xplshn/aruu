@@ -1,0 +1,56 @@
+kmap 1
+id at-nodeadkeys
+layout at
+variant nodeadkeys
+name German (Austria, no dead keys)
+level3 ralt
+key TLDE ^ ° ¬ ¬
+key AE01 1 ! ¹ ¡
+key AE02 2 " ² ⅛
+key AE03 3 § ³ £
+key AE04 4 $ ¼ ¤
+key AE05 5 % ½ ⅜
+key AE06 6 & ¬ ⅝
+key AE07 7 / { ⅞
+key AE08 8 ( [ ™
+key AE09 9 ) ] ±
+key AE10 0 = } °
+key AE11 ß ? \ ¿ ẞ type=FOUR_LEVEL_PLUS_LOCK
+key AE12 ´ ` ¸ ¸
+key AD01 q Q @ Ω caps
+key AD02 w W ſ § caps
+key AD03 e E € € caps
+key AD04 r R ¶ ® caps
+key AD05 t T ŧ Ŧ caps
+key AD06 z Z ← ¥ caps
+key AD07 u U ↓ ↑ caps
+key AD08 i I → ı caps
+key AD09 o O ø Ø caps
+key AD10 p P þ Þ caps
+key AD11 ü Ü ¨ ¨ caps
+key AD12 + * ~ ¯
+key BKSL '#' '''' ’ `
+key AC01 a A æ Æ caps
+key AC02 s S ſ ẞ caps
+key AC03 d D ð Ð caps
+key AC04 f F đ ª caps
+key AC05 g G ŋ Ŋ caps
+key AC06 h H ħ Ħ caps
+key AC07 j J ʒ Ʒ caps
+key AC08 k K ĸ & caps
+key AC09 l L ł Ł caps
+key AC10 ö Ö ˝ ˝ caps
+key AC11 ä Ä ^ ^ caps
+key LSGT < > | †
+key AB01 y Y » › caps
+key AB02 x X « ‹ caps
+key AB03 c C ¢ © caps
+key AB04 v V „ ‚ caps
+key AB05 b B “ ‘ caps
+key AB06 n N ” ’ caps
+key AB07 m M µ º caps
+key AB08 , ; · ×
+key AB09 . : U2026 ÷
+key AB10 - _ – —
+key SPCE space
+key KPDL KP_Delete KP_Separator

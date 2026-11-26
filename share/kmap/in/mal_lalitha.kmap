@@ -1,0 +1,56 @@
+kmap 1
+id in-mal_lalitha
+layout in
+variant mal_lalitha
+name Malayalam (Lalitha)
+level3 ralt
+key TLDE ് ം ` ~
+key AE01 1 ! ൧ !
+key AE02 2 @ ൨ @
+key AE03 3 '#' ൩ '#'
+key AE04 4 $ ൪ ₹
+key AE05 5 % ൫ %
+key AE06 6 ^ ൬ ^
+key AE07 7 & ൭ &
+key AE08 8 * ൮ *
+key AE09 9 ( ൯ (
+key AE10 0 ) ൦ )
+key AE11 - _ type=FOUR_LEVEL
+key AE12 = + type=FOUR_LEVEL
+key AD01 ൈ ൌ ഐ ഔ
+key AD02 വ type=FOUR_LEVEL
+key AD03 െ േ എ ഏ
+key AD04 ര റ ൃ ഋ
+key AD05 ത ഥ ട ഠ
+key AD06 യ type=FOUR_LEVEL
+key AD07 ു ൂ ഉ ഊ
+key AD08 ി ീ ഇ ഈ
+key AD09 ൊ ോ ഒ ഓ
+key AD10 പ type=FOUR_LEVEL
+key AD11 [ { type=FOUR_LEVEL
+key AD12 ] } type=FOUR_LEVEL
+key BKSL \ | U200C
+key AC01 ാ അ ആ അ
+key AC02 സ ഷ type=FOUR_LEVEL
+key AC03 ദ ധ ഡ ഢ
+key AC04 ഫ type=FOUR_LEVEL
+key AC05 ഗ ഘ type=FOUR_LEVEL
+key AC06 ഹ ഃ type=FOUR_LEVEL
+key AC07 ജ ഝ type=FOUR_LEVEL
+key AC08 ക ഖ type=FOUR_LEVEL
+key AC09 ല ള type=FOUR_LEVEL
+key AC10 ; : type=FOUR_LEVEL
+key AC11 '''' " type=FOUR_LEVEL
+key LSGT < > | ¦
+key AB01 ഴ ശ type=FOUR_LEVEL
+key AB02 ് U200B type=FOUR_LEVEL
+key AB03 ച ഛ type=FOUR_LEVEL
+key AB04 വ U200D type=FOUR_LEVEL
+key AB05 ബ ഭ type=FOUR_LEVEL
+key AB06 ന ണ ങ ഞ
+key AB07 മ ം type=FOUR_LEVEL
+key AB08 , < type=FOUR_LEVEL
+key AB09 . > type=FOUR_LEVEL
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

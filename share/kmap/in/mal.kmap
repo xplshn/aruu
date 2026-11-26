@@ -1,0 +1,56 @@
+kmap 1
+id in-mal
+layout in
+variant mal
+name Malayalam
+level3 ralt
+key TLDE ൊ ഒ
+key AE01 ൧ !
+key AE02 ൨ @
+key AE03 ൩ '#'
+key AE04 ൪ $ ₹
+key AE05 ൫ %
+key AE06 ൬ ^
+key AE07 ൭ &
+key AE08 ൮ *
+key AE09 ൯ (
+key AE10 ൦ )
+key AE11 - ഃ
+key AE12 ൃ ഋ
+key AD01 ൌ ഔ
+key AD02 ൈ ഐ
+key AD03 ാ ആ
+key AD04 ീ ഈ
+key AD05 ൂ ഊ
+key AD06 ബ ഭ
+key AD07 ഹ ങ
+key AD08 ഗ ഘ
+key AD09 ദ ധ
+key AD10 ജ ഝ
+key AD11 ഡ ഢ
+key AD12 U200D ഞ
+key BKSL U200C \
+key AC01 ോ ഓ
+key AC02 േ ഏ
+key AC03 ് അ
+key AC04 ി ഇ
+key AC05 ു ഉ
+key AC06 പ ഫ
+key AC07 ര റ
+key AC08 ക ഖ
+key AC09 ത ഥ
+key AC10 ച ഛ
+key AC11 ട ഠ
+key LSGT < > | ¦
+key AB01 െ എ
+key AB02 ം U200B
+key AB03 മ ണ
+key AB04 ന
+key AB05 വ ഴ
+key AB06 ല ള
+key AB07 സ ശ
+key AB08 , ഷ
+key AB09 . U200D
+key AB10 യ ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

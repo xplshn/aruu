@@ -1,0 +1,21 @@
+kmap 1
+id brai-left_hand_invert
+layout brai
+variant left_hand_invert
+name Braille (one-handed, left, inverted thumb)
+key BKSL \ |
+key AC01 braille_dot_3
+key AC02 braille_dot_2
+key AC03 braille_dot_1
+key AC04 braille_dot_4
+key LSGT < > | ¦
+key AB04 braille_dot_6
+key AB05 braille_dot_5
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key KPMU braille_dot_1 KP_Multiply KP_Multiply KP_Multiply XF86ClearGrab type=CTRL+ALT
+key NMLK braille_dot_3
+key KPSU braille_dot_4 KP_Subtract KP_Subtract KP_Subtract XF86Prev_VMode type=CTRL+ALT
+key KPAD braille_dot_5 KP_Add KP_Add KP_Add XF86Next_VMode type=CTRL+ALT
+key KPEN braille_dot_6
+key KPDV braille_dot_2 KP_Divide KP_Divide KP_Divide XF86Ungrab type=CTRL+ALT

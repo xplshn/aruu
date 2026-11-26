@@ -1,0 +1,57 @@
+kmap 1
+id us-olpc2
+layout us
+variant olpc2
+name English (the divide/multiply toggle the layout)
+level3 ralt
+key TLDE ` ~ dead_grave dead_tilde
+key AE01 1 ! ¡ ¡
+key AE02 2 @ ¬ ¬
+key AE03 3 '#' combining_grave combining_grave
+key AE04 4 $ combining_acute combining_acute
+key AE05 5 % U0306 U0306
+key AE06 6 ^ U030A U030A
+key AE07 7 & U0302 U0302
+key AE08 8 * U030C U030C
+key AE09 9 ( U0307 U0307
+key AE10 0 ) U0308 U0308
+key AE11 - _ U0304 U0304
+key AE12 = + combining_tilde combining_tilde
+key AD01 q Q ω Ω caps
+key AD02 w W ø Ø caps
+key AD03 e E œ Œ caps
+key AD04 r R U0327 U0327 caps
+key AD05 t T U032E U032E caps
+key AD06 y Y U0325 U0325 caps
+key AD07 u U U032D U032D caps
+key AD08 i I U032C U032C caps
+key AD09 o O combining_belowdot combining_belowdot caps
+key AD10 p P U0324 U0324 caps
+key AD11 [ { U0331 U0331
+key AD12 ] } U0330 U0330
+key BKSL \ | § §
+key AC01 a A æ Æ caps
+key AC02 s S ß ẞ caps
+key AC03 d D ð Ð caps
+key AC04 f F þ Þ caps
+key AC05 g G caps
+key AC06 h H £ £ caps
+key AC07 j J € € caps
+key AC08 k K caps
+key AC09 l L caps
+key AC10 ; : º ª
+key AC11 '''' " ¤ ¤
+key LSGT < > | ¦
+key AB01 z Z caps
+key AB02 x X caps
+key AB03 c C ç Ç caps
+key AB04 v V caps
+key AB05 b B caps
+key AB06 n N ñ Ñ caps
+key AB07 m M µ µ caps
+key AB08 , < « «
+key AB09 . > » »
+key AB10 / ? ¿ ¿
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key I219 ISO_Next_Group ISO_Prev_Group ISO_Next_Group ISO_Prev_Group

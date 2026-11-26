@@ -1,0 +1,56 @@
+kmap 1
+id in-sat
+layout in
+variant sat
+name Santali (Ol Chiki)
+level3 ralt
+key TLDE ` ᱻ
+key AE01 ᱑ !
+key AE02 ᱒ @
+key AE03 ᱓ '#'
+key AE04 ᱔ $ ₹
+key AE05 ᱕ %
+key AE06 ᱖ ^
+key AE07 ᱗ &
+key AE08 ᱘ *
+key AE09 ᱙ (
+key AE10 ᱐ )
+key AE11 - ᱼ
+key AE12 = +
+key AD01 ᱧ
+key AD02 ᱣ
+key AD03 ᱮ
+key AD04 ᱨ
+key AD05 ᱴ ᱛ
+key AD06 ᱭ
+key AD07 ᱩ
+key AD08 ᱤ
+key AD09 ᱚ ᱳ
+key AD10 ᱯ
+key AD11 [ {
+key AD12 ] }
+key BKSL ᱿ ᱾
+key AC01 ᱟ
+key AC02 ᱥ
+key AC03 ᱰ ᱫ
+key AC04 ᱝ
+key AC05 ᱜ
+key AC06 ᱦ ᱷ
+key AC07 ᱡ
+key AC08 ᱠ
+key AC09 ᱞ
+key AC10 ; ᱺ
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ᱲ
+key AB02 ᱽ
+key AB03 ᱪ
+key AB04 ᱶ
+key AB05 ᱵ
+key AB06 ᱱ ᱸ
+key AB07 ᱢ ᱬ
+key AB08 , <
+key AB09 ᱹ >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

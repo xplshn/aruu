@@ -1,0 +1,55 @@
+kmap 1
+id bd
+layout bd
+name Bangla
+level3 ralt
+key TLDE ` ~ VoidSymbol VoidSymbol
+key AE01 ১ ! ৴ VoidSymbol
+key AE02 ২ @ ৵ VoidSymbol
+key AE03 ৩ '#' ৶ VoidSymbol
+key AE04 ৪ $ ৳ ৲
+key AE05 ৫ % ৷ VoidSymbol
+key AE06 ৬ ^ ৸ ঳
+key AE07 ৭ & ं VoidSymbol
+key AE08 ৮ * VoidSymbol VoidSymbol
+key AE09 ৯ ( VoidSymbol VoidSymbol
+key AE10 ০ ) ৹ VoidSymbol
+key AE11 - _ U200C VoidSymbol
+key AE12 = + U200D VoidSymbol
+key AD01 ঙ ং ৢ ৣ
+key AD02 য য় VoidSymbol VoidSymbol
+key AD03 ড ঢ ৄ VoidSymbol
+key AD04 প ফ VoidSymbol VoidSymbol
+key AD05 ট ঠ VoidSymbol VoidSymbol
+key AD06 চ ছ VoidSymbol VoidSymbol
+key AD07 জ ঝ VoidSymbol VoidSymbol
+key AD08 হ ঞ ঽ VoidSymbol
+key AD09 গ ঘ VoidSymbol VoidSymbol
+key AD10 ড় ঢ় VoidSymbol VoidSymbol
+key AD11 [ { VoidSymbol VoidSymbol
+key AD12 ] } VoidSymbol VoidSymbol
+key BKSL \ | VoidSymbol VoidSymbol
+key AC01 ৃ ৗ ঋ ৠ
+key AC02 ু ূ উ ঊ
+key AC03 ি ী ই ঈ
+key AC04 ব ভ ৰ ৱ
+key AC05 ্ । ॥ VoidSymbol
+key AC06 া অ আ VoidSymbol
+key AC07 ক খ ঻ VoidSymbol
+key AC08 ত থ ৎ VoidSymbol
+key AC09 দ ধ ঌ ৡ
+key AC10 ; : VoidSymbol VoidSymbol
+key AC11 '''' " VoidSymbol VoidSymbol
+key LSGT < > | ¦
+key AB01 ঁ ঃ ৺ VoidSymbol
+key AB02 ো ৌ ও ঔ
+key AB03 ে ৈ এ ঐ
+key AB04 র ল VoidSymbol VoidSymbol
+key AB05 ন ণ VoidSymbol VoidSymbol
+key AB06 স ষ VoidSymbol VoidSymbol
+key AB07 ম শ VoidSymbol VoidSymbol
+key AB08 , < VoidSymbol VoidSymbol
+key AB09 . > ় VoidSymbol
+key AB10 / ? VoidSymbol VoidSymbol
+key SPCE space
+key KPDL KP_Delete KP_Decimal

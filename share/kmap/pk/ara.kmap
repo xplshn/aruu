@@ -1,0 +1,55 @@
+kmap 1
+id pk-ara
+layout pk
+variant ara
+name Arabic (Pakistan)
+key TLDE U064D U064B
+key AE01 ۱ !
+key AE02 ۲
+key AE03 ۳ /
+key AE04 ۴ U0626
+key AE05 ۵
+key AE06 ۶ ۖ
+key AE07 ۷ ٔ
+key AE08 ۸ U064C
+key AE09 ۹ )
+key AE10 ۰ (
+key AE11 U0623 U0651
+key AE12 U0624 U0622
+key AD01 U0642 U0652
+key AD02 U0648 £
+key AD03 U0639 ¥
+key AD04 U0631 ڑ
+key AD05 U062A ٹ
+key AD06 ے ؁
+key AD07 U0621 U060C
+key AD08 ی ٰ
+key AD09 ہ ۃ
+key AD10 پ U064F
+key AD11 ] ٰ
+key AD12 [ ٰ
+key BKSL ؎ ؔ
+key AC01 U0627 ٓ
+key AC02 U0633 U0635
+key AC03 U062F ڈ
+key AC04 U0641
+key AC05 گ U063A
+key AC06 ھ U062D
+key AC07 U062C U0636
+key AC08 ک U062E
+key AC09 U0644 ؓ
+key AC10 U061B :
+key AC11 ٰ "
+key LSGT | ¦ | ¦
+key AB01 U0632 U0630
+key AB02 U0634 ژ
+key AB03 چ U062B
+key AB04 U0637 U0638
+key AB05 U0628 ؒ
+key AB06 U0646 ں
+key AB07 U0645
+key AB08 U060C U0650
+key AB09 ۔ U064E
+key AB10 VoidSymbol U061F
+key SPCE space
+key KPDL KP_Delete KP_Decimal

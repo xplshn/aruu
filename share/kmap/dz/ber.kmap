@@ -1,0 +1,56 @@
+kmap 1
+id dz-ber
+layout dz
+variant ber
+name Berber (Algeria, Tifinagh)
+level3 ralt
+key TLDE ² ³ ¹ dead_cedilla
+key AE01 & 1 dead_caron dead_ogonek
+key AE02 é 2 ~ É
+key AE03 " 3 '#' dead_breve
+key AE04 '''' 4 { U2014
+key AE05 ( 5 [ U2013
+key AE06 - 6 | ‑
+key AE07 è 7 ` È
+key AE08 _ 8 \ ™
+key AE09 ç 9 ^ Ç
+key AE10 à 0 @ À
+key AE11 ) ° ] ≠
+key AE12 = + } ±
+key AD01 ⴰ
+key AD02 ⵣ ⵥ ⵤ
+key AD03 ⴻ ⵦ
+key AD04 ⵔ ⵕ
+key AD05 ⵜ ⵟ ⵝ
+key AD06 ⵢ
+key AD07 ⵓ
+key AD08 ⵉ
+key AD09 ⵄ ⵧ
+key AD10 ⵃ
+key AD11 ⵯ
+key AD12 $ £ ø Ø
+key BKSL * µ dead_grave dead_macron
+key AC01 ⵇ ⵈ
+key AC02 ⵙ ⵚ
+key AC03 ⴷ ⴹ ⴸ ⴺ
+key AC04 ⴼ
+key AC05 ⴳ ⴵ ⴴ ⴶ
+key AC06 ⵀ ⵁ ⵂ
+key AC07 ⵊ ⵋ ⵌ
+key AC08 ⴽ ⴿ ⴾ
+key AC09 ⵍ
+key AC10 ⵎ
+key AC11 ù % dead_acute Ù
+key LSGT < > ≤ ≥
+key AB01 ⵡ
+key AB02 ⵅ ⵆ
+key AB03 ⵛ ⵞ
+key AB04 ⵖ ⵗ ⵘ ⵠ
+key AB05 ⴱ ⴲ ⵒ
+key AB06 ⵏ ⵐ ⵑ
+key AB07 , ? ¿ U2026
+key AB08 ; . × ⋅
+key AB09 : / ÷ ∕
+key AB10 ! § ¡ −
+key SPCE space
+key KPDL KP_Delete KP_Decimal
