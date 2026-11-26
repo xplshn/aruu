@@ -80,6 +80,33 @@ long kmap_char(const char *sym);
 /* the words of line, rc unquoted in place, into w (max of them). their number */
 int kmap_words(char *line, char **w, int max);
 
+/* the ways systems number keys: evdev codes (linux), pc scancodes of set 1
+   (wscons for pc keyboards, syscons and vt), and usb hid usages (wscons for
+   usb keyboards) */
+enum kmap_codes {
+  KMAP_EVDEV,
+  KMAP_PC,
+  KMAP_HID,
+};
+
+/* where a key is in one of those numberings, -1 for a key kmap does not
+   place there */
+int kmap_code(const char *name, enum kmap_codes scheme);
+
+/* the unicode character a symbol types: a character, a named one (space,
+   nobreakspace, combining_acute), or Uxxxx. -1 for anything else */
+long kmap_unicode(const char *sym);
+
+/* the combining character a dead key puts on the next one (U+0301 for
+   dead_acute), -1 when sym is no dead key */
+long kmap_dead(const char *sym);
+
+/* the console's keyboard set to k, through the system's own interface: the
+   linux console (kmap_linux.c), wscons on netbsd and openbsd
+   (kmap_wscons.c), syscons and vt on freebsd (kmap_fbsd.c). 0, or -1 with
+   the reason said, as on a system kmap has no backend for (kmap_posix.c) */
+int kmap_load_console(const struct kmap *k);
+
 /* the n layouts of maps as one xkb keymap, a group each, the keys they do
    not name from the pc layout. options are xkb's (caps:escape,
    grp:alt_shift_toggle), looked up in rules (xkeyboard-config's

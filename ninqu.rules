@@ -53,7 +53,8 @@
         "session_linux.c" "session_posix.c"
         "sysinfo_linux.c" "sysinfo_posix.c"
         "timer_linux.c" "timer_posix.c"
-        "tty_linux.c" "tty_posix.c")
+        "tty_linux.c" "tty_posix.c"
+        "kmap_linux.c" "kmap_wscons.c" "kmap_fbsd.c" "kmap_posix.c")
   (dep $(MATCH) FEATURES_H)
   (after NOFORK_LIST_H)
   (out "$(STEM).o")
@@ -93,10 +94,14 @@
         "shared/libutil/timer_linux.c"
         "shared/libutil/timer_posix.c"
         "shared/libutil/tty_linux.c"
-        "shared/libutil/tty_posix.c")
+        "shared/libutil/tty_posix.c"
+        "shared/libutil/kmap_linux.c"
+        "shared/libutil/kmap_wscons.c"
+        "shared/libutil/kmap_fbsd.c"
+        "shared/libutil/kmap_posix.c")
   (dep $(MATCH) "shared/diskutil.h" "shared/filesystem.h" "shared/net.h" "shared/passwd.h"
        "shared/proc.h" "shared/reboot.h" "shared/session.h" "shared/sysinfo.h"
-       "shared/timer.h" "shared/util.h" FEATURES_H)
+       "shared/timer.h" "shared/util.h" "shared/kmap.h" FEATURES_H)
   (after NOFORK_LIST_H)
   (out "shared/libutil/$(BASESTEM).o")
   (exec $(CC) $(CPPFLAGS_LIBUTIL) -Ishared -Ishared/libutil $(CFLAGS) -c -o $(OUT) $(MATCH)))

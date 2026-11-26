@@ -310,3 +310,95 @@ kmap_write_xkb(FILE *fp, const struct kmap *maps, int n, const char *options, co
   fputs("  };\n};\n", fp);
   return ferror(fp) ? -1 : 0;
 }
+
+// the keys a layout places and where they are: evdev codes, which are the
+// pc scancodes of set 1 but for the two japanese keys, and usb hid usages
+static const struct {
+  const char *name;
+  int         evdev, pc, hid;
+} codes[] = {
+  {"TLDE", 41, 41, 53},   {"AE01", 2, 2, 30},     {"AE02", 3, 3, 31},     {"AE03", 4, 4, 32},
+  {"AE04", 5, 5, 33},     {"AE05", 6, 6, 34},     {"AE06", 7, 7, 35},     {"AE07", 8, 8, 36},
+  {"AE08", 9, 9, 37},     {"AE09", 10, 10, 38},   {"AE10", 11, 11, 39},   {"AE11", 12, 12, 45},
+  {"AE12", 13, 13, 46},   {"AE13", 124, 125, 137}, {"AD01", 16, 16, 20},  {"AD02", 17, 17, 26},
+  {"AD03", 18, 18, 8},    {"AD04", 19, 19, 21},   {"AD05", 20, 20, 23},   {"AD06", 21, 21, 28},
+  {"AD07", 22, 22, 24},   {"AD08", 23, 23, 12},   {"AD09", 24, 24, 18},   {"AD10", 25, 25, 19},
+  {"AD11", 26, 26, 47},   {"AD12", 27, 27, 48},   {"BKSL", 43, 43, 49},   {"AC01", 30, 30, 4},
+  {"AC02", 31, 31, 22},   {"AC03", 32, 32, 7},    {"AC04", 33, 33, 9},    {"AC05", 34, 34, 10},
+  {"AC06", 35, 35, 11},   {"AC07", 36, 36, 13},   {"AC08", 37, 37, 14},   {"AC09", 38, 38, 15},
+  {"AC10", 39, 39, 51},   {"AC11", 40, 40, 52},   {"LSGT", 86, 86, 100},  {"AB01", 44, 44, 29},
+  {"AB02", 45, 45, 27},   {"AB03", 46, 46, 6},    {"AB04", 47, 47, 25},   {"AB05", 48, 48, 5},
+  {"AB06", 49, 49, 17},   {"AB07", 50, 50, 16},   {"AB08", 51, 51, 54},   {"AB09", 52, 52, 55},
+  {"AB10", 53, 53, 56},   {"AB11", 89, 115, 135}, {"SPCE", 57, 57, 44},   {"KPDL", 83, 83, 99},
+};
+
+int
+kmap_code(const char *name, enum kmap_codes scheme)
+{
+  size_t i;
+
+  for (i = 0; i < sizeof(codes) / sizeof(codes[0]); i++)
+    if (!strcmp(codes[i].name, name))
+      return scheme == KMAP_PC ? codes[i].pc : scheme == KMAP_HID ? codes[i].hid : codes[i].evdev;
+  return -1;
+}
+
+// characters a layout writes by name
+static const struct {
+  const char *name;
+  long        c;
+} named[] = {
+  {"space", ' '},
+  {"nobreakspace", 0xa0},
+  {"combining_grave", 0x300},
+  {"combining_acute", 0x301},
+  {"combining_tilde", 0x303},
+  {"combining_hook", 0x309},
+  {"combining_belowdot", 0x323},
+};
+
+long
+kmap_unicode(const char *s)
+{
+  long c = kmap_char(s);
+  size_t i;
+  char *end;
+
+  if (c >= 0)
+    return c;
+  for (i = 0; i < sizeof(named) / sizeof(named[0]); i++)
+    if (!strcmp(named[i].name, s))
+      return named[i].c;
+  if (s[0] == 'U' && s[1]) {
+    c = strtol(s + 1, &end, 16);
+    if (!*end && c > 0)
+      return c;
+  }
+  return -1;
+}
+
+// the dead keys and the combining characters they stand for
+static const struct {
+  const char *name;
+  long        c;
+} deads[] = {
+  {"dead_grave", 0x300},       {"dead_acute", 0x301},       {"dead_circumflex", 0x302},
+  {"dead_tilde", 0x303},       {"dead_macron", 0x304},      {"dead_breve", 0x306},
+  {"dead_abovedot", 0x307},    {"dead_diaeresis", 0x308},   {"dead_hook", 0x309},
+  {"dead_abovering", 0x30a},   {"dead_doubleacute", 0x30b}, {"dead_caron", 0x30c},
+  {"dead_doublegrave", 0x30f}, {"dead_invertedbreve", 0x311}, {"dead_abovecomma", 0x313},
+  {"dead_abovereversedcomma", 0x314}, {"dead_horn", 0x31b}, {"dead_belowdot", 0x323},
+  {"dead_belowcomma", 0x326},  {"dead_cedilla", 0x327},     {"dead_ogonek", 0x328},
+  {"dead_belowmacron", 0x331}, {"dead_stroke", 0x335},      {"dead_iota", 0x345},
+};
+
+long
+kmap_dead(const char *s)
+{
+  size_t i;
+
+  for (i = 0; i < sizeof(deads) / sizeof(deads[0]); i++)
+    if (!strcmp(deads[i].name, s))
+      return deads[i].c;
+  return -1;
+}
