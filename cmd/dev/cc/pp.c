@@ -132,9 +132,9 @@ include(void)
 
   /* freestanding headers (stddef.h etc) the libc may not ship: an include/
      dir next to the compiler in a source tree, lib/aruu/include in a
-     system whose binaries are all in bin/ */
+     system whose binaries are in bin/, or beside a lib/aruu/bin they sit in */
   if (!f) {
-    static const char *const rel[] = {"include", "../lib/aruu/include"};
+    static const char *const rel[] = {"include", "../lib/aruu/include", "../include"};
     char                     self[FILENAME_MAX];
     ssize_t n = proc_selfexe(self, sizeof(self) - 1);
     if (n == -1) {

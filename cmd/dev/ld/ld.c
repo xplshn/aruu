@@ -516,7 +516,12 @@ outelf_write(struct outelf *oe, int fd)
       write(fd, pad, gap);
       free(pad);
     }
-    code_end = sec->faddr + len;
+    /* an empty section can share its address with one that has code (musl's
+     * empty .text beside .text.strlen), and the order of equal addresses is
+     * qsort's: the end only moves forward, or the next gap fill writes over
+     * the code */
+    if ((long)(sec->faddr + len) > code_end)
+      code_end = sec->faddr + len;
     lseek(fd, sec->faddr, SEEK_SET);
     write(fd, buf, len);
   }

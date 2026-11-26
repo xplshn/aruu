@@ -510,13 +510,17 @@ scanclose(void)
 void
 scan(struct token *t)
 {
+  struct scanner *next;
+
   scanner->sawspace = false;
   for (;;) {
     t->kind = scankind(scanner, &t->loc);
     if (t->kind != TEOF || !scanner->next)
       break;
+    /* the file that ended is freed: where to go on is taken first */
+    next = scanner->next;
     scanclose();
-    scanner = scanner->next;
+    scanner = next;
     scanopen();
   }
   if (scanner->usebuf) {

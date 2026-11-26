@@ -3,6 +3,7 @@
 #include "arg.h"
 #include "util.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,8 +15,10 @@
 static void __attribute__((noreturn))
 usage(void)
 {
-  eprintf("usage: %s guided [-s swap_mib] [-f root_fs] disk | disks | layout | show plan | check [-rb] plan | write plan |\n"
-          "       mkfs plan | mounts plan | fstab plan | get plan esp|root|swap|bios|rootfs\n",
+  eprintf("usage: %s guided [-s swap_mib] [-f root_fs] disk | disks | layout | read disk | new [-m] disk |\n"
+          "       show plan | gaps plan | changes plan | check [-rb] plan | write plan | mkfs plan | mounts plan |\n"
+          "       fstab plan | get plan esp|root|swap|bios|rootfs |\n"
+          "       add [-t type] [-l label] plan size fs [mount] | delete plan n | set [-k] [-l label] plan n fs [mount]\n",
           argv0);
 }
 
@@ -26,9 +29,9 @@ load(struct plan *p, const char *path)
   FILE *f = path && strcmp(path, "-") ? fopen(path, "r") : stdin;
 
   if (!f)
-    eprintf("%s: %s:", argv0, path);
+    eprintf("%s:", path);
   if (plan_load(p, f, why, sizeof why) < 0)
-    eprintf("%s: %s: %s\n", argv0, path, why);
+    eprintf("%s: %s\n", path, why);
   if (f != stdin)
     fclose(f);
   return 0;
@@ -84,7 +87,7 @@ do_guided(int argc, char *argv[])
   if (argc != 1)
     usage();
   if (plan_guided(&p, argv[0], swap, fs) < 0)
-    eprintf("%s: %s cannot hold the guided layout\n", argv0, argv[0]);
+    eprintf("%s cannot hold the guided layout\n", argv[0]);
   return plan_save(&p, stdout);
 }
 
@@ -154,19 +157,19 @@ do_write(struct plan *p)
   int             rc;
 
   if (blockdev_open(&dev, p->disk, 1) < 0)
-    eprintf("%s: %s:", argv0, p->disk);
+    eprintf("%s:", p->disk);
   /* what was there is read again as a signature of something: a filesystem, an old table */
   rc = blockdev_write(&dev, 0, zero, SECTORS_ZEROED * 512 / dev.sec_size);
   free(zero);
   if (rc < 0)
-    weprintf("%s: could not clear the start of %s\n", argv0, p->disk);
+    weprintf("could not clear the start of %s\n", p->disk);
   rc = label_write(&dev, &p->label);
   blockdev_close(&dev);
   if (rc < 0)
-    eprintf("%s: could not write the partition table of %s\n", argv0, p->disk);
+    eprintf("could not write the partition table of %s\n", p->disk);
   /* a disk that is an image has no devices to wait for */
   if (access(p->disk, F_OK) == 0 && plan_wait_nodes(p, 100) < 0)
-    eprintf("%s: the partition devices of %s did not appear\n", argv0, p->disk);
+    eprintf("the partition devices of %s did not appear\n", p->disk);
   return 0;
 }
 
@@ -187,11 +190,11 @@ do_mkfs(struct plan *p)
     printf("formatting %s as %s...\n", dev, p->attr[i].fs);
     fflush(stdout);
     if (plan_mkfs_argv(p, i, argv, 16, store, sizeof store) < 0)
-      eprintf("%s: no way to make a %s filesystem\n", argv0, p->attr[i].fs);
+      eprintf("no way to make a %s filesystem\n", p->attr[i].fs);
     /* swap is a warning when its maker is missing: the system works without it */
     switch ((pid = fork())) {
       case -1:
-        eprintf("%s: fork:", argv0);
+        eprintf("fork:");
         break;
       case 0:
         freopen("/dev/null", "w", stdout);
@@ -200,9 +203,9 @@ do_mkfs(struct plan *p)
       default:
         if (waitpid(pid, &st, 0) < 0 || !WIFEXITED(st) || WEXITSTATUS(st) != 0) {
           if (strcmp(p->attr[i].fs, "swap") == 0) {
-            weprintf("%s: %s did not make swap on %s, going on without it\n", argv0, argv[0], dev);
+            weprintf("%s did not make swap on %s, going on without it\n", argv[0], dev);
           } else {
-            weprintf("%s: %s failed on %s\n", argv0, argv[0], dev);
+            weprintf("%s failed on %s\n", argv[0], dev);
             status = 1;
           }
         }
@@ -258,8 +261,235 @@ do_fstab(struct plan *p)
   return 0;
 }
 
+/* the plan written back over its file, whole or not at all */
+static void
+save(const struct plan *p, const char *path)
+{
+  char  tmp[PATH_MAX];
+  FILE *f;
+
+  if (snprintf(tmp, sizeof tmp, "%s.new", path) >= (int)sizeof tmp)
+    eprintf("%s: name too long\n", path);
+  if (!(f = fopen(tmp, "w")))
+    eprintf("%s:", tmp);
+  if (plan_save(p, f) < 0 || fclose(f) == EOF)
+    eprintf("%s: could not write\n", tmp);
+  if (rename(tmp, path) < 0)
+    eprintf("%s:", path);
+}
+
+/* a partition named as a person does, by the number its device ends in */
+static int
+slot_of(const struct plan *p, const char *n)
+{
+  long slot = estrtol(n, 10) - 1;
+
+  if (slot < 0 || slot >= p->label.slots || !p->label.part[slot].used)
+    eprintf("%s: no such partition\n", n);
+  return (int)slot;
+}
+
+/* "512M", "20G", "1T", plain MiB, or "rest": sectors, 0 for what is left */
+static uint64_t
+sectors_of(const struct plan *p, const char *size)
+{
+  char    *end;
+  uint64_t n, mul = 1048576;
+
+  if (strcmp(size, "rest") == 0 || strcmp(size, "0") == 0)
+    return 0;
+  n = strtoull(size, &end, 10);
+  switch (*end) {
+    case 'k': case 'K': mul = 1024; end++; break;
+    case 'm': case 'M': end++; break;
+    case 'g': case 'G': mul = 1048576ULL * 1024; end++; break;
+    case 't': case 'T': mul = 1048576ULL * 1024 * 1024; end++; break;
+  }
+  if (*end == 'i' || *end == 'I')
+    end++;
+  if (*end == 'b' || *end == 'B')
+    end++;
+  if (end == size || *end || !n)
+    eprintf("%s: not a size (512M, 20G, rest)\n", size);
+  return (n * mul + p->label.sec_size - 1) / p->label.sec_size;
+}
+
+/* the type a filesystem is given when none is said: what a firmware, limine and a reader of the table expect */
+static const char *
+type_of(const char *fs, const char *mount)
+{
+  if (strcmp(fs, "swap") == 0)
+    return "8200";
+  if (strcmp(fs, "vfat") == 0 && mount && strcmp(mount, "/boot/efi") == 0)
+    return "ef00";
+  if (strcmp(fs, "bios") == 0)
+    return "ef02";
+  if (strcmp(fs, "vfat") == 0)
+    return "0700";
+  return "8300";
+}
+
+static int
+do_read(int argc, char *argv[])
+{
+  struct plan p;
+
+  if (argc != 2)
+    usage();
+  if (plan_read_disk(&p, argv[1]) < 0)
+    eprintf("%s: could not read its partitions\n", argv[1]);
+  return plan_save(&p, stdout);
+}
+
+static int
+do_new(int argc, char *argv[])
+{
+  struct plan     p;
+  struct BlockDev dev;
+  enum label_kind kind = LABEL_GPT;
+
+  ARGBEGIN
+  {
+    case 'm':
+      kind = LABEL_MBR;
+      break;
+    default:
+      usage();
+  }
+  ARGEND
+  if (argc != 1)
+    usage();
+  memset(&p, 0, sizeof p);
+  snprintf(p.disk, sizeof p.disk, "%s", argv[0]);
+  if (blockdev_open(&dev, argv[0], 0) < 0)
+    eprintf("%s:", argv[0]);
+  if (label_init(&p.label, &dev, kind) < 0)
+    eprintf("%s is too small for a partition table\n", argv[0]);
+  blockdev_close(&dev);
+  return plan_save(&p, stdout);
+}
+
+static int
+do_gaps(struct plan *p)
+{
+  struct label_gap gaps[LABEL_SLOTS + 1];
+  int              n = label_gaps(&p->label, gaps, LABEL_SLOTS + 1), i;
+  char             size[32];
+
+  for (i = 0; i < n; i++) {
+    plan_size((gaps[i].end - gaps[i].start + 1) * p->label.sec_size, size, sizeof size);
+    printf("free %9s  sectors %llu-%llu\n", size, (unsigned long long)gaps[i].start, (unsigned long long)gaps[i].end);
+  }
+  return 0;
+}
+
+static int
+do_changes(struct plan *p)
+{
+  struct plan before;
+
+  if (plan_read_disk(&before, p->disk) < 0)
+    memset(&before, 0, sizeof before);
+  plan_changes(&before, p, show_line, NULL);
+  return 0;
+}
+
+static int
+do_add(int argc, char *argv[])
+{
+  struct plan *p;
+  const char  *type = NULL, *label = "", *fs, *mount;
+  char         name[16];
+  int          slot;
+
+  ARGBEGIN
+  {
+    case 't':
+      type = EARGF(usage());
+      break;
+    case 'l':
+      label = EARGF(usage());
+      break;
+    default:
+      usage();
+  }
+  ARGEND
+  if (argc < 3 || argc > 4)
+    usage();
+  p = ecalloc(1, sizeof *p);
+  load(p, argv[0]);
+  if (p->label.kind == LABEL_NONE)
+    eprintf("%s has no partition table: start from partplan new\n", p->disk);
+  fs    = argv[2];
+  mount = argc == 4 ? argv[3] : "";
+  if (!type)
+    type = type_of(fs, mount);
+  /* the BIOS boot partition holds no filesystem, it is only its type */
+  if (strcmp(fs, "bios") == 0 || strcmp(fs, "none") == 0)
+    fs = "";
+  snprintf(name, sizeof name, "%s", strcmp(type, "ef00") == 0 ? "ESP" : strcmp(type, "ef02") == 0 ? "BIOS"
+                                    : strcmp(type, "8200") == 0 ? "SWAP" : strcmp(mount, "/") == 0 ? "ROOT" : "DATA");
+  slot = plan_add(p, 0, sectors_of(p, argv[1]), type, name, fs, mount, label);
+  if (slot < 0)
+    eprintf("no room for %s, or %s %s is not a partition (gaps shows the room)\n", argv[1], argv[2], mount);
+  save(p, argv[0]);
+  printf("%d\n", slot + 1);
+  free(p);
+  return 0;
+}
+
+static int
+do_delete(int argc, char *argv[])
+{
+  struct plan *p;
+
+  if (argc != 3)
+    usage();
+  p = ecalloc(1, sizeof *p);
+  load(p, argv[1]);
+  if (plan_delete(p, slot_of(p, argv[2])) < 0)
+    eprintf("could not delete %s\n", argv[2]);
+  save(p, argv[1]);
+  free(p);
+  return 0;
+}
+
+/* a partition's filesystem and place: -k keeps what is on it instead of making it anew */
+static int
+do_set(int argc, char *argv[])
+{
+  struct plan *p;
+  const char  *label = NULL;
+  int          keep  = 0, slot;
+
+  ARGBEGIN
+  {
+    case 'k':
+      keep = 1;
+      break;
+    case 'l':
+      label = EARGF(usage());
+      break;
+    default:
+      usage();
+  }
+  ARGEND
+  if (argc < 3 || argc > 4)
+    usage();
+  p = ecalloc(1, sizeof *p);
+  load(p, argv[0]);
+  slot = slot_of(p, argv[1]);
+  if (strcmp(argv[2], "none") == 0)
+    argv[2] = "";
+  if (plan_set(p, slot, argv[2], argc == 4 ? argv[3] : "", label ? label : p->attr[slot].label, !keep) < 0)
+    eprintf("%s is not a filesystem partplan makes, or its label is too long\n", argv[2]);
+  save(p, argv[0]);
+  free(p);
+  return 0;
+}
+
 // ?man partplan: a disk's layout as a plan, made, checked and applied
-// ?man arguments: guided [-s swap_mib] [-f root_fs] disk | disks | layout | show plan | check [-rb] plan | write plan | mkfs plan | mounts plan | fstab plan | get plan role
+// ?man arguments: guided [-s swap_mib] [-f root_fs] disk | disks | layout | read disk | new [-m] disk | show plan | gaps plan | changes plan | check [-rb] plan | write plan | mkfs plan | mounts plan | fstab plan | get plan role | add [-t type] [-l label] plan size fs [mount] | delete plan n | set [-k] [-l label] plan n fs [mount]
 // ?man partplan works on a plan, the text a partitioner and an installer
 // ?man share: the disk, its partition table, and for each partition the
 // ?man filesystem it holds, where it is mounted and whether it is made
@@ -270,8 +500,14 @@ do_fstab(struct plan *p)
 // ?man write clears the start of the disk and writes the table, mkfs makes
 // ?man the filesystems, mounts and fstab say where each goes, and get tells
 // ?man the device of the esp, root or swap, the number of the bios boot partition,
-// ?man or the root filesystem. a plan is read from the file named, or from the
-// ?man standard input when it is -
+// ?man or the root filesystem. read makes a plan of a disk as it is, new one of
+// ?man an empty GPT table (-m an MBR one), and add, delete and set edit a plan
+// ?man file in place: add puts a partition of size (512M, 20G, rest) holding fs
+// ?man (ext4, f2fs, vfat, swap, bios, none) in the first room that fits it, set
+// ?man gives partition n its filesystem and mount point, made anew unless -k
+// ?man keeps what is on it. gaps lists the free room, changes what writing the
+// ?man plan would do to the disk. a plan is read from the file named, or from
+// ?man the standard input when it is -
 int
 main(int argc, char *argv[])
 {
@@ -287,6 +523,16 @@ main(int argc, char *argv[])
     return do_check(argc - 1, argv + 1);
   if (strcmp(argv[1], "disks") == 0)
     return do_disks();
+  if (strcmp(argv[1], "read") == 0)
+    return do_read(argc - 1, argv + 1);
+  if (strcmp(argv[1], "new") == 0)
+    return do_new(argc - 1, argv + 1);
+  if (strcmp(argv[1], "add") == 0)
+    return do_add(argc - 1, argv + 1);
+  if (strcmp(argv[1], "delete") == 0)
+    return do_delete(argc - 1, argv + 1);
+  if (strcmp(argv[1], "set") == 0)
+    return do_set(argc - 1, argv + 1);
   /* what the guided layout puts ahead of the root, for a question to show */
   if (strcmp(argv[1], "layout") == 0) {
     printf("BIOS boot|%d MiB\nEFI system|%d MiB\n", PLAN_BIOS_MIB, PLAN_ESP_MIB);
@@ -298,6 +544,10 @@ main(int argc, char *argv[])
   load(p, argv[2]);
   if (strcmp(argv[1], "show") == 0)
     rc = do_show(p);
+  else if (strcmp(argv[1], "gaps") == 0)
+    rc = do_gaps(p);
+  else if (strcmp(argv[1], "changes") == 0)
+    rc = do_changes(p);
   else if (strcmp(argv[1], "write") == 0)
     rc = do_write(p);
   else if (strcmp(argv[1], "mkfs") == 0)
