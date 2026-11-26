@@ -1,0 +1,4 @@
+kmap 1
+id grp:lctrl_lshift_toggle
+key LCTL Control_L ISO_Next_Group
+key LFSH Shift_L ISO_Next_Group type=PC_CONTROL_LEVEL2

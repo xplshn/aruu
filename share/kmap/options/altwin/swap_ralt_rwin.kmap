@@ -1,0 +1,4 @@
+kmap 1
+id altwin:swap_ralt_rwin
+key RALT Super_R
+key RWIN Alt_R Meta_R

@@ -1,0 +1,4 @@
+kmap 1
+id grp:alt_altgr_toggle
+key LALT Alt_L Alt_L ISO_Prev_Group ISO_Prev_Group
+key RALT ISO_Level3_Shift ISO_Next_Group type=PC_ALT_LEVEL2

@@ -1,0 +1,4 @@
+kmap 1
+id ctrl:swap_lwin_lctl
+key LCTL Super_L
+key LWIN Control_L

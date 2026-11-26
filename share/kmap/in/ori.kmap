@@ -4,6 +4,7 @@ layout in
 variant ori
 name Oriya
 level3 ralt
+key TLDE none
 key AE01 ୧
 key AE02 ୨
 key AE03 ୩
@@ -41,6 +42,7 @@ key AC09 ତ ଥ
 key AC10 ଚ ଛ
 key AC11 ଟ ଠ
 key LSGT < > | ¦
+key AB01 none
 key AB02 ଂ ଁ
 key AB03 ମ ଣ
 key AB04 ନ

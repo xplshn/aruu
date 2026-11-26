@@ -1,0 +1,4 @@
+kmap 1
+id altwin:ctrl_win
+key LWIN Control_L
+key RWIN Control_R

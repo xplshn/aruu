@@ -1,0 +1,3 @@
+kmap 1
+id grp:alt_caps_toggle
+key CAPS Caps_Lock ISO_Next_Group type=PC_ALT_LEVEL2

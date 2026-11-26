@@ -101,7 +101,7 @@ join(char *dst, size_t sz, char **w, int n)
 int
 kmap_read(const char *path, struct kmap *k)
 {
-  char line[1024], *w[16];
+  char line[1024], *w[24];
   FILE *fp;
   int n, lineno = 0;
 
@@ -111,7 +111,7 @@ kmap_read(const char *path, struct kmap *k)
   }
   while (fgets(line, sizeof(line), fp)) {
     lineno++;
-    if (!(n = kmap_words(line, w, 16)))
+    if (!(n = kmap_words(line, w, 24)))
       continue;
     // a header field keeps its first value: compose.kmap read after a
     // layout does not rename it
@@ -146,6 +146,13 @@ kmap_read(const char *path, struct kmap *k)
         else if (key->nsym < KMAP_LEVELS)
           copy(key->sym[key->nsym++], KMAP_SYM, w[i]);
       }
+    } else if (!strcmp(w[0], "modmap") && n > 2 && k->nmodmaps < 8) {
+      struct kmap_modmap *m = &k->modmaps[k->nmodmaps++];
+      int i;
+
+      copy(m->mod, sizeof(m->mod), w[1]);
+      for (i = 2, m->n = 0; i < n && m->n < 16; i++)
+        copy(m->sym[m->n++], KMAP_SYM, w[i]);
     } else if (!strcmp(w[0], "compose") && n == 4) {
       struct kmap_compose *c;
 
@@ -186,128 +193,135 @@ xkb_sym(FILE *fp, const char *s)
     fprintf(fp, "U%04lX", c);
 }
 
-// the includes an xkb option stands for in section (symbols, compat or
-// types) of the rules file, written as include lines. an option the rules
-// do not know is said
+// a file of dir's xkb/ written out as it is
 static int
-option_includes(FILE *fp, const char *rules, const char *option, const char *section)
+put_file(FILE *fp, const char *dir, const char *name)
 {
-  char line[512], *w[8];
-  FILE *rf;
-  int in = 0, found = 0, n;
+  char path[4096], buf[8192];
+  size_t n;
+  FILE *in;
 
-  if (!(rf = fopen(rules, "r")))
-    return 0;
-  while (fgets(line, sizeof(line), rf)) {
-    if (line[0] == '!') {
-      n = kmap_words(line + 1, w, 8);
-      in = n == 3 && !strcmp(w[0], "option") && !strcmp(w[1], "=") && !strcmp(w[2], section);
-      continue;
-    }
-    if (!in || kmap_words(line, w, 8) != 3 || strcmp(w[0], option) || strcmp(w[1], "="))
-      continue;
-    // +a(b)+c(d): each part is a file and map of its own
-    for (char *p = strtok(w[2], "+|"); p; p = strtok(NULL, "+|"))
-      fprintf(fp, "    include \"%s\"\n", p);
-    found = 1;
+  snprintf(path, sizeof(path), "%s/xkb/%s", dir, name);
+  if (!(in = fopen(path, "r"))) {
+    weprintf("open %s:", path);
+    return -1;
   }
-  fclose(rf);
-  return found;
+  while ((n = fread(buf, 1, sizeof(buf), in)) > 0)
+    fwrite(buf, 1, n, fp);
+  fclose(in);
+  return 0;
+}
+
+static const struct kmap_key *
+find_key(const struct kmap *k, const char *name)
+{
+  size_t i;
+
+  for (i = 0; i < k->nkeys; i++)
+    if (!strcmp(k->keys[i].name, name))
+      return &k->keys[i];
+  return NULL;
 }
 
 static void
-put_options(FILE *fp, const char *rules, const char *options, const char *section)
+put_group(FILE *fp, int g, const struct kmap_key *key, int *first)
 {
-  const char *o, *end;
-  char one[128];
+  int l;
 
-  if (!options || !rules)
-    return;
-  // split by hand: option_includes tokenizes the rules lines with strtok
-  for (o = options; *o; o = *end ? end + 1 : end) {
-    end = strchr(o, ',');
-    if (!end)
-      end = o + strlen(o);
-    if (end == o || (size_t)(end - o) >= sizeof(one))
-      continue;
-    snprintf(one, sizeof(one), "%.*s", (int)(end - o), o);
-    if (!option_includes(fp, rules, one, section) && !strcmp(section, "symbols"))
-      weprintf("xkb option %s is not in %s\n", one, rules);
+  if (key->type[0])
+    fprintf(fp, "%stype[Group%d] = \"%s\"", *first ? "" : ", ", g + 1, key->type);
+  fprintf(fp, "%ssymbols[Group%d] = [ ", *first && !key->type[0] ? "" : ", ", g + 1);
+  for (l = 0; l < key->nsym; l++) {
+    if (l)
+      fputs(", ", fp);
+    xkb_sym(fp, key->sym[l]);
   }
+  fputs(" ]", fp);
+  *first = 0;
+}
+
+// what a key is in group g: the last option that names it, the layout of g,
+// right alt as level 3 where the layout reaches it so, the pc keyboard
+static const struct kmap_key *
+key_in(const char *name, int g, const struct kmap *pc, const struct kmap *maps,
+       const struct kmap *opts, int nopts)
+{
+  static const struct kmap_key lv3 = {"RALT", {"ISO_Level3_Shift"}, 1, 0, "ONE_LEVEL"};
+  const struct kmap_key *key;
+  int o;
+
+  for (o = nopts - 1; o >= 0; o--)
+    if ((key = find_key(&opts[o], name)))
+      return key;
+  if ((key = find_key(&maps[g], name)))
+    return key;
+  if (maps[g].level3_ralt && !strcmp(name, "RALT"))
+    return &lv3;
+  return find_key(pc, name);
 }
 
 int
-kmap_write_xkb(FILE *fp, const struct kmap *maps, int n, const char *options, const char *rules)
+kmap_write_xkb(FILE *fp, const char *dir, const struct kmap *pc, const struct kmap *maps, int n,
+               const struct kmap *opts, int nopts)
 {
   const char **names = NULL;
   size_t i, j, nnames = 0;
-  int g, l, ralt = 0;
+  int g, m, s;
 
-  for (g = 0; g < n; g++)
-    ralt |= maps[g].level3_ralt;
-  fprintf(fp, "xkb_keymap {\n"
-              "  xkb_keycodes { include \"evdev+aliases(qwerty)\" };\n"
-              "  xkb_types {\n"
-              "    include \"complete\"\n");
-  put_options(fp, rules, options, "types");
-  fprintf(fp, "  };\n"
-              "  xkb_compat {\n"
-              "    include \"complete\"\n");
-  put_options(fp, rules, options, "compat");
-  fprintf(fp, "  };\n"
-              "  xkb_symbols {\n"
-              "    include \"pc+inet(evdev)\"\n");
-  if (ralt)
-    fputs("    include \"level3(ralt_switch)\"\n", fp);
+  fputs("xkb_keymap {\n", fp);
+  if (put_file(fp, dir, "keycodes.xkb") || put_file(fp, dir, "types.xkb") || put_file(fp, dir, "compat.xkb"))
+    return -1;
+  fputs("xkb_symbols \"kmap\" {\n", fp);
   for (g = 0; g < n; g++) {
-    fprintf(fp, "    name[Group%d] = \"", g + 1);
+    fprintf(fp, "\tname[Group%d] = \"", g + 1);
     for (i = 0; maps[g].name[i]; i++)
       if (maps[g].name[i] != '"' && maps[g].name[i] != '\\')
         fputc(maps[g].name[i], fp);
     fputs("\";\n", fp);
   }
-  // every key any of the layouts names, in the order they first name it
+  // every key the pc keyboard, a layout or an option names, once
+#define ADD(km)                                                                  \
+  for (i = 0; i < (km)->nkeys; i++) {                                            \
+    for (j = 0; j < nnames && strcmp(names[j], (km)->keys[i].name); j++)        \
+      ;                                                                          \
+    if (j == nnames) {                                                           \
+      names = ereallocarray(names, nnames + 1, sizeof(*names));                 \
+      names[nnames++] = (km)->keys[i].name;                                      \
+    }                                                                            \
+  }
+  ADD(pc);
   for (g = 0; g < n; g++)
-    for (i = 0; i < maps[g].nkeys; i++) {
-      for (j = 0; j < nnames && strcmp(names[j], maps[g].keys[i].name); j++)
-        ;
-      if (j == nnames) {
-        names = ereallocarray(names, nnames + 1, sizeof(*names));
-        names[nnames++] = maps[g].keys[i].name;
-      }
-    }
+    ADD(&maps[g]);
+  for (g = 0; g < nopts; g++)
+    ADD(&opts[g]);
+#undef ADD
   for (j = 0; j < nnames; j++) {
-    int first = 1;
+    int first = 1, last = -1;
 
-    // replace, so a level the layout leaves empty is not filled from pc
-    fprintf(fp, "    replace key <%s> { ", names[j]);
-    for (g = 0; g < n; g++) {
-      const struct kmap_key *key = NULL;
+    // the groups up to the last that has the key, none skipped
+    for (g = 0; g < n; g++)
+      if (key_in(names[j], g, pc, maps, opts, nopts))
+        last = g;
+    if (last < 0)
+      continue;
+    fprintf(fp, "\tkey <%s> { ", names[j]);
+    for (g = 0; g <= last; g++) {
+      const struct kmap_key *key = key_in(names[j], g, pc, maps, opts, nopts);
+      static const struct kmap_key none = {"", {"NoSymbol"}, 1, 0, ""};
 
-      for (i = 0; i < maps[g].nkeys && !key; i++)
-        if (!strcmp(maps[g].keys[i].name, names[j]))
-          key = &maps[g].keys[i];
-      if (!key)
-        continue;
-      if (key->type[0]) {
-        fprintf(fp, "%stype[Group%d] = \"%s\"", first ? "" : ", ", g + 1, key->type);
-        first = 0;
-      }
-      fprintf(fp, "%ssymbols[Group%d] = [ ", first ? "" : ", ", g + 1);
-      for (l = 0; l < key->nsym; l++) {
-        if (l)
-          fputs(", ", fp);
-        xkb_sym(fp, key->sym[l]);
-      }
-      fputs(" ]", fp);
-      first = 0;
+      put_group(fp, g, key ? key : &none, &first);
     }
     fputs(" };\n", fp);
   }
   free(names);
-  // the options last, over the layouts' keys, as xkb's rules put them
-  put_options(fp, rules, options, "symbols");
-  fputs("  };\n};\n", fp);
+  // a modifier follows the keysyms that drive it, wherever a layout put them
+  for (m = 0; m < pc->nmodmaps; m++) {
+    fprintf(fp, "\tmodifier_map %s { ", pc->modmaps[m].mod);
+    for (s = 0; s < pc->modmaps[m].n; s++)
+      fprintf(fp, "%s%s", s ? ", " : "", pc->modmaps[m].sym[s]);
+    fputs(" };\n", fp);
+  }
+  fputs("};\n};\n", fp);
   return ferror(fp) ? -1 : 0;
 }
 

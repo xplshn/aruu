@@ -1,0 +1,4 @@
+kmap 1
+id ctrl:swap_rwin_rctl
+key RCTL Super_R
+key RWIN Control_R

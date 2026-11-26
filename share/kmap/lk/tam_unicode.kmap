@@ -27,6 +27,7 @@ key AD08 ை ஐ
 key AD09 ொ ோ
 key AD10 ி ீ
 key AD11 ு ூ
+key AD12 none
 key BKSL \ |
 key AC01 ய
 key AC02 ள
@@ -48,5 +49,7 @@ key AB05 ெ ே
 key AB06 ஔ ௌ
 key AB07 அ ஆ
 key AB08 இ ஈ
+key AB09 none
+key AB10 none
 key SPCE space
 key KPDL KP_Delete KP_Decimal

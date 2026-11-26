@@ -1,0 +1,4 @@
+kmap 1
+id altwin:hyper_win
+key LWIN Hyper_L
+key RWIN Hyper_R

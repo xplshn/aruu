@@ -30,6 +30,12 @@
  * (space, dead_acute, KP_Delete), none for nothing. caps marks a key caps
  * lock shifts. level3 ralt says right alt reaches level 3.
  *
+ * pc.kmap is the whole pc keyboard under every layout, with the keysyms
+ * that drive each modifier ("modmap Mod1 Alt_L Alt_R"); options/<group>/
+ * <name>.kmap are the xkb options that change keys, laid over a layout; and
+ * xkb/ holds the key codes, types and compatibility every xkb keymap has, so
+ * kmap -x needs no xkb data of the system's.
+ *
  * compose.kmap, beside the layouts, says what a dead key makes:
  *
  *   compose dead_acute e é
@@ -56,9 +62,18 @@ struct kmap_compose {
   char result[KMAP_SYM];
 };
 
+/* a modifier and the keysyms whose keys drive it: pc.kmap's own maps */
+struct kmap_modmap {
+  char mod[16];
+  char sym[16][KMAP_SYM];
+  int  n;
+};
+
 struct kmap {
   char id[64], layout[32], variant[64], name[256];
   int  level3_ralt;
+  struct kmap_modmap modmaps[8];
+  int  nmodmaps;
   struct kmap_key     *keys;
   size_t               nkeys;
   struct kmap_compose *compose;
@@ -107,11 +122,11 @@ long kmap_dead(const char *sym);
    the reason said, as on a system kmap has no backend for (kmap_posix.c) */
 int kmap_load_console(const struct kmap *k);
 
-/* the n layouts of maps as one xkb keymap, a group each, the keys they do
-   not name from the pc layout. options are xkb's (caps:escape,
-   grp:alt_shift_toggle), looked up in rules (xkeyboard-config's
-   rules/evdev); either may be NULL */
-int kmap_write_xkb(FILE *fp, const struct kmap *maps, int n, const char *options,
-                   const char *rules);
+/* a whole xkb keymap, needing no xkb data: the key codes, types and
+   compatibility in dir/xkb, the pc keyboard pc, the n layouts of maps as a
+   group each over it, then the nopts options over every group. 0, or -1
+   said */
+int kmap_write_xkb(FILE *fp, const char *dir, const struct kmap *pc, const struct kmap *maps,
+                   int n, const struct kmap *opts, int nopts);
 
 #endif

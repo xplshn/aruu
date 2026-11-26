@@ -3,6 +3,7 @@ id my
 layout my
 name Malay (Jawi, Arabic Keyboard)
 level3 ralt
+key TLDE none
 key AE01 ١ ! 1
 key AE02 ٢ @ 2
 key AE03 ٣ '#' 3

@@ -1,0 +1,308 @@
+xkb_compatibility "complete" {
+	virtual_modifiers NumLock,Alt,LevelThree,Super,LevelFive,Meta,Hyper,ScrollLock;
+
+	interpret.useModMapMods= AnyLevel;
+	interpret.repeat= False;
+	interpret 0xff7f+AnyOf(all) {
+		virtualModifier= NumLock;
+		action= LockMods(modifiers=NumLock);
+	};
+	interpret 0xfe03+AnyOf(all) {
+		virtualModifier= LevelThree;
+		useModMapMods=level1;
+		action= SetMods(modifiers=LevelThree,clearLocks);
+	};
+	interpret 0xffe9+AnyOf(all) {
+		virtualModifier= Alt;
+		action= SetMods(modifiers=modMapMods,clearLocks);
+	};
+	interpret 0xffea+AnyOf(all) {
+		virtualModifier= Alt;
+		action= SetMods(modifiers=modMapMods,clearLocks);
+	};
+	interpret 0xffe7+AnyOf(all) {
+		virtualModifier= Meta;
+		action= SetMods(modifiers=modMapMods,clearLocks);
+	};
+	interpret 0xffe8+AnyOf(all) {
+		virtualModifier= Meta;
+		action= SetMods(modifiers=modMapMods,clearLocks);
+	};
+	interpret 0xffeb+AnyOf(all) {
+		virtualModifier= Super;
+		action= SetMods(modifiers=modMapMods,clearLocks);
+	};
+	interpret 0xffec+AnyOf(all) {
+		virtualModifier= Super;
+		action= SetMods(modifiers=modMapMods,clearLocks);
+	};
+	interpret 0xffed+AnyOf(all) {
+		virtualModifier= Hyper;
+		action= SetMods(modifiers=modMapMods,clearLocks);
+	};
+	interpret 0xfe11+AnyOf(all) {
+		virtualModifier= LevelFive;
+		useModMapMods=level1;
+		action= SetMods(modifiers=LevelFive,clearLocks);
+	};
+	interpret 0xff7e+AnyOfOrNone(all) {
+		action= SetGroup(group=+1);
+	};
+	interpret 0xfe03+AnyOfOrNone(all) {
+		action= SetMods(modifiers=LevelThree,clearLocks);
+	};
+	interpret 0xfe04+AnyOfOrNone(all) {
+		action= LatchMods(modifiers=LevelThree,clearLocks,latchToLock);
+	};
+	interpret 0xfe05+AnyOfOrNone(all) {
+		action= LockMods(modifiers=LevelThree);
+	};
+	interpret 0xfe08+AnyOfOrNone(all) {
+		action= LockGroup(group=+1);
+	};
+	interpret 0xfe0a+AnyOfOrNone(all) {
+		action= LockGroup(group=-1);
+	};
+	interpret 0xfe0c+AnyOfOrNone(all) {
+		action= LockGroup(group=1);
+	};
+	interpret 0xfe0e+AnyOfOrNone(all) {
+		action= LockGroup(group=2);
+	};
+	interpret 0xffb1+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=-1,y=+1);
+	};
+	interpret 0xff9c+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=-1,y=+1);
+	};
+	interpret 0xffb2+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+0,y=+1);
+	};
+	interpret 0xff99+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+0,y=+1);
+	};
+	interpret 0xffb3+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+1,y=+1);
+	};
+	interpret 0xff9b+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+1,y=+1);
+	};
+	interpret 0xffb4+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=-1,y=+0);
+	};
+	interpret 0xff96+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=-1,y=+0);
+	};
+	interpret 0xffb6+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+1,y=+0);
+	};
+	interpret 0xff98+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+1,y=+0);
+	};
+	interpret 0xffb7+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=-1,y=-1);
+	};
+	interpret 0xff95+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=-1,y=-1);
+	};
+	interpret 0xffb8+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+0,y=-1);
+	};
+	interpret 0xff97+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+0,y=-1);
+	};
+	interpret 0xffb9+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+1,y=-1);
+	};
+	interpret 0xff9a+AnyOfOrNone(all) {
+		repeat= True;
+		action= MovePtr(x=+1,y=-1);
+	};
+	interpret 0xffb5+AnyOfOrNone(all) {
+		repeat= True;
+		action= PtrBtn(button=default);
+	};
+	interpret 0xff9d+AnyOfOrNone(all) {
+		repeat= True;
+		action= PtrBtn(button=default);
+	};
+	interpret 0xffaf+AnyOfOrNone(all) {
+		repeat= True;
+		action= SetPtrDflt(affect=button,button=1);
+	};
+	interpret 0xffaa+AnyOfOrNone(all) {
+		repeat= True;
+		action= SetPtrDflt(affect=button,button=2);
+	};
+	interpret 0xffad+AnyOfOrNone(all) {
+		repeat= True;
+		action= SetPtrDflt(affect=button,button=3);
+	};
+	interpret 0xffac+AnyOfOrNone(all) {
+		repeat= True;
+		action= PtrBtn(button=default,count=2);
+	};
+	interpret 0xffab+AnyOfOrNone(all) {
+		repeat= True;
+		action= PtrBtn(button=default,count=2);
+	};
+	interpret 0xffb0+AnyOfOrNone(all) {
+		repeat= True;
+		action= LockPtrBtn(button=default,affect=lock);
+	};
+	interpret 0xff9e+AnyOfOrNone(all) {
+		repeat= True;
+		action= LockPtrBtn(button=default,affect=lock);
+	};
+	interpret 0xffae+AnyOfOrNone(all) {
+		repeat= True;
+		action= LockPtrBtn(button=default,affect=unlock);
+	};
+	interpret 0xff9f+AnyOfOrNone(all) {
+		repeat= True;
+		action= LockPtrBtn(button=default,affect=unlock);
+	};
+	interpret 0xfef9+AnyOfOrNone(all) {
+		action= LockControls(controls=MouseKeys);
+	};
+	interpret 0xfed5+AnyOfOrNone(all) {
+		action= Terminate();
+	};
+	interpret 0xffe9+AnyOfOrNone(all) {
+		action= SetMods(modifiers=Alt,clearLocks);
+	};
+	interpret 0xffea+AnyOfOrNone(all) {
+		action= SetMods(modifiers=Alt,clearLocks);
+	};
+	interpret 0xffed+AnyOfOrNone(all) {
+		action= SetMods(modifiers=Hyper,clearLocks);
+	};
+	interpret 0xffee+AnyOfOrNone(all) {
+		action= SetMods(modifiers=Hyper,clearLocks);
+	};
+	interpret 0xff14+AnyOfOrNone(all) {
+		action= LockMods(modifiers=ScrollLock);
+	};
+	interpret 0xffe1+AnyOfOrNone(all) {
+		action= SetMods(modifiers=Shift,clearLocks);
+	};
+	interpret 0xffe2+AnyOfOrNone(all) {
+		action= SetMods(modifiers=Shift,clearLocks);
+	};
+	interpret 0x1008fe01+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=1,!same);
+	};
+	interpret 0x1008fe02+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=2,!same);
+	};
+	interpret 0x1008fe03+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=3,!same);
+	};
+	interpret 0x1008fe04+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=4,!same);
+	};
+	interpret 0x1008fe05+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=5,!same);
+	};
+	interpret 0x1008fe06+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=6,!same);
+	};
+	interpret 0x1008fe07+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=7,!same);
+	};
+	interpret 0x1008fe08+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=8,!same);
+	};
+	interpret 0x1008fe09+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=9,!same);
+	};
+	interpret 0x1008fe0a+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=10,!same);
+	};
+	interpret 0x1008fe0b+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=11,!same);
+	};
+	interpret 0x1008fe0c+AnyOfOrNone(all) {
+		repeat= True;
+		action= SwitchScreen(screen=12,!same);
+	};
+	interpret 0x1008fe25+AnyOfOrNone(all) {
+		repeat= True;
+		action= Private(type=0x86,data[0]=0x50,data[1]=0x72,data[2]=0x47,data[3]=0x72,data[4]=0x62,data[5]=0x73,data[6]=0x00);
+	};
+	interpret 0x1008fe24+AnyOfOrNone(all) {
+		repeat= True;
+		action= Private(type=0x86,data[0]=0x50,data[1]=0x72,data[2]=0x57,data[3]=0x69,data[4]=0x6e,data[5]=0x73,data[6]=0x00);
+	};
+	interpret 0x1008fe22+AnyOfOrNone(all) {
+		repeat= True;
+		action= Private(type=0x86,data[0]=0x2b,data[1]=0x56,data[2]=0x4d,data[3]=0x6f,data[4]=0x64,data[5]=0x65,data[6]=0x00);
+	};
+	interpret 0x1008fe23+AnyOfOrNone(all) {
+		repeat= True;
+		action= Private(type=0x86,data[0]=0x2d,data[1]=0x56,data[2]=0x4d,data[3]=0x6f,data[4]=0x64,data[5]=0x65,data[6]=0x00);
+	};
+	interpret 0xfe11+AnyOfOrNone(all) {
+		action= SetMods(modifiers=LevelFive,clearLocks);
+	};
+	interpret 0xfe12+AnyOfOrNone(all) {
+		action= LatchMods(modifiers=LevelFive,clearLocks,latchToLock);
+	};
+	interpret 0xfe13+AnyOfOrNone(all) {
+		action= LockMods(modifiers=LevelFive);
+	};
+	interpret 0xffe5+AnyOfOrNone(all) {
+		action= LockMods(modifiers=Lock);
+	};
+	interpret Any+AnyOf(all) {
+		action= SetMods(modifiers=modMapMods,clearLocks);
+	};
+	indicator "Caps Lock" {
+		whichModState= locked;
+		modifiers= Lock;
+	};
+	indicator "Num Lock" {
+		whichModState= locked;
+		modifiers= NumLock;
+	};
+	indicator "Scroll Lock" {
+		whichModState= locked;
+		modifiers= ScrollLock;
+	};
+	indicator "Shift Lock" {
+		whichModState= locked;
+		modifiers= Shift;
+	};
+	indicator "Group 2" {
+		groups= 0xfffffffe;
+	};
+	indicator "Mouse Keys" {
+		controls= MouseKeys;
+	};
+};

@@ -1,0 +1,6 @@
+kmap 1
+id altwin:swap_alt_win
+key LALT Super_L
+key RALT Super_R
+key LWIN Alt_L Meta_L
+key RWIN Alt_R Meta_R

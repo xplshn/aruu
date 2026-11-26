@@ -1,0 +1,4 @@
+kmap 1
+id grp:rctrl_rshift_toggle
+key RTSH Shift_R ISO_Next_Group type=PC_CONTROL_LEVEL2
+key RCTL Control_R ISO_Next_Group

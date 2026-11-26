@@ -1,0 +1,4 @@
+kmap 1
+id caps:swapescape
+key ESC Caps_Lock
+key CAPS Escape

@@ -1,0 +1,3 @@
+kmap 1
+id kpdl:semi
+key KPDL KP_Delete KP_Decimal ; type=FOUR_LEVEL_MIXED_KEYPAD

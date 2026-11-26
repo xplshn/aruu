@@ -1,0 +1,4 @@
+kmap 1
+id grp:lalt_lshift_toggle
+key LFSH Shift_L ISO_Next_Group type=PC_ALT_LEVEL2
+key LALT Alt_L ISO_Next_Group

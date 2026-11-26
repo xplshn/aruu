@@ -4,6 +4,7 @@ layout in
 variant guj
 name Gujarati
 level3 ralt
+key TLDE none
 key AE01 ૧ ઍ
 key AE02 ૨ ૅ
 key AE03 ૩

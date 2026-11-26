@@ -4,6 +4,7 @@ layout my
 variant phonetic
 name Malay (Jawi, phonetic)
 level3 ralt
+key TLDE none
 key AE01 ١ ! 1
 key AE02 ٢ ء 2
 key AE03 ٣ أ 3

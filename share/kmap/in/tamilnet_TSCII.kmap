@@ -3,6 +3,7 @@ id in-tamilnet_TSCII
 layout in
 variant tamilnet_TSCII
 name 'Tamil (TamilNet ''99, TSCII encoding)'
+key TLDE none
 key AE01 0x010000b7 0x010000a4
 key AE02 0x01000082 0x010000a5
 key AE03 0x01000083 0x01000088
@@ -10,6 +11,11 @@ key AE04 0x01000084 0x01000089
 key AE05 0x01000085 0x0100008a
 key AE06 0x01000086 0x0100008b
 key AE07 0x01000087 0x0100008c
+key AE08 none
+key AE09 none
+key AE10 none
+key AE11 none
+key AE12 none
 key AD01 0x010000bb 0x0100009a
 key AD02 0x010000c8 0x010000da
 key AD03 0x010000bf 0x010000d1
@@ -21,6 +27,7 @@ key AD08 0x010000a8 0x010000b3
 key AD09 0x010000ca 0x010000cb
 key AD10 0x010000a2 0x010000a3
 key AD11 dead_acute 0x010000a3
+key AD12 none
 key BKSL \ |
 key AC01 0x010000c2 0x010000d4
 key AC02 0x010000c7 0x010000d9
@@ -42,5 +49,7 @@ key AB05 0x010000a6 0x010000a7
 key AB06 0x010000b6 0x010000aa
 key AB07 0x010000ab 0x010000ac
 key AB08 0x010000fe 0x010000ae
+key AB09 none
+key AB10 none
 key SPCE space
 key KPDL KP_Delete KP_Decimal

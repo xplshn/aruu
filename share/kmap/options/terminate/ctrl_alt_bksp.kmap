@@ -1,0 +1,3 @@
+kmap 1
+id terminate:ctrl_alt_bksp
+key BKSP BackSpace BackSpace none none Terminate_Server type=CTRL+ALT

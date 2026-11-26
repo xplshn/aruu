@@ -3,6 +3,7 @@ id in-tamilnet_TAB
 layout in
 variant tamilnet_TAB
 name 'Tamil (TamilNet ''99, TAB encoding)'
+key TLDE none
 key AE01 0x010000e7 0x010000a7
 key AE02 0x010000fa 0x010000a8
 key AE03 0x010000fb
@@ -10,6 +11,11 @@ key AE04 0x010000fc
 key AE05 0x010000fd
 key AE06 0x010000fe
 key AE07 0x010000ff
+key AE08 none
+key AE09 none
+key AE10 none
+key AE11 none
+key AE12 none
 key AD01 0x010000eb 0x010000b3
 key AD02 0x010000f8 0x010000c1
 key AD03 0x010000ef 0x010000b8
@@ -21,6 +27,7 @@ key AD08 0x010000ac 0x010000e4
 key AD09 0x010000ae 0x010000af
 key AD10 0x010000a4 0x010000a6
 key AD11 dead_circumflex 0x010000a6
+key AD12 none
 key BKSL \ |
 key AC01 0x010000f2 0x010000bb
 key AC02 0x010000f7 0x010000c0
@@ -42,5 +49,7 @@ key AB05 0x010000aa 0x010000ab
 key AB06 0x010000ac 0x010000a3
 key AB07 0x010000dc 0x010000dd
 key AB08 0x010000de 0x010000df
+key AB09 none
+key AB10 none
 key SPCE space
 key KPDL KP_Delete KP_Decimal

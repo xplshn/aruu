@@ -1,0 +1,4 @@
+kmap 1
+id grp:shifts_toggle
+key LFSH Shift_L ISO_Prev_Group
+key RTSH Shift_R ISO_Next_Group

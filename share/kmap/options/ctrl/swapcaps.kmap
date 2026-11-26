@@ -1,0 +1,4 @@
+kmap 1
+id ctrl:swapcaps
+key LCTL Caps_Lock
+key CAPS Control_L

@@ -27,6 +27,8 @@ key AD07 u U ᚒ caps type=THREE_LEVEL
 key AD08 i I ᚔ caps type=THREE_LEVEL
 key AD09 o O ᚑ caps type=THREE_LEVEL
 key AD10 p P ᚚ caps type=THREE_LEVEL
+key AD11 none
+key AD12 none
 key BKSL '#' ~   type=THREE_LEVEL
 key AC01 a A ᚐ caps type=THREE_LEVEL
 key AC02 s S ᚄ caps type=THREE_LEVEL
@@ -37,6 +39,8 @@ key AC06 h H ᚆ caps type=THREE_LEVEL
 key AC07 j J ᚗ caps type=THREE_LEVEL
 key AC08 k K ᚖ caps type=THREE_LEVEL
 key AC09 l L ᚂ caps type=THREE_LEVEL
+key AC10 none
+key AC11 none
 key LSGT \ | ᚛ ᚜ type=FOUR_LEVEL_ALPHABETIC
 key AB01 z Z ᚎ caps type=THREE_LEVEL
 key AB02 x X ᚙ caps type=THREE_LEVEL

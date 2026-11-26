@@ -14,7 +14,7 @@
 static void
 usage(void)
 {
-  eprintf("usage: %s [-d dir] [-l [layout]] [-n] [-x [-o options] [-r rules]]\n"
+  eprintf("usage: %s [-d dir] [-l [layout]] [-n] [-x [-o options]]\n"
           "       [layout[,layout] [variant[,variant]]]\n", argv0);
 }
 
@@ -99,7 +99,7 @@ nth(char *buf, size_t sz, const char *list, int n)
 }
 
 // ?man kmap: set the keyboard layout of the console, or give it to xkb
-// ?man arguments: [-d dir] [-l [layout]] [-n] [-x [-o options] [-r rules]] [layout[,layout] [variant[,variant]]]
+// ?man arguments: [-d dir] [-l [layout]] [-n] [-x [-o options]] [layout[,layout] [variant[,variant]]]
 // ?man kmap loads a kmap layout (see kmap.h: portable text, every layout
 // ?man alpine ships) into the console's keyboard: every console takes it,
 // ?man through the system's own interface (linux's console, wscons, syscons
@@ -110,8 +110,10 @@ nth(char *buf, size_t sz, const char *list, int n)
 int
 main(int argc, char *argv[])
 {
-  const char *dir = KMAP_DIR, *options = NULL, *rules = NULL;
-  char path[PATH_MAX], layouts[256], variants[256], rulesbuf[PATH_MAX];
+  const char *dir = KMAP_DIR, *options = NULL;
+  char path[PATH_MAX], layouts[256], variants[256];
+  struct kmap pc, opts[8];
+  int nopts = 0;
   int lflag = 0, xflag = 0, nflag = 0, rc = 0, n, i;
   struct kmap maps[4];
 
@@ -133,10 +135,6 @@ main(int argc, char *argv[])
     case 'o':
       options = EARGF(usage());
       break;
-    // ?man -r:str: -r rules: the xkb rules file options are looked up in
-    case 'r':
-      rules = EARGF(usage());
-      break;
     // ?man -x: write the layouts as an xkb keymap
     case 'x':
       xflag = 1;
@@ -154,18 +152,18 @@ main(int argc, char *argv[])
     snprintf(layouts, sizeof(layouts), "%s", argv[0]);
     snprintf(variants, sizeof(variants), "%s", argc > 1 ? argv[1] : "");
   } else if (configured(layouts, sizeof(layouts), variants, sizeof(variants)) != 0) {
-    // no layout chosen: the console keeps its own
-    return 0;
+    // no layout chosen: the console keeps its own, and xkb is given us
+    if (!xflag)
+      return 0;
+    snprintf(layouts, sizeof(layouts), "us");
+    variants[0] = '\0';
   }
-  if (!rules) {
-    const char *root = getenv("XKB_CONFIG_ROOT");
 
-    snprintf(rulesbuf, sizeof(rulesbuf), "%s/rules/evdev", root && *root ? root : "/share/X11/xkb");
-    rules = rulesbuf;
-  }
 
   // the console has one layout: the first of them
   memset(maps, 0, sizeof(maps));
+  memset(&pc, 0, sizeof(pc));
+  memset(opts, 0, sizeof(opts));
   for (n = 0; n < (xflag ? (int)LEN(maps) : 1); n++) {
     char layout[64], variant[128];
 
@@ -186,12 +184,48 @@ main(int argc, char *argv[])
       goto done;
     }
   }
-  if (xflag)
-    rc = kmap_write_xkb(stdout, maps, n, options, rules);
+  if (xflag) {
+    // the pc keyboard under the layouts, and each option, xkb's name for it
+    // (caps:escape) the file options/caps/escape.kmap
+    snprintf(path, sizeof(path), "%s/pc.kmap", dir);
+    if (kmap_read(path, &pc) != 0) {
+      rc = 1;
+      goto done;
+    }
+    for (const char *o = options; o && *o && nopts < (int)LEN(opts);) {
+      const char *end = strchr(o, ','), *colon;
+      size_t len = end ? (size_t)(end - o) : strlen(o);
+      char one[128];
+
+      snprintf(one, sizeof(one), "%.*s", (int)(len < sizeof(one) ? len : sizeof(one) - 1), o);
+      o = end ? end + 1 : o + len;
+      if (!one[0])
+        continue;
+      if (!(colon = strchr(one, ':'))) {
+        weprintf("%s: an option is group:name\n", one);
+        rc = 1;
+        goto done;
+      }
+      snprintf(path, sizeof(path), "%s/options/%.*s/%s.kmap", dir, (int)(colon - one), one, colon + 1);
+      if (access(path, F_OK) != 0) {
+        weprintf("%s: kmap has no such option\n", one);
+        rc = 1;
+        goto done;
+      }
+      if (kmap_read(path, &opts[nopts++]) != 0) {
+        rc = 1;
+        goto done;
+      }
+    }
+    rc = kmap_write_xkb(stdout, dir, &pc, maps, n, opts, nopts);
+  }
   else if (!nflag)
     rc = kmap_load_console(&maps[0]);
 done:
   for (i = 0; i < (int)LEN(maps); i++)
     kmap_free(&maps[i]);
+  for (i = 0; i < nopts; i++)
+    kmap_free(&opts[i]);
+  kmap_free(&pc);
   return rc != 0;
 }

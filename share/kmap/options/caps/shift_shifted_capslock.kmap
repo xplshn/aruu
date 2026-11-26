@@ -1,0 +1,3 @@
+kmap 1
+id caps:shift_shifted_capslock
+key CAPS Shift_L Caps_Lock type=ALPHABETIC

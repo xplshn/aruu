@@ -1,0 +1,4 @@
+kmap 1
+id lv3:win_switch
+key LWIN ISO_Level3_Shift
+key RWIN ISO_Level3_Shift

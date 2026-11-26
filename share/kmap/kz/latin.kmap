@@ -26,6 +26,8 @@ key AD07 u U caps
 key AD08 i I caps
 key AD09 o O caps
 key AD10 p P caps
+key AD11 none
+key AD12 none
 key BKSL \ / type=FOUR_LEVEL
 key AC01 a A caps
 key AC02 s S caps
@@ -36,6 +38,8 @@ key AC06 h H caps
 key AC07 j J caps
 key AC08 k K caps
 key AC09 l L caps
+key AC10 none
+key AC11 none
 key LSGT < > | ¦
 key AB01 z Z caps
 key AB02 x X caps
@@ -44,6 +48,8 @@ key AB04 v M
 key AB05 b B caps
 key AB06 n N caps
 key AB07 m M caps
+key AB08 none
+key AB09 none
 key AB10 № ? type=FOUR_LEVEL
 key SPCE space
 key KPDL KP_Delete KP_Decimal

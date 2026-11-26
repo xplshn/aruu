@@ -1,0 +1,18 @@
+kmap 1
+id solaris:sun_compat
+key FK11 SunF36 F11 F11 F11 XF86Switch_VT_11 type=CTRL+ALT
+key FK12 SunF37 F12 F12 F12 XF86Switch_VT_12 type=CTRL+ALT
+key MUTE SunAudioMute SunVideoDegauss
+key VOL- SunAudioLowerVolume SunVideoLowerBrightness
+key VOL+ SunAudioRaiseVolume SunVideoRaiseBrightness
+key POWR XF86Sleep XF86Hibernate
+key STOP F11 F11 Cancel
+key AGAI F12 F12 Redo
+key PROP F13 F13 SunProps
+key UNDO F14 F14 Undo
+key FRNT F15 F15 SunFront
+key COPY F16 F16 SunCopy
+key OPEN F17 F17 SunOpen
+key PAST F18 F18 SunPaste
+key FIND F19 F19 Find
+key CUT F20 F20 SunCut
