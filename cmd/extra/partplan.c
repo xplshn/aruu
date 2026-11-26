@@ -1,4 +1,5 @@
 /* see LICENSE file for copyright and license details */
+#include "libdisk/gpt.h"
 #include "libdisk/plan.h"
 #include "arg.h"
 #include "util.h"
@@ -17,7 +18,7 @@ usage(void)
 {
   eprintf("usage: %s guided [-s swap_mib] [-f root_fs] disk | disks | layout | read disk | new [-m] disk |\n"
           "       show plan | gaps plan | changes plan | check [-rb] plan | write plan | mkfs plan | mounts plan |\n"
-          "       fstab plan | get plan esp|root|swap|bios|rootfs |\n"
+          "       fstab plan | get plan esp|root|swap|bios|rootfs|rootuuid |\n"
           "       add [-t type] [-l label] plan size fs [mount] | delete plan n | set [-k] [-l label] plan n fs [mount]\n",
           argv0);
 }
@@ -232,6 +233,23 @@ do_mounts(struct plan *p)
   return 0;
 }
 
+/* how fstab names a partition: by its filesystem's UUID, which stays when
+ * another disk is plugged in and the names move, or its device when the
+ * filesystem has none to read */
+static void
+fstab_source(const char *dev, char *out, size_t n)
+{
+  struct BlockDev bd;
+  char            type[32] = "", label[128] = "", uuid[128] = "";
+
+  snprintf(out, n, "%s", dev);
+  if (blockdev_open(&bd, dev, 0) < 0)
+    return;
+  if (blockdev_detect_fs(&bd, type, sizeof type, label, sizeof label, uuid, sizeof uuid) == 0 && uuid[0])
+    snprintf(out, n, "UUID=%s", uuid);
+  blockdev_close(&bd);
+}
+
 /* the lines of the installed system's fstab: what is mounted, and swap */
 static int
 do_fstab(struct plan *p)
@@ -241,11 +259,12 @@ do_fstab(struct plan *p)
   for (i = 0; i < n; i++) {
     const struct plan_fs *f = plan_filesystem(p->attr[slots[i]].fs);
     const char           *mp = p->attr[slots[i]].mount;
-    char                  dev[PLAN_PATH + 8];
+    char                  path[PLAN_PATH + 8], dev[PLAN_PATH + 140];
 
     if (!f || !f->mount_as)
       continue;
-    plan_part_path(p->disk, slots[i], dev, sizeof dev);
+    plan_part_path(p->disk, slots[i], path, sizeof path);
+    fstab_source(path, dev, sizeof dev);
     if (strcmp(mp, "/") == 0)
       printf("%s  /  %s  defaults,noatime  0  1\n", dev, f->mount_as);
     else
@@ -488,6 +507,38 @@ do_set(int argc, char *argv[])
   return 0;
 }
 
+/* the root partition's PARTUUID, which the kernel finds it by whatever the disk
+ * is called this boot: a GPT partition's own GUID, or the MBR's disk signature
+ * and the partition's number. it is read from the disk, as the table written
+ * made it, not from the plan, which carries none */
+static int
+do_rootuuid(struct plan *p)
+{
+  struct plan disk;
+  char        guid[37];
+  int         i;
+
+  if (plan_read_disk(&disk, p->disk) < 0)
+    eprintf("%s: could not read its partitions\n", p->disk);
+  for (i = 0; i < p->label.slots; i++) {
+    if (!p->label.part[i].used || strcmp(p->attr[i].mount, "/") != 0)
+      continue;
+    if (!disk.label.part[i].used || disk.label.part[i].start != p->label.part[i].start)
+      eprintf("%s: the root partition is not on the disk: write the plan first\n", p->disk);
+    if (disk.label.kind == LABEL_GPT) {
+      format_guid(disk.label.part[i].guid, guid);
+      for (char *c = guid; *c; c++)
+        if (*c >= 'A' && *c <= 'F')
+          *c += 'a' - 'A';
+      puts(guid);
+    } else {
+      printf("%08x-%02x\n", (unsigned)disk.label.mbr_id, (unsigned)(i + 1));
+    }
+    return 0;
+  }
+  return 1;
+}
+
 // ?man partplan: a disk's layout as a plan, made, checked and applied
 // ?man arguments: guided [-s swap_mib] [-f root_fs] disk | disks | layout | read disk | new [-m] disk | show plan | gaps plan | changes plan | check [-rb] plan | write plan | mkfs plan | mounts plan | fstab plan | get plan role | add [-t type] [-l label] plan size fs [mount] | delete plan n | set [-k] [-l label] plan n fs [mount]
 // ?man partplan works on a plan, the text a partitioner and an installer
@@ -500,10 +551,11 @@ do_set(int argc, char *argv[])
 // ?man write clears the start of the disk and writes the table, mkfs makes
 // ?man the filesystems, mounts and fstab say where each goes, and get tells
 // ?man the device of the esp, root or swap, the number of the bios boot partition,
-// ?man or the root filesystem. read makes a plan of a disk as it is, new one of
-// ?man an empty GPT table (-m an MBR one), and add, delete and set edit a plan
-// ?man file in place: add puts a partition of size (512M, 20G, rest) holding fs
-// ?man (ext4, f2fs, vfat, swap, bios, none) in the first room that fits it, set
+// ?man the root filesystem, or rootuuid, the root's PARTUUID read from the disk.
+// ?man read makes a plan of a disk as it is, new one of an empty GPT table
+// ?man (-m an MBR one), and add, delete and set edit a plan file in place:
+// ?man add puts a partition of size (512M, 20G, rest) holding fs (ext4, f2fs,
+// ?man vfat, swap, bios, none) in the first room that fits it, set
 // ?man gives partition n its filesystem and mount point, made anew unless -k
 // ?man keeps what is on it. gaps lists the free room, changes what writing the
 // ?man plan would do to the disk. a plan is read from the file named, or from
@@ -556,6 +608,8 @@ main(int argc, char *argv[])
     rc = do_mounts(p);
   else if (strcmp(argv[1], "fstab") == 0)
     rc = do_fstab(p);
+  else if (strcmp(argv[1], "get") == 0 && argc == 4 && strcmp(argv[3], "rootuuid") == 0)
+    rc = do_rootuuid(p);
   else if (strcmp(argv[1], "get") == 0 && argc == 4) {
     char value[PLAN_PATH + 8];
 
