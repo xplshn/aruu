@@ -154,6 +154,8 @@ static const struct FsType fstypes[] = {
     {"vfat", 54, 4, 0x31544146, 0, 39, 4, 43, 11},
     /* ntfs */
     {"ntfs", 3, 4, 0x5346544e, 0, 72, 8, 0, 0},
+    /* exfat: its label is an entry of the root folder, not in the boot sector */
+    {"exfat", 3, 8, 0x2020205441465845ULL, 0, 100, 4, 0, 0},
     /* iso9660: "CD001" at the primary volume descriptor, LBA 16 */
     {"iso9660", 32769, 5, 0x3130304443ULL, 0, 0, 0, 32808, 32},
     /* xfs */
@@ -177,7 +179,7 @@ format_uuid(const unsigned char *buf, size_t len, const char *type, char *out, s
   char  *p;
 
   p = out;
-  if (strcmp(type, "vfat") == 0) {
+  if (strcmp(type, "vfat") == 0 || strcmp(type, "exfat") == 0) {
     snprintf(out, out_len, "%02X%02X-%02X%02X", buf[3], buf[2], buf[1], buf[0]);
     return;
   }
@@ -317,6 +319,62 @@ plan9_detect_text(const unsigned char *buf, size_t len, const char **name)
   return 0;
 }
 
+/* exfat keeps its label as an entry of the root folder: the folder's
+ * first cluster is read and its label entry, utf-16, written as utf-8 */
+#define EXFAT_ENTRY_LABEL 0x83
+#define EXFAT_LABEL_MAX   11
+
+static uint32_t
+le32(const unsigned char *p)
+{
+  return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24;
+}
+
+static void
+exfat_label(struct BlockDev *dev, const unsigned char *boot, char *label, size_t label_sz)
+{
+  unsigned char *dir, *e;
+  uint32_t       heap  = le32(boot + 88);
+  uint32_t       root  = le32(boot + 96);
+  unsigned       sshift = boot[108], cshift = boot[109];
+  size_t         csize, i, k, used = 0;
+  uint64_t       sector;
+
+  label[0] = '\0';
+  if (sshift < 9 || sshift > 12 || cshift > 25 - sshift || root < 2 || (1u << sshift) != dev->sec_size)
+    return;
+  csize  = (size_t)1 << (sshift + cshift);
+  sector = (uint64_t)heap + ((uint64_t)(root - 2) << cshift);
+  dir    = emalloc(csize);
+  if (blockdev_read(dev, sector, dir, (size_t)1 << cshift) < 0) {
+    free(dir);
+    return;
+  }
+  for (i = 0; i + 32 <= csize; i += 32) {
+    e = dir + i;
+    if (e[0] == 0)
+      break;
+    if (e[0] != EXFAT_ENTRY_LABEL)
+      continue;
+    for (k = 0; k < e[1] && k < EXFAT_LABEL_MAX; k++) {
+      unsigned c = e[2 + 2 * k] | e[3 + 2 * k] << 8;
+      if (c < 0x80 && used + 1 < label_sz) {
+        label[used++] = (char)c;
+      } else if (c < 0x800 && used + 2 < label_sz) {
+        label[used++] = (char)(0xC0 | c >> 6);
+        label[used++] = (char)(0x80 | (c & 0x3F));
+      } else if (c >= 0x800 && (c < 0xD800 || c > 0xDFFF) && used + 3 < label_sz) {
+        label[used++] = (char)(0xE0 | c >> 12);
+        label[used++] = (char)(0x80 | (c >> 6 & 0x3F));
+        label[used++] = (char)(0x80 | (c & 0x3F));
+      }
+    }
+    break;
+  }
+  label[used] = '\0';
+  free(dir);
+}
+
 int
 blockdev_detect_fs(
     struct BlockDev *dev,
@@ -357,10 +415,12 @@ blockdev_detect_fs(
     if (val == fs->magic1 || (fs->magic2 && val == fs->magic2)) {
       const char *type_name = fs->name;
       if (strcmp(fs->name, "ext") == 0) {
-        if (buf[1116] & 4)
-          type_name = "ext3";
-        else if (buf[1120] & 64)
+        /* ext4 has a journal too: its own features (extents, 64bit,
+         * flex_bg) are looked for before the journal that makes ext3 */
+        if ((buf[1120] & 0xC0) || (buf[1121] & 0x02))
           type_name = "ext4";
+        else if (buf[1116] & 4)
+          type_name = "ext3";
         else
           type_name = "ext2";
       }
@@ -377,6 +437,9 @@ blockdev_detect_fs(
           end--;
         }
       }
+
+      if (label && label_sz && strcmp(type_name, "exfat") == 0)
+        exfat_label(dev, buf, label, label_sz);
 
       if (uuid && uuid_sz && fs->uuid_len && fs->uuid_offset + fs->uuid_len <= read_size) {
         format_uuid(buf + fs->uuid_offset, fs->uuid_len, fs->name, uuid, uuid_sz);
