@@ -319,6 +319,30 @@ plan9_detect_text(const unsigned char *buf, size_t len, const char **name)
   return 0;
 }
 
+/* utf-16 little end first, n units, written as utf-8; returns its length */
+static size_t
+utf16_to_utf8(const unsigned char *p, size_t n, char *out, size_t sz)
+{
+  size_t used = 0;
+
+  for (size_t k = 0; k < n; k++) {
+    unsigned c = p[2 * k] | p[2 * k + 1] << 8;
+
+    if (c < 0x80 && used + 1 < sz) {
+      out[used++] = (char)c;
+    } else if (c >= 0x80 && c < 0x800 && used + 2 < sz) {
+      out[used++] = (char)(0xC0 | c >> 6);
+      out[used++] = (char)(0x80 | (c & 0x3F));
+    } else if (c >= 0x800 && (c < 0xD800 || c > 0xDFFF) && used + 3 < sz) {
+      out[used++] = (char)(0xE0 | c >> 12);
+      out[used++] = (char)(0x80 | (c >> 6 & 0x3F));
+      out[used++] = (char)(0x80 | (c & 0x3F));
+    }
+  }
+  out[used] = '\0';
+  return used;
+}
+
 /* exfat keeps its label as an entry of the root folder: the folder's
  * first cluster is read and its label entry, utf-16, written as utf-8 */
 #define EXFAT_ENTRY_LABEL 0x83
@@ -337,7 +361,7 @@ exfat_label(struct BlockDev *dev, const unsigned char *boot, char *label, size_t
   uint32_t       heap  = le32(boot + 88);
   uint32_t       root  = le32(boot + 96);
   unsigned       sshift = boot[108], cshift = boot[109];
-  size_t         csize, i, k, used = 0;
+  size_t         csize, i, used = 0;
   uint64_t       sector;
 
   label[0] = '\0';
@@ -356,23 +380,70 @@ exfat_label(struct BlockDev *dev, const unsigned char *boot, char *label, size_t
       break;
     if (e[0] != EXFAT_ENTRY_LABEL)
       continue;
-    for (k = 0; k < e[1] && k < EXFAT_LABEL_MAX; k++) {
-      unsigned c = e[2 + 2 * k] | e[3 + 2 * k] << 8;
-      if (c < 0x80 && used + 1 < label_sz) {
-        label[used++] = (char)c;
-      } else if (c < 0x800 && used + 2 < label_sz) {
-        label[used++] = (char)(0xC0 | c >> 6);
-        label[used++] = (char)(0x80 | (c & 0x3F));
-      } else if (c >= 0x800 && (c < 0xD800 || c > 0xDFFF) && used + 3 < label_sz) {
-        label[used++] = (char)(0xE0 | c >> 12);
-        label[used++] = (char)(0x80 | (c >> 6 & 0x3F));
-        label[used++] = (char)(0x80 | (c & 0x3F));
-      }
-    }
+    used = utf16_to_utf8(e + 2, e[1] < EXFAT_LABEL_MAX ? e[1] : EXFAT_LABEL_MAX, label, label_sz);
     break;
   }
   label[used] = '\0';
   free(dir);
+}
+
+/* ntfs keeps its label in the $VOLUME_NAME attribute of the master file
+ * table's fourth record, $Volume: the record is read and its fixups
+ * undone, then its attributes walked */
+#define NTFS_VOLUME_RECORD 3
+#define NTFS_ATTR_VOLNAME  0x60
+#define NTFS_ATTR_END      0xFFFFFFFFu
+#define NTFS_RECORD_MAX    4096
+
+static void
+ntfs_label(struct BlockDev *dev, const unsigned char *boot, char *label, size_t label_sz)
+{
+  unsigned       bps = boot[11] | boot[12] << 8, spc = boot[13];
+  signed char    cpr = (signed char)boot[64];
+  uint64_t       mft = 0, rsize, at;
+  unsigned char *rec;
+  unsigned       usa, nusa, a;
+
+  label[0] = '\0';
+  for (int i = 7; i >= 0; i--)
+    mft = mft << 8 | boot[48 + i];
+  if (!bps || bps % 512 || !spc)
+    return;
+  rsize = cpr > 0 ? (uint64_t)cpr * spc * bps : (uint64_t)1 << -cpr;
+  if (rsize < 512 || rsize > NTFS_RECORD_MAX || rsize % dev->sec_size)
+    return;
+  at  = (mft * spc * bps + NTFS_VOLUME_RECORD * rsize) / dev->sec_size;
+  rec = emalloc(rsize);
+  if (blockdev_read(dev, at, rec, rsize / dev->sec_size) < 0 || memcmp(rec, "FILE", 4))
+    goto out;
+  /* each 512 bytes ends in the update number; the array holds what was there */
+  usa  = rec[4] | rec[5] << 8;
+  nusa = rec[6] | rec[7] << 8;
+  if (usa + 2 * (size_t)nusa > rsize || nusa < 1)
+    goto out;
+  for (unsigned k = 1; k < nusa && k * 512 <= rsize; k++) {
+    rec[k * 512 - 2] = rec[usa + 2 * k];
+    rec[k * 512 - 1] = rec[usa + 2 * k + 1];
+  }
+  for (a = rec[20] | rec[21] << 8; a + 24 <= rsize;) {
+    uint32_t type = rec[a] | rec[a + 1] << 8 | (uint32_t)rec[a + 2] << 16 | (uint32_t)rec[a + 3] << 24;
+    uint32_t len  = rec[a + 4] | rec[a + 5] << 8 | (uint32_t)rec[a + 6] << 16 | (uint32_t)rec[a + 7] << 24;
+
+    if (type == NTFS_ATTR_END || len < 24 || a + len > rsize)
+      break;
+    /* resident: its value's length and where it starts in the attribute */
+    if (type == NTFS_ATTR_VOLNAME && !rec[a + 8]) {
+      uint32_t vlen = rec[a + 16] | rec[a + 17] << 8 | (uint32_t)rec[a + 18] << 16 | (uint32_t)rec[a + 19] << 24;
+      unsigned voff = rec[a + 20] | rec[a + 21] << 8;
+
+      if (voff + vlen <= len)
+        utf16_to_utf8(rec + a + voff, vlen / 2, label, label_sz);
+      break;
+    }
+    a += len;
+  }
+out:
+  free(rec);
 }
 
 int
@@ -440,6 +511,8 @@ blockdev_detect_fs(
 
       if (label && label_sz && strcmp(type_name, "exfat") == 0)
         exfat_label(dev, buf, label, label_sz);
+      if (label && label_sz && strcmp(type_name, "ntfs") == 0)
+        ntfs_label(dev, buf, label, label_sz);
 
       if (uuid && uuid_sz && fs->uuid_len && fs->uuid_offset + fs->uuid_len <= read_size) {
         format_uuid(buf + fs->uuid_offset, fs->uuid_len, fs->name, uuid, uuid_sz);
