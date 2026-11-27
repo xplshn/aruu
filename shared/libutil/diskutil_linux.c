@@ -1,5 +1,7 @@
 /* see LICENSE file for copyright and license details */
+#ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE /* realpath, sync */
+#endif
 #include "../diskutil.h"
 #include "../util.h"
 
