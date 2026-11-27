@@ -279,3 +279,16 @@ mg_index_probe(struct MagicRun *r, unsigned char *buf, size_t have, size_t n, si
   }
   return k;
 }
+
+int
+magic_knows(const struct Magic *m, const char *mime)
+{
+  size_t   *pick, n;
+  long long reach;
+
+  if (!m->ix || !mime)
+    return 0;
+  n = mg_index_pick(m->ix, mime, &pick, &reach);
+  free(pick);
+  return n > 0;
+}

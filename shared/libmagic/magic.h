@@ -100,6 +100,11 @@ int magic_prepare(struct Magic *m);
  */
 int magic_fd_hint(struct Magic *m, int fd, const char *hint, char *desc, size_t dn, char *mime, size_t mn);
 /*
+ * whether a test can give mime: when one can and the file did not come
+ * out so, its name was wrong to say it. 0 without magic_prepare
+ */
+int magic_knows(const struct Magic *m, const char *mime);
+/*
  * the charset file --mime prints for these bytes: "us-ascii",
  * "utf-8", "iso-8859-1" and so on, or "binary". the result is a
  * constant string
