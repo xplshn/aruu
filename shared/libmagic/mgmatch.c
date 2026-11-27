@@ -241,6 +241,9 @@ tail_fill(struct MagicRun *r)
   if (r->fsize < 0)
     return -1;
   n = (unsigned long long)r->fsize < r->head.n ? (size_t)r->fsize : r->head.n;
+  /* no test reads further back than the index says */
+  if (r->m->ix && n > r->m->ix->tail)
+    n = r->m->ix->tail;
   if ((unsigned long long)r->fsize <= r->head.n) {
     r->tail   = (unsigned char *)r->head.p + (r->head.n - n);
     r->tlen   = n;
@@ -2161,6 +2164,30 @@ match(
 }
 
 /*
+ * whether the top level test m holds over b, its continuations not
+ * tried: 1, 0, or -1 when memory runs out
+ */
+int
+mg_top_holds(struct MagicRun *r, struct MagicLine *m, const struct MagicBuf *b)
+{
+  struct MagicBuf bb;
+  struct Shared   sh = {0, 0, 1};
+  int             ret = 0, found = 0;
+
+  memset(&bb, 0, sizeof(bb));
+  if (skip_line(m, MF_BINTEST, 0) || setoffset(r, m, &bb, b, 0, 0) < 0)
+    return 0;
+  switch (mget(r, m, b, &bb, 0, 0, MF_BINTEST, 0, 0, &sh, &ret, &found)) {
+    case -1:
+      return -1;
+    case 0:
+      return m->reln == '!';
+    default:
+      return magiccheck(r, m);
+  }
+}
+
+/*
  * run every loaded database against b, the binary tests when mode is
  * MF_BINTEST and the text tests when it is MF_TEXTTEST. text tells if
  * the bytes looked like text. returns 1 when something matched
@@ -2177,6 +2204,16 @@ mg_softmagic(struct MagicRun *r, const struct MagicBuf *b, int mode, int text)
   sh.firstline = 1;
   r->nindir    = 0;
   r->nnames    = 0;
+  /* a hint narrows the tests to the groups that can give its type */
+  if (r->pick) {
+    for (size_t i = 0; i < r->npick; i++) {
+      const struct MagicGroup *g = &r->m->ix->group[r->pick[i]];
+
+      if ((ret = match(r, g->db->v[0] + g->first, g->n, b, 0, mode, text, 0, &sh, NULL, NULL)) != 0)
+        return ret;
+    }
+    return 0;
+  }
   for (db = r->m->db; db; db = db->next) {
     if ((ret = match(r, db->v[0], db->n[0], b, 0, mode, text, 0, &sh, NULL, NULL)) != 0)
       return ret;

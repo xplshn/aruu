@@ -194,9 +194,34 @@ struct MagicDb {
   struct MagicDb   *next;
 };
 
-struct Magic {
+/* a top level test and its continuations, and how far into a file they
+ * read: -1 when that is known only once the file is read */
+struct MagicGroup {
   struct MagicDb *db;
-  locale_t        cloc; /* regex and ctype run in the posix locale */
+  size_t          first, n;
+  long long       reach;
+};
+/* a mime type a group can give */
+struct MagicMime {
+  const char *mime;
+  size_t      group;
+};
+/* what magic_prepare works out: the groups, the types by name, and the
+ * farthest any group with a known reach reads */
+struct MagicIndex {
+  struct MagicGroup *group;
+  size_t             ngroup;
+  struct MagicMime  *mime;
+  size_t             nmime;
+  long long          reach;
+  size_t            *far; /* the groups that read past MAGIC_CHARSET_MAX */
+  size_t             nfar;
+  size_t             tail; /* the most any test reads back from the end */
+};
+struct Magic {
+  struct MagicDb    *db;
+  locale_t           cloc; /* regex and ctype run in the posix locale */
+  struct MagicIndex *ix;   /* NULL until magic_prepare */
 };
 
 /* growing output string, empty on allocation failure with err set */
@@ -237,8 +262,14 @@ struct MagicRun {
   int                  ligot[MG_LEVELS];
   unsigned             nindir;
   unsigned             nnames;
+  const size_t        *pick; /* when set, only these groups of the index are tried */
+  size_t               npick;
 };
 
+/* mgindex.c */
+void   mg_index_free(struct MagicIndex *);
+size_t mg_index_pick(const struct MagicIndex *, const char *, size_t **, long long *);
+size_t mg_index_probe(struct MagicRun *, unsigned char *, size_t, size_t, size_t *);
 /* mgload.c */
 int      mg_load(struct Magic *, const char *);
 void     mg_free(struct MagicDb *);
@@ -248,6 +279,7 @@ uint64_t mg_signextend(const struct MagicLine *, uint64_t);
 
 /* mgmatch.c */
 int    mg_softmagic(struct MagicRun *, const struct MagicBuf *, int, int);
+int    mg_top_holds(struct MagicRun *, struct MagicLine *, const struct MagicBuf *);
 int    mg_find(struct Magic *, const char *, struct MagicLine **, size_t *);
 size_t mg_pstrlen_size(uint32_t);
 

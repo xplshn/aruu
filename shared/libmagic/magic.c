@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -361,6 +362,7 @@ magic_close(struct Magic *m)
 {
   if (!m)
     return;
+  mg_index_free(m->ix);
   mg_free(m->db);
   if (m->cloc)
     freelocale(m->cloc);
@@ -452,4 +454,216 @@ magic_charset(const void *buf, size_t n)
   if (mg_encoding(buf, n, NULL, NULL, &code, &code_mime, &type) < 0)
     return "binary";
   return code_mime;
+}
+
+/* what a hinted pass reads when a test of the hint's says only at run time how far it looks */
+#define HINT_REACH (64 * 1024)
+/* the least a pass reads: classify calls a file of fewer bytes empty */
+#define HEAD_LEAST 512
+
+/* the head of fd grown to want bytes, those already read kept */
+static int
+grow_head(int fd, unsigned char **buf, size_t *have, size_t *cap, size_t want, int *eof)
+{
+  unsigned char *more;
+  ssize_t        got;
+
+  if (want > *cap) {
+    if (!(more = realloc(*buf, want)))
+      return -1;
+    *buf = more;
+    *cap = want;
+  }
+  while (*have < want && !*eof) {
+    if ((got = pread(fd, *buf + *have, want - *have, (off_t)*have)) < 0) {
+      if (errno == EINTR)
+        continue;
+      return -1;
+    }
+    if (!got)
+      *eof = 1;
+    *have += (size_t)got;
+  }
+  return 0;
+}
+
+/* only the binary tests of the picked groups: what the hint says, or nothing */
+static int
+hint_pass(struct MagicRun *r, int mime, char *dst, size_t dn)
+{
+  const char *code, *code_mime, *ftype;
+  int         text, rv;
+
+  memset(&r->out, 0, sizeof(r->out));
+  r->mime = mime;
+  if ((text = mg_encoding(r->head.p, r->head.n, NULL, NULL, &code, &code_mime, &ftype)) < 0)
+    return -1;
+  rv = mg_softmagic(r, &r->head, MF_BINTEST, text);
+  if (r->out.err)
+    rv = -1;
+  if (rv > 0)
+    deliver(&r->out, dst, dn);
+  free(r->out.s);
+  memset(&r->out, 0, sizeof(r->out));
+  return rv;
+}
+
+static void
+run_free(struct MagicRun *r)
+{
+  if (r->tstate == 1)
+    free(r->tail);
+  r->tail   = NULL;
+  r->tstate = 0;
+}
+
+/* the run over fd's head as read so far */
+static void
+run_init(struct MagicRun *r, struct Magic *m, int fd, const struct stat *st, const unsigned char *buf, size_t n)
+{
+  memset(r, 0, sizeof(*r));
+  r->m      = m;
+  r->head.p = buf;
+  r->head.n = n;
+  r->head.file = 1;
+  r->fd     = fd;
+  r->fsize  = (long long)st->st_size;
+}
+
+/* the hinted pass: 1 with the result in desc and mime when it gave hint */
+static int
+try_hint(struct Magic *m, int fd, const struct stat *st, const unsigned char *buf, size_t n, const size_t *pick,
+         size_t npick, const char *hint, char *desc, size_t dn, char *mime, size_t mn)
+{
+  struct MagicRun r;
+  char            got[MG_MIMELEN];
+  locale_t        old = (locale_t)0;
+  int             rv;
+
+  run_init(&r, m, fd, st, buf, n);
+  r.pick  = pick;
+  r.npick = npick;
+  if (m->cloc)
+    old = uselocale(m->cloc);
+  got[0] = '\0';
+  rv     = hint_pass(&r, 1, got, sizeof(got));
+  if (rv > 0 && !strcasecmp(got, hint)) {
+    if (mime && mn)
+      snprintf(mime, mn, "%s", got);
+    if (desc && dn && (rv = hint_pass(&r, 0, desc, dn)) <= 0)
+      desc[0] = '\0';
+    rv = 1;
+  } else if (rv >= 0) {
+    rv = 0;
+  }
+  if (m->cloc)
+    uselocale(old);
+  run_free(&r);
+  return rv;
+}
+
+/* the far groups over the head as read and their own bytes past it, the
+ * rest zeros: 1 when one of them matches */
+static int
+try_far(struct Magic *m, int fd, const struct stat *st, unsigned char **buf, size_t have, size_t *cap, size_t want)
+{
+  struct MagicRun r;
+  unsigned char  *more;
+  char            got[MG_MIMELEN];
+  locale_t        old = (locale_t)0;
+  size_t         *alive, nalive;
+  int             rv;
+
+  if (want > *cap) {
+    if (!(more = realloc(*buf, want)))
+      return -1;
+    *buf = more;
+    *cap = want;
+  }
+  memset(*buf + have, 0, want - have);
+  if (!(alive = malloc(m->ix->nfar * sizeof(*alive))))
+    return -1;
+  run_init(&r, m, fd, st, *buf, want);
+  if ((nalive = mg_index_probe(&r, *buf, have, want, alive)) == (size_t)-1 || !nalive) {
+    free(alive);
+    run_free(&r);
+    memset(*buf + have, 0, want - have);
+    return nalive ? -1 : 0;
+  }
+  r.pick  = alive;
+  r.npick = nalive;
+  if (m->cloc)
+    old = uselocale(m->cloc);
+  got[0] = '\0';
+  rv     = hint_pass(&r, 1, got, sizeof(got));
+  if (rv == 0)
+    rv = hint_pass(&r, 0, got, sizeof(got));
+  if (m->cloc)
+    uselocale(old);
+  run_free(&r);
+  free(alive);
+  /* what was probed is not the file: the head is read again from have */
+  memset(*buf + have, 0, want - have);
+  return rv;
+}
+
+int
+magic_fd_hint(struct Magic *m, int fd, const char *hint, char *desc, size_t dn, char *mime, size_t mn)
+{
+  struct MagicRun *r;
+  struct stat      st;
+  unsigned char   *buf = NULL;
+  size_t           have = 0, cap = 0, npick = 0, *pick = NULL, want;
+  long long        reach = m->ix ? m->ix->reach : MAGIC_BYTES_MAX;
+  int              eof = 0, rv = -1, e;
+
+  if (desc && dn)
+    desc[0] = '\0';
+  if (mime && mn)
+    mime[0] = '\0';
+  if (fstat(fd, &st) < 0)
+    return -1;
+  if (!S_ISREG(st.st_mode))
+    return magic_fd(m, fd, desc, dn, mime, mn);
+  if (m->ix && hint && *hint && (npick = mg_index_pick(m->ix, hint, &pick, &reach)) > 0) {
+    want = reach < 0 ? HINT_REACH : reach < HEAD_LEAST ? HEAD_LEAST : (size_t)reach;
+    if (grow_head(fd, &buf, &have, &cap, want, &eof) < 0)
+      goto out;
+    if ((rv = try_hint(m, fd, &st, buf, have, pick, npick, hint, desc, dn, mime, mn)) != 0)
+      goto out;
+  }
+  /* everything else, from what was read on: first the window the text
+   * tests read, which holds what nearly every test looks at; only what
+   * that calls data is read on, as far as the tests with a known reach
+   * look (disk images, mostly), never more than file(1) does */
+  if (!(r = calloc(1, sizeof(*r)))) {
+    rv = -1;
+    goto out;
+  }
+  reach = m->ix ? m->ix->reach : MAGIC_BYTES_MAX;
+  want  = reach > MAGIC_BYTES_MAX ? MAGIC_BYTES_MAX : reach < MAGIC_CHARSET_MAX ? MAGIC_CHARSET_MAX : (size_t)reach;
+  if (grow_head(fd, &buf, &have, &cap, m->ix ? MAGIC_CHARSET_MAX : want, &eof) < 0) {
+    rv = -1;
+    goto done;
+  }
+  run_init(r, m, fd, &st, buf, have);
+  rv = run(m, r, (st.st_mode & 0111) != 0, desc, dn, mime, mn);
+  if (rv < 0 || eof || have >= want || !m->ix || !m->ix->nfar || !mime || strcmp(mime, "application/octet-stream"))
+    goto done;
+  /* the far tests tried over just the bytes they look at; read the whole
+   * way only for one that matches */
+  if ((rv = try_far(m, fd, &st, &buf, have, &cap, want)) <= 0)
+    goto done;
+  if ((rv = grow_head(fd, &buf, &have, &cap, want, &eof)) < 0)
+    goto done;
+  run_init(r, m, fd, &st, buf, have);
+  rv = run(m, r, (st.st_mode & 0111) != 0, desc, dn, mime, mn);
+done:
+  free(r);
+out:
+  e = errno;
+  free(pick);
+  free(buf);
+  errno = e;
+  return rv < 0 ? -1 : 0;
 }

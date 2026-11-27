@@ -84,6 +84,22 @@ int magic_buffer(
 int magic_fd(struct Magic *m, int fd, char *desc, size_t dn, char *mime, size_t mn);
 
 /*
+ * works out once what the loaded tests need of a file: how far each
+ * reads, and which tests give which mime type. after it the handle may
+ * be shared by threads classifying at the same time, as every regex is
+ * compiled. returns 0, or -1 with errno set when memory runs out
+ */
+int magic_prepare(struct Magic *m);
+/*
+ * as magic_fd, reading no more of the file than the tests need. hint,
+ * a mime type the name suggests (NULL for none), is tried first: only
+ * the tests that can give it, over only the bytes they look at. when
+ * they give it, that is the answer; else every test runs, over the
+ * bytes already read and as many more as the tests with a known reach
+ * look at. without magic_prepare it reads as magic_fd does
+ */
+int magic_fd_hint(struct Magic *m, int fd, const char *hint, char *desc, size_t dn, char *mime, size_t mn);
+/*
  * the charset file --mime prints for these bytes: "us-ascii",
  * "utf-8", "iso-8859-1" and so on, or "binary". the result is a
  * constant string
