@@ -148,7 +148,7 @@ xsi:
 	mknod, passwd, su
 
 extra:
-	b3sum, blkid, fdisk, lsblk, sync, yap
+	b3sum, blkid, fdisk, lsblk, mkfs.fat, sync, yap
 
 TODOs / PENDING RELEASE
 =======================
@@ -161,6 +161,7 @@ LICENSE
 =======
 
 ISC, see ./LICENSE for details. Credits:
+Copyright (c) 1998 Robert Nordier
 Copyright (C) 2006, 2019 Rob Landley [rob@landley.net](mailto:rob@landley.net)
 Copyright (c) 2011 Connor Lane Smith [cls@lubutu.com](mailto:cls@lubutu.com)
 Copyright (c) 2011-2016 Dimitris Papastamos [sin@2f30.org](mailto:sin@2f30.org)
@@ -215,6 +216,7 @@ Copyright (c) 2026 xplshn [anto@xplshn.com.ar](mailto:anto@xplshn.com.ar) (https
 
 Portions of this software (specifically utils under net/) are partially based on code written by Rob Landley
 Our line editing library is partially based on work by Salvatore Sanfilippo (linenoise) and JC Wang (crossline)
+mkfs.fat is a port of OpenBSD's newfs_msdos (BSD 2-Clause).
 The rest are based on SBASE/UBASE source code
 
 =~= Argentino Roca Unix Utilities =~= https://github.com/xplshn/aruu =~=
