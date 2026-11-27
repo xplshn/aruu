@@ -4,6 +4,7 @@
 
 #if defined(__FreeBSD__) && !defined(ARUU_FORCE_POSIX)
 #include <dirent.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -136,5 +137,33 @@ blockdev_get_list(void)
   }
 
   return head;
+}
+
+int
+blockdev_mount(const char *dev, const char *dir, const char *fstype, int flags, const char *data)
+{
+  (void)dev;
+  (void)dir;
+  (void)fstype;
+  (void)flags;
+  (void)data;
+  errno = ENOSYS;
+  return -1;
+}
+
+int
+blockdev_unmount(const char *dir)
+{
+  (void)dir;
+  errno = ENOSYS;
+  return -1;
+}
+
+int
+blockdev_poweroff(const char *disk)
+{
+  (void)disk;
+  errno = ENOSYS;
+  return -1;
 }
 #endif
