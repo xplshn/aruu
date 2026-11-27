@@ -88,6 +88,24 @@ disk_removable(const char *name)
   return strstr(real, "/usb") || strstr(real, "/mmc_host/");
 }
 
+/* the mounts file writes a blank, a tab, a newline and a backslash in a
+ * path as octal escapes, which are undone in place */
+static void
+unescape_mount(char *s)
+{
+  char *w = s;
+
+  for (; *s; s++) {
+    if (s[0] == '\\' && s[1] >= '0' && s[1] <= '3' && s[2] >= '0' && s[2] <= '7' && s[3] >= '0' && s[3] <= '7') {
+      *w++ = (char)((s[1] - '0') << 6 | (s[2] - '0') << 3 | (s[3] - '0'));
+      s += 3;
+    } else {
+      *w++ = *s;
+    }
+  }
+  *w = '\0';
+}
+
 struct BlockDevInfo *
 blockdev_get_list(void)
 {
@@ -171,6 +189,7 @@ blockdev_get_list(void)
   if (mfile) {
     while (fgets(mline, sizeof(mline), mfile)) {
       if (sscanf(mline, "%127s %255s %63s", devpath, mnt, fs) == 3) {
+        unescape_mount(mnt);
         char  *devname = devpath;
         size_t dev_len = strlen(ARUU_PATH_DEV);
         if (strncmp(devpath, ARUU_PATH_DEV, dev_len) == 0 && devpath[dev_len] == '/')
