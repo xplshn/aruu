@@ -591,11 +591,35 @@ usage(void)
   eprintf("usage: %s [-cdfkn] [-1..-9] [file ...]\n", argv0);
 }
 
+// gzip's long names, which scripts and build systems write, as the letters
+// they stand for
+static void
+short_names(int argc, char *argv[])
+{
+  static const struct {
+    const char *name, *letter;
+  } names[] = {
+    {"--stdout", "-c"}, {"--to-stdout", "-c"}, {"--decompress", "-d"}, {"--uncompress", "-d"},
+    {"--force", "-f"},  {"--keep", "-k"},      {"--no-name", "-n"},    {"--fast", "-1"},
+    {"--best", "-9"},
+  };
+  int i;
+  size_t j;
+
+  for (i = 1; i < argc && argv[i][0] == '-' && strcmp(argv[i], "--") != 0; i++)
+    for (j = 0; j < LEN(names); j++)
+      if (!strcmp(argv[i], names[j].name))
+        argv[i] = (char *)names[j].letter;
+}
+
 // ?man gzip: compress or decompress files
 // ?man arguments: [file ...]
 // ?man with no files, reads standard input and writes standard output
 // ?man compressing replaces each file with file.gz; decompressing
-// ?man reverses that. only single-member gzip streams are read back
+// ?man reverses that. only single-member gzip streams are read back. the
+// ?man long names of other gzips are taken for their letters: --stdout and
+// ?man its alias --to-stdout, --decompress and its alias --uncompress,
+// ?man then --force, --keep, --no-name, --fast and --best
 int
 main(int argc, char *argv[])
 {
@@ -603,6 +627,7 @@ main(int argc, char *argv[])
   int  i;
   char outname[4096];
 
+  short_names(argc, argv);
   ARGBEGIN
   {
     // ?man -c: write to standard output, keep the input file
