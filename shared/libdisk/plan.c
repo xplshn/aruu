@@ -301,6 +301,7 @@ plan_mkfs_argv(const struct plan *p, int slot, char **argv, int max, char *store
     return -1;
   argv[0] = NULL;
   if (strcmp(a->fs, "ext4") == 0) {
+    /* mkfs.ext4 generates a fresh UUID, even for filesystems with the same label. */
     rc |= put(argv, &n, max, store, store_n, &used, "mkfs.ext4");
     if (a->label[0]) {
       rc |= put(argv, &n, max, store, store_n, &used, "-L");

@@ -1,0 +1,55 @@
+kmap 1
+id ara-buckwalter
+layout ara
+variant buckwalter
+name Arabic (Buckwalter)
+key TLDE ٰ ّ
+key AE01 ١ VoidSymbol
+key AE02 ٢ VoidSymbol
+key AE03 ٣ VoidSymbol
+key AE04 ٤ ش
+key AE05 ٥ ٪
+key AE06 ٦ VoidSymbol
+key AE07 ٧ ؤ
+key AE08 ٨ ذ
+key AE09 ٩ ﴾
+key AE10 ٠ ﴿
+key AE11 - ـ
+key AE12 = +
+key AD01 ق VoidSymbol
+key AD02 و ؤ
+key AD03 VoidSymbol ع
+key AD04 ر VoidSymbol
+key AD05 ت ط
+key AD06 ي ى
+key AD07 ُ VoidSymbol
+key AD08 ِ إ
+key AD09 ْ أ
+key AD10 ة VoidSymbol
+key AD11 VoidSymbol ٱ
+key AD12 VoidSymbol ئ
+key BKSL VoidSymbol آ
+key AC01 َ ا
+key AC02 س ص
+key AC03 د ض
+key AC04 ف ً
+key AC05 غ VoidSymbol
+key AC06 ه ح
+key AC07 ج VoidSymbol
+key AC08 ك ٍ
+key AC09 ل VoidSymbol
+key AC10 ؛ VoidSymbol
+key AC11 ء VoidSymbol
+key LSGT < > | ¦
+key AB01 ز ظ
+key AB02 خ VoidSymbol
+key AB03 VoidSymbol VoidSymbol
+key AB04 ث VoidSymbol
+key AB05 ب VoidSymbol
+key AB06 ن ٌ
+key AB07 م VoidSymbol
+key AB08 ، إ
+key AB09 ۔ أ
+key AB10 VoidSymbol ؟
+key SPCE space
+key KPDL KP_Delete KP_Decimal

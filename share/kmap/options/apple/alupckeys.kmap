@@ -1,0 +1,6 @@
+kmap 1
+id apple:alupckeys
+key NMLK Num_Lock Pointer_EnableKeys
+key FK13 Print Sys_Req type=PC_ALT_LEVEL2
+key FK14 Scroll_Lock
+key FK15 Pause Break type=PC_CONTROL_LEVEL2

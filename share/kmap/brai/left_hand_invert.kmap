@@ -1,0 +1,61 @@
+kmap 1
+id brai-left_hand_invert
+layout brai
+variant left_hand_invert
+name Braille (one-handed, left, inverted thumb)
+key TLDE none
+key AE01 none
+key AE02 none
+key AE03 none
+key AE04 none
+key AE05 none
+key AE06 none
+key AE07 none
+key AE08 none
+key AE09 none
+key AE10 none
+key AE11 none
+key AE12 none
+key AD01 none
+key AD02 none
+key AD03 none
+key AD04 none
+key AD05 none
+key AD06 none
+key AD07 none
+key AD08 none
+key AD09 none
+key AD10 none
+key AD11 none
+key AD12 none
+key BKSL \ |
+key AC01 braille_dot_3
+key AC02 braille_dot_2
+key AC03 braille_dot_1
+key AC04 braille_dot_4
+key AC05 none
+key AC06 none
+key AC07 none
+key AC08 none
+key AC09 none
+key AC10 none
+key AC11 none
+key LSGT < > | ¦
+key AB01 none
+key AB02 none
+key AB03 none
+key AB04 braille_dot_6
+key AB05 braille_dot_5
+key AB06 none
+key AB07 none
+key AB08 none
+key AB09 none
+key AB10 none
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key KPMU braille_dot_1 KP_Multiply KP_Multiply KP_Multiply XF86ClearGrab type=CTRL+ALT
+key NMLK braille_dot_3
+key KPSU braille_dot_4 KP_Subtract KP_Subtract KP_Subtract XF86Prev_VMode type=CTRL+ALT
+key KPAD braille_dot_5 KP_Add KP_Add KP_Add XF86Next_VMode type=CTRL+ALT
+key KPEN braille_dot_6
+key KPDV braille_dot_2 KP_Divide KP_Divide KP_Divide XF86Ungrab type=CTRL+ALT

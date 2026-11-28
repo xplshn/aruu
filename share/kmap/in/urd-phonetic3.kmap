@@ -1,0 +1,56 @@
+kmap 1
+id in-urd-phonetic3
+layout in
+variant urd-phonetic3
+name Urdu (alt. phonetic)
+level3 ralt
+key TLDE ~ U064B
+key AE01 ۱ 1 !
+key AE02 ۲ 2 @
+key AE03 ۳ 3 '#'
+key AE04 ۴ 4
+key AE05 ۵ 5 ٪
+key AE06 ۶ 6
+key AE07 ۷ 7 &
+key AE08 ۸ 8 *
+key AE09 ۹ 9 )
+key AE10 ۰ 0 (
+key AE11 - _
+key AE12 = +
+key AD01 U0642 U0652
+key AD02 U0648 U0651 ؂
+key AD03 U0639 ٰ ٖ
+key AD04 U0631 ڑ ؓ
+key AD05 U062A ٹ ؔ
+key AD06 ے U064E ؁
+key AD07 U0621 U0626 ٔ
+key AD08 ی U0650 ؑ
+key AD09 ہ ۃ
+key AD10 پ U064F ٗ
+key AD11 ] }
+key AD12 [ {
+key BKSL \ |
+key AC01 U0627 U0622 ﷲ
+key AC02 U0633 U0635 ؐ
+key AC03 U062F ڈ ﷺ
+key AC04 U0641 U0651
+key AC05 گ U063A
+key AC06 U062D ھ ؒ
+key AC07 U062C U0636 ﷻ
+key AC08 ک U062E
+key AC09 U0644 ٔ
+key AC10 U061B :
+key AC11 '''' "
+key LSGT | ¦ | ¦
+key AB01 U0632 U0630 ؏
+key AB02 U0634 ژ ؎
+key AB03 چ U062B ؃
+key AB04 U0637 U0638
+key AB05 U0628 . ﷽
+key AB06 U0646 ں ؀
+key AB07 U0645 ٘
+key AB08 U060C < <
+key AB09 ۔ ٫ >
+key AB10 / U061F
+key SPCE space
+key KPDL KP_Delete KP_Decimal

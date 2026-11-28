@@ -1,0 +1,55 @@
+kmap 1
+id cn-tib
+layout cn
+variant tib
+name Tibetan
+key TLDE ཨ ༁ ྸ ༀ
+key AE01 ༡ ༪ ༄ ྲྀ
+key AE02 ༢ ༫ ༅ ཷ
+key AE03 ༣ ༬ ཾ ླྀ
+key AE04 ༤ ༭ ྃ ཹ
+key AE05 ༥ ༮ ༷ ཱྀ
+key AE06 ༦ ༯ ༵ ༉
+key AE07 ༧ ༰ ཿ ༊
+key AE08 ༨ ༱ ༔ ༏
+key AE09 ༩ ༲ ༑ ༐
+key AE10 ༠ ༳ ༈ ༒
+key AE11 ཧ ༼ ྷ ༌
+key AE12 ཝ ༽ ྺ ༓
+key AD01 ཅ ༕ ྕ ྉ
+key AD02 ཆ ༖ ྖ ྈ
+key AD03 ེ ༗ ཻ ྾
+key AD04 ར ྼ ྲ ཪ
+key AD05 ཏ ཊ ྟ ྚ
+key AD06 ཡ ྻ ྱ ྿
+key AD07 ུ ༘ ྭ ཱུ
+key AD08 ི ༙ ྀ ཱི
+key AD09 ོ ༚ ཽ ࿀
+key AD10 ཕ ༛ ྥ ࿁
+key AD11 ཙ ༜ ྩ ࿂
+key AD12 ཚ ༝ ྪ ࿃
+key BKSL ཛ ༞ ྫ ཛྷ
+key AC01 འ ཱ ྰ ࿄
+key AC02 ས ༟ ྶ ࿅
+key AC03 ད ཌ ྡ ྜ
+key AC04 བ ༾ ྦ བྷ
+key AC05 ང ༿ ྔ ࿆
+key AC06 མ ࿏ ྨ ࿇
+key AC07 ་ ༂ ྄ ࿈
+key AC08 ག ༃ ྒ གྷ
+key AC09 ལ ༆ ླ ࿉
+key AC10 ཞ ༇ ྮ ࿊
+key AC11 ། ༸ ༎ ࿋
+key LSGT < > | ¦
+key AB01 ཟ ༴ ྯ ࿌
+key AB02 ཤ ཥ ྴ ྵ
+key AB03 ཀ ཀྵ ྐ ྐྵ
+key AB04 ཁ ྇ ྑ ༶
+key AB05 པ ྆ ྤ ྂ
+key AB06 ན ཎ ྣ ྞ
+key AB07 ISO_Level3_Latch ISO_Level3_Latch ྅ དྷ
+key AB08 ཐ ཋ ྠ ྛ
+key AB09 ཇ ༺ ྗ ྋ
+key AB10 ཉ ༻ ྙ ྊ
+key SPCE space
+key KPDL KP_Delete KP_Decimal

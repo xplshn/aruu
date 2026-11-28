@@ -1,0 +1,55 @@
+kmap 1
+id mm-mnw-a1
+layout mm
+variant mnw-a1
+name Mon (A1)
+key TLDE ` ~
+key AE01 ၁ !
+key AE02 ၂ @
+key AE03 ၃ ၓ
+key AE04 ၄ ဩ
+key AE05 ၅ %
+key AE06 ၆ ၐ
+key AE07 ၇ ၑ
+key AE08 ၈ *
+key AE09 ၉ (
+key AE10 ၀ )
+key AE11 - _
+key AE12 = +
+key AD01 သ ဿ
+key AD02 ဝ ွ
+key AD03 ေ ဵ
+key AD04 ရ ြ
+key AD05 တ ထ
+key AD06 ယ ျ
+key AD07 ု ူ
+key AD08 ိ ဳ
+key AD09 ဲ ဴ
+key AD10 ပ ဏ
+key AD11 ဍ ဨ
+key AD12 ဎ ၔ
+key BKSL ၜ ၝ
+key AC01 အ ဣ
+key AC02 စ ဆ
+key AC03 ဒ ဓ
+key AC04 ဖ ္
+key AC05 ဂ ဃ
+key AC06 ဟ ှ
+key AC07 ် ီ
+key AC08 က ခ
+key AC09 လ ၠ
+key AC10 ဥ ဠ
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ဇ ၛ
+key AB02 ဋ ဌ
+key AB03 ၚ ၎
+key AB04 ည ဉ
+key AB05 ဗ ဘ
+key AB06 န ၞ
+key AB07 မ ၟ
+key AB08 ံ း
+key AB09 ာ ါ
+key AB10 ၊ ။
+key SPCE space
+key KPDL KP_Delete KP_Decimal

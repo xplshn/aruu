@@ -1,0 +1,56 @@
+kmap 1
+id mt-alt-us
+layout mt
+variant alt-us
+name Maltese (US, with AltGr overrides)
+level3 ralt
+key TLDE ` ~ dead_grave dead_tilde
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#' £
+key AE04 4 $ €
+key AE05 5 %
+key AE06 6 ^ none dead_circumflex
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 q Q caps
+key AD02 w W caps
+key AD03 e E è È caps
+key AD04 r R caps
+key AD05 t T caps
+key AD06 y Y caps
+key AD07 u U ù Ù caps
+key AD08 i I ì Ì caps
+key AD09 o O ò Ò caps
+key AD10 p P caps
+key AD11 [ {
+key AD12 ] }
+key BKSL \ |
+key AC01 a A à À caps
+key AC02 s S caps
+key AC03 d D caps
+key AC04 f F caps
+key AC05 g G ġ Ġ caps
+key AC06 h H ħ Ħ caps
+key AC07 j J caps
+key AC08 k K caps
+key AC09 l L caps
+key AC10 ; :
+key AC11 '''' " dead_acute dead_diaeresis
+key LSGT < > | ¦
+key AB01 z Z ż Ż caps
+key AB02 x X caps
+key AB03 c C ċ Ċ caps
+key AB04 v V caps
+key AB05 b B caps
+key AB06 n N caps
+key AB07 m M caps
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

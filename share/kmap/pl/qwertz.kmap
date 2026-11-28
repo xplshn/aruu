@@ -1,0 +1,56 @@
+kmap 1
+id pl-qwertz
+layout pl
+variant qwertz
+name Polish (QWERTZ)
+level3 ralt
+key TLDE ˙ dead_ogonek ¬ ¬
+key AE01 1 ! ~ ¡
+key AE02 2 " dead_caron ⅛
+key AE03 3 '#' dead_circumflex £
+key AE04 4 $ dead_breve $
+key AE05 5 % ° ⅜
+key AE06 6 & dead_ogonek ⅝
+key AE07 7 / dead_grave ⅞
+key AE08 8 ( dead_abovedot ™
+key AE09 9 ) dead_acute ±
+key AE10 0 = dead_doubleacute °
+key AE11 + ? dead_diaeresis ¿
+key AE12 '''' * dead_cedilla dead_ogonek
+key AD01 q Q \ Ω caps
+key AD02 w W | Σ caps
+key AD03 e E € ¢ caps
+key AD04 r R ¶ ® caps
+key AD05 t T ŧ Ŧ caps
+key AD06 z Z ← ¥ caps
+key AD07 u U ↓ ↑ caps
+key AD08 i I → ı caps
+key AD09 o O ø Ø caps
+key AD10 p P þ Þ caps
+key AD11 ż ń ÷ dead_abovering
+key AD12 ś ć × dead_macron
+key BKSL ó ź dead_grave dead_breve
+key AC01 a A æ Æ caps
+key AC02 s S đ § caps
+key AC03 d D Đ Ð caps
+key AC04 f F [ ª caps
+key AC05 g G ] Ŋ caps
+key AC06 h H ħ Ħ caps
+key AC07 j J dead_hook dead_horn caps
+key AC08 k K ĸ & caps
+key AC09 l L ł Ł caps
+key AC10 ł Ł $ dead_doubleacute caps
+key AC11 ą ę ß dead_caron
+key LSGT < > | ¦
+key AB01 y Y « < caps
+key AB02 x X » > caps
+key AB03 c C ¢ © caps
+key AB04 v V @ ` caps
+key AB05 b B { '''' caps
+key AB06 n N } ´ caps
+key AB07 m M § º caps
+key AB08 , ; < ×
+key AB09 . : > ÷
+key AB10 - _ dead_belowdot dead_abovedot
+key SPCE space
+key KPDL KP_Delete KP_Separator

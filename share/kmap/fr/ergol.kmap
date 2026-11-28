@@ -1,0 +1,58 @@
+kmap 1
+id fr-ergol
+layout fr
+variant ergol
+name French (Ergo‑L)
+level3 ralt
+key TLDE ` ~ VoidSymbol VoidSymbol VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key AE01 1 € ₁ ¹ U201E U201A type=EIGHT_LEVEL
+key AE02 2 « ₂ ² U201C U2018 type=EIGHT_LEVEL
+key AE03 3 » ₃ ³ U201D U2019 type=EIGHT_LEVEL
+key AE04 4 $ ₄ ⁴ ¢ VoidSymbol type=EIGHT_LEVEL
+key AE05 5 % ₅ ⁵ U2030 VoidSymbol type=EIGHT_LEVEL
+key AE06 6 ^ ₆ ⁶ VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key AE07 7 & ₇ ⁷ VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key AE08 8 * ₈ ⁸ § VoidSymbol type=EIGHT_LEVEL
+key AE09 9 '#' ₉ ⁹ ¶ VoidSymbol type=EIGHT_LEVEL
+key AE10 0 @ ₀ ⁰ ° VoidSymbol type=EIGHT_LEVEL
+key AE11 / _ VoidSymbol VoidSymbol ÷ – type=EIGHT_LEVEL
+key AE12 = + VoidSymbol VoidSymbol ≠ ± type=EIGHT_LEVEL
+key AE13 VoidSymbol VoidSymbol VoidSymbol VoidSymbol VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key AD01 q Q ^ dead_circumflex â Â caps type=EIGHT_LEVEL
+key AD02 c C < ≤ ç Ç caps type=EIGHT_LEVEL
+key AD03 o O > ≥ œ Œ caps type=EIGHT_LEVEL
+key AD04 p P $ dead_currency ô Ô caps type=EIGHT_LEVEL
+key AD05 w W % U2030 VoidSymbol VoidSymbol caps type=EIGHT_LEVEL
+key AD06 j J @ dead_abovering VoidSymbol VoidSymbol caps type=EIGHT_LEVEL
+key AD07 m M & VoidSymbol µ VoidSymbol caps type=EIGHT_LEVEL
+key AD08 d D * × _ _ caps type=EIGHT_LEVEL
+key AD09 ISO_Level5_Latch ! '''' dead_acute dead_diaeresis ¡ type=EIGHT_LEVEL
+key AD10 y Y ` dead_grave û Û caps type=EIGHT_LEVEL
+key AD11 [ { VoidSymbol VoidSymbol VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key AD12 ] } VoidSymbol VoidSymbol VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key BKSL \ | VoidSymbol VoidSymbol VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key AC01 a A { dead_caron à À caps type=EIGHT_LEVEL
+key AC02 s S ( VoidSymbol é É caps type=EIGHT_LEVEL
+key AC03 e E ) VoidSymbol è È caps type=EIGHT_LEVEL
+key AC04 n N } dead_abovedot ê Ê caps type=EIGHT_LEVEL
+key AC05 f F = ≠ ñ Ñ caps type=EIGHT_LEVEL
+key AC06 l L \ dead_stroke ( VoidSymbol caps type=EIGHT_LEVEL
+key AC07 r R + ± ) VoidSymbol caps type=EIGHT_LEVEL
+key AC08 t T - dead_macron î Î caps type=EIGHT_LEVEL
+key AC09 i I / ÷ ï Ï caps type=EIGHT_LEVEL
+key AC10 u U " dead_doubleacute ù Ù caps type=EIGHT_LEVEL
+key AC11 '''' " VoidSymbol VoidSymbol VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key LSGT < > VoidSymbol VoidSymbol VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key AB01 z Z ~ dead_tilde æ Æ caps type=EIGHT_LEVEL
+key AB02 x X [ dead_belowcomma ß ẞ caps type=EIGHT_LEVEL
+key AB03 - ? ] dead_ogonek ‑ ¿ type=EIGHT_LEVEL
+key AB04 v V _ – – VoidSymbol caps type=EIGHT_LEVEL
+key AB05 b B '#' VoidSymbol — VoidSymbol caps type=EIGHT_LEVEL
+key AB06 . : | ¦ … VoidSymbol type=EIGHT_LEVEL
+key AB07 h H ! ¬ VoidSymbol VoidSymbol caps type=EIGHT_LEVEL
+key AB08 g G ; dead_cedilla dead_greek VoidSymbol caps type=EIGHT_LEVEL
+key AB09 , ; : : · • type=EIGHT_LEVEL
+key AB10 k K ? dead_breve VoidSymbol VoidSymbol caps type=EIGHT_LEVEL
+key AB11 VoidSymbol VoidSymbol VoidSymbol VoidSymbol VoidSymbol VoidSymbol type=EIGHT_LEVEL
+key SPCE space   space nobreakspace U2019 U2019 type=EIGHT_LEVEL
+key KPDL KP_Delete KP_Decimal

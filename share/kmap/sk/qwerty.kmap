@@ -1,0 +1,56 @@
+kmap 1
+id sk-qwerty
+layout sk
+variant qwerty
+name Slovak (QWERTY)
+level3 ralt
+key TLDE ; dead_abovering ` ~
+key AE01 + 1 ! dead_tilde
+key AE02 ľ 2 @ dead_caron
+key AE03 š 3 '#' dead_circumflex
+key AE04 č 4 $ dead_breve
+key AE05 ť 5 % dead_abovering
+key AE06 ž 6 ^ dead_ogonek
+key AE07 ý 7 & dead_grave
+key AE08 á 8 * dead_abovedot
+key AE09 í 9 { dead_acute
+key AE10 é 0 } dead_doubleacute
+key AE11 = % \ dead_diaeresis
+key AE12 dead_acute dead_caron dead_macron dead_cedilla
+key AD01 q Q \ Ω caps
+key AD02 w W | § caps
+key AD03 e E € E caps
+key AD04 r R ¶ ® caps
+key AD05 t T ŧ Ŧ caps
+key AD06 y Y ← ¥ caps
+key AD07 u U ↓ ↑ caps
+key AD08 i I → ı caps
+key AD09 o O ø Ø caps
+key AD10 p P þ Þ caps
+key AD11 ú / [ ÷
+key AD12 ä ( ] ×
+key BKSL ň ) \ |
+key AC01 a A ~ Æ caps
+key AC02 s S đ ẞ caps
+key AC03 d D Đ Ð caps
+key AC04 f F [ ª caps
+key AC05 g G ] Ŋ caps
+key AC06 h H ` Ħ caps
+key AC07 j J '''' dead_horn caps
+key AC08 k K ł & caps
+key AC09 l L Ł Ł caps
+key AC10 ô " $ dead_doubleacute
+key AC11 § ! '''' ß
+key LSGT \ | / ¦
+key AB01 z Z ° < caps
+key AB02 x X '#' > caps
+key AB03 c C & © caps
+key AB04 v V @ ‚ caps
+key AB05 b B { ‘ caps
+key AB06 n N } ’ caps
+key AB07 m M ^ º caps
+key AB08 , ? < ×
+key AB09 . : > ÷
+key AB10 - _ * dead_abovedot
+key SPCE space space nobreakspace nobreakspace
+key KPDL KP_Delete KP_Decimal

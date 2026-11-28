@@ -1,0 +1,4 @@
+kmap 1
+id grp:win_switch
+key LWIN ISO_Group_Shift Multi_key
+key RWIN ISO_Group_Shift Multi_key

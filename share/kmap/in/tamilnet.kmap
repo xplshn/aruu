@@ -1,0 +1,55 @@
+kmap 1
+id in-tamilnet
+layout in
+variant tamilnet
+name 'Tamil (TamilNet ''99)'
+key TLDE '''' ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 ௹
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 ஞ ஶ
+key AD02 ற ஷ
+key AD03 ந ஸ
+key AD04 ச ஹ
+key AD05 வ ஜ
+key AD06 ல
+key AD07 ர
+key AD08 ை ஐ
+key AD09 ொ ோ
+key AD10 ி ீ
+key AD11 ு ூ
+key AD12 none
+key BKSL \ |
+key AC01 ய
+key AC02 ள
+key AC03 ன
+key AC04 க
+key AC05 ப
+key AC06 ா ழ
+key AC07 த
+key AC08 ம
+key AC09 ட
+key AC10 ் ஃ
+key AC11 ங
+key LSGT < > | ¦
+key AB01 ண
+key AB02 ஒ ஓ
+key AB03 உ ஊ
+key AB04 எ ஏ
+key AB05 ெ ே
+key AB06 ஔ ௌ
+key AB07 அ ஆ
+key AB08 இ ஈ
+key AB09 none
+key AB10 none
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,56 @@
+kmap 1
+id us-intl
+layout us
+variant intl
+name English (US, intl., with dead keys)
+level3 ralt
+key TLDE dead_grave dead_tilde ` ~
+key AE01 1 ! ¡ ¹
+key AE02 2 @ ² dead_doubleacute
+key AE03 3 '#' ³ dead_macron
+key AE04 4 $ ¤ £
+key AE05 5 % € dead_cedilla
+key AE06 6 dead_circumflex ¼ ^
+key AE07 7 & ½ dead_horn
+key AE08 8 * ¾ dead_ogonek
+key AE09 9 ( ‘ dead_breve
+key AE10 0 ) ’ dead_abovering
+key AE11 - _ ¥ dead_belowdot
+key AE12 = + × ÷
+key AD01 q Q ä Ä caps
+key AD02 w W å Å caps
+key AD03 e E é É caps
+key AD04 r R ® ™ caps
+key AD05 t T þ Þ caps
+key AD06 y Y ü Ü caps
+key AD07 u U ú Ú caps
+key AD08 i I í Í caps
+key AD09 o O ó Ó caps
+key AD10 p P ö Ö caps
+key AD11 [ { « “
+key AD12 ] } » ”
+key BKSL \ | ¬ ¦
+key AC01 a A á Á caps
+key AC02 s S ß § caps
+key AC03 d D ð Ð caps
+key AC04 f F ë Ë caps
+key AC05 g G g G caps
+key AC06 h H h H caps
+key AC07 j J ï Ï caps
+key AC08 k K œ Œ caps
+key AC09 l L ø Ø caps
+key AC10 ; : ¶ °
+key AC11 dead_acute dead_diaeresis '''' "
+key LSGT \ | \ |
+key AB01 z Z æ Æ caps
+key AB02 x X · dead_stroke caps
+key AB03 c C © ¢ caps
+key AB04 v V v V caps
+key AB05 b B b B caps
+key AB06 n N ñ Ñ caps
+key AB07 m M µ ± caps
+key AB08 , < ç Ç
+key AB09 . > dead_abovedot dead_caron
+key AB10 / ? ¿ dead_hook
+key SPCE space
+key KPDL KP_Delete KP_Decimal

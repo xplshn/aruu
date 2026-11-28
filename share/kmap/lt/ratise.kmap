@@ -1,0 +1,57 @@
+kmap 1
+id lt-ratise
+layout lt
+variant ratise
+name Lithuanian (Ratise)
+level3 ralt
+key TLDE + § ` ´
+key AE01 ! ¤ ’ ¡
+key AE02 : @ ⟨ U2190
+key AE03 . '#' ⟩ U2192
+key AE04 * $ ” £
+key AE05 _ % … ‰
+key AE06 — | ^ ¦
+key AE07 = & 7 ≠
+key AE08 , < 8 ≤
+key AE09 ; > 9 ≥
+key AE10 / \ ÷ ‖
+key AE11 w W Ω ß caps
+key AE12 ? ~ ≈ ¿
+key AD01 ū Ū ‘ › caps
+key AD02 ė Ė [ dead_abovering caps
+key AD03 y Y ] dead_circumflex caps
+key AD04 o O “ » caps
+key AD05 q Q combining_acute U2191 caps
+key AD06 j J € ¥ caps
+key AD07 n N 4 ¬ caps
+key AD08 k K 5 † caps
+key AD09 g G 6 enfilledcircbullet caps
+key AD10 b B × ∞ caps
+key AD11 c C ¢ © caps
+key AD12 f F ⁄ ™ caps
+key BKSL z Z ° ® caps
+key AC01 u U '''' dead_macron caps
+key AC02 e E ( dead_grave caps
+key AC03 i I ) dead_acute caps
+key AC04 a A " dead_diaeresis caps
+key AC05 h H combining_tilde dead_tilde caps
+key AC06 l L ł Ł caps
+key AC07 r R 1 ¹ caps
+key AC08 t T 2 ² caps
+key AC09 s S 3 ³ caps
+key AC10 p P − ¶ caps
+key AC11 ž Ž - dead_cedilla caps
+key LSGT - – U0307 ‑
+key AB01 ų Ų ‚ ‹ caps
+key AB02 ę Ę { dead_breve caps
+key AB03 į Į } dead_caron caps
+key AB04 ą Ą „ « caps
+key AB05 x X combining_grave U2193 caps
+key AB06 v V squareroot ◊ caps
+key AB07 m M 0 µ caps
+key AB08 d D . ‡ caps
+key AB09 š Š , · caps
+key AB10 č Č + ± caps
+key SPCE space space space nobreakspace
+key KPDL KP_Delete KP_Decimal
+key TAB Tab ISO_Left_Tab Multi_key

@@ -1,0 +1,55 @@
+kmap 1
+id cn-mon_trad_xibe
+layout cn
+variant mon_trad_xibe
+name Mongolian (Xibe)
+key TLDE ᠍ ~
+key AE01 1 !
+key AE02 2 U2018
+key AE03 3 U2019
+key AE04 4 ᠇
+key AE05 5 %
+key AE06 6 U200C
+key AE07 7 ᠊
+key AE08 8 U200D
+key AE09 9 (
+key AE10 0 )
+key AE11    
+key AE12 = +
+key AD01 ᠴ ᠴ
+key AD02 ᠸ ᠸ
+key AD03 ᡝ ᡝ
+key AD04 ᠷ ᡰ
+key AD05 ᡨ ᡨ
+key AD06 ᠶ ᠶ
+key AD07 ᡠ ᡠ
+key AD08 ᡞ ᡟ
+key AD09 ᠣ ᠣ
+key AD10 ᡦ ᡦ
+key AD11 [ U201C
+key AD12 ] U201D
+key BKSL ᠁ U2014
+key AC01 ᠠ ᠠ
+key AC02 ᠰ ᠰ
+key AC03 ᡩ ᡩ
+key AC04 ᡫ ᡫ
+key AC05 ᡤ ᡬ
+key AC06 ᡥ ᡭ
+key AC07 ᡪ ᡪ
+key AC08 ᡣ ᠺ
+key AC09 ᠯ ᠯ
+key AC10 ; ᠄
+key AC11 ᠋ ᠌
+key LSGT < > | ¦
+key AB01 ᡯ ᡲ
+key AB02 ᡧ ᡧ
+key AB03 ᡮ ᡱ
+key AB04 ᡡ ᡡ
+key AB05 ᠪ ᠪ
+key AB06 ᠨ ᡢ
+key AB07 ᠮ ᠮ
+key AB08 , 『
+key AB09 U3002 』
+key AB10 U3001 ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

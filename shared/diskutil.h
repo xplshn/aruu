@@ -33,6 +33,7 @@ struct BlockDevInfo {
   char                 mountpoint[256];
   char                 fstype[32];
   char                 model[64]; // what the disk calls itself, "" when it does not say
+  int                  removable; // made to be pulled out: a USB stick, a card. a partition takes its disk's
   struct BlockDevInfo *parts;
   struct BlockDevInfo *next;
 };
@@ -64,5 +65,18 @@ void                 blockdev_check_loop(const struct stat *, const char *);
 void                 blockdev_sys_size(struct BlockDev *dev);
 void                 blockdev_sys_reread(struct BlockDev *dev);
 struct BlockDevInfo *blockdev_probe_list(void);
+
+/* mounting, by backend too. the flags are these whatever a kernel calls
+ * them, and data is the filesystem's own options, NULL for none. each is
+ * -1 with errno set where it fails, ENOSYS where the kernel has no backend */
+#define BLOCKDEV_RDONLY 0x1
+#define BLOCKDEV_NOSUID 0x2
+#define BLOCKDEV_NODEV  0x4
+#define BLOCKDEV_NOEXEC 0x8
+int blockdev_mount(const char *dev, const char *dir, const char *fstype, int flags, const char *data);
+int blockdev_unmount(const char *dir);
+/* the unit holding disk, a name as blockdev_get_list gives it, let go and
+ * powered off so it can be pulled. its filesystems must be unmounted first */
+int blockdev_poweroff(const char *disk);
 
 #endif

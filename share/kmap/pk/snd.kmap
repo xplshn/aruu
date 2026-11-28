@@ -1,0 +1,56 @@
+kmap 1
+id pk-snd
+layout pk
+variant snd
+name Sindhi (M.B. Sindhi)
+level3 ralt
+key TLDE U2019 U2018 `
+key AE01 1 ! ۱
+key AE02 2 ٰ ۲
+key AE03 3 U0621 ۳
+key AE04 4 U0621 ۴
+key AE05 5 U0621 ۵
+key AE06 6 U0621 ٦
+key AE07 7 ۽ ۷
+key AE08 8 * ۸
+key AE09 9 ) ۹
+key AE10 0 ( ۰
+key AE11 ڏ _ U0652
+key AE12 ڌ = ۔
+key AD01 U0642 U064E U064B
+key AD02 U0635 U0636 ﷺ
+key AD03 U064A U0650 ٖ
+key AD04 U0631 ڙ ؒ
+key AD05 U062A ٽ U0629
+key AD06 ٿ U062B ؐ
+key AD07 U0639 U063A ؑ
+key AD08 ڳ ہ ؓ
+key AD09 U0648 U064F ٗ
+key AD10 پ ڦ U064C
+key AD11 ڇ ڃ ]
+key AD12 چ ڄ [
+key BKSL ڍ ٺ \
+key AC01 U0627 U0622 U0649
+key AC02 U0633 U0634 U064D
+key AC03 U062F ڊ '#'
+key AC04 U0641 ڦ $
+key AC05 گ گ %
+key AC06 ھ U062D U0647
+key AC07 U062C U062C @
+key AC08 ڪ ۡ &
+key AC09 U0644 : +
+key AC10 ک U061B -
+key AC11 ڱ U0640 ٓ
+key LSGT < > | ¦
+key AB01 U0632 U0630 ~
+key AB02 U062E U0651 ٪
+key AB03 U0637 U0638 U2026
+key AB04 ڀ U0621 U0624
+key AB05 U0628 ٻ ﷽
+key AB06 U0646 ڻ ﷲ
+key AB07 U0645 ۾ ﷴ
+key AB08 U060C U201C >
+key AB09 . U201D <
+key AB10 U0626 U061F /
+key SPCE space
+key KPDL KP_Delete KP_Decimal

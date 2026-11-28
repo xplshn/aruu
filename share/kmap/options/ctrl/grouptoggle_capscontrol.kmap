@@ -1,0 +1,4 @@
+kmap 1
+id ctrl:grouptoggle_capscontrol
+key LCTL ISO_Next_Group
+key CAPS Control_L

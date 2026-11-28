@@ -1,0 +1,56 @@
+kmap 1
+id epo-legacy
+layout epo
+variant legacy
+name Esperanto (legacy)
+level3 ralt
+key TLDE ` ~ type=FOUR_LEVEL
+key AE01 1 ! type=FOUR_LEVEL
+key AE02 2 " type=FOUR_LEVEL
+key AE03 3 '#' type=FOUR_LEVEL
+key AE04 4 $ type=FOUR_LEVEL
+key AE05 5 % type=FOUR_LEVEL
+key AE06 6 '''' type=FOUR_LEVEL
+key AE07 7 & type=FOUR_LEVEL
+key AE08 8 * type=FOUR_LEVEL
+key AE09 9 ( type=FOUR_LEVEL
+key AE10 0 ) type=FOUR_LEVEL
+key AE11 - _ type=FOUR_LEVEL
+key AE12 = + type=FOUR_LEVEL
+key AD01 ŝ Ŝ @ caps
+key AD02 ĵ Ĵ ^ caps
+key AD03 e E € caps
+key AD04 r R — caps
+key AD05 t T – caps
+key AD06 ĝ Ĝ caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AD07 u U caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AD08 i I caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AD09 o O caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AD10 p P caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AD11 [ { type=FOUR_LEVEL
+key AD12 ] } type=FOUR_LEVEL
+key BKSL \ | type=FOUR_LEVEL
+key AC01 a A < caps
+key AC02 s S > caps
+key AC03 d D “ caps
+key AC04 f F ” caps
+key AC05 g G caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AC06 h H caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AC07 j J caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AC08 k K caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AC09 l L caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AC10 ŭ Ŭ caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AC11 ĥ Ĥ caps type=FOUR_LEVEL_SEMIALPHABETIC
+key LSGT < > | ¦
+key AB01 z Z ‘ caps
+key AB02 ĉ Ĉ ’ caps
+key AB03 c C caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AB04 v V caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AB05 b B caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AB06 n N caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AB07 m M caps type=FOUR_LEVEL_SEMIALPHABETIC
+key AB08 , ; type=FOUR_LEVEL
+key AB09 . : type=FOUR_LEVEL
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

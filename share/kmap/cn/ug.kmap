@@ -1,0 +1,55 @@
+kmap 1
+id cn-ug
+layout cn
+variant ug
+name Uyghur
+key TLDE ` ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 )
+key AE10 0 (
+key AE11 - U2014
+key AE12 = +
+key AD01 چ VoidSymbol
+key AD02 ۋ VoidSymbol
+key AD03 ې VoidSymbol
+key AD04 U0631 VoidSymbol
+key AD05 U062A VoidSymbol
+key AD06 U064A VoidSymbol
+key AD07 ۇ VoidSymbol
+key AD08 ڭ VoidSymbol
+key AD09 U0648 VoidSymbol
+key AD10 پ VoidSymbol
+key AD11 ] »
+key AD12 [ «
+key BKSL \ |
+key AC01 ھ VoidSymbol
+key AC02 U0633 VoidSymbol
+key AC03 U062F ژ
+key AC04 U0627 U0641
+key AC05 ە گ
+key AC06 U0649 U062E
+key AC07 U0642 U062C
+key AC08 U0643 ۆ
+key AC09 U0644 VoidSymbol
+key AC10 ؛ :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 U0632 VoidSymbol
+key AB02 U0634 VoidSymbol
+key AB03 U063A VoidSymbol
+key AB04 ۈ VoidSymbol
+key AB05 U0628 VoidSymbol
+key AB06 U0646 VoidSymbol
+key AB07 U0645 VoidSymbol
+key AB08 ، ›
+key AB09 . ‹
+key AB10 U0626 ؟
+key SPCE space
+key KPDL KP_Delete KP_Decimal

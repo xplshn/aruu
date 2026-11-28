@@ -1,0 +1,55 @@
+kmap 1
+id ro
+layout ro
+name Romanian
+level3 ralt
+key TLDE ` ~
+key AE01 1 ! dead_tilde
+key AE02 2 @ dead_caron
+key AE03 3 '#' dead_circumflex
+key AE04 4 $ dead_breve
+key AE05 5 % dead_abovering
+key AE06 6 ^ dead_ogonek
+key AE07 7 & dead_grave
+key AE08 8 * dead_abovedot
+key AE09 9 ( dead_acute
+key AE10 0 ) dead_doubleacute
+key AE11 - _ dead_diaeresis –
+key AE12 = + dead_cedilla ±
+key AD01 q Q â Â caps
+key AD02 w W ß ẞ caps
+key AD03 e E € caps
+key AD04 r R caps
+key AD05 t T ț Ț caps
+key AD06 y Y caps
+key AD07 u U caps
+key AD08 i I î Î caps
+key AD09 o O caps
+key AD10 p P § caps
+key AD11 [ { „
+key AD12 ] } ”
+key BKSL \ |
+key AC01 a A ă Ă caps
+key AC02 s S ș Ș caps
+key AC03 d D đ Đ caps
+key AC04 f F caps
+key AC05 g G caps
+key AC06 h H caps
+key AC07 j J caps
+key AC08 k K caps
+key AC09 l L ł Ł caps
+key AC10 ; :
+key AC11 '''' "
+key LSGT \ | | ¦
+key AB01 z Z caps
+key AB02 x X caps
+key AB03 c C © caps
+key AB04 v V caps
+key AB05 b B caps
+key AB06 n N caps
+key AB07 m M caps
+key AB08 , < «
+key AB09 . > »
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal KP_Separator KP_Separator

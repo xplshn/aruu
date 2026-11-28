@@ -1,0 +1,56 @@
+kmap 1
+id in-ori-wx
+layout in
+variant ori-wx
+name Oriya (Wx)
+level3 ralt
+key TLDE ` ~ U200C U200D
+key AE01 ୧ ! 1
+key AE02 ୨ @ 2 U20AC
+key AE03 ୩ '#' 3 £
+key AE04 ୪ $ 4 ₹
+key AE05 ୫ % 5
+key AE06 ୬ ^ 6
+key AE07 ୭ & 7
+key AE08 ୮ * 8
+key AE09 ୯ ( 9
+key AE10 ୦ ) 0
+key AE11 - _
+key AE12 = +
+key AD01 ୃ ୄ ଋ ୠ
+key AD02 ତ ଥ
+key AD03 େ ୈ ଏ ଐ
+key AD04 ର ଷ
+key AD05 ଟ ଠ
+key AD06 ଯ ୟ
+key AD07 ୁ ୂ ଉ ଊ
+key AD08 ି ୀ ଇ ଈ
+key AD09 ୋ ୌ ଓ ଔ
+key AD10 ପ ଫ
+key AD11 [ {
+key AD12 ] }
+key BKSL । ॥ \ |
+key AC01 ୍ ା ଅ ଆ
+key AC02 ସ ଶ
+key AC03 ଡ ଢ
+key AC04 ଙ ଞ
+key AC05 ଗ ଘ
+key AC06 ହ ଃ
+key AC07 ଜ ଝ
+key AC08 କ ଖ
+key AC09 ଲ ୢ ଳ ଌ
+key AC10 ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ଁ ଼ ଽ
+key AB02 ଦ ଧ
+key AB03 ଚ ଛ
+key AB04 ୱ ଵ
+key AB05 ବ ଭ
+key AB06 ନ ଣ
+key AB07 ମ ଂ
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,55 @@
+kmap 1
+id af
+layout af
+name Dari
+level3 ralt
+key TLDE U200D 0x010000f7 dead_tilde
+key AE01 ۱ ! 0x01000060
+key AE02 ۲ ٬ 0x01000040
+key AE03 ۳ ٫ '#'
+key AE04 ۴  0x01000024
+key AE05 ۵ ٪ 0x01000025
+key AE06 ۶ × 0x0100005e
+key AE07 ۷ ، 0x01000026
+key AE08 ۸ * •
+key AE09 ۹ 0x01000029 U200E
+key AE10 ۰ 0x01000028 U200F
+key AE11 - ـ 0x0100005f
+key AE12 = +
+key AD01 ض ْ 0x010000b0
+key AD02 ص ٌ
+key AD03 ث ٍ U20AC
+key AD04 ق ً ﴾
+key AD05 ف ُ ﴿
+key AD06 غ ِ 
+key AD07 ع َ 
+key AD08 ه ّ ٕ
+key AD09 خ ] 0x01000027
+key AD10 ح [ 0x01000022
+key AD11 ج } ځ
+key AD12 چ { څ
+key BKSL \ | 0x0100003f
+key AC01 ش ؤ ښ
+key AC02 س ئ ۍ
+key AC03 ی ي U0649
+key AC04 ب إ ې
+key AC05 ل أ ڷ
+key AC06 ا آ ٱ
+key AC07 ت ة ټ
+key AC08 ن 0x010000bb ڼ
+key AC09 م 0x010000ab ں
+key AC10 ک : 0x0100003b
+key AC11 گ ؛ ګ
+key LSGT < > | ¦
+key AB01 ظ ك ے
+key AB02 ط ٓ ڑ
+key AB03 ز ژ ږ
+key AB04 ر ٰ ړ
+key AB05 ذ U200C ڈ
+key AB06 د ٔ ډ
+key AB07 پ ء ٹ
+key AB08 و > 0x0100002c
+key AB09 . < ۇ
+key AB10 / ؟ ۉ
+key SPCE space U200C nobreakspace
+key KPDL KP_Delete KP_Decimal

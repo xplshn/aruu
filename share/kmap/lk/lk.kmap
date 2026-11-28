@@ -1,0 +1,55 @@
+kmap 1
+id lk
+layout lk
+name Sinhala (phonetic)
+level3 ralt
+key TLDE ` ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 ඍ ඎ ෘ ෲ
+key AD02 ඇ ඈ ැ ෑ
+key AD03 එ ඒ ෙ ේ
+key AD04 ර ් ර VoidSymbol
+key AD05 ත ථ ට ඨ
+key AD06 ය ් VoidSymbol VoidSymbol
+key AD07 උ ඌ ු ූ
+key AD08 ඉ ඊ ි ී
+key AD09 ඔ ඕ ො ෝ
+key AD10 ප ඵ VoidSymbol VoidSymbol
+key AD11 [ {
+key AD12 ] }
+key BKSL \ |
+key AC01 අ ආ ් ා
+key AC02 ස ශ ෂ VoidSymbol
+key AC03 ද ධ ඩ ඪ
+key AC04 ෆ VoidSymbol ෛ ඓ
+key AC05 ග ඝ ඟ VoidSymbol
+key AC06 හ ඃ ෞ ඖ
+key AC07 ජ ඣ ඦ VoidSymbol
+key AC08 ක ඛ ඏ ඐ
+key AC09 ල ළ ෟ ෳ
+key AC10 ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ඤ ඥ VoidSymbol VoidSymbol
+key AB02 ඳ ඬ VoidSymbol VoidSymbol
+key AB03 ච ඡ VoidSymbol VoidSymbol
+key AB04 ව VoidSymbol VoidSymbol VoidSymbol
+key AB05 බ භ VoidSymbol VoidSymbol
+key AB06 න ණ ං ඞ
+key AB07 ම ඹ VoidSymbol VoidSymbol
+key AB08 , < ් VoidSymbol
+key AB09 . > ෴ VoidSymbol
+key AB10 / ? U200D VoidSymbol
+key SPCE space nobreakspace U200C
+key KPDL KP_Delete KP_Decimal

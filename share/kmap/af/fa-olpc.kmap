@@ -1,0 +1,56 @@
+kmap 1
+id af-fa-olpc
+layout af
+variant fa-olpc
+name Dari (Afghanistan, OLPC)
+key TLDE U200D ÷ ~
+key AE01 ۱ ! `
+key AE02 ۲ ٬ @
+key AE03 ۳ ٫ '#'
+key AE04 ۴ ؋ $
+key AE05 ۵ ٪ %
+key AE06 ۶ × ^
+key AE07 ۷ U060C &
+key AE08 ۸ * enfilledcircbullet
+key AE09 ۹ ) U200E
+key AE10 ۰ ( U200F
+key AE11 - U0640 _
+key AE12 = +
+key AD01 U0636 U0652 °
+key AD02 U0635 U064C
+key AD03 U062B U064D €
+key AD04 U0642 U064B ﴾
+key AD05 U0641 U064F ﴿
+key AD06 U063A U0650 ٖ
+key AD07 U0639 U064E 
+key AD08 U0647 U0651 ٕ
+key AD09 U062E ] ''''
+key AD10 U062D [ "
+key AD11 U062C } ځ
+key AD12 چ { څ
+key BKSL \ | ?
+key AC01 U0634 U0624 ښ
+key AC02 U0633 U0626 ۍ
+key AC03 ی U064A U0649
+key AC04 U0628 U0625 ې
+key AC05 U0644 U0623 ڷ
+key AC06 U0627 U0622 ٱ
+key AC07 U062A U0629 ټ
+key AC08 U0646 » ڼ
+key AC09 U0645 « ں
+key AC10 ک : ;
+key AC11 گ U061B ګ
+key LSGT < > | ¦
+key AB01 U0638 U0643 ے
+key AB02 U0637 ٓ ڑ
+key AB03 U0632 ژ ږ
+key AB04 U0631 ٰ ړ
+key AB05 U0630 U200C ڈ
+key AB06 U062F ٔ ډ
+key AB07 پ U0621 ٹ
+key AB08 U0648 > ,
+key AB09 . < ۇ
+key AB10 / U061F ۉ
+key SPCE space U200C nobreakspace
+key KPDL KP_Delete KP_Decimal
+key I219 ISO_Next_Group ISO_Prev_Group

@@ -1,0 +1,3 @@
+kmap 1
+id kpdl:dotoss_latin9
+key KPDL KP_Delete . , nobreakspace type=FOUR_LEVEL_MIXED_KEYPAD

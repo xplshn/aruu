@@ -1,0 +1,4 @@
+kmap 1
+id shift:both_capslock_cancel
+key LFSH Shift_L Caps_Lock type=ALPHABETIC
+key RTSH Shift_R Caps_Lock type=ALPHABETIC

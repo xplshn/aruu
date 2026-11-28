@@ -101,7 +101,9 @@ main(int argc, char *argv[])
   if (!self)
     eprintf("passwd: who are you?\n");
 
-  name = argc > 0 ? argv[0] : self->pw_name;
+  /* copied: self is getpwuid's buffer, which getpwnam reads into, so a name
+   * pointing into it would be written over while it is looked up */
+  name = estrdup(argc > 0 ? argv[0] : self->pw_name);
   if (uid != 0 && (strcmp(name, self->pw_name) != 0 || lflag || uflag || dflag))
     eprintf("passwd: permission denied\n");
 
@@ -141,7 +143,9 @@ main(int argc, char *argv[])
 
   if (uid != 0) {
     cur = readpass("Current password: ");
-    if (!cur || pw_check(self, cur) != 1)
+    /* target, not self: the lookup above wrote over self. for anyone but
+     * root they are the same person, as checked above */
+    if (!cur || pw_check(target, cur) != 1)
       eprintf("passwd: authentication failed\n");
   }
 

@@ -1,0 +1,56 @@
+kmap 1
+id se-swl
+layout se
+variant swl
+name Swedish Sign Language
+level3 ralt
+key TLDE § ½ ¶ ¾
+key AE01 􌥓 􌤶 􌦈 􌥢
+key AE02 􌥔 􌥗 􌥽 􌥣
+key AE03 􌤴 􌤷 􌥾 􌦃
+key AE04 􌥕 􌥘 􌦊 􌦄
+key AE05 􌤵 􌤸 􌥿 􌥦
+key AE06 􌥖 􌥙 􌦀 􌥧
+key AE07 􌥠 􌥩 􌦂 􌥪
+key AE08 􌥼 􌤋 􌦉 􌥤
+key AE09 􌥻 􌤊 􌦋 􌥥
+key AE10 􌥴 􌤉 􌦌 􌥨
+key AE11 + ? \ ¿
+key AE12 dead_acute dead_grave ± ¬
+key AD01 􌥬 􌤪 􌤀 􌦡
+key AD02 􌥱 􌤰 􌤃 􌦞
+key AD03 􌦇 􌥇 􌤌 􌥭
+key AD04 􌦆 􌤬 􌤛 􌦓
+key AD05 􌤹 􌥊 􌤑 􌦕
+key AD06 􌥒 􌥃 􌤒 􌦛
+key AD07 􌥸 􌥷 􌥞 􌦣
+key AD08 􌥑 􌤱 􌤞 􌦗
+key AD09 􌤎 􌥆 􌤆 􌦠
+key AD10 􌤟 􌥡 􌤜 VoidSymbol
+key AD11 􌤽 􌤯 􌤂 VoidSymbol
+key AD12 dead_diaeresis dead_circumflex dead_tilde dead_caron
+key BKSL '''' * ´ ×
+key AC01 􌥳 􌤤 􌤼 􌦤
+key AC02 􌥲 􌥅 􌤚 􌦜
+key AC03 􌥹 􌤩 􌤖 􌦙
+key AC04 􌥶 􌥵 􌤗 􌦔
+key AC05 􌥚 􌤦 􌤘 􌦖
+key AC06 􌥯 􌤲 􌤕 􌦘
+key AC07 􌥂 􌤢 􌤓 􌦢
+key AC08 􌦅 􌥎 􌤔 􌥺
+key AC09 􌤨 􌥈 􌤙 􌦥
+key AC10 􌥰 􌤫 􌤅 􌦑
+key AC11 􌤮 􌥄 􌤄 VoidSymbol
+key LSGT < > | ¦
+key AB01 􌤥 􌥟 􌥀 􌦚
+key AB02 􌥫 􌤳 􌤠 􌦎
+key AB03 􌥉 􌥋 􌤡 􌦟
+key AB04 􌤣 􌤭 􌥜 􌥮
+key AB05 􌤻 􌤧 􌤈 􌦦
+key AB06 􌤺 􌥌 􌤾 􌦧
+key AB07 􌥛 􌤿 􌤇 􌦒
+key AB08 , ; dead_cedilla dead_ogonek
+key AB09 . : · …
+key AB10 - _ dead_belowdot dead_abovedot
+key SPCE space space space nobreakspace
+key KPDL KP_Delete KP_Separator

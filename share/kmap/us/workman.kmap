@@ -1,0 +1,56 @@
+kmap 1
+id us-workman
+layout us
+variant workman
+name English (Workman)
+key TLDE ` ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 q Q caps
+key AD02 d D caps
+key AD03 r R caps
+key AD04 w W caps
+key AD05 b B caps
+key AD06 j J caps
+key AD07 f F caps
+key AD08 u U caps
+key AD09 p P caps
+key AD10 ; :
+key AD11 [ {
+key AD12 ] }
+key BKSL \ |
+key AC01 a A caps
+key AC02 s S caps
+key AC03 h H caps
+key AC04 t T caps
+key AC05 g G caps
+key AC06 y Y caps
+key AC07 n N caps
+key AC08 e E caps
+key AC09 o O caps
+key AC10 i I caps
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 z Z caps
+key AB02 x X caps
+key AB03 m M caps
+key AB04 c C caps
+key AB05 v V caps
+key AB06 k K caps
+key AB07 l L caps
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key CAPS BackSpace Escape

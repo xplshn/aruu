@@ -1,0 +1,56 @@
+kmap 1
+id se-smi
+layout se
+variant smi
+name Northern Saami (Sweden)
+level3 ralt
+key TLDE | § ` ~
+key AE01 1 ! • ¡
+key AE02 2 " @ ©
+key AE03 3 '#' £ VoidSymbol
+key AE04 4 ¤ $ ¢
+key AE05 5 % € ‰
+key AE06 6 & ^ ×
+key AE07 7 / { ÷
+key AE08 8 ( [ ≤
+key AE09 9 ) ] ≥
+key AE10 0 = } ≠
+key AE11 + ? ± ¿
+key AE12 \ dead_grave dead_acute ¬
+key AD01 á Á q Q caps
+key AD02 š Š w W caps
+key AD03 e E € VoidSymbol caps
+key AD04 r R ® ™ caps
+key AD05 t T þ Þ caps
+key AD06 ŧ Ŧ y Y caps
+key AD07 u U ü Ü caps
+key AD08 i I ï Ï caps
+key AD09 o O õ Õ caps
+key AD10 p P œ Œ caps
+key AD11 å Å dead_diaeresis dead_circumflex caps
+key AD12 ŋ Ŋ dead_tilde dead_caron caps
+key BKSL đ Đ '''' * caps
+key AC01 a A â Â caps
+key AC02 s S ß ẞ caps
+key AC03 d D ð Ð caps
+key AC04 f F VoidSymbol ª caps
+key AC05 g G ǧ Ǧ caps
+key AC06 h H ǥ Ǥ caps
+key AC07 j J „ ‚ caps
+key AC08 k K ǩ Ǩ caps
+key AC09 l L ° ­ caps
+key AC10 ö Ö ø Ø caps
+key AC11 ä Ä æ Æ caps
+key LSGT ž Ž ǯ Ǯ caps
+key AB01 z Z ʒ Ʒ caps
+key AB02 č Č x X caps
+key AB03 c C “ ‘ caps
+key AB04 v V « ‹ caps
+key AB05 b B » › caps
+key AB06 n N ” ’ caps
+key AB07 m M µ º caps
+key AB08 , ; < ·
+key AB09 . : > …
+key AB10 - _ – —
+key SPCE space
+key KPDL KP_Delete KP_Decimal

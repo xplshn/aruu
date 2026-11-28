@@ -1,0 +1,56 @@
+kmap 1
+id ch-de_mac
+layout ch
+variant de_mac
+name German (Switzerland, Macintosh)
+level3 ralt
+key TLDE § ° ﬁ ‰
+key AE01 1 + ± ∞
+key AE02 2 " “ ”
+key AE03 3 * '#' <
+key AE04 4 ç Ç /
+key AE05 5 % [
+key AE06 6 & ]
+key AE07 7 / | \
+key AE08 8 ( { Ò
+key AE09 9 ) } Ô
+key AE10 0 = ≠ Ú
+key AE11 '''' ? ¿
+key AE12 dead_circumflex dead_grave dead_acute ^
+key AD01 q Q œ Œ caps
+key AD02 w W Σ Á caps
+key AD03 e E € Ë caps
+key AD04 r R ® È caps
+key AD05 t T † Î caps
+key AD06 z Z Ω Í caps
+key AD07 u U ° Ù caps
+key AD08 i I ¡ ı caps
+key AD09 o O ø Ø caps
+key AD10 p P π Π caps
+key AD11 ü è § ÿ
+key AD12 dead_diaeresis ! ` ''''
+key BKSL $ £ ¶ enfilledcircbullet
+key AC01 a A å Å caps
+key AC02 s S ß ẞ caps
+key AC03 d D σ ∂ caps
+key AC04 f F ƒ ‡ caps
+key AC05 g G @ , caps
+key AC06 h H ª · caps
+key AC07 j J º ð caps
+key AC08 k K Δ ¯ caps
+key AC09 l L ¬ ‸ caps
+key AC10 ö é ¢ ˘
+key AC11 ä à æ Æ
+key LSGT < > ≤ ≥
+key AB01 y Y ¥ Ÿ caps
+key AB02 x X ≃ ™ caps
+key AB03 c C © caps
+key AB04 v V √ ♦ caps
+key AB05 b B ∫ caps
+key AB06 n N dead_tilde enopencircbullet caps
+key AB07 m M µ dead_abovering caps
+key AB08 , ; « »
+key AB09 . : … ÷
+key AB10 - _ ­ —
+key SPCE space nobreakspace nobreakspace
+key KPDL KP_Delete KP_Separator

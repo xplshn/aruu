@@ -1,0 +1,56 @@
+kmap 1
+id latam-colemak
+layout latam
+variant colemak
+name Spanish (Latin American, Colemak)
+level3 ralt
+key TLDE | ° ¬ ¬
+key AE01 1 ! | ¡
+key AE02 2 " @ ⅛
+key AE03 3 '#' · £
+key AE04 4 $ ~ $
+key AE05 5 % ½ ⅜
+key AE06 6 & ¬ ⅝
+key AE07 7 / { ⅞
+key AE08 8 ( [ ™
+key AE09 9 ) ] ±
+key AE10 0 = } °
+key AE11 '''' ? \ ¿
+key AE12 ¿ ¡ dead_cedilla dead_ogonek
+key AD01 q Q U201A U201E caps
+key AD02 w W U2018 U201C caps
+key AD03 f F U2019 U201D caps
+key AD04 p P ⊓ ¶ caps
+key AD05 g G ŋ Ŋ caps
+key AD06 j J U222B U03A3 caps
+key AD07 l L ł Ł caps
+key AD08 u U ‹ « caps
+key AD09 y Y › » caps
+key AD10 ñ Ñ ~ ˮ caps
+key AD11 dead_acute dead_diaeresis dead_diaeresis dead_abovering
+key AD12 + * ~ dead_macron
+key BKSL } ] dead_grave }
+key AC01 a A æ Æ caps
+key AC02 r R ® ™ caps
+key AC03 s S ß § caps
+key AC04 t T þ Þ caps
+key AC05 d D ð Ð caps
+key AC06 h H ħ Ħ caps
+key AC07 n N ­ U2190 caps
+key AC08 e E € U2191 caps
+key AC09 i I U2015 U2192 caps
+key AC10 o O º ª caps
+key AC11 { [ dead_circumflex {
+key LSGT < > | ¦
+key AB01 z Z ʒ Ʒ caps
+key AB02 x X U2020 U2021 caps
+key AB03 c C ¢ © caps
+key AB04 v V ÷ U03B3 caps
+key AB05 b B • U03B2 caps
+key AB06 k K ç Ç caps
+key AB07 m M × U2193 caps
+key AB08 , ; ­ ×
+key AB09 . : combining_belowdot ÷
+key AB10 - _
+key SPCE space
+key KPDL KP_Delete KP_Decimal

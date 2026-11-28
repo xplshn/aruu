@@ -1,0 +1,54 @@
+kmap 1
+id bg
+layout bg
+name Bulgarian
+key TLDE ( ) [ ]
+key AE01 1 !
+key AE02 2 ?
+key AE03 3 + † †
+key AE04 4 "
+key AE05 5 % 〈 〉
+key AE06 6 = — —
+key AE07 7 : … …
+key AE08 8 / combining_grave combining_acute
+key AE09 9 –
+key AE10 0 №
+key AE11 - $ ‑ €
+key AE12 . €
+key AD01 , ы ’ ‘
+key AD02 у У caps
+key AD03 е Е э Э caps
+key AD04 и И ѝ Ѝ caps
+key AD05 ш Ш caps
+key AD06 щ Щ caps
+key AD07 к К © © caps
+key AD08 с С © © caps
+key AD09 д Д caps
+key AD10 з З caps
+key AD11 ц Ц caps
+key AD12 ; §
+key BKSL „ “ « »
+key AC01 ь ѝ ы Ы
+key AC02 я Я ѣ Ѣ caps
+key AC03 а А caps
+key AC04 о О caps
+key AC05 ж Ж caps
+key AC06 г Г caps
+key AC07 т Т ™ ™ caps
+key AC08 н Н caps
+key AC09 в В caps
+key AC10 м М caps
+key AC11 ч Ч caps
+key LSGT ѝ Ѝ | ¦ caps
+key AB01 ю Ю caps
+key AB02 й Й ѭ Ѭ caps
+key AB03 ъ Ъ ѫ Ѫ caps
+key AB04 э Э caps
+key AB05 ф Ф caps
+key AB06 х Х caps
+key AB07 п П caps
+key AB08 р Р ® ® caps
+key AB09 л Л caps
+key AB10 б Б caps
+key SPCE space space nobreakspace nobreakspace
+key KPDL KP_Delete KP_Separator

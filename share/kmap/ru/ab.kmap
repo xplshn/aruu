@@ -1,0 +1,56 @@
+kmap 1
+id ru-ab
+layout ru
+variant ab
+name Abkhazian (Russia)
+level3 ralt
+key TLDE combining_acute ~ U201C U201D
+key AE01 1 ! « »
+key AE02 2 @ " U201E
+key AE03 3 '#' №
+key AE04 4 $ ;
+key AE05 5 %
+key AE06 6 ^ :
+key AE07 7 & ?
+key AE08 8 *
+key AE09 9 ( [ {
+key AE10 0 ) ] }
+key AE11 - _ U2013 U2014
+key AE12 = +
+key AD01 ҟ Ҟ caps
+key AD02 ц Ц ҵ Ҵ caps
+key AD03 у У caps
+key AD04 к К қ Қ caps
+key AD05 е Е caps
+key AD06 н Н caps
+key AD07 г Г ӷ Ӷ caps
+key AD08 ш Ш caps
+key AD09 ә Ә caps
+key AD10 з З ӡ Ӡ caps
+key AD11 х Х ҳ Ҳ caps
+key AD12 ҿ Ҿ caps
+key BKSL \ | /
+key AC01 ф Ф caps
+key AC02 ы Ы caps
+key AC03 в В caps
+key AC04 а А caps
+key AC05 п П ԥ Ԥ caps
+key AC06 р Р caps
+key AC07 о О caps
+key AC08 л Л caps
+key AC09 д Д caps
+key AC10 ж Ж ; : caps
+key AC11 ҽ Ҽ '''' " caps
+key LSGT / | | ¦
+key AB01 U045F U040F caps
+key AB02 ч Ч ҷ Ҷ caps
+key AB03 с С caps
+key AB04 м М caps
+key AB05 и И caps
+key AB06 т Т ҭ Ҭ caps
+key AB07 ь Ь caps
+key AB08 б Б , < caps
+key AB09 ҩ Ҩ . > caps
+key AB10 / ? , .
+key SPCE space
+key KPDL KP_Delete KP_Separator

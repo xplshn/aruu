@@ -1,0 +1,56 @@
+kmap 1
+id ph-dvorak-bay
+layout ph
+variant dvorak-bay
+name Filipino (Dvorak, Baybayin)
+level3 ralt
+key TLDE VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE01 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE02 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE03 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE04 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE05 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE06 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE07 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE08 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE09 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE10 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE11 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AE12 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AD01 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AD02 ᜵ VoidSymbol VoidSymbol VoidSymbol
+key AD03 ᜶ VoidSymbol VoidSymbol VoidSymbol
+key AD04 ᜉ VoidSymbol VoidSymbol VoidSymbol
+key AD05 ᜌ VoidSymbol VoidSymbol VoidSymbol
+key AD06 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AD07 ᜄ VoidSymbol VoidSymbol VoidSymbol
+key AD08 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AD09 ᜍ VoidSymbol VoidSymbol VoidSymbol
+key AD10 ᜎ VoidSymbol VoidSymbol VoidSymbol
+key AD11 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AD12 ᜔ ᜔ VoidSymbol VoidSymbol
+key BKSL VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AC01 ᜀ VoidSymbol VoidSymbol VoidSymbol
+key AC02 ᜓ ᜂ VoidSymbol VoidSymbol
+key AC03 ᜒ ᜁ VoidSymbol VoidSymbol
+key AC04 ᜓ ᜂ VoidSymbol VoidSymbol
+key AC05 ᜒ ᜁ VoidSymbol VoidSymbol
+key AC06 ᜇ VoidSymbol VoidSymbol VoidSymbol
+key AC07 ᜑ VoidSymbol VoidSymbol VoidSymbol
+key AC08 ᜆ VoidSymbol VoidSymbol VoidSymbol
+key AC09 ᜈ ᜅ VoidSymbol VoidSymbol
+key AC10 ᜐ VoidSymbol VoidSymbol VoidSymbol
+key AC11 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key LSGT < > | ¦
+key AB01 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AB02 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AB03 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AB04 ᜃ VoidSymbol VoidSymbol VoidSymbol
+key AB05 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AB06 ᜊ VoidSymbol VoidSymbol VoidSymbol
+key AB07 ᜋ VoidSymbol VoidSymbol VoidSymbol
+key AB08 ᜏ VoidSymbol VoidSymbol VoidSymbol
+key AB09 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AB10 VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key SPCE space
+key KPDL KP_Delete KP_Decimal

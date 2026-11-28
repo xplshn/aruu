@@ -1,0 +1,66 @@
+kmap 1
+id ara-digits
+layout ara
+variant digits
+name Arabic (Eastern Arabic numerals)
+level3 ralt
+key TLDE ذ ّ % U2030
+key AE01 ١ ! 1
+key AE02 ٢ @ 2
+key AE03 ٣ '#' 3
+key AE04 ٤ $ 4
+key AE05 ٥ ٪ 5 ؉
+key AE06 ٦ ^ 6
+key AE07 ٧ & 7
+key AE08 ٨ * 8
+key AE09 ٩ ) 9
+key AE10 ٠ ( 0
+key AE11 - _ – ‑
+key AE12 = + ≠ ≈
+key AD01 ض َ none ⁦
+key AD02 ص ً none ⁧
+key AD03 ث ُ none ⁨
+key AD04 ق ٌ none ⁩
+key AD05 ف ﻹ ڤ
+key AD06 غ إ none ‪
+key AD07 ع ` none ‫
+key AD08 ه ÷ none ‬
+key AD09 خ × type=FOUR_LEVEL
+key AD10 ح ؛ none U200E
+key AD11 ج < چ U200F
+key AD12 د > none ؜
+key BKSL \ | ⟨  
+key AC01 ش ِ type=FOUR_LEVEL
+key AC02 س ٍ type=FOUR_LEVEL
+key AC03 ي ] type=FOUR_LEVEL
+key AC04 ب [ پ
+key AC05 ل ﻷ type=FOUR_LEVEL
+key AC06 ا أ ٱ
+key AC07 ت ـ type=FOUR_LEVEL
+key AC08 ن ، ٫
+key AC09 م / type=FOUR_LEVEL
+key AC10 ك : گ
+key AC11 ط " ⟩ U200D
+key LSGT | … ¦ ¦
+key AB01 ئ ~ » ›
+key AB02 ء ْ « ‹
+key AB03 ؤ } type=FOUR_LEVEL
+key AB04 ر { type=FOUR_LEVEL
+key AB05 ﻻ ﻵ type=FOUR_LEVEL
+key AB06 ى آ ٰ
+key AB07 ة '''' type=FOUR_LEVEL
+key AB08 و , ٬
+key AB09 ز . ژ
+key AB10 ظ ؟ ٭ U200C
+key SPCE space
+key KPDL KP_Delete ٫ ,   type=FOUR_LEVEL_MIXED_KEYPAD
+key KP7 KP_Home ٧ 7 ۷ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP8 KP_Up ٨ 8 ۸ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP9 KP_Prior ٩ 9 ۹ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP4 KP_Left ٤ 4 ۴ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP5 KP_Begin ٥ 5 ۵ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP6 KP_Right ٦ 6 ۶ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP1 KP_End ١ 1 ۱ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP2 KP_Down ٢ 2 ۲ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP3 KP_Next ٣ 3 ۳ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP0 KP_Insert ٠ 0 ۰ type=FOUR_LEVEL_MIXED_KEYPAD

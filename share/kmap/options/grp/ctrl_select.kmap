@@ -1,0 +1,4 @@
+kmap 1
+id grp:ctrl_select
+key LCTL ISO_First_Group
+key RCTL ISO_Last_Group

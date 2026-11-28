@@ -1,0 +1,50 @@
+kmap 1
+id misc:apl
+key AE01 1 ! ¨ ⌶
+key AE02 2 @ ¯ ⍫
+key AE03 3 '#' < ⍒
+key AE04 4 $ U2264 ⍋
+key AE05 5 % = ⌽
+key AE06 6 ^ U2265 ⍉
+key AE07 7 & > ⊖
+key AE08 8 * U2260 ⍟
+key AE09 9 ( U2228 ⍱
+key AE10 0 ) U2227 ⍲
+key AE11 - _ × !
+key AE12 = + ÷ ⌹
+key AD01 q Q ? ⍰ caps
+key AD02 w W ⍵ ⍹ caps
+key AD03 e E ∊ ⍷ caps
+key AD04 r R ⍴ ⌾ caps
+key AD05 t T ~ ⍨ caps
+key AD06 y Y U2191 caps
+key AD07 u U U2193 caps
+key AD08 i I ⍳ ⍸ caps
+key AD09 o O U25CB ⍥ caps
+key AD10 p P * ⍣ caps
+key AD11 [ { U2190 ⍞
+key AD12 ] } U2192 ⍬
+key AC01 a A ⍺ ⍶ caps
+key AC02 s S U2308 caps
+key AC03 d D U230A caps
+key AC04 f F _ ⍛ caps
+key AC05 g G U2207 ⍢ caps
+key AC06 h H ∆ caps
+key AC07 j J U2218 ⍤ caps
+key AC08 k K '''' ⌸ caps
+key AC09 l L U2395 ⌷ caps
+key AC10 ; : ⍎ U2261
+key AC11 '''' " ⍕ ≢
+key TLDE ` ~ ⋄ ⌺
+key BKSL \ | U22A2 U22A3
+key AB01 z Z U2282 ⊆ caps
+key AB02 x X U2283 caps
+key AB03 c C U2229 caps
+key AB04 v V U222A caps
+key AB05 b B U22A5 ⍭ caps
+key AB06 n N U22A4 ⍡ caps
+key AB07 m M | ∥ caps
+key AB08 , < ⍝ ⍪
+key AB09 . > ⍀ ⍙
+key AB10 / ? ⌿ ⍠
+key LSGT < > U22A2 U22A3

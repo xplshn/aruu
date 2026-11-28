@@ -1,0 +1,56 @@
+kmap 1
+id in-guj-kagapa
+layout in
+variant guj-kagapa
+name Gujarati (KaGaPa, phonetic)
+level3 ralt
+key TLDE ` ~ U201C
+key AE01 1 ! ૧
+key AE02 2 @ ૨ ૱
+key AE03 3 '#' ૩
+key AE04 4 $ ૪ ₹
+key AE05 5 % ૫
+key AE06 6 ^ ૬ U200C
+key AE07 7 & ૭ U200D
+key AE08 8 * ૮ ઁ
+key AE09 9 ( ૯
+key AE10 0 ) ૦ ૰
+key AE11 - _ ॒
+key AE12 = + type=FOUR_LEVEL
+key AD01 ટ ઠ type=FOUR_LEVEL
+key AD02 ડ ઢ type=FOUR_LEVEL
+key AD03 ે ૈ એ ઐ
+key AD04 ર ૃ ઋ ૄ
+key AD05 ત થ ટ ઠ
+key AD06 ય type=FOUR_LEVEL
+key AD07 ુ ૂ ઉ ઊ
+key AD08 િ ી ઇ ઈ
+key AD09 ો ૌ ઓ ઔ
+key AD10 પ ફ type=FOUR_LEVEL
+key AD11 [ { type=FOUR_LEVEL
+key AD12 ] } type=FOUR_LEVEL
+key BKSL \ | । ॥
+key AC01 ા આ અ ઍ
+key AC02 સ શ type=FOUR_LEVEL
+key AC03 દ ધ ડ ઢ
+key AC04 ્ ૄ ૠ
+key AC05 ગ ઘ type=FOUR_LEVEL
+key AC06 હ ઃ type=FOUR_LEVEL
+key AC07 જ ઝ ઞ ૹ
+key AC08 ક ખ type=FOUR_LEVEL
+key AC09 લ ળ ૡ ૢ
+key AC10 ; : type=FOUR_LEVEL
+key AC11 '''' " ॑ U201D
+key LSGT < > | ¦
+key AB01 ઞ ઙ type=FOUR_LEVEL
+key AB02 ષ ઼ type=FOUR_LEVEL
+key AB03 ચ છ type=FOUR_LEVEL
+key AB04 વ ૌ ઔ
+key AB05 બ ભ type=FOUR_LEVEL
+key AB06 ન ણ type=FOUR_LEVEL
+key AB07 મ ં ઽ ૐ
+key AB08 , < ૅ ઍ
+key AB09 . > ૉ ઑ
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

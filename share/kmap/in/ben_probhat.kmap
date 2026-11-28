@@ -1,0 +1,56 @@
+kmap 1
+id in-ben_probhat
+layout in
+variant ben_probhat
+name Bangla (India, Probhat)
+level3 ralt
+key TLDE U200D ~ type=FOUR_LEVEL
+key AE01 ১ ! ৴
+key AE02 ২ @ ৵
+key AE03 ৩ '#' ৶
+key AE04 ৪ ৳ ৷ ৲
+key AE05 ৫ % type=FOUR_LEVEL
+key AE06 ৬ ^ type=FOUR_LEVEL
+key AE07 ৭ ঞ ৺
+key AE08 ৮ ৎ type=FOUR_LEVEL
+key AE09 ৯ ( type=FOUR_LEVEL
+key AE10 ০ ) ৸ ৹
+key AE11 - _ type=FOUR_LEVEL
+key AE12 = + type=FOUR_LEVEL
+key AD01 দ ধ type=FOUR_LEVEL
+key AD02 ূ ঊ type=FOUR_LEVEL
+key AD03 ী ঈ type=FOUR_LEVEL
+key AD04 র ড় ₹
+key AD05 ট ঠ type=FOUR_LEVEL
+key AD06 এ ঐ type=FOUR_LEVEL
+key AD07 ু উ type=FOUR_LEVEL
+key AD08 ি ই type=FOUR_LEVEL
+key AD09 ও ঔ type=FOUR_LEVEL
+key AD10 প ফ type=FOUR_LEVEL
+key AD11 ে ৈ type=FOUR_LEVEL
+key AD12 ো ৌ ৗ
+key BKSL U200C ॥ type=FOUR_LEVEL
+key AC01 া অ ঌ ৠ
+key AC02 স ষ ৡ ৣ
+key AC03 ড ঢ ৄ ৢ
+key AC04 ত থ type=FOUR_LEVEL
+key AC05 গ ঘ type=FOUR_LEVEL
+key AC06 হ ঃ ঽ
+key AC07 জ ঝ type=FOUR_LEVEL
+key AC08 ক খ type=FOUR_LEVEL
+key AC09 ল ং type=FOUR_LEVEL
+key AC10 ; : type=FOUR_LEVEL
+key AC11 '''' " type=FOUR_LEVEL
+key LSGT < > | ¦
+key AB01 য় য type=FOUR_LEVEL
+key AB02 শ ঢ় type=FOUR_LEVEL
+key AB03 চ ছ type=FOUR_LEVEL
+key AB04 আ ঋ type=FOUR_LEVEL
+key AB05 ব ভ type=FOUR_LEVEL
+key AB06 ন ণ type=FOUR_LEVEL
+key AB07 ম ঙ type=FOUR_LEVEL
+key AB08 , ৃ type=FOUR_LEVEL
+key AB09 । ঁ ়
+key AB10 ্ ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

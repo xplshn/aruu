@@ -1,0 +1,55 @@
+kmap 1
+id il-lyx
+layout il
+variant lyx
+name Hebrew (lyx)
+key TLDE ; ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 )
+key AE10 0 (
+key AE11 - ־
+key AE12 = +
+key AD01 / VoidSymbol
+key AD02 '''' VoidSymbol
+key AD03 ק ָ
+key AD04 ר ּ
+key AD05 א U200E
+key AD06 ט U200F
+key AD07 ו ֹ
+key AD08 ן VoidSymbol
+key AD09 ם VoidSymbol
+key AD10 פ ַ
+key AD11 ] }
+key AD12 [ {
+key BKSL \ |
+key AC01 ש ְ
+key AC02 ד ּ
+key AC03 ג VoidSymbol
+key AC04 כ VoidSymbol
+key AC05 ע ׂ
+key AC06 י ׁ
+key AC07 ח ִ
+key AC08 ל ₪
+key AC09 ך VoidSymbol
+key AC10 ף :
+key AC11 , "
+key LSGT < > | ¦
+key AB01 ז VoidSymbol
+key AB02 ס ֶ
+key AB03 ב ֻ
+key AB04 ה ֱ
+key AB05 נ ֲ
+key AB06 מ ֳ
+key AB07 צ ֵ
+key AB08 ת >
+key AB09 ץ <
+key AB10 . ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

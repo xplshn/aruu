@@ -1,0 +1,56 @@
+kmap 1
+id my-phonetic
+layout my
+variant phonetic
+name Malay (Jawi, phonetic)
+level3 ralt
+key TLDE none
+key AE01 ١ ! 1
+key AE02 ٢ ء 2
+key AE03 ٣ أ 3
+key AE04 ٤ آ 4
+key AE05 ٥ إ 5
+key AE06 ٦ ئ 6
+key AE07 ٧ ؤ 7
+key AE08 ٨ none 8
+key AE09 ٩ ) 9
+key AE10 ٠ ( 0
+key AE11 - _
+key AE12 = +
+key AD01 ق ڤ
+key AD02 و ّ
+key AD03 ع غ
+key AD04 ر غ
+key AD05 ت ة
+key AD06 ي ى
+key AD07 و ط
+key AD08 ي ـ
+key AD09 ع U200C
+key AD10 ڤ ت
+key AD11 ] }
+key AD12 [ {
+key BKSL \ |
+key AC01 ا آ
+key AC02 س ش
+key AC03 د ض
+key AC04 ف ڤ
+key AC05 ڬ ڠ
+key AC06 ه ح
+key AC07 ج چ
+key AC08 ك ق
+key AC09 ل ﻻ
+key AC10 ؛ :
+key AC11 '''' "
+key LSGT | ¦ | ¦
+key AB01 ز ذ
+key AB02 خ ح
+key AB03 چ ﺹ
+key AB04 ۏ ظ
+key AB05 ب پ
+key AB06 ن ڽ
+key AB07 م آ
+key AB08 ، >
+key AB09 . <
+key AB10 / ؟
+key SPCE space
+key KPDL KP_Delete KP_Decimal

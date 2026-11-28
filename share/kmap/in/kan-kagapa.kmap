@@ -1,0 +1,56 @@
+kmap 1
+id in-kan-kagapa
+layout in
+variant kan-kagapa
+name Kannada (KaGaPa, phonetic)
+level3 ralt
+key TLDE ` ~ U201C
+key AE01 1 ! ೧
+key AE02 2 @ ೨ ₨
+key AE03 3 '#' ೩
+key AE04 4 $ ೪ ₹
+key AE05 5 % ೫
+key AE06 6 ^ ೬ U200C
+key AE07 7 & ೭ U200D
+key AE08 8 * ೮ ँ
+key AE09 9 ( ೯
+key AE10 0 ) ೦
+key AE11 - _ ॒
+key AE12 = + type=FOUR_LEVEL
+key AD01 ಟ ಠ type=FOUR_LEVEL
+key AD02 ಡ ಢ type=FOUR_LEVEL
+key AD03 ೆ ೇ ಎ ಏ
+key AD04 ರ ೃ ಋ ಱ
+key AD05 ತ ಥ type=FOUR_LEVEL
+key AD06 ಯ ೈ ಐ
+key AD07 ು ೂ ಉ ಊ
+key AD08 ಿ ೀ ಇ ಈ
+key AD09 ೊ ೋ ಒ ಓ
+key AD10 ಪ ಫ type=FOUR_LEVEL
+key AD11 [ { type=FOUR_LEVEL
+key AD12 ] } type=FOUR_LEVEL
+key BKSL \ | । ॥
+key AC01 ಾ ಆ ಅ
+key AC02 ಸ ಶ type=FOUR_LEVEL
+key AC03 ದ ಧ type=FOUR_LEVEL
+key AC04 ್ ೄ ೠ
+key AC05 ಗ ಘ type=FOUR_LEVEL
+key AC06 ಹ ಃ ೱ ೲ
+key AC07 ಜ ಝ type=FOUR_LEVEL
+key AC08 ಕ ಖ type=FOUR_LEVEL
+key AC09 ಲ ಳ ೢ ಌ
+key AC10 ; : type=FOUR_LEVEL
+key AC11 '''' " ॑ U201D
+key LSGT < > | ¦
+key AB01 ಞ ಙ type=FOUR_LEVEL
+key AB02 ಷ ಼ ೞ
+key AB03 ಚ ಛ type=FOUR_LEVEL
+key AB04 ವ ೌ ಔ
+key AB05 ಬ ಭ type=FOUR_LEVEL
+key AB06 ನ ಣ type=FOUR_LEVEL
+key AB07 ಮ ಂ ಽ ॐ
+key AB08 , < ಱ
+key AB09 . > ೞ
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

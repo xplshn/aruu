@@ -1,0 +1,56 @@
+kmap 1
+id pk-brahui
+layout pk
+variant brahui
+name Brahui (Pakistan)
+level3 ralt
+key TLDE U064D U064C ` ~
+key AE01 1 ! ۱ VoidSymbol
+key AE02 2 @ ۲ VoidSymbol
+key AE03 3 '#' ۳ VoidSymbol
+key AE04 4 $ ۴ VoidSymbol
+key AE05 5 % ۵ ٪
+key AE06 6 ^ ۶ ؉
+key AE07 7 & ۷ ٫
+key AE08 8 * ۸ ٬
+key AE09 9 ) ۹ U2030
+key AE10 0 ( ۰ U2026
+key AE11 - _ ‑ U2013
+key AE12 = + − VoidSymbol
+key AD01 U0642 U0652 VoidSymbol VoidSymbol
+key AD02 U0648 U0651 U0624 VoidSymbol
+key AD03 U0639 ٰ VoidSymbol VoidSymbol
+key AD04 U0631 ڑ VoidSymbol VoidSymbol
+key AD05 U062A ٹ VoidSymbol VoidSymbol
+key AD06 ے U064E ۓ VoidSymbol
+key AD07 U0626 U0621 ٔ ٕ
+key AD08 ی U0650 U064A U0649
+key AD09 ہ ۃ ۂ U0629
+key AD10 پ U064F VoidSymbol VoidSymbol
+key AD11 [ { VoidSymbol VoidSymbol
+key AD12 ] } VoidSymbol VoidSymbol
+key BKSL \ | ; VoidSymbol
+key AC01 U0627 U0622 U0623 U0625
+key AC02 U0633 U0635 VoidSymbol VoidSymbol
+key AC03 U062F ڈ VoidSymbol VoidSymbol
+key AC04 U0641 ڤ VoidSymbol VoidSymbol
+key AC05 گ U063A VoidSymbol VoidSymbol
+key AC06 U062D ھ U0647 VoidSymbol
+key AC07 U062C U0636 VoidSymbol VoidSymbol
+key AC08 ک U062E U0643 VoidSymbol
+key AC09 U0644 ڷ VoidSymbol VoidSymbol
+key AC10 U061B : U201C U2018
+key AC11 '''' " U201D U2019
+key LSGT VoidSymbol VoidSymbol VoidSymbol VoidSymbol
+key AB01 U0632 U0630 VoidSymbol VoidSymbol
+key AB02 U0634 ژ VoidSymbol VoidSymbol
+key AB03 چ U062B VoidSymbol VoidSymbol
+key AB04 U0637 U0638 VoidSymbol VoidSymbol
+key AB05 U0628 U064B VoidSymbol VoidSymbol
+key AB06 U0646 ں VoidSymbol VoidSymbol
+key AB07 U0645 VoidSymbol VoidSymbol VoidSymbol
+key AB08 U060C < , VoidSymbol
+key AB09 ۔ > . VoidSymbol
+key AB10 / U061F ? VoidSymbol
+key SPCE space space U200C U200D
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,56 @@
+kmap 1
+id it-geo
+layout it
+variant geo
+name Georgian (Italy)
+level3 ralt
+key TLDE \ | ¬ ¦
+key AE01 1 ! ¹ ¡
+key AE02 2 " ² dead_doubleacute
+key AE03 3 £ ³ dead_tilde
+key AE04 4 $ ¼ ⅛
+key AE05 5 % ½ ⅜
+key AE06 6 & ¬ ⅝
+key AE07 7 / { ⅞
+key AE08 8 ( [ ™
+key AE09 9 ) ] ±
+key AE10 0 = } dead_ogonek
+key AE11 '''' ? ` ¿
+key AE12 ì ^ ~ dead_circumflex
+key AD01 ქ Q @ Ω
+key AD02 წ ჭ ſ §
+key AD03 ე E € ¢
+key AD04 რ ღ ® ®
+key AD05 ტ თ ŧ Ŧ
+key AD06 ყ Y ჸ ¥
+key AD07 უ U ↓ ↑
+key AD08 ი I ჲ ı
+key AD09 ო O ø Ø
+key AD10 პ P þ Þ
+key AD11 è é [ {
+key AD12 + * ] }
+key BKSL ù § dead_grave dead_breve
+key AC01 ა A ჺ Æ
+key AC02 ს შ ß ẞ
+key AC03 დ D ð Ð
+key AC04 ფ F ჶ ª
+key AC05 გ G ჹ Ŋ
+key AC06 ჰ H ჵ Ħ
+key AC07 ჯ ჟ ჷ dead_horn
+key AC08 კ K ĸ &
+key AC09 ლ L ł Ł
+key AC10 ò ç @ dead_cedilla
+key AC11 à ° '#' °
+key LSGT < > « »
+key AB01 ზ ძ « <
+key AB02 ხ X ჴ >
+key AB03 ც ჩ © ©
+key AB04 ვ V ჳ ‘
+key AB05 ბ B ” ’
+key AB06 ნ N ჼ Ñ
+key AB07 მ M µ º
+key AB08 , ; « ×
+key AB09 . : » dead_diaeresis
+key AB10 - _ ჻ ÷
+key SPCE space
+key KPDL KP_Delete KP_Decimal

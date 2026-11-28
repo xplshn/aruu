@@ -1,0 +1,55 @@
+kmap 1
+id in-mni
+layout in
+variant mni
+name Manipuri (Meitei)
+key TLDE ` ~
+key AE01 ꯱ !
+key AE02 ꯲ @
+key AE03 ꯳ '#'
+key AE04 ꯴ $
+key AE05 ꯵ %
+key AE06 ꯶ ^
+key AE07 ꯷ &
+key AE08 ꯸ *
+key AE09 ꯹ (
+key AE10 ꯰ )
+key AE11 - _
+key AE12 = +
+key AD01 ꯈ ꯘ
+key AD02 ꯋ ꯋ
+key AD03 ꯏ ꯢ
+key AD04 ꯔ ꯔ
+key AD05 ꯇ ꯠ
+key AD06 ꯌ ꯦ
+key AD07 ꯎ ꯨ
+key AD08 ꯤ ꯩ
+key AD09 ꯣ ꯧ
+key AD10 ꯄ ꯞ
+key AD11 [ {
+key AD12 ] }
+key BKSL \ |
+key AC01 ꯑ ꯥ
+key AC02 ꯁ ꯓ
+key AC03 ꯗ ꯙ
+key AC04 ꯐ ꯚ
+key AC05 ꯒ ꯘ
+key AC06 ꯍ ꯪ
+key AC07 ꯖ ꯓ
+key AC08 ꯀ ꯛ
+key AC09 ꯂ ꯜ
+key AC10 ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ꯉ ꯡ
+key AB02 ꯊ ꯙ
+key AB03 ꯆ ꯫
+key AB04 ꯚ ꯭
+key AB05 ꯕ ꯬
+key AB06 ꯅ ꯟ
+key AB07 ꯃ ꯝ
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

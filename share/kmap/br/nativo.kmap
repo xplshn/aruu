@@ -1,0 +1,57 @@
+kmap 1
+id br-nativo
+layout br
+variant nativo
+name Portuguese (Brazil, Nativo)
+level3 ralt
+key TLDE = + § ±
+key AE01 1 ! ¹ ¡
+key AE02 2 @ ² ½
+key AE03 3 '#' ³ ¾
+key AE04 4 $ £ ¼
+key AE05 5 % ¢ ‰
+key AE06 6 dead_diaeresis ¬ ¨
+key AE07 7 & dead_belowdot dead_abovedot
+key AE08 8 * dead_ogonek dead_horn
+key AE09 9 ( dead_cedilla dead_hook
+key AE10 0 ) dead_macron dead_breve
+key AE11 [ { ª U0326
+key AE12 ] } º dead_abovering
+key AD01 / ? ° ¿
+key AD02 , < U0329 U0313
+key AD03 . > • ·
+key AD04 h H ¶ ¶ caps
+key AD05 x X × ÷ caps
+key AD06 w W ŭ Ŭ caps
+key AD07 l L ł Ł caps
+key AD08 t T ™ ™ caps
+key AD09 c C © © caps
+key AD10 p P þ Þ caps
+key AD11 dead_tilde dead_circumflex ~ ^
+key AD12 - _ U2015 U0336
+key BKSL '''' " dead_caron dead_doubleacute
+key AC01 i I ı İ caps
+key AC02 e E € € caps
+key AC03 a A æ Æ caps
+key AC04 o O œ Œ caps
+key AC05 u U ø Ø caps
+key AC06 m M µ µ caps
+key AC07 d D ð Ð caps
+key AC08 s S ß ẞ caps
+key AC09 r R ® ® caps
+key AC10 n N ŋ Ŋ caps
+key AC11 dead_acute dead_grave ´ `
+key LSGT ; : U0331 U032D
+key AB01 y Y ¥ ¥ caps
+key AB02 ç Ç \ | caps
+key AB03 j J ʒ Ʒ caps
+key AB04 b B « ‹ caps
+key AB05 k K » › caps
+key AB06 q Q ə Ə caps
+key AB07 v V „ ‚ caps
+key AB08 g G “ ‘ caps
+key AB09 f F ” ’ caps
+key AB10 z Z ‟ ‛ caps
+key AB11 \ | ¤ ¦
+key SPCE space space nobreakspace nobreakspace
+key KPDL KP_Delete KP_Separator

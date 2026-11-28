@@ -1,0 +1,59 @@
+kmap 1
+id de-T3
+layout de
+variant T3
+name German (T3)
+level3 ralt
+key TLDE dead_circumflex ° × none ⁊ ­ | type=EIGHT_LEVEL
+key AE01 1 ! ’ none ¹ ¡ ʹ type=EIGHT_LEVEL
+key AE02 2 " ² none ² ¤ ʺ type=EIGHT_LEVEL
+key AE03 3 § ³ none ³ £ ʿ type=EIGHT_LEVEL
+key AE04 4 $ — none ¼ € ʾ type=EIGHT_LEVEL
+key AE05 5 % ¡ none ½ ↑ ˁ type=EIGHT_LEVEL
+key AE06 6 & ¿ none ¾ ↓ ˀ type=EIGHT_LEVEL
+key AE07 7 / { none ⅛ ← { type=EIGHT_LEVEL
+key AE08 8 ( [ none ⅜ → } type=EIGHT_LEVEL
+key AE09 9 ) ] none ⅝ ± [ type=EIGHT_LEVEL
+key AE10 0 = } none ⅞ ™ ] type=EIGHT_LEVEL
+key AE11 ß ? \ none \ ¿ ʻ type=EIGHT_LEVEL
+key AE12 dead_acute dead_grave dead_abovedot none dead_cedilla dead_ogonek ¬ type=EIGHT_LEVEL
+key AD01 q Q @ none ɂ Ɂ U030D caps type=EIGHT_LEVEL_ALPHABETIC
+key AD02 w W dead_caron none ʷ Ω dead_abovedot caps type=EIGHT_LEVEL_ALPHABETIC
+key AD03 e E € none œ Œ dead_breve caps type=EIGHT_LEVEL_ALPHABETIC
+key AD04 r R dead_diaeresis none ¶ ® dead_circumflex caps type=EIGHT_LEVEL_ALPHABETIC
+key AD05 t T dead_macron none ꞌ Ꞌ dead_diaeresis caps type=EIGHT_LEVEL_ALPHABETIC
+key AD06 z Z dead_doubleacute none ɼ ¥ dead_invertedbreve caps type=EIGHT_LEVEL_ALPHABETIC
+key AD07 u U dead_breve none ȣ Ȣ dead_caron caps type=EIGHT_LEVEL_ALPHABETIC
+key AD08 i I dead_tilde none ı ⅍ dead_abovecomma caps type=EIGHT_LEVEL_ALPHABETIC
+key AD09 o O dead_abovering none ø Ø dead_horn caps type=EIGHT_LEVEL_ALPHABETIC
+key AD10 p P dead_hook none þ Þ dead_hook caps type=EIGHT_LEVEL_ALPHABETIC
+key AD11 ü Ü dead_horn none ſ dead_abovering dead_grave caps type=EIGHT_LEVEL_ALPHABETIC
+key AD12 + * ~ none dead_tilde dead_macron @ type=EIGHT_LEVEL
+key BKSL '#' '''' ® none ə Ə ″ type=EIGHT_LEVEL
+key AC01 a A ≤ none æ Æ U0329 caps type=EIGHT_LEVEL_ALPHABETIC
+key AC02 s S ≥ none ß § dead_belowdot caps type=EIGHT_LEVEL_ALPHABETIC
+key AC03 d D ⌀ none ð Ð dead_belowbreve caps type=EIGHT_LEVEL_ALPHABETIC
+key AC04 f F ′ none ʔ ª dead_belowcircumflex caps type=EIGHT_LEVEL_ALPHABETIC
+key AC05 g G ″ none ŋ Ŋ dead_belowmacron caps type=EIGHT_LEVEL_ALPHABETIC
+key AC06 h H ẞ none ɲ Ɲ U0332 caps type=EIGHT_LEVEL_ALPHABETIC
+key AC07 j J dead_cedilla none ĳ Ĳ dead_belowring caps type=EIGHT_LEVEL_ALPHABETIC
+key AC08 k K dead_belowcomma none ĸ dead_belowcomma dead_stroke caps type=EIGHT_LEVEL_ALPHABETIC
+key AC09 l L dead_ogonek none ł Ł U0338 caps type=EIGHT_LEVEL_ALPHABETIC
+key AC10 ö Ö dead_belowdot none dead_acute dead_doubleacute ° caps type=EIGHT_LEVEL_ALPHABETIC
+key AC11 ä Ä dead_stroke none ƛ ẞ ′ caps type=EIGHT_LEVEL_ALPHABETIC
+key LSGT < > | ¦ ŉ ¦ ♪ type=EIGHT_LEVEL
+key AB01 y Y › none ʒ Ʒ « caps type=EIGHT_LEVEL_ALPHABETIC
+key AB02 x X » none „ ‚ » caps type=EIGHT_LEVEL_ALPHABETIC
+key AB03 c C © none ¢ © ― caps type=EIGHT_LEVEL_ALPHABETIC
+key AB04 v V « none “ ‘ ‹ caps type=EIGHT_LEVEL_ALPHABETIC
+key AB05 b B ‹ none ” ’ › caps type=EIGHT_LEVEL_ALPHABETIC
+key AB06 n N – none ƞ Ƞ – caps type=EIGHT_LEVEL_ALPHABETIC
+key AB07 m M µ none µ º — caps type=EIGHT_LEVEL_ALPHABETIC
+key AB08 , ; ʻ none … × $ type=EIGHT_LEVEL
+key AB09 . : U200C none · ÷ '#' type=EIGHT_LEVEL
+key AB10 - _ ­ none ŀ Ŀ ‑ type=EIGHT_LEVEL
+key SPCE space space nobreakspace none   U200C nobreakspace type=EIGHT_LEVEL
+key KPDL KP_Delete KP_Separator
+key LFSH Shift_L Shift_L ISO_Level5_Latch type=THREE_LEVEL
+key RTSH Shift_R Shift_R ISO_Level5_Latch type=THREE_LEVEL
+key RALT ISO_Level3_Shift ISO_Level5_Latch ISO_Level5_Latch type=THREE_LEVEL

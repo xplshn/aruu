@@ -1,0 +1,56 @@
+kmap 1
+id us-mac-iso
+layout us
+variant mac-iso
+name English (Macintosh, ABC, ISO)
+level3 ralt
+key TLDE § ± § ±
+key AE01 1 ! ¡ ⁄
+key AE02 2 @ ™ €
+key AE03 3 '#' £ ‹
+key AE04 4 $ ¢ ›
+key AE05 5 % ∞ ﬁ
+key AE06 6 ^ § ﬂ
+key AE07 7 & ¶ ‡
+key AE08 8 * enfilledcircbullet °
+key AE09 9 ( ª ·
+key AE10 0 ) º ‚
+key AE11 - _ – —
+key AE12 = + ≠ ±
+key AD01 q Q œ Œ caps type=FOUR_LEVEL
+key AD02 w W ∑ „ caps type=FOUR_LEVEL
+key AD03 e E dead_acute ´ caps type=FOUR_LEVEL
+key AD04 r R ® ‰ caps type=FOUR_LEVEL
+key AD05 t T † dead_caron caps type=FOUR_LEVEL
+key AD06 y Y ¥ ¼ caps type=FOUR_LEVEL
+key AD07 u U dead_diaeresis ¨ caps type=FOUR_LEVEL
+key AD08 i I dead_circumflex ˆ caps type=FOUR_LEVEL
+key AD09 o O ø Ø caps type=FOUR_LEVEL
+key AD10 p P π ∏ caps type=FOUR_LEVEL
+key AD11 [ { “ ”
+key AD12 ] } ‘ ’
+key BKSL \ | « »
+key AC01 a A å Å caps type=FOUR_LEVEL
+key AC02 s S ß dead_stroke caps type=FOUR_LEVEL
+key AC03 d D ∂ ð caps type=FOUR_LEVEL
+key AC04 f F ƒ dead_hook caps type=FOUR_LEVEL
+key AC05 g G © dead_doubleacute caps type=FOUR_LEVEL
+key AC06 h H dead_abovedot dead_belowdot caps type=FOUR_LEVEL
+key AC07 j J ∆ ½ caps type=FOUR_LEVEL
+key AC08 k K dead_abovering  caps type=FOUR_LEVEL
+key AC09 l L ¬ Þ caps type=FOUR_LEVEL
+key AC10 ; : U2026 þ
+key AC11 '''' " æ Æ
+key LSGT ` ~ dead_grave dead_horn
+key AB01 z Z Ω dead_cedilla caps type=FOUR_LEVEL
+key AB02 x X ≈ dead_ogonek caps type=FOUR_LEVEL
+key AB03 c C ç Ç caps type=FOUR_LEVEL
+key AB04 v V squareroot ◊ caps type=FOUR_LEVEL
+key AB05 b B ∫ ı caps type=FOUR_LEVEL
+key AB06 n N dead_tilde ˜ caps type=FOUR_LEVEL
+key AB07 m M µ ¾ caps type=FOUR_LEVEL
+key AB08 , < ≤ dead_macron
+key AB09 . > ≥ dead_breve
+key AB10 / ? ÷ ¿
+key SPCE space
+key KPDL KP_Delete KP_Decimal

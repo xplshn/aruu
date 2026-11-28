@@ -1,0 +1,55 @@
+kmap 1
+id gr
+layout gr
+name Greek
+level3 ralt
+key TLDE ` ~ U2015
+key AE01 1 ! • ¹
+key AE02 2 @ ½ ²
+key AE03 3 '#' £ ³
+key AE04 4 $ ¼ ¾
+key AE05 5 % € ‰
+key AE06 6 ^ ϰ ¶
+key AE07 7 & ϗ Ϗ
+key AE08 8 * ₯ ¤
+key AE09 9 ( ¦ ‘
+key AE10 0 ) ° ’
+key AE11 - _ ±
+key AE12 = +
+key AD01 ; : ·
+key AD02 ς Σ ϛ Ϛ caps
+key AD03 ε Ε € ϵ caps
+key AD04 ρ Ρ ® ϱ caps
+key AD05 τ Τ caps
+key AD06 υ Υ ϒ ¥ caps
+key AD07 θ Θ ϑ ϴ caps
+key AD08 ι Ι ͻ Ͻ caps
+key AD09 ο Ο ϙ Ϙ caps
+key AD10 π Π ϡ Ϡ caps
+key AD11 [ { dead_tilde dead_macron
+key AD12 ] } dead_iota dead_breve
+key BKSL \ | ¬
+key AC01 α Α caps
+key AC02 σ Σ § caps
+key AC03 δ Δ ↓ ↑ caps
+key AC04 φ Φ ϕ Φ caps
+key AC05 γ Γ ϝ Ϝ caps
+key AC06 η Η ϳ Ϳ caps
+key AC07 ξ Ξ ͼ Ͼ caps
+key AC08 κ Κ ϟ Ϟ caps
+key AC09 λ Λ ϲ Ϲ caps
+key AC10 dead_acute dead_diaeresis dead_acute dead_abovecomma
+key AC11 '''' " dead_grave dead_abovereversedcomma
+key LSGT « » | ¦
+key AB01 ζ Ζ ͽ Ͽ caps
+key AB02 χ Χ → ← caps
+key AB03 ψ Ψ © caps
+key AB04 ω Ω ϖ caps
+key AB05 β Β ϐ caps
+key AB06 ν Ν ʹ ͵ caps
+key AB07 μ Μ ϻ Ϻ caps
+key AB08 , < « …
+key AB09 . > » ·
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Separator

@@ -1,0 +1,56 @@
+kmap 1
+id af-ps-olpc
+layout af
+variant ps-olpc
+name Pashto (Afghanistan, OLPC)
+key TLDE U200D ٔ `
+key AE01 ۱ ! ~
+key AE02 ۲ ٬ @
+key AE03 ۳ ٫ '#'
+key AE04 ۴ ؋ $
+key AE05 ۵ ٪ %
+key AE06 ۶ × ^
+key AE07 ۷ » &
+key AE08 ۸ « ٭
+key AE09 ۹ ) enfilledcircbullet
+key AE10 ۰ ( °
+key AE11 - U0640 _
+key AE12 = + ÷
+key AD01 U0636 U0652 €
+key AD02 U0635 U064C ٱ
+key AD03 U062B U064D U0649
+key AD04 U0642 U064B U200E
+key AD05 U0641 U064F U200F
+key AD06 U063A U0650 
+key AD07 U0639 U064E 
+key AD08 U0647 U0651 ٰ
+key AD09 U062E ځ ''''
+key AD10 U062D څ "
+key AD11 U062C ] {
+key AD12 چ [ }
+key BKSL \ * |
+key AC01 U0634 ښ
+key AC02 U0633 ۍ
+key AC03 ی U064A ے
+key AC04 U0628 پ ں
+key AC05 U0644 U0623 ڷ
+key AC06 U0627 U0622 U0625
+key AC07 U062A ټ ٹ
+key AC08 U0646 ڼ >
+key AC09 U0645 U0629 <
+key AC10 ک : U0643
+key AC11 ګ U061B گ
+key LSGT < > | ¦
+key AB01 U0638 U0626 ?
+key AB02 ې U0637 ;
+key AB03 U0632 ژ
+key AB04 U0631 U0621
+key AB05 U0630 U200C
+key AB06 U062F ډ ڈ
+key AB07 ړ U0624 ڑ
+key AB08 U0648 . ,
+key AB09 ږ 0x0100002e ۇ
+key AB10 / U061F ۉ
+key SPCE space U200C nobreakspace
+key KPDL KP_Delete KP_Decimal
+key I219 ISO_Next_Group ISO_Prev_Group

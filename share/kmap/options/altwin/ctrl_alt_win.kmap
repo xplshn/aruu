@@ -1,0 +1,8 @@
+kmap 1
+id altwin:ctrl_alt_win
+key LCTL Super_L
+key LALT Control_L Control_L
+key RCTL Super_R
+key RALT Control_R Control_R
+key LWIN Alt_L Meta_L
+key RWIN Alt_R Meta_R

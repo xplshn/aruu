@@ -1,0 +1,56 @@
+kmap 1
+id in-asm-kagapa
+layout in
+variant asm-kagapa
+name Assamese (KaGaPa, phonetic)
+level3 ralt
+key TLDE ` ~ U201C
+key AE01 1 ! ১
+key AE02 2 @ ২ ₨
+key AE03 3 '#' ৩
+key AE04 4 $ ৪ ₹
+key AE05 5 % ৫
+key AE06 6 ^ ৬ U200C
+key AE07 7 & ৭ U200D
+key AE08 8 * ৮ ঁ
+key AE09 9 ( ৯
+key AE10 0 ) ০ ৽
+key AE11 - _ ॒
+key AE12 = + type=FOUR_LEVEL
+key AD01 ট ঠ type=FOUR_LEVEL
+key AD02 ড ঢ ড় ঢ়
+key AD03 ে ৈ এ ঐ
+key AD04 র ৃ ঋ ৰ
+key AD05 ত থ ৎ
+key AD06 য য় type=FOUR_LEVEL
+key AD07 ু ূ উ ঊ
+key AD08 ি ী ই ঈ
+key AD09 ো ৌ ও ঔ
+key AD10 প ফ type=FOUR_LEVEL
+key AD11 [ { type=FOUR_LEVEL
+key AD12 ] } type=FOUR_LEVEL
+key BKSL \ | । ॥
+key AC01 া আ অ
+key AC02 স শ type=FOUR_LEVEL
+key AC03 দ ধ type=FOUR_LEVEL
+key AC04 ্ ৄ ৠ
+key AC05 গ ঘ type=FOUR_LEVEL
+key AC06 হ ঃ ᳵ ᳶ
+key AC07 জ ঝ type=FOUR_LEVEL
+key AC08 ক খ type=FOUR_LEVEL
+key AC09 ল ল ৢ ঌ
+key AC10 ; : ᳲ ᳳ
+key AC11 '''' " ॑ U201D
+key LSGT < > | ¦
+key AB01 ঞ ঙ type=FOUR_LEVEL
+key AB02 ষ ় type=FOUR_LEVEL
+key AB03 চ ছ type=FOUR_LEVEL
+key AB04 ৱ ৌ ঔ ৗ
+key AB05 ব ভ ৰ
+key AB06 ন ণ type=FOUR_LEVEL
+key AB07 ম ং ঽ ঀ
+key AB08 , < type=FOUR_LEVEL
+key AB09 . > type=FOUR_LEVEL
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,4 @@
+kmap 1
+id grp:ctrls_toggle
+key LCTL Control_L ISO_Prev_Group type=PC_CONTROL_LEVEL2
+key RCTL Control_R ISO_Next_Group type=PC_CONTROL_LEVEL2

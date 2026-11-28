@@ -200,7 +200,26 @@ resolve_source(const char *src, char *buf, size_t bufsz)
   if (!list)
     return NULL;
 
+  /* the disks, and after each the partitions it holds: a filesystem is
+   * mostly on a partition, and only a disc or an unpartitioned stick is a
+   * whole disk */
   for (cur = list; cur; cur = cur->next) {
+    struct BlockDevInfo *part;
+
+    for (part = cur->parts; part; part = part->next) {
+      if (blockdev_open(&dev, part->path, 0) != 0)
+        continue;
+      if (blockdev_detect_fs(&dev, dev_type, sizeof(dev_type), dev_label,
+                             sizeof(dev_label), dev_uuid, sizeof(dev_uuid)) == 0 &&
+          ((is_label && strcmp(dev_label, target_val) == 0) ||
+           (!is_label && strcasecmp(dev_uuid, target_val) == 0))) {
+        blockdev_close(&dev);
+        estrlcpy(buf, part->path, bufsz);
+        blockdev_free_list(list);
+        return buf;
+      }
+      blockdev_close(&dev);
+    }
     if (blockdev_open(&dev, cur->path, 0) == 0) {
       if (blockdev_detect_fs(&dev, dev_type, sizeof(dev_type), dev_label,
                              sizeof(dev_label), dev_uuid, sizeof(dev_uuid)) == 0) {

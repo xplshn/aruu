@@ -1,0 +1,55 @@
+kmap 1
+id us-chr
+layout us
+variant chr
+name Cherokee
+key TLDE ` Ꮚ type=ALPHABETIC
+key AE01 1 Ꮁ type=ALPHABETIC
+key AE02 2 Ꮗ type=ALPHABETIC
+key AE03 3 Ꮷ type=ALPHABETIC
+key AE04 Ꮩ Ꮀ type=ALPHABETIC
+key AE05 Ꮶ Ꮉ type=ALPHABETIC
+key AE06 Ꮬ Ꮭ type=ALPHABETIC
+key AE07 Ꮛ Ꮱ type=ALPHABETIC
+key AE08 Ꮦ Ꮊ type=ALPHABETIC
+key AE09 Ꮢ ( type=ALPHABETIC
+key AE10 Ꮔ ) type=ALPHABETIC
+key AE11 Ꮏ Ꮌ type=ALPHABETIC
+key AE12 Ᏻ Ꮍ type=ALPHABETIC
+key AD01 Ꭺ Ꮖ type=ALPHABETIC
+key AD02 Ꮃ Ꮻ type=ALPHABETIC
+key AD03 Ꭱ Ꮳ type=ALPHABETIC
+key AD04 Ꮫ Ꮟ type=ALPHABETIC
+key AD05 Ꮤ Ꮨ type=ALPHABETIC
+key AD06 Ꮿ Ᏺ type=ALPHABETIC
+key AD07 Ꭴ Ꭽ type=ALPHABETIC
+key AD08 Ꭲ Ᏹ type=ALPHABETIC
+key AD09 Ꭳ Ꮼ type=ALPHABETIC
+key AD10 Ꮑ Ꮺ type=ALPHABETIC
+key AD11 Ꮥ Ꮡ type=ALPHABETIC
+key AD12 Ꮆ Ꮴ type=ALPHABETIC
+key BKSL Ꮹ Ꮾ type=ALPHABETIC
+key AC01 Ꭰ Ꮜ type=ALPHABETIC
+key AC02 Ꮝ Ꮞ type=ALPHABETIC
+key AC03 Ꮧ Ꮠ type=ALPHABETIC
+key AC04 Ꭹ Ꮘ type=ALPHABETIC
+key AC05 Ꭶ Ꮵ type=ALPHABETIC
+key AC06 Ꭿ Ꮂ type=ALPHABETIC
+key AC07 Ꮪ Ꭻ type=ALPHABETIC
+key AC08 Ꮈ Ꭷ type=ALPHABETIC
+key AC09 Ꮅ Ꭾ type=ALPHABETIC
+key AC10 Ꮸ Ꮰ type=ALPHABETIC
+key AC11 '''' " type=ALPHABETIC
+key LSGT < > | ¦
+key AB01 Ꭼ Ꮓ type=ALPHABETIC
+key AB02 Ᏼ Ꮽ type=ALPHABETIC
+key AB03 Ꮣ Ꮯ type=ALPHABETIC
+key AB04 Ꭵ Ꮮ type=ALPHABETIC
+key AB05 Ꭸ Ᏸ type=ALPHABETIC
+key AB06 Ꮎ Ꮋ type=ALPHABETIC
+key AB07 Ꮕ Ꮇ type=ALPHABETIC
+key AB08 , Ꮲ type=ALPHABETIC
+key AB09 . Ꮄ type=ALPHABETIC
+key AB10 Ꮒ Ꮙ type=ALPHABETIC
+key SPCE space
+key KPDL KP_Delete KP_Decimal

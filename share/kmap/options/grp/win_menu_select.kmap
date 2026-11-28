@@ -1,0 +1,5 @@
+kmap 1
+id grp:win_menu_select
+key LWIN ISO_First_Group
+key RWIN ISO_Last_Group
+key COMP ISO_Last_Group

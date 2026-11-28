@@ -1,0 +1,4 @@
+kmap 1
+id ctrl:hyper_capscontrol
+key LCTL Hyper_L
+key CAPS Control_L

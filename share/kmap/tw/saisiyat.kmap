@@ -1,0 +1,56 @@
+kmap 1
+id tw-saisiyat
+layout tw
+variant saisiyat
+name Saisiyat (Taiwan)
+level3 ralt
+key TLDE ` ~ dead_grave dead_tilde
+key AE01 1 ! U030D ¡
+key AE02 2 @ U0358 ²
+key AE03 3 '#' § ³
+key AE04 4 $ ¥ £
+key AE05 5 % € ¢
+key AE06 6 ^ dead_circumflex dead_caron
+key AE07 7 & dead_acute
+key AE08 8 * dead_cedilla dead_horn
+key AE09 9 ( dead_ogonek dead_breve
+key AE10 0 ) dead_abovedot dead_abovering
+key AE11 - _ dead_macron ±
+key AE12 = + × ÷
+key AD01 q Q ¶ ° caps
+key AD02 w W caps
+key AD03 e E é É caps
+key AD04 r R ṟ Ṟ caps
+key AD05 t T ṯ Ṯ caps
+key AD06 y Y ṳ Ṳ caps
+key AD07 u U ʉ Ʉ caps
+key AD08 i I ɨ Ɨ caps
+key AD09 o O ø Ø caps
+key AD10 p P caps
+key AD11 [ {
+key AD12 ] }
+key BKSL \ | ¬ ¦
+key AC01 a A caps
+key AC02 s S ß ẞ caps
+key AC03 d D ḏ Ḏ caps
+key AC04 f F caps
+key AC05 g G ŋ Ŋ caps
+key AC06 h H caps
+key AC07 j J caps
+key AC08 k K caps
+key AC09 l L ḻ Ḻ caps
+key AC10 ː : ; dead_diaeresis
+key AC11 ʼ " '''' dead_doubleacute
+key LSGT < > | ¦
+key AB01 z Z caps
+key AB02 x X caps
+key AB03 c C ç Ç caps
+key AB04 v V caps
+key AB05 b B caps
+key AB06 n N ⁿ ᴺ caps
+key AB07 m M µ µ caps
+key AB08 , < dead_belowcomma «
+key AB09 . > dead_belowdot »
+key AB10 / ? ¿ dead_hook
+key SPCE space
+key KPDL KP_Delete KP_Decimal

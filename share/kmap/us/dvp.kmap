@@ -1,0 +1,55 @@
+kmap 1
+id us-dvp
+layout us
+variant dvp
+name English (programmer Dvorak)
+key TLDE $ ~ dead_tilde dead_tilde
+key AE01 & %
+key AE02 [ 7 ¤ type=FOUR_LEVEL_ALPHABETIC
+key AE03 { 5 ¢ type=FOUR_LEVEL_ALPHABETIC
+key AE04 } 3 ¥ type=FOUR_LEVEL_ALPHABETIC
+key AE05 ( 1 € type=FOUR_LEVEL_ALPHABETIC
+key AE06 = 9 £ dead_circumflex type=FOUR_LEVEL_ALPHABETIC
+key AE07 * 0 type=FOUR_LEVEL_ALPHABETIC
+key AE08 ) 2 ½ type=FOUR_LEVEL_ALPHABETIC
+key AE09 + 4 dead_grave dead_breve type=FOUR_LEVEL_ALPHABETIC
+key AE10 ] 6 type=FOUR_LEVEL_ALPHABETIC
+key AE11 ! 8 ¡ ⸘ type=FOUR_LEVEL_ALPHABETIC
+key AE12 '#' ` dead_grave
+key AD01 ; : dead_diaeresis dead_diaeresis
+key AD02 , < « U201C
+key AD03 . > » U201D
+key AD04 p P ¶ § caps
+key AD05 y Y ü Ü caps
+key AD06 f F caps
+key AD07 g G caps
+key AD08 c C ç Ç caps
+key AD09 r R ® ™ caps
+key AD10 l L caps
+key AD11 / ? ¿ ‽
+key AD12 @ ^ dead_circumflex dead_caron
+key BKSL \ |
+key AC01 a A å Å caps
+key AC02 o O ø Ø caps
+key AC03 e E æ Æ caps
+key AC04 u U é É caps
+key AC05 i I caps
+key AC06 d D ð Ð caps
+key AC07 h H dead_acute caps
+key AC08 t T þ Þ caps
+key AC09 n N ñ Ñ caps
+key AC10 s S ß ẞ caps
+key AC11 - _ ­ – type=FOUR_LEVEL_ALPHABETIC
+key LSGT < > | ¦
+key AB01 '''' " dead_acute dead_doubleacute
+key AB02 q Q caps
+key AB03 j J caps
+key AB04 k K caps
+key AB05 x X caps
+key AB06 b B caps
+key AB07 m M caps
+key AB08 w W caps
+key AB09 v V caps
+key AB10 z Z caps
+key SPCE space
+key KPDL KP_Delete KP_Decimal

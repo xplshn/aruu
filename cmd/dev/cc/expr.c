@@ -644,6 +644,21 @@ decodechar(
         c = '\v';
         ++s;
         break;
+      case 'u':
+      case 'U':
+        /* a universal character name names a code point, written as a
+         * character of the literal's encoding would be */
+        n = *s == 'u' ? 4 : 8;
+        ++s;
+        c = 0;
+        while (n-- > 0) {
+          v = hexval(*s++);
+          assert(v >= 0);
+          c = c * 16 + v;
+        }
+        if (c > 0x10ffff || (c >= 0xd800 && c <= 0xdfff))
+          error(loc, "%s names %#lx, which is no character", desc, (unsigned long)c);
+        break;
       case 'x':
         ++s;
         c = 0;

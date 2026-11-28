@@ -1,0 +1,56 @@
+kmap 1
+id in-guru
+layout in
+variant guru
+name Punjabi (Gurmukhi)
+level3 ralt
+key TLDE none
+key AE01 ੧
+key AE02 ੨
+key AE03 ੩ ੱ
+key AE04 ੪ ੴ ₹
+key AE05 ੫ ☬
+key AE06 ੬
+key AE07 ੭
+key AE08 ੮
+key AE09 ੯ (
+key AE10 ੦ )
+key AE11 ਃ
+key AE12 = +
+key AD01 ੌ ਔ
+key AD02 ੈ ਐ
+key AD03 ਾ ਆ
+key AD04 ੀ ਈ
+key AD05 ੂ ਊ
+key AD06 ਬ ਭ
+key AD07 ਹ ਙ
+key AD08 ਗ ਘ
+key AD09 ਦ ਧ
+key AD10 ਜ ਝ
+key AD11 ਡ ਢ
+key AD12 ਼ ਞ
+key BKSL \ |
+key AC01 ੋ ਓ
+key AC02 ੇ ਏ
+key AC03 ੍ ਅ
+key AC04 ਿ ਇ
+key AC05 ੁ ਉ
+key AC06 ਪ ਫ
+key AC07 ਰ ੜ
+key AC08 ਕ ਖ
+key AC09 ਤ ਥ
+key AC10 ਚ ਛ
+key AC11 ਟ ਠ
+key LSGT < > | ¦
+key AB01 z ਁ
+key AB02 ਂ ੰ ੱ
+key AB03 ਮ ਣ
+key AB04 ਨ ਨ
+key AB05 ਵ ਵ
+key AB06 ਲ ਲ਼
+key AB07 ਸ ਸ਼
+key AB08 , <
+key AB09 . ।
+key AB10 ਯ ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

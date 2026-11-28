@@ -1,0 +1,56 @@
+kmap 1
+id pl-ru_phonetic_dvorak
+layout pl
+variant ru_phonetic_dvorak
+name Russian (Poland, phonetic Dvorak)
+level3 ralt
+key TLDE ` ~ dead_grave dead_tilde
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^ dead_circumflex dead_circumflex
+key AE07 7 &
+key AE08 8 *
+key AE09 9 ( dead_grave dead_breve
+key AE10 0 )
+key AE11 [ {
+key AE12 ] } dead_tilde
+key AD01 '''' " dead_acute dead_diaeresis
+key AD02 , < dead_cedilla dead_caron
+key AD03 . > dead_abovedot ·
+key AD04 п П ь Ь caps
+key AD05 ы Ы caps
+key AD06 ф Ф caps
+key AD07 г Г caps
+key AD08 ц Ц ч Ч caps
+key AD09 р Р ь Ь caps
+key AD10 л Л ь Ь caps
+key AD11 / ?
+key AD12 = +
+key BKSL \ |
+key AC01 а А я Я caps
+key AC02 о О ё Ё caps
+key AC03 е Е э Э caps
+key AC04 у У ю Ю caps
+key AC05 и И caps
+key AC06 д Д ь Ь caps
+key AC07 х Х caps
+key AC08 т Т ь Ь caps
+key AC09 н Н ь Ь caps
+key AC10 с С ш Ш caps
+key AC11 - _
+key LSGT < > | ¦
+key AB01 ; : dead_ogonek dead_doubleacute
+key AB02 я Я caps
+key AB03 й Й caps
+key AB04 к К caps
+key AB05 щ Щ caps
+key AB06 б Б ъ Ъ caps
+key AB07 м М caps
+key AB08 в В щ Щ caps
+key AB09 в В щ Щ caps
+key AB10 з З ж Ж caps
+key SPCE space
+key KPDL KP_Delete KP_Separator

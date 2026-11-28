@@ -1,0 +1,56 @@
+kmap 1
+id il-phonetic
+layout il
+variant phonetic
+name Hebrew (phonetic)
+level3 ralt
+key TLDE ` ~ ׳
+key AE01 1 ! type=FOUR_LEVEL
+key AE02 2 @ type=FOUR_LEVEL
+key AE03 3 '#' €
+key AE04 4 $ ₪
+key AE05 5 % °
+key AE06 6 ^ ֫
+key AE07 7 & ֽ
+key AE08 8 * ×
+key AE09 9 ( U200E
+key AE10 0 ) U200F
+key AE11 - _ ־
+key AE12 = + –
+key AD01 ק ק ׂ type=FOUR_LEVEL_SEMIALPHABETIC
+key AD02 ו ו ׁ type=FOUR_LEVEL_SEMIALPHABETIC
+key AD03 א א ָ type=FOUR_LEVEL_SEMIALPHABETIC
+key AD04 ר ר ֳ type=FOUR_LEVEL_SEMIALPHABETIC
+key AD05 ת ט type=FOUR_LEVEL_SEMIALPHABETIC
+key AD06 ע ע װ type=FOUR_LEVEL_SEMIALPHABETIC
+key AD07 ו ו ֹ type=FOUR_LEVEL_SEMIALPHABETIC
+key AD08 י י type=FOUR_LEVEL_SEMIALPHABETIC
+key AD09 ס ס type=FOUR_LEVEL_SEMIALPHABETIC
+key AD10 פ ף ַ type=FOUR_LEVEL_SEMIALPHABETIC
+key AD11 [ { ֲ
+key AD12 ] } ֿ
+key BKSL \ | ֻ
+key AC01 א א ְ type=FOUR_LEVEL_SEMIALPHABETIC
+key AC02 ש ש ּ type=FOUR_LEVEL_SEMIALPHABETIC
+key AC03 ד ד type=FOUR_LEVEL_SEMIALPHABETIC
+key AC04 פ ף type=FOUR_LEVEL_SEMIALPHABETIC
+key AC05 ג ג ױ type=FOUR_LEVEL_SEMIALPHABETIC
+key AC06 ה ה ײ type=FOUR_LEVEL_SEMIALPHABETIC
+key AC07 י י ִ type=FOUR_LEVEL_SEMIALPHABETIC
+key AC08 כ ך type=FOUR_LEVEL_SEMIALPHABETIC
+key AC09 ל ל ” type=FOUR_LEVEL_SEMIALPHABETIC
+key AC10 ; : „ type=FOUR_LEVEL_SEMIALPHABETIC
+key AC11 '''' " ״
+key LSGT < > | ¦
+key AB01 ז ז type=FOUR_LEVEL_SEMIALPHABETIC
+key AB02 ח ח ֶ type=FOUR_LEVEL_SEMIALPHABETIC
+key AB03 צ ץ ֱ type=FOUR_LEVEL_SEMIALPHABETIC
+key AB04 ו ו type=FOUR_LEVEL_SEMIALPHABETIC
+key AB05 ב ב VoidSymbol ׆ type=FOUR_LEVEL_SEMIALPHABETIC
+key AB06 נ ן type=FOUR_LEVEL_SEMIALPHABETIC
+key AB07 מ ם ֵ type=FOUR_LEVEL_SEMIALPHABETIC
+key AB08 , < ’ type=FOUR_LEVEL_SEMIALPHABETIC
+key AB09 . > ‚ type=FOUR_LEVEL_SEMIALPHABETIC
+key AB10 / ? ÷
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,3 @@
+kmap 1
+id lv3:caps_switch_latch
+key CAPS ISO_Level3_Shift ISO_Level3_Shift ISO_Level3_Latch type=THREE_LEVEL

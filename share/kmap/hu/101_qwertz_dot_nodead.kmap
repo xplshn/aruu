@@ -1,0 +1,56 @@
+kmap 1
+id hu-101_qwertz_dot_nodead
+layout hu
+variant 101_qwertz_dot_nodead
+name Hungarian (QWERTZ, 101-key, dot, no dead keys)
+level3 ralt
+key TLDE í Í 0 § caps
+key AE01 1 '''' ~ ¡
+key AE02 2 " ˇ ⅛
+key AE03 3 + ^ £
+key AE04 4 ! ˘ $
+key AE05 5 % ° ⅜
+key AE06 6 / ˛ ⅝
+key AE07 7 = ` ⅞
+key AE08 8 ( ˙ ™
+key AE09 9 ) ´ ±
+key AE10 ö Ö ˝ ° caps
+key AE11 ü Ü ¨ ¿ caps
+key AE12 ó Ó ¸ dead_ogonek caps
+key AD01 q Q \ Ω caps
+key AD02 w W | § caps
+key AD03 e E Ä E caps
+key AD04 r R ¶ ® caps
+key AD05 t T ŧ Ŧ caps
+key AD06 z Z – ¥ caps
+key AD07 u U € ↑ caps
+key AD08 i I Í í caps
+key AD09 o O „ Ø caps
+key AD10 p P ” Þ caps
+key AD11 ő Ő ÷ dead_abovering caps
+key AD12 ú Ú × dead_macron caps
+key BKSL ű Ű ¤ dead_breve caps
+key AC01 a A ä Ä caps
+key AC02 s S đ ẞ caps
+key AC03 d D Đ Ð caps
+key AC04 f F [ ª caps
+key AC05 g G ] Ŋ caps
+key AC06 h H ħ Ħ caps
+key AC07 j J í Í caps
+key AC08 k K ł & caps
+key AC09 l L Ł Ł caps
+key AC10 é É $ ¢ caps
+key AC11 á Á ß ẞ caps
+key LSGT < > | ¦
+key AB01 y Y > < caps
+key AB02 x X '#' > caps
+key AB03 c C & © caps
+key AB04 v V @ ‚ caps
+key AB05 b B { ‘ caps
+key AB06 n N } ’ caps
+key AB07 m M < º caps
+key AB08 , ? ; ×
+key AB09 . : > ÷
+key AB10 - _ * dead_abovedot
+key SPCE space
+key KPDL KP_Delete KP_Decimal

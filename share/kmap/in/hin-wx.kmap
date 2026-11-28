@@ -1,0 +1,56 @@
+kmap 1
+id in-hin-wx
+layout in
+variant hin-wx
+name Hindi (Wx)
+level3 ralt
+key TLDE ` ~ 2 3
+key AE01 १ !
+key AE02 २ @
+key AE03 ३ '#'
+key AE04 ४ $ ₹
+key AE05 ५ %
+key AE06 ६ ^
+key AE07 ७ &
+key AE08 ८ *
+key AE09 ९ (
+key AE10 ० )
+key AE11 - _
+key AE12 = +
+key AD01 ृ ॄ ऋ ॠ
+key AD02 त थ
+key AD03 े ै ए ऐ
+key AD04 र ष
+key AD05 ट ठ
+key AD06 य
+key AD07 ु ू उ ऊ
+key AD08 ि ी इ ई
+key AD09 ो ौ ओ औ
+key AD10 प फ
+key AD11 [ {
+key AD12 ] }
+key BKSL \ | । ॥
+key AC01 ् ा अ आ
+key AC02 स श
+key AC03 ड ढ
+key AC04 ङ ञ
+key AC05 ग घ
+key AC06 ह ः
+key AC07 ज झ
+key AC08 क ख
+key AC09 ल ॢ ळ ऌ
+key AC10 ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ँ ़ ऽ ॐ
+key AB02 द ध
+key AB03 च छ
+key AB04 व
+key AB05 ब भ
+key AB06 न ण
+key AB07 म ं
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

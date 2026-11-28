@@ -1,0 +1,4 @@
+kmap 1
+id ctrl:swap_ralt_rctl
+key RCTL Alt_R Meta_R
+key RALT Control_R Control_R

@@ -1,0 +1,56 @@
+kmap 1
+id cz-rus
+layout cz
+variant rus
+name Russian (Czechia, phonetic)
+level3 ralt
+key TLDE ё Ё ` ~ caps
+key AE01 + & 1 1
+key AE02 ъ 2 2 2
+key AE03 ш Ш 3 3 caps
+key AE04 ч Ч 4 4 caps
+key AE05 щ Щ 5 5 caps
+key AE06 ж Ж 6 6 caps
+key AE07 " 4 7 7
+key AE08 § 5 8 8
+key AE09 $ 6 9 9
+key AE10 = 7 0 0
+key AE11 % 8 \ dead_diaeresis
+key AE12 '''' 9 dead_macron dead_cedilla
+key AD01 № 1 q Q
+key AD02 ю Ю w W caps
+key AD03 е Е e E caps
+key AD04 р Р r R caps
+key AD05 т Т t T caps
+key AD06 ы Ы y Y caps
+key AD07 у У u U caps
+key AD08 и И i I caps
+key AD09 о О o O caps
+key AD10 п П p P caps
+key AD11 э Э [ ÷ caps
+key AD12 ) ( ] ×
+key BKSL \ ¦ \ |
+key AC01 а А a A caps
+key AC02 с С s S caps
+key AC03 д Д d D caps
+key AC04 ф Ф f F caps
+key AC05 г Г g G caps
+key AC06 х Х h H caps
+key AC07 й Й j J caps
+key AC08 к К k K caps
+key AC09 л Л l L caps
+key AC10 ь Ь < > caps
+key AC11 ; : '''' ß
+key LSGT | ¦ / ¦
+key AB01 з З z Z caps
+key AB02 я Я x X caps
+key AB03 ц Ц c C caps
+key AB04 в В v V caps
+key AB05 б Б b B caps
+key AB06 н Н n N caps
+key AB07 м М m M caps
+key AB08 , ? < ×
+key AB09 . ! > ÷
+key AB10 - / * dead_abovedot
+key SPCE space space space space
+key KPDL KP_Delete KP_Decimal

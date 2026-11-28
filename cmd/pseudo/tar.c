@@ -421,7 +421,7 @@ archive(const char *path)
     }
   }
 
-  putoctal(h->mode, (unsigned)st.st_mode & 0777, sizeof(h->mode));
+  putoctal(h->mode, (unsigned)st.st_mode & 07777, sizeof(h->mode));
   putoctal(h->uid, (unsigned)st.st_uid, sizeof(h->uid));
   putoctal(h->gid, (unsigned)st.st_gid, sizeof(h->gid));
   putoctal(h->mtime, (unsigned)st.st_mtime, sizeof(h->mtime));

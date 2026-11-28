@@ -1,0 +1,3 @@
+kmap 1
+id caps:ctrl_shifted_capslock
+key CAPS Control_L Caps_Lock

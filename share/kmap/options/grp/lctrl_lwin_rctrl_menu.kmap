@@ -1,0 +1,4 @@
+kmap 1
+id grp:lctrl_lwin_rctrl_menu
+key LWIN Super_L ISO_First_Group type=PC_CONTROL_LEVEL2
+key COMP Menu ISO_Last_Group type=PC_CONTROL_LEVEL2

@@ -1,0 +1,17 @@
+kmap 1
+id keypad:oss_wang
+key KPMU KP_Multiply ⋅ 0x010000d7 VoidSymbol XF86ClearGrab type=CTRL+ALT
+key KP7 KP_Home KP_7 < ↖ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP8 KP_Up KP_8 > U2191 type=FOUR_LEVEL_MIXED_KEYPAD
+key KP9 KP_Prior KP_9 ^ ↗ type=FOUR_LEVEL_MIXED_KEYPAD
+key KPSU KP_Subtract − − VoidSymbol XF86Prev_VMode type=CTRL+ALT
+key KP4 KP_Left KP_4 [ U2190 type=FOUR_LEVEL_MIXED_KEYPAD
+key KP5 KP_Begin KP_5 ] ↔ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP6 KP_Right KP_6 $ U2192 type=FOUR_LEVEL_MIXED_KEYPAD
+key KPAD KP_Add 0x0100002b 0x0100002b VoidSymbol XF86Next_VMode type=CTRL+ALT
+key KP1 KP_End KP_1 & ↙ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP2 KP_Down KP_2 @ U2193 type=FOUR_LEVEL_MIXED_KEYPAD
+key KP3 KP_Next KP_3 '#' ↘ type=FOUR_LEVEL_MIXED_KEYPAD
+key KP0 KP_Insert KP_0 '''' ↕ type=FOUR_LEVEL_MIXED_KEYPAD
+key KPDL KP_Delete . ,   type=FOUR_LEVEL_MIXED_KEYPAD
+key KPDV KP_Divide ∕ 0x010000f7 VoidSymbol XF86Ungrab type=CTRL+ALT

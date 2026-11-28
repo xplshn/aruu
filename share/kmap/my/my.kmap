@@ -1,0 +1,55 @@
+kmap 1
+id my
+layout my
+name Malay (Jawi, Arabic Keyboard)
+level3 ralt
+key TLDE none
+key AE01 ١ ! 1
+key AE02 ٢ @ 2
+key AE03 ٣ '#' 3
+key AE04 ٤ $ 4
+key AE05 ٥ ٪ 5
+key AE06 ٦ ^ 6
+key AE07 ٧ & 7
+key AE08 ٨ * 8
+key AE09 ٩ ) 9
+key AE10 ٠ ( 0
+key AE11 - _
+key AE12 = +
+key AD01 ض چ
+key AD02 ص ڠ
+key AD03 ث ڬ
+key AD04 ق U0640
+key AD05 ف ﻹ ڤ
+key AD06 غ إ
+key AD07 ع `
+key AD08 ه ÷
+key AD09 خ ×
+key AD10 ک ؛
+key AD11 ج < چ
+key AD12 د >
+key BKSL \ |
+key AC01 ش ۏ
+key AC02 س ڨ
+key AC03 ي ]
+key AC04 ب [ پ
+key AC05 ل ﻷ
+key AC06 ا أ
+key AC07 ت ـ
+key AC08 ن ،
+key AC09 م /
+key AC10 ک : گ
+key AC11 ط "
+key LSGT | ¦ | ¦
+key AB01 ئ ~ »
+key AB02 ء ڽ «
+key AB03 ؤ }
+key AB04 ر {
+key AB05 ﻻ ﻵ
+key AB06 ى آ
+key AB07 ة ''''
+key AB08 و U200C ,
+key AB09 ز .
+key AB10 ظ ؟
+key SPCE space
+key KPDL KP_Delete KP_Decimal

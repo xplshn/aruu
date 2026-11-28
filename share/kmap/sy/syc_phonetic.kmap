@@ -1,0 +1,55 @@
+kmap 1
+id sy-syc_phonetic
+layout sy
+variant syc_phonetic
+name Syriac (phonetic)
+key TLDE ܏ U032E ّ
+key AE01 1 ! ܁
+key AE02 2 U030A ܂
+key AE03 3 U0325 ܃
+key AE04 4 ݉ ܄
+key AE05 5 ♰ ܅
+key AE06 6 ♱ ܈
+key AE07 7 ܊ ܉
+key AE08 8 » ܋
+key AE09 9 ) ܌
+key AE10 0 ( ܍
+key AE11 - « U250C
+key AE12 = + U2510
+key AD01 ܩ ܰ َ
+key AD02 ܘ ܳ ً
+key AD03 ܖ ܶ ُ
+key AD04 ܪ ܺ ٌ
+key AD05 ܬ ܽ ٓ
+key AD06 ܝ ݀ ٔ
+key AD07 ܜ ݁ ݇
+key AD08 ܥ U0308 ݃
+key AD09 ܧ U0304 ݅
+key AD10 ܦ U0307 U032D
+key AD11 ] combining_tilde
+key AD12 [ ݊
+key BKSL ܆ :
+key AC01 ܐ ܱ ِ
+key AC02 ܣ ܴ ٍ
+key AC03 ܕ ܷ
+key AC04 ܔ ܻ ء
+key AC05 ܓ ܾ ٕ
+key AC06 ܗ ܑ ٰ
+key AC07 ܛ ـ ݈
+key AC08 ܟ U0324 ݄
+key AC09 ܠ U0331 ݆
+key AC10 ܚ combining_belowdot
+key AC11 ܞ U0330
+key LSGT < > | ¦
+key AB01 ܙ ܲ ْ
+key AB02 ܨ ܵ
+key AB03 ܤ ܸ U200D
+key AB04 ܫ ܼ U200C
+key AB05 ܒ ܿ U200E
+key AB06 ܢ ܹ U200F
+key AB07 ܡ ݂
+key AB08 ܀ ،
+key AB09 . ؛
+key AB10 ܇ ؟
+key SPCE space U200C
+key KPDL KP_Delete KP_Decimal

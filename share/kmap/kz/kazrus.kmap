@@ -1,0 +1,55 @@
+kmap 1
+id kz-kazrus
+layout kz
+variant kazrus
+name Kazakh (with Russian)
+key TLDE ё Ё caps type=FOUR_LEVEL_ALPHABETIC
+key AE01 1 ! type=FOUR_LEVEL
+key AE02 2 " @
+key AE03 3 № '#'
+key AE04 4 ; $
+key AE05 5 % type=FOUR_LEVEL
+key AE06 6 : ^
+key AE07 7 ? &
+key AE08 8 * type=FOUR_LEVEL
+key AE09 9 ( type=FOUR_LEVEL
+key AE10 0 ) type=FOUR_LEVEL
+key AE11 - _ type=FOUR_LEVEL
+key AE12 = + type=FOUR_LEVEL
+key AD01 й Й caps type=FOUR_LEVEL_ALPHABETIC
+key AD02 ң Ң ц Ц caps
+key AD03 у У caps type=FOUR_LEVEL_ALPHABETIC
+key AD04 к К қ Қ caps
+key AD05 е Е ё Ё caps
+key AD06 н Н caps type=FOUR_LEVEL_ALPHABETIC
+key AD07 г Г caps type=FOUR_LEVEL_ALPHABETIC
+key AD08 ш Ш caps type=FOUR_LEVEL_ALPHABETIC
+key AD09 ғ Ғ щ Щ caps
+key AD10 з З caps type=FOUR_LEVEL_ALPHABETIC
+key AD11 х Х һ Һ caps
+key AD12 ұ Ұ ъ Ъ caps
+key BKSL \ / |
+key AC01 ө Ө ф Ф caps
+key AC02 ы Ы caps type=FOUR_LEVEL_ALPHABETIC
+key AC03 қ Қ в В caps
+key AC04 а А caps type=FOUR_LEVEL_ALPHABETIC
+key AC05 п П caps type=FOUR_LEVEL_ALPHABETIC
+key AC06 р Р caps type=FOUR_LEVEL_ALPHABETIC
+key AC07 о О caps type=FOUR_LEVEL_ALPHABETIC
+key AC08 л Л caps type=FOUR_LEVEL_ALPHABETIC
+key AC09 д Д caps type=FOUR_LEVEL_ALPHABETIC
+key AC10 ж Ж caps type=FOUR_LEVEL_ALPHABETIC
+key AC11 ә Ә э Э caps
+key LSGT < > | ¦
+key AB01 я Я caps type=FOUR_LEVEL_ALPHABETIC
+key AB02 і І ч Ч caps
+key AB03 с С caps type=FOUR_LEVEL_ALPHABETIC
+key AB04 м М caps type=FOUR_LEVEL_ALPHABETIC
+key AB05 и И caps type=FOUR_LEVEL_ALPHABETIC
+key AB06 т Т caps type=FOUR_LEVEL_ALPHABETIC
+key AB07 ү Ү ь Ь caps
+key AB08 б Б caps type=FOUR_LEVEL_ALPHABETIC
+key AB09 ю Ю caps type=FOUR_LEVEL_ALPHABETIC
+key AB10 . , / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

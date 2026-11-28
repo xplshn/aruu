@@ -1,0 +1,56 @@
+kmap 1
+id ge-mess
+layout ge
+variant mess
+name Georgian (MESS)
+level3 ralt
+key TLDE ჭ \ ` ~
+key AE01 1 ! ''''
+key AE02 2 @ ~
+key AE03 3 U2116 '#'
+key AE04 4 $ €
+key AE05 5 % €
+key AE06 6 ^
+key AE07 7 & §
+key AE08 8 * °
+key AE09 9 (
+key AE10 0 ) U2014
+key AE11 - _ U2013
+key AE12 ჟ + |
+key AD01 ქ Q
+key AD02 წ W
+key AD03 ე E ჱ
+key AD04 რ R ®
+key AD05 ტ T
+key AD06 ყ Y ჸ
+key AD07 უ U
+key AD08 ი I ჲ
+key AD09 ო O
+key AD10 პ P
+key AD11 შ [ «
+key AD12 ღ ] »
+key BKSL = / | ~
+key AC01 ა A ჺ
+key AC02 ს S
+key AC03 დ D
+key AC04 ფ F ჶ
+key AC05 გ G ჹ
+key AC06 ჰ H ჱ
+key AC07 ჯ J ჷ
+key AC08 კ K
+key AC09 ლ L
+key AC10 თ U201E
+key AC11 ჩ U201C
+key LSGT « » | ¦
+key AB01 ზ Z ჵ
+key AB02 ხ X ჴ
+key AB03 ც C ©
+key AB04 ვ V ჳ
+key AB05 ბ B
+key AB06 ნ N ჼ
+key AB07 მ M
+key AB08 , ; <
+key AB09 . : >
+key AB10 ძ ? ჻
+key SPCE space
+key KPDL KP_Delete KP_Decimal

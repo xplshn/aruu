@@ -1,0 +1,498 @@
+kmap 1
+id pc
+name the pc keyboard, its keys and modifiers, under every layout
+key ESC Escape
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key BKSP BackSpace BackSpace
+key TAB Tab ISO_Left_Tab
+key AD01 q Q caps
+key AD02 w W caps
+key AD03 e E caps
+key AD04 r R caps
+key AD05 t T caps
+key AD06 y Y caps
+key AD07 u U caps
+key AD08 i I caps
+key AD09 o O caps
+key AD10 p P caps
+key AD11 [ {
+key AD12 ] }
+key RTRN Return
+key LCTL Control_L
+key AC01 a A caps
+key AC02 s S caps
+key AC03 d D caps
+key AC04 f F caps
+key AC05 g G caps
+key AC06 h H caps
+key AC07 j J caps
+key AC08 k K caps
+key AC09 l L caps
+key AC10 ; :
+key AC11 '''' "
+key TLDE ` ~
+key LFSH Shift_L
+key BKSL \ |
+key AB01 z Z caps
+key AB02 x X caps
+key AB03 c C caps
+key AB04 v V caps
+key AB05 b B caps
+key AB06 n N caps
+key AB07 m M caps
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key RTSH Shift_R
+key KPMU KP_Multiply KP_Multiply KP_Multiply KP_Multiply XF86ClearGrab type=CTRL+ALT
+key LALT Alt_L
+key SPCE space
+key CAPS Caps_Lock
+key FK01 F1 F1 F1 F1 XF86Switch_VT_1 type=CTRL+ALT
+key FK02 F2 F2 F2 F2 XF86Switch_VT_2 type=CTRL+ALT
+key FK03 F3 F3 F3 F3 XF86Switch_VT_3 type=CTRL+ALT
+key FK04 F4 F4 F4 F4 XF86Switch_VT_4 type=CTRL+ALT
+key FK05 F5 F5 F5 F5 XF86Switch_VT_5 type=CTRL+ALT
+key FK06 F6 F6 F6 F6 XF86Switch_VT_6 type=CTRL+ALT
+key FK07 F7 F7 F7 F7 XF86Switch_VT_7 type=CTRL+ALT
+key FK08 F8 F8 F8 F8 XF86Switch_VT_8 type=CTRL+ALT
+key FK09 F9 F9 F9 F9 XF86Switch_VT_9 type=CTRL+ALT
+key FK10 F10 F10 F10 F10 XF86Switch_VT_10 type=CTRL+ALT
+key NMLK Num_Lock
+key SCLK Scroll_Lock
+key KP7 KP_Home KP_7
+key KP8 KP_Up KP_8
+key KP9 KP_Prior KP_9
+key KPSU KP_Subtract KP_Subtract KP_Subtract KP_Subtract XF86Prev_VMode type=CTRL+ALT
+key KP4 KP_Left KP_4
+key KP5 KP_Begin KP_5
+key KP6 KP_Right KP_6
+key KPAD KP_Add KP_Add KP_Add KP_Add XF86Next_VMode type=CTRL+ALT
+key KP1 KP_End KP_1
+key KP2 KP_Down KP_2
+key KP3 KP_Next KP_3
+key KP0 KP_Insert KP_0
+key KPDL KP_Delete KP_Decimal
+key LVL3 ISO_Level3_Shift
+key ZEHA F24 XF86TouchpadToggle type=PC_CONTROL_SUPER_LEVEL2
+key LSGT < > | ¦
+key FK11 F11 F11 F11 F11 XF86Switch_VT_11 type=CTRL+ALT
+key FK12 F12 F12 F12 F12 XF86Switch_VT_12 type=CTRL+ALT
+key KATA Katakana
+key HIRA Hiragana
+key HENK Henkan_Mode
+key HKTG Hiragana_Katakana
+key MUHE Muhenkan
+key KPEN KP_Enter
+key RCTL Control_R
+key KPDV KP_Divide KP_Divide KP_Divide KP_Divide XF86Ungrab type=CTRL+ALT
+key PRSC Print Sys_Req type=PC_ALT_LEVEL2
+key RALT Alt_R
+key LNFD Linefeed
+key HOME Home
+key UP Up
+key PGUP Prior
+key LEFT Left
+key RGHT Right
+key END End
+key DOWN Down
+key PGDN Next
+key INS Insert
+key DELE Delete
+key MUTE XF86AudioMute
+key VOL- XF86AudioLowerVolume
+key VOL+ XF86AudioRaiseVolume
+key POWR XF86PowerOff
+key KPEQ KP_Equal
+key I126 ±
+key PAUS Pause Break type=PC_CONTROL_LEVEL2
+key I128 XF86LaunchA
+key I129 KP_Decimal KP_Decimal
+key HNGL Hangul
+key HJCV Hangul_Hanja
+key LWIN Super_L
+key RWIN Super_R
+key COMP Menu
+key STOP Cancel
+key AGAI Redo
+key PROP SunProps
+key UNDO Undo
+key FRNT SunFront
+key COPY XF86Copy
+key OPEN XF86Open
+key PAST XF86Paste
+key FIND Find
+key CUT XF86Cut
+key HELP Help
+key I147 XF86MenuKB
+key I148 XF86Calculator
+key I150 XF86Sleep
+key I151 XF86WakeUp
+key I152 XF86Explorer
+key I153 XF86Send
+key I155 XF86Xfer
+key I156 XF86Launch1
+key I157 XF86Launch2
+key I158 XF86WWW
+key I159 XF86DOS
+key I160 XF86ScreenSaver
+key I161 XF86RotateWindows
+key I162 XF86TaskPane
+key I163 XF86Mail
+key I164 XF86Favorites
+key I165 XF86MyComputer
+key I166 XF86Back
+key I167 XF86Forward
+key I169 XF86Eject
+key I170 XF86Eject
+key I171 XF86AudioNext
+key I172 XF86AudioPlay XF86AudioPause
+key I173 XF86AudioPrev
+key I174 XF86AudioStop XF86Eject
+key I175 XF86AudioRecord
+key I176 XF86AudioRewind
+key I177 XF86Phone
+key I179 XF86Tools
+key I180 XF86HomePage
+key I181 XF86Reload
+key I182 XF86Close
+key I185 XF86ScrollUp
+key I186 XF86ScrollDown
+key I187 (
+key I188 )
+key I189 XF86New
+key I190 Redo
+key FK13 XF86Tools
+key FK14 XF86Launch5
+key FK15 XF86Launch6
+key FK16 XF86Launch7
+key FK17 XF86Launch8
+key FK18 XF86Launch9
+key FK19 F19
+key FK20 XF86AudioMicMute
+key FK21 XF86TouchpadToggle
+key FK22 XF86TouchpadOn
+key FK23 XF86TouchpadOff XF86Assistant type=PC_SHIFT_SUPER_LEVEL2
+key FK24 F24 XF86TouchpadToggle type=PC_CONTROL_SUPER_LEVEL2
+key LVL5 ISO_Level5_Shift
+key ALT none Alt_L
+key META none Meta_L
+key SUPR none Super_L
+key HYPR none Hyper_L
+key I208 XF86AudioPlay
+key I209 XF86AudioPause
+key I210 XF86Launch3
+key I211 XF86Launch4
+key I212 XF86LaunchB
+key I213 XF86Suspend
+key I214 XF86Close
+key I215 XF86AudioPlay
+key I216 XF86AudioForward
+key I217 XF86AudioBassBoost
+key I218 Print
+key I220 XF86WebCam
+key I221 XF86AudioPreset
+key I223 XF86Mail
+key I224 XF86Messenger
+key I225 XF86Search
+key I226 XF86Go
+key I227 XF86Finance
+key I228 XF86Game
+key I229 XF86Shop
+key I231 Cancel
+key I232 XF86MonBrightnessDown
+key I233 XF86MonBrightnessUp
+key I234 XF86AudioMedia
+key I235 XF86Display
+key I236 XF86KbdLightOnOff
+key I237 XF86KbdBrightnessDown
+key I238 XF86KbdBrightnessUp
+key I239 XF86Send
+key I240 XF86Reply
+key I241 XF86MailForward
+key I242 XF86Save
+key I243 XF86Documents
+key I244 XF86Battery
+key I245 XF86Bluetooth
+key I246 XF86WLAN
+key I247 XF86UWB
+key I249 XF86Next_VMode
+key I250 XF86Prev_VMode
+key I251 XF86MonBrightnessCycle
+key I252 XF86BrightnessAuto
+key I253 XF86DisplayOff
+key I254 XF86WWAN
+key I255 XF86RFKill
+key I256 XF86AudioMicMute
+key I360 XF86OK
+key I361 XF86Select
+key I362 XF86GoTo
+key I363 XF86Clear
+key I365 XF86Option
+key I366 XF86Info
+key I367 XF86Time
+key I368 XF86VendorLogo
+key I370 XF86MediaSelectProgramGuide
+key I371 XF86NextFavorite
+key I372 XF86Favorites
+key I373 XF86MediaSelectProgramGuide
+key I374 XF86MediaSelectHome
+key I376 XF86MediaLanguageMenu
+key I377 XF86MediaTitleMenu
+key I378 XF86Subtitle
+key I379 XF86CycleAngle
+key I380 XF86FullScreen
+key I381 XF86AudioChannelMode
+key I382 XF86Keyboard
+key I383 XF86AspectRatio
+key I384 XF86MediaSelectPC
+key I385 XF86MediaSelectTV
+key I386 XF86MediaSelectCable
+key I387 XF86MediaSelectVCR
+key I388 XF86MediaSelectVCRPlus
+key I389 XF86MediaSelectSatellite
+key I391 XF86CD
+key I392 XF86MediaSelectTape
+key I393 XF86MediaSelectRadio
+key I394 XF86MediaSelectTuner
+key I395 XF86MediaPlayer
+key I396 XF86MediaSelectTeletext
+key I397 XF86DVD
+key I398 XF86MediaSelectAuxiliary
+key I400 XF86Audio
+key I401 XF86Video
+key I404 XF86Memo
+key I405 XF86Calendar
+key I406 XF86Red
+key I407 XF86Green
+key I408 XF86Yellow
+key I409 XF86Blue
+key I410 XF86ChannelUp
+key I411 XF86ChannelDown
+key I417 XF86MediaPlaySlow
+key I418 XF86AudioRandomPlay
+key I419 XF86Break
+key I421 XF86NumberEntryMode
+key I424 XF86VideoPhone
+key I425 XF86Game
+key I426 XF86ZoomIn
+key I427 XF86ZoomOut
+key I428 XF86ZoomReset
+key I429 XF86Word
+key I430 XF86Editor
+key I431 XF86Excel
+key I432 XF86GraphicsEditor
+key I433 XF86Presentation
+key I434 XF86Database
+key I435 XF86News
+key I436 XF86Voicemail
+key I437 XF86Addressbook
+key I438 XF86Messenger
+key I439 XF86DisplayToggle
+key I440 XF86SpellCheck
+key I441 XF86LogOff
+key I442 $
+key I443 €
+key I444 XF86FrameBack
+key I445 XF86FrameForward
+key I446 XF86ContextMenu
+key I447 XF86MediaRepeat
+key I448 XF8610ChannelsUp
+key I449 XF8610ChannelsDown
+key I450 XF86Images
+key I452 XF86NotificationCenter
+key I453 XF86PickupPhone
+key I454 XF86HangupPhone
+key I455 XF86LinkPhone
+key I472 XF86Fn
+key I473 XF86Fn_Esc
+key I474 XF86Fn_F1
+key I475 XF86Fn_F2
+key I476 XF86Fn_F3
+key I477 XF86Fn_F4
+key I478 XF86Fn_F5
+key I479 XF86Fn_F6
+key I480 XF86Fn_F7
+key I481 XF86Fn_F8
+key I482 XF86Fn_F9
+key I483 XF86Fn_F10
+key I484 XF86Fn_F11
+key I485 XF86Fn_F12
+key I486 XF86Fn_1
+key I487 XF86Fn_2
+key I488 XF86Fn_D
+key I489 XF86Fn_E
+key I490 XF86Fn_F
+key I491 XF86Fn_S
+key I492 XF86Fn_B
+key I493 XF86FnRightShift
+key I505 braille_dot_1
+key I506 braille_dot_2
+key I507 braille_dot_3
+key I508 braille_dot_4
+key I509 braille_dot_5
+key I510 braille_dot_6
+key I511 braille_dot_7
+key I512 braille_dot_8
+key I513 braille_dot_9
+key I514 braille_dot_1
+key I520 XF86Numeric0
+key I521 XF86Numeric1
+key I522 XF86Numeric2
+key I523 XF86Numeric3
+key I524 XF86Numeric4
+key I525 XF86Numeric5
+key I526 XF86Numeric6
+key I527 XF86Numeric7
+key I528 XF86Numeric8
+key I529 XF86Numeric9
+key I530 XF86NumericStar
+key I531 XF86NumericPound
+key I532 XF86NumericA
+key I533 XF86NumericB
+key I534 XF86NumericC
+key I535 XF86NumericD
+key I536 XF86CameraFocus
+key I537 XF86WPSButton
+key I538 XF86TouchpadToggle
+key I539 XF86TouchpadOn
+key I540 XF86TouchpadOff
+key I541 XF86CameraZoomIn
+key I542 XF86CameraZoomOut
+key I543 XF86CameraUp
+key I544 XF86CameraDown
+key I545 XF86CameraLeft
+key I546 XF86CameraRight
+key I547 XF86AttendantOn
+key I548 XF86AttendantOff
+key I549 XF86AttendantToggle
+key I550 XF86LightsToggle
+key I568 XF86ALSToggle
+key I569 XF86RotationLockToggle
+key I570 XF86RefreshRateToggle
+key I584 XF86Buttonconfig
+key I585 XF86Taskmanager
+key I586 XF86Journal
+key I587 XF86ControlPanel
+key I588 XF86AppSelect
+key I589 XF86Screensaver
+key I590 XF86VoiceCommand
+key I591 XF86Assistant
+key I592 ISO_Next_Group
+key I593 XF86EmojiPicker
+key I594 XF86Dictate
+key I595 XF86CameraAccessEnable
+key I596 XF86CameraAccessDisable
+key I597 XF86CameraAccessToggle
+key I598 XF86Accessibility
+key I599 XF86DoNotDisturb
+key I600 XF86BrightnessMin
+key I601 XF86BrightnessMax
+key I602 XF86ElectronicPrivacyScreenOn
+key I603 XF86ElectronicPrivacyScreenOff
+key I604 XF86ActionOnSelection
+key I605 XF86ContextualInsert
+key I606 XF86ContextualQuery
+key I616 XF86KbdInputAssistPrev
+key I617 XF86KbdInputAssistNext
+key I618 XF86KbdInputAssistPrevgroup
+key I619 XF86KbdInputAssistNextgroup
+key I620 XF86KbdInputAssistAccept
+key I621 XF86KbdInputAssistCancel
+key I622 XF86RightUp
+key I623 XF86RightDown
+key I624 XF86LeftUp
+key I625 XF86LeftDown
+key I626 XF86RootMenu
+key I627 XF86MediaTopMenu
+key I628 XF86Numeric11
+key I629 XF86Numeric12
+key I630 XF86AudioDesc
+key I631 XF863DMode
+key I632 XF86NextFavorite
+key I633 XF86StopRecord
+key I634 XF86PauseRecord
+key I635 XF86VOD
+key I636 XF86Unmute
+key I637 XF86FastReverse
+key I638 XF86SlowReverse
+key I639 XF86Data
+key I640 XF86OnScreenKeyboard
+key I641 XF86PrivacyScreenToggle
+key I642 XF86SelectiveScreenshot
+key I643 XF86NextElement
+key I644 XF86PreviousElement
+key I645 XF86AutopilotEngageToggle
+key I646 XF86MarkWaypoint
+key I647 XF86Sos
+key I648 XF86NavChart
+key I649 XF86FishingChart
+key I650 XF86SingleRangeRadar
+key I651 XF86DualRangeRadar
+key I652 XF86RadarOverlay
+key I653 XF86TraditionalSonar
+key I654 XF86ClearvuSonar
+key I655 XF86SidevuSonar
+key I656 XF86NavInfo
+key I657 XF86BrightnessAdjust
+key I664 XF86Macro1
+key I665 XF86Macro2
+key I666 XF86Macro3
+key I667 XF86Macro4
+key I668 XF86Macro5
+key I669 XF86Macro6
+key I670 XF86Macro7
+key I671 XF86Macro8
+key I672 XF86Macro9
+key I673 XF86Macro10
+key I674 XF86Macro11
+key I675 XF86Macro12
+key I676 XF86Macro13
+key I677 XF86Macro14
+key I678 XF86Macro15
+key I679 XF86Macro16
+key I680 XF86Macro17
+key I681 XF86Macro18
+key I682 XF86Macro19
+key I683 XF86Macro20
+key I684 XF86Macro21
+key I685 XF86Macro22
+key I686 XF86Macro23
+key I687 XF86Macro24
+key I688 XF86Macro25
+key I689 XF86Macro26
+key I690 XF86Macro27
+key I691 XF86Macro28
+key I692 XF86Macro29
+key I693 XF86Macro30
+key I696 XF86MacroRecordStart
+key I697 XF86MacroRecordStop
+key I698 XF86MacroPresetCycle
+key I699 XF86MacroPreset1
+key I700 XF86MacroPreset2
+key I701 XF86MacroPreset3
+key I704 XF86KbdLcdMenu1
+key I705 XF86KbdLcdMenu2
+key I706 XF86KbdLcdMenu3
+key I707 XF86KbdLcdMenu4
+key I708 XF86KbdLcdMenu5
+key I709 XF86PerformanceMode
+modmap Shift Shift_L Shift_R
+modmap Lock Caps_Lock
+modmap Control Control_L Control_R
+modmap Mod1 Alt_L Alt_R Meta_L
+modmap Mod2 Num_Lock
+modmap Mod3 ISO_Level5_Shift
+modmap Mod4 Super_L Super_R
+modmap Mod5 ISO_Level3_Shift

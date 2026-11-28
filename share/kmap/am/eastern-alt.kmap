@@ -1,0 +1,55 @@
+kmap 1
+id am-eastern-alt
+layout am
+variant eastern-alt
+name Armenian (alt. eastern)
+key TLDE ՝ ՜
+key AE01 ։ KP_1
+key AE02 ձ Ձ caps
+key AE03 յ Յ caps
+key AE04 ՛ KP_3
+key AE05 , KP_4
+key AE06 - KP_9
+key AE07 . և
+key AE08 « (
+key AE09 » )
+key AE10 օ Օ caps
+key AE11 ռ Ռ caps
+key AE12 ժ Ժ caps
+key AD01 խ Խ caps
+key AD02 ւ Ւ caps
+key AD03 է Է caps
+key AD04 ր Ր caps
+key AD05 տ Տ caps
+key AD06 ե Ե caps
+key AD07 ը Ը caps
+key AD08 ի Ի caps
+key AD09 ո Ո caps
+key AD10 պ Պ caps
+key AD11 չ Չ caps
+key AD12 ջ Ջ caps
+key BKSL '''' ՞
+key AC01 ա Ա caps
+key AC02 ս Ս caps
+key AC03 դ Դ caps
+key AC04 ֆ Ֆ caps
+key AC05 ք Ք caps
+key AC06 հ Հ caps
+key AC07 ճ Ճ caps
+key AC08 կ Կ caps
+key AC09 լ Լ caps
+key AC10 թ Թ caps
+key AC11 փ Փ caps
+key LSGT < > | ¦
+key AB01 զ Զ caps
+key AB02 ց Ց caps
+key AB03 գ Գ caps
+key AB04 վ Վ caps
+key AB05 բ Բ caps
+key AB06 ն Ն caps
+key AB07 մ Մ caps
+key AB08 շ Շ caps
+key AB09 ղ Ղ caps
+key AB10 ծ Ծ caps
+key SPCE space
+key KPDL KP_Delete KP_Decimal

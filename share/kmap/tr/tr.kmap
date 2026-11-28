@@ -1,0 +1,55 @@
+kmap 1
+id tr
+layout tr
+name Turkish
+level3 ralt
+key TLDE " é < °
+key AE01 1 ! > ¡
+key AE02 2 '''' £ ²
+key AE03 3 ^ '#' ³
+key AE04 4 + $ ¼
+key AE05 5 % ½ ⅜
+key AE06 6 & ¾ VoidSymbol
+key AE07 7 / { VoidSymbol
+key AE08 8 ( [ VoidSymbol
+key AE09 9 ) ] ±
+key AE10 0 = } °
+key AE11 * ? \ ¿
+key AE12 - _ | VoidSymbol
+key AD01 q Q @ Ω caps
+key AD02 w W VoidSymbol VoidSymbol caps
+key AD03 e E € VoidSymbol caps
+key AD04 r R ¶ ® caps
+key AD05 t T ₺ VoidSymbol caps
+key AD06 y Y ← ¥ caps
+key AD07 u U û Û caps
+key AD08 ı I î Î caps
+key AD09 o O ô Ô caps
+key AD10 p P VoidSymbol VoidSymbol caps
+key AD11 ğ Ğ dead_diaeresis dead_abovering caps
+key AD12 ü Ü ~ dead_macron caps
+key BKSL , ; ` dead_grave
+key AC01 a A â Â caps
+key AC02 s S ß VoidSymbol caps
+key AC03 d D VoidSymbol VoidSymbol caps
+key AC04 f F ª VoidSymbol caps
+key AC05 g G VoidSymbol VoidSymbol caps
+key AC06 h H VoidSymbol VoidSymbol caps
+key AC07 j J dead_hook dead_horn caps
+key AC08 k K VoidSymbol VoidSymbol caps
+key AC09 l L VoidSymbol VoidSymbol caps
+key AC10 ş Ş ´ dead_acute caps
+key AC11 i İ '''' dead_caron
+key LSGT < > | ¦
+key AB01 z Z « < caps
+key AB02 x X » > caps
+key AB03 c C ¢ © caps
+key AB04 v V „ ‚ caps
+key AB05 b B “ ‘ caps
+key AB06 n N ” ’ caps
+key AB07 m M µ º caps
+key AB08 ö Ö × VoidSymbol caps
+key AB09 ç Ç · ÷ caps
+key AB10 . : dead_abovedot dead_abovedot
+key SPCE space
+key KPDL KP_Delete KP_Separator

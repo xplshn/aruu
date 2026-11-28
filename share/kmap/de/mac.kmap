@@ -1,0 +1,56 @@
+kmap 1
+id de-mac
+layout de
+variant mac
+name German (Macintosh)
+level3 ralt
+key TLDE dead_circumflex ° „ “
+key AE01 1 ! ¡ ¬
+key AE02 2 " “ ”
+key AE03 3 § ¶ '#'
+key AE04 4 $ ¢ £
+key AE05 5 % [ ﬁ
+key AE06 6 & ] dead_circumflex
+key AE07 7 / | \
+key AE08 8 ( { ˜
+key AE09 9 ) } ·
+key AE10 0 = ≠ ¯
+key AE11 ß ? ¿ ˙
+key AE12 dead_acute dead_grave '''' ˚
+key AD01 q Q « » caps
+key AD02 w W Σ „ caps
+key AD03 e E € ‰ caps
+key AD04 r R ® ¸ caps
+key AD05 t T † U02DD caps
+key AD06 z Z Ω ˇ caps
+key AD07 u U dead_diaeresis Á caps
+key AD08 i I ⁄ Û caps
+key AD09 o O ø Ø caps
+key AD10 p P π Π caps
+key AD11 ü Ü • ° caps
+key AD12 + * ± 
+key BKSL '#' '''' ‘ ’
+key AC01 a A å Å caps
+key AC02 s S ‚ Í caps
+key AC03 d D partdifferential ™ caps
+key AC04 f F ƒ Ï caps
+key AC05 g G © Ì caps
+key AC06 h H ª Ó caps
+key AC07 j J º ı caps
+key AC08 k K Δ ˆ caps
+key AC09 l L @ ﬂ caps
+key AC10 ö Ö œ Œ caps
+key AC11 ä Ä æ Æ caps
+key LSGT < > ≤ ≥
+key AB01 y Y ¥ ‡ caps
+key AB02 x X ≈ Ù caps
+key AB03 c C ç Ç caps
+key AB04 v V √ ◊ caps
+key AB05 b B ∫ ‹ caps
+key AB06 n N dead_tilde › caps
+key AB07 m M µ ˘ caps
+key AB08 , ; ∞ ˛
+key AB09 . : … ÷
+key AB10 - _ – —
+key SPCE space
+key KPDL KP_Delete KP_Decimal

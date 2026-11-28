@@ -1,0 +1,3 @@
+kmap 1
+id altwin:prtsc_rwin
+key PRSC Super_R Super_R type=PC_ALT_LEVEL2

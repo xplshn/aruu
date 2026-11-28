@@ -1,0 +1,55 @@
+kmap 1
+id in-marathi
+layout in
+variant marathi
+name Marathi (enhanced InScript)
+key TLDE ॢ ऌ ` ~
+key AE01 १ ! 1 !
+key AE02 २ ॅ 2 @
+key AE03 ३ ऽ 3 '#'
+key AE04 ४ ₹ 4
+key AE05 ५ % 5 %
+key AE06 ६ ^ 6 ^
+key AE07 ७ ॰ 7 &
+key AE08 ८ ॐ 8 *
+key AE09 ९ ( 9 (
+key AE10 ० ) 0 )
+key AE11 - ः - _
+key AE12 ृ ऋ ॄ ॠ
+key AD01 ौ औ
+key AD02 ै ऐ
+key AD03 ा आ
+key AD04 ी ई ॣ ॡ
+key AD05 ू ऊ
+key AD06 ब भ
+key AD07 ह ङ
+key AD08 ग घ ग़
+key AD09 द ध
+key AD10 ज झ ज़
+key AD11 ड ढ ड़ ढ़
+key AD12 ़ ञ
+key BKSL ॉ ऑ \ |
+key AC01 ो ओ
+key AC02 े ए
+key AC03 ् अ
+key AC04 ि इ ॢ ऌ
+key AC05 ु उ
+key AC06 प फ none फ़
+key AC07 र ऱ
+key AC08 क ख क़ ख़
+key AC09 त थ
+key AC10 च छ ॒
+key AC11 ट ठ none ॑
+key LSGT < > | ¦
+key AB01 '''' ॲ ॓
+key AB02 ं ँ none ॐ
+key AB03 म ण ॔
+key AB04 न "
+key AB05 व ꣻ
+key AB06 ल ळ
+key AB07 स श
+key AB08 , ष ॰
+key AB09 . । ॥ ऽ
+key AB10 य ? / ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal

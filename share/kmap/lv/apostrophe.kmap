@@ -1,0 +1,56 @@
+kmap 1
+id lv-apostrophe
+layout lv
+variant apostrophe
+name Latvian (apostrophe)
+level3 ralt
+key TLDE ` ~ ´ ~
+key AE01 1 ! ¹ ¡
+key AE02 2 @ ² ⅛
+key AE03 3 '#' ³ £
+key AE04 4 $ € ¢
+key AE05 5 % ½ ⅜
+key AE06 6 ^ ¾ ⅝
+key AE07 7 & { ⅞
+key AE08 8 * [ ™
+key AE09 9 ( ] ±
+key AE10 0 ) } °
+key AE11 - _ \ ¿
+key AE12 = + – —
+key AD01 q Q q Q caps
+key AD02 w W w W caps
+key AD03 e E ē Ē caps
+key AD04 r R ŗ Ŗ caps
+key AD05 t T t T caps
+key AD06 y Y y Y caps
+key AD07 u U ū Ū caps
+key AD08 i I ī Ī caps
+key AD09 o O ō Ō caps
+key AD10 p P p P caps
+key AD11 [ { « “
+key AD12 ] } » ”
+key BKSL \ | ` ˘
+key AC01 a A ā Ā caps
+key AC02 s S š Š caps
+key AC03 d D d D caps
+key AC04 f F f F caps
+key AC05 g G ģ Ģ caps
+key AC06 h H h H caps
+key AC07 j J j J caps
+key AC08 k K ķ Ķ caps
+key AC09 l L ļ Ļ caps
+key AC10 ; : ; :
+key AC11 ISO_Level3_Latch " '''' "
+key LSGT < > | ¦
+key AB01 z Z ž Ž caps
+key AB02 x X x X caps
+key AB03 c C č Č caps
+key AB04 v V v V caps
+key AB05 b B b B caps
+key AB06 n N ņ Ņ caps
+key AB07 m M m M caps
+key AB08 , < • ×
+key AB09 . > · ÷
+key AB10 / ? / ˙
+key SPCE space space '''' space
+key KPDL KP_Delete KP_Decimal

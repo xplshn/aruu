@@ -1,0 +1,56 @@
+kmap 1
+id th-mnc
+layout th
+variant mnc
+name Thai (Manoonchai)
+level3 ralt
+key TLDE ` ~ ` VoidSymbol
+key AE01 1 ! ๑ VoidSymbol
+key AE02 2 @ ๒ VoidSymbol
+key AE03 3 '#' ๓ VoidSymbol
+key AE04 4 $ ๔ VoidSymbol
+key AE05 5 % ๕ VoidSymbol
+key AE06 6 ^ ๖ VoidSymbol
+key AE07 7 & ๗ VoidSymbol
+key AE08 8 * ๘ VoidSymbol
+key AE09 9 ( ๙ VoidSymbol
+key AE10 0 ) ๐ VoidSymbol
+key AE11 - _ ÷ VoidSymbol
+key AE12 = + × VoidSymbol
+key AD01 ใ ฒ VoidSymbol VoidSymbol
+key AD02 ต ฏ VoidSymbol VoidSymbol
+key AD03 ห ซ VoidSymbol VoidSymbol
+key AD04 ล ญ VoidSymbol VoidSymbol
+key AD05 ส ฟ VoidSymbol VoidSymbol
+key AD06 ป ฉ VoidSymbol VoidSymbol
+key AD07 ั ึ ฺ VoidSymbol
+key AD08 ก ธ VoidSymbol VoidSymbol
+key AD09 ิ ฐ VoidSymbol VoidSymbol
+key AD10 บ ฎ VoidSymbol VoidSymbol
+key AD11 ็ ฆ [ {
+key AD12 ฬ ฑ ] }
+key BKSL ฯ ฌ \ |
+key AC01 ง ษ ◌ VoidSymbol
+key AC02 เ ถ ๏ VoidSymbol
+key AC03 ร แ ๛ VoidSymbol
+key AC04 น ช ฿ VoidSymbol
+key AC05 ม พ VoidSymbol VoidSymbol
+key AC06 อ ผ ํ VoidSymbol
+key AC07 า ำ ๅ VoidSymbol
+key AC08 ่ ข ฃ VoidSymbol
+key AC09 ้ โ VoidSymbol VoidSymbol
+key AC10 ว ภ ; :
+key AC11 ื " '''' "
+key LSGT < > | ¦
+key AB01 ุ ฤ ฦ VoidSymbol
+key AB02 ไ ฝ VoidSymbol VoidSymbol
+key AB03 ท ๆ ๚ VoidSymbol
+key AB04 ย ณ VoidSymbol VoidSymbol
+key AB05 จ ๊ VoidSymbol VoidSymbol
+key AB06 ค ๋ ฅ VoidSymbol
+key AB07 ี ์ ๎ VoidSymbol
+key AB08 ด ศ , <
+key AB09 ะ ฮ . >
+key AB10 ู ? / ?
+key SPCE space space space space
+key KPDL . . . .

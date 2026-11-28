@@ -1,0 +1,55 @@
+kmap 1
+id mn
+layout mn
+name Mongolian
+level3 ralt
+key TLDE = + °
+key AE01 1 № ×
+key AE02 2 - ÷
+key AE03 3 " ±
+key AE04 4 ₮ ¬
+key AE05 5 :
+key AE06 6 . ≠
+key AE07 7 _ &
+key AE08 8 , *
+key AE09 9 % [
+key AE10 0 ? ]
+key AE11 е Е X caps
+key AE12 щ Щ L caps
+key AD01 ф Ф '''' caps
+key AD02 ц Ц ` caps
+key AD03 у У € caps
+key AD04 ж Ж ® caps
+key AD05 э Э ™ caps
+key AD06 н Н ¥ caps
+key AD07 г Г „ caps
+key AD08 ш Ш “ caps
+key AD09 ү Ү ” caps
+key AD10 з З caps
+key AD11 к К { caps
+key AD12 ъ Ъ } caps
+key BKSL ! | |
+key AC01 й Й µ caps
+key AC02 ы Ы £ caps
+key AC03 б Б $ caps
+key AC04 ө Ө ” caps
+key AC05 а А ы caps
+key AC06 х Х Ы caps
+key AC07 р Р э caps
+key AC08 о О Э caps
+key AC09 л Л № caps
+key AC10 д Д § caps
+key AC11 п П … caps
+key LSGT ( ) | ¦
+key AB01 я Я — caps
+key AB02 ч Ч – caps
+key AB03 ё Ё © caps
+key AB04 с С caps
+key AB05 м М caps
+key AB06 и И < caps
+key AB07 т Т > caps
+key AB08 ь Ь « caps
+key AB09 в В » caps
+key AB10 ю Ю \ caps
+key SPCE space space nobreakspace
+key KPDL KP_Delete KP_Decimal

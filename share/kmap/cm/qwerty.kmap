@@ -1,0 +1,56 @@
+kmap 1
+id cm-qwerty
+layout cm
+variant qwerty
+name Cameroon Multilingual (QWERTY, intl.)
+level3 ralt
+key TLDE U030D combining_tilde ` ~
+key AE01 1 ! ¼
+key AE02 2 @ ½
+key AE03 3 '#' ¾
+key AE04 4 $ none U20AC
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 * none ×
+key AE09 9 ( U2018 U201C
+key AE10 0 ) U2019 U201D
+key AE11 - _ U0304
+key AE12 = + none ±
+key AD01 q Q U2014 U2013 caps
+key AD02 w W ẅ Ẅ caps
+key AD03 e E ə Ə caps
+key AD04 r R ◌ ® caps
+key AD05 t T U0153 U0152 caps
+key AD06 y Y ƴ Ƴ caps
+key AD07 u U ʉ Ʉ caps
+key AD08 i I ɨ Ɨ caps
+key AD09 o O ɔ Ɔ caps
+key AD10 p P ø Ø caps
+key AD11 combining_acute U030C [ {
+key AD12 U0327 U0308 ] }
+key BKSL \ |
+key AC01 a A ɛ Ɛ caps
+key AC02 s S caps
+key AC03 d D ɗ Ɗ caps
+key AC04 f F æ Æ caps
+key AC05 g G ʼ Ꞌ caps
+key AC06 h H ɑ Ɑ caps
+key AC07 j J U0330 combining_belowdot caps
+key AC08 k K ᷅ ᷇ caps
+key AC09 l L ᷆ ᷄ caps
+key AC10 ISO_Level3_Latch : ; :
+key AC11 combining_grave U0302 '''' "
+key LSGT < > | ¦
+key AB01 z Z U2026 U2020 caps
+key AB02 x X caps
+key AB03 c C U0327 © caps
+key AB04 v V ꞌ Ꞌ caps
+key AB05 b B ɓ Ɓ caps
+key AB06 n N U014B U014A caps
+key AB07 m M none U2122 caps
+key AB08 , < ‹ «
+key AB09 . > › »
+key AB10 / ? ÷
+key SPCE space
+key KPDL KP_Delete KP_Decimal

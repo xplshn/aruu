@@ -1,0 +1,59 @@
+kmap 1
+id ie-ogam_is434
+layout ie
+variant ogam_is434
+name Ogham (IS434)
+level3 ralt
+key TLDE ` ¬ ᚜ type=THREE_LEVEL
+key AE01 1 !
+key AE02 2 "
+key AE03 3 £
+key AE04 4 $ € type=THREE_LEVEL
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 & ⁊ type=THREE_LEVEL
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 q Q ᚊ caps type=THREE_LEVEL
+key AD02 w W ᚕ caps type=THREE_LEVEL
+key AD03 e E ᚓ caps type=THREE_LEVEL
+key AD04 r R ᚏ caps type=THREE_LEVEL
+key AD05 t T ᚈ caps type=THREE_LEVEL
+key AD06 y Y ᚘ caps type=THREE_LEVEL
+key AD07 u U ᚒ caps type=THREE_LEVEL
+key AD08 i I ᚔ caps type=THREE_LEVEL
+key AD09 o O ᚑ caps type=THREE_LEVEL
+key AD10 p P ᚚ caps type=THREE_LEVEL
+key AD11 none
+key AD12 none
+key BKSL '#' ~   type=THREE_LEVEL
+key AC01 a A ᚐ caps type=THREE_LEVEL
+key AC02 s S ᚄ caps type=THREE_LEVEL
+key AC03 d D ᚇ caps type=THREE_LEVEL
+key AC04 f F ᚃ caps type=THREE_LEVEL
+key AC05 g G ᚌ caps type=THREE_LEVEL
+key AC06 h H ᚆ caps type=THREE_LEVEL
+key AC07 j J ᚗ caps type=THREE_LEVEL
+key AC08 k K ᚖ caps type=THREE_LEVEL
+key AC09 l L ᚂ caps type=THREE_LEVEL
+key AC10 none
+key AC11 none
+key LSGT \ | ᚛ ᚜ type=FOUR_LEVEL_ALPHABETIC
+key AB01 z Z ᚎ caps type=THREE_LEVEL
+key AB02 x X ᚙ caps type=THREE_LEVEL
+key AB03 c C ᚉ caps type=THREE_LEVEL
+key AB04 v V ᚍ caps type=THREE_LEVEL
+key AB05 b B ᚁ caps type=THREE_LEVEL
+key AB06 n N ᚅ caps type=THREE_LEVEL
+key AB07 m M ᚋ caps type=THREE_LEVEL
+key AB08 , < ᚜ type=THREE_LEVEL
+key AB09 . > ᚛ type=THREE_LEVEL
+key AB10 / ?   type=THREE_LEVEL
+key SPCE space space space type=THREE_LEVEL
+key KPDL KP_Delete KP_Decimal
+key CAPS ISO_Level3_Lock
+key SCLK Shift_Lock
+key RWIN Multi_key Multi_key

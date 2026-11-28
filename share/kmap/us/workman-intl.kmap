@@ -1,0 +1,57 @@
+kmap 1
+id us-workman-intl
+layout us
+variant workman-intl
+name English (Workman, intl., with dead keys)
+level3 ralt
+key TLDE dead_grave dead_tilde ` ~
+key AE01 1 ! ¡ ¹
+key AE02 2 @ ² dead_doubleacute
+key AE03 3 '#' ³ dead_macron
+key AE04 4 $ ¤ £
+key AE05 5 % € dead_cedilla
+key AE06 6 dead_circumflex ¼ ^
+key AE07 7 & ½ dead_horn
+key AE08 8 * ¾ dead_ogonek
+key AE09 9 ( ‘ dead_breve
+key AE10 0 ) ’ dead_abovering
+key AE11 - _ ¥ dead_belowdot
+key AE12 = + × ÷
+key AD01 q Q ä Ä caps
+key AD02 d D ð Ð caps
+key AD03 r R ® ™ caps
+key AD04 w W å Å caps
+key AD05 b B b B caps
+key AD06 j J ï Ï caps
+key AD07 f F ë Ë caps
+key AD08 u U ú Ú caps
+key AD09 p P ö Ö caps
+key AD10 ; : ¶ °
+key AD11 [ { « “
+key AD12 ] } » ”
+key BKSL \ | ¬ ¦
+key AC01 a A á Á caps
+key AC02 s S ß § caps
+key AC03 h H h H caps
+key AC04 t T þ Þ caps
+key AC05 g G g G caps
+key AC06 y Y ü Ü caps
+key AC07 n N ñ Ñ caps
+key AC08 e E é É caps
+key AC09 o O ó Ó caps
+key AC10 i I í Í caps
+key AC11 dead_acute dead_diaeresis '''' "
+key LSGT \ | \ |
+key AB01 z Z æ Æ caps
+key AB02 x X · dead_stroke caps
+key AB03 m M µ ± caps
+key AB04 c C © ¢ caps
+key AB05 v V v V caps
+key AB06 k K œ Œ caps
+key AB07 l L ø Ø caps
+key AB08 , < ç Ç
+key AB09 . > dead_abovedot dead_caron
+key AB10 / ? ¿ dead_hook
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key CAPS BackSpace Escape BackSpace BackSpace

@@ -1,0 +1,56 @@
+kmap 1
+id ir-winkeys
+layout ir
+variant winkeys
+name Persian (Windows)
+level3 ralt
+key TLDE ÷ ×
+key AE01 1 ! ۱ U200D
+key AE02 2 @ ۲ U200C
+key AE03 3 '#' ۳ U200E
+key AE04 4 $ ۴ U200F
+key AE05 5 % ۵
+key AE06 6 ^ ۶
+key AE07 7 & ۷
+key AE08 8 * ۸
+key AE09 9 ) ۹
+key AE10 0 ( ۰
+key AE11 - _
+key AE12 = +
+key AD01 ض ً
+key AD02 ص ٌ
+key AD03 ث ٍ
+key AD04 ق ﷼
+key AD05 ف ،
+key AD06 غ ؛
+key AD07 ع ,
+key AD08 ه ]
+key AD09 خ [
+key AD10 ح \
+key AD11 ج }
+key AD12 چ {
+key BKSL پ |
+key AC01 ش َ
+key AC02 س ُ
+key AC03 ی ِ
+key AC04 ب ّ
+key AC05 ل ۀ
+key AC06 ا آ
+key AC07 ت ـ
+key AC08 ن «
+key AC09 م »
+key AC10 ک :
+key AC11 گ "
+key LSGT پ | | ¦
+key AB01 ظ ة
+key AB02 ط ي
+key AB03 ز ژ
+key AB04 ر ؤ
+key AB05 ذ أ
+key AB06 د إ
+key AB07 ئ ء
+key AB08 و <
+key AB09 . >
+key AB10 / ؟
+key SPCE space
+key KPDL KP_Delete KP_Decimal

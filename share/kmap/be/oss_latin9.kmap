@@ -1,0 +1,60 @@
+kmap 1
+id be-oss_latin9
+layout be
+variant oss_latin9
+name Belgian (Latin-9 only, alt.)
+level3 ralt
+key TLDE ² ³ ¹ <
+key AE01 & 1 | >
+key AE02 é 2 @ É
+key AE03 " 3 '#' dead_tilde
+key AE04 '''' 4 dead_cedilla -
+key AE05 ( 5 dead_caron -
+key AE06 § 6 ^ ^
+key AE07 è 7 ` È
+key AE08 ! 8 ~ ¡
+key AE09 ç 9 { Ç
+key AE10 à 0 } À
+key AE11 ) ° ø Ø
+key AE12 - _ - ±
+key AD01 a A æ Æ caps
+key AD02 z Z â Â caps
+key AD03 e E € ¢ caps
+key AD04 r R ê Ê caps
+key AD05 t T þ Þ caps
+key AD06 y Y ÿ Ÿ caps
+key AD07 u U û Û caps
+key AD08 i I î Î caps
+key AD09 o O œ Œ caps
+key AD10 p P ô Ô caps
+key AD11 dead_circumflex dead_diaeresis [ dead_abovering
+key AD12 $ * ] dead_cedilla
+key BKSL µ £ dead_grave dead_circumflex
+key AC01 q Q ä Ä caps
+key AC02 s S ß « caps
+key AC03 d D ë Ë caps
+key AC04 f F '''' '''' caps
+key AC05 g G '''' ¥ caps
+key AC06 h H ð Ð caps
+key AC07 j J ü Ü caps
+key AC08 k K ï Ï caps
+key AC09 l L l L caps
+key AC10 m M ö Ö caps
+key AC11 ù % dead_acute Ù
+key LSGT < > \ =
+key AB01 w W « « caps
+key AB02 x X » » caps
+key AB03 c C © ® caps
+key AB04 v V nobreakspace < caps
+key AB05 b B - ^ caps
+key AB06 n N ¬ > caps
+key AB07 , ? ¿ .
+key AB08 ; . × ·
+key AB09 : / ÷ /
+key AB10 = + dead_tilde -
+key SPCE space space nobreakspace  
+key KPDL KP_Delete . , nobreakspace type=FOUR_LEVEL_MIXED_KEYPAD
+key KPMU KP_Multiply · × XF86ClearGrab type=FOUR_LEVEL_X
+key KPSU KP_Subtract - - XF86Prev_VMode type=FOUR_LEVEL_X
+key KPAD KP_Add + + XF86Next_VMode type=FOUR_LEVEL_X
+key KPDV KP_Divide / ÷ XF86Ungrab type=FOUR_LEVEL_X

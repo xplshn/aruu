@@ -1,0 +1,56 @@
+kmap 1
+id ma-tifinagh-extended
+layout ma
+variant tifinagh-extended
+name Berber (Morocco, Tifinagh extended)
+level3 ralt
+key TLDE ² U200C
+key AE01 & 1
+key AE02 ⵒ 2 ~
+key AE03 " 3 '#'
+key AE04 '''' 4 {
+key AE05 ( 5 [
+key AE06 - 6 |
+key AE07 ⵤ 7
+key AE08 _ 8 \
+key AE09 U2014 9 ^
+key AE10 U200D 0 @
+key AE11 ) ° ]
+key AE12 = + }
+key AD01 ⴰ ⴶ
+key AD02 ⵣ ⵥ
+key AD03 ⴻ ⵗ U20AC
+key AD04 ⵔ ⵕ
+key AD05 ⵜ ⵟ
+key AD06 ⵢ ⵂ
+key AD07 ⵓ ⵌ
+key AD08 ⵉ ⵘ
+key AD09 ⵄ ⵝ
+key AD10 ⵃ ⵞ
+key AD11 ⵯ ⵠ
+key AD12 $ £ ¤
+key BKSL * µ
+key AC01 ⵇ ⵈ
+key AC02 ⵙ ⵚ
+key AC03 ⴷ ⴹ
+key AC04 ⴼ ⴵ
+key AC05 ⴳ ⴳ
+key AC06 ⵀ ⵁ
+key AC07 ⵊ ⵋ
+key AC08 ⴽ ⴽ
+key AC09 ⵍ ⴸ
+key AC10 ⵎ ⴺ
+key AC11 ⵑ %
+key LSGT < > | ¦
+key AB01 ⵡ ⴾ
+key AB02 ⵅ ⵆ
+key AB03 ⵛ ⴿ
+key AB04 ⵖ ⴴ
+key AB05 ⴱ ⴲ
+key AB06 ⵏ ⵐ
+key AB07 , ?
+key AB08 ; .
+key AB09 : /
+key AB10 ! §
+key SPCE space
+key KPDL KP_Delete KP_Decimal

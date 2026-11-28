@@ -1,0 +1,56 @@
+kmap 1
+id se-svdvorak
+layout se
+variant svdvorak
+name Swedish (Svdvorak)
+level3 ralt
+key TLDE § ½ ¶ ¾
+key AE01 1 ! ¡ ¹
+key AE02 2 " @ ²
+key AE03 3 '#' £ ³
+key AE04 4 ¤ $ ¼
+key AE05 5 % € ‰
+key AE06 6 & ¥ √
+key AE07 7 / { ÷
+key AE08 8 ( [ «
+key AE09 9 ) ] »
+key AE10 0 = } °
+key AE11 + ? \ ¿
+key AE12 dead_acute dead_grave ± ¬
+key AD01 å Å { Ω caps
+key AD02 , ; [ Σ
+key AD03 . : ] ¢
+key AD04 p P } ™ caps
+key AD05 y Y þ Þ caps
+key AD06 f F ← ¥ caps
+key AD07 g G ↓ ↑ caps
+key AD08 c C → ı caps
+key AD09 r R œ Œ caps
+key AD10 l L π Π caps
+key AD11 '''' * dead_diaeresis dead_abovering
+key AD12 dead_diaeresis dead_circumflex dead_tilde dead_caron
+key BKSL < > | ×
+key AC01 a A ª º caps
+key AC02 o O ( ẞ caps
+key AC03 e E ) Ð caps
+key AC04 u U đ ª caps
+key AC05 i I ŋ Ŋ caps
+key AC06 d D ħ Ħ caps
+key AC07 h H dead_hook dead_horn caps
+key AC08 t T ĸ † caps
+key AC09 n N ł Ł caps
+key AC10 s S ß ẞ caps
+key AC11 - _ æ Æ
+key LSGT ö Ö | ¦ caps
+key AB01 ä Ä « < caps
+key AB02 q Q » > caps
+key AB03 j J © 🄯 caps
+key AB04 k K „ ‚ caps
+key AB05 x X “ ‘ caps
+key AB06 b B ” ’ caps
+key AB07 m M µ º caps
+key AB08 w W dead_cedilla dead_ogonek caps
+key AB09 v V · … caps
+key AB10 z Z dead_belowdot dead_abovedot caps
+key SPCE space space space nobreakspace
+key KPDL KP_Delete KP_Separator

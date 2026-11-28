@@ -1,0 +1,60 @@
+kmap 1
+id no-colemak
+layout no
+variant colemak
+name Norwegian (Colemak)
+level3 ralt
+key TLDE | § ¦ ¶
+key AE01 1 ! ¡ ¹
+key AE02 2 " @ ²
+key AE03 3 '#' £ ³
+key AE04 4 ¤ $ ¼
+key AE05 5 % ½ ‰
+key AE06 6 & ¥ ⅝
+key AE07 7 / { ÷
+key AE08 8 ( [ «
+key AE09 9 ) ] »
+key AE10 0 = } °
+key AE11 + ? ± ¿
+key AE12 \ dead_grave dead_acute ¬
+key AD01 q Q @ Ω caps
+key AD02 w W ſ § caps
+key AD03 f F đ ª caps
+key AD04 p P π Π caps
+key AD05 g G ŋ Ŋ caps
+key AD06 j J ← ¥ caps
+key AD07 l L ł Ł caps
+key AD08 u U ↓ ↑ caps
+key AD09 y Y ← ¥ caps
+key AD10 ø Ø dead_acute dead_doubleacute caps
+key AD11 å Å dead_diaeresis dead_abovering caps
+key AD12 dead_diaeresis dead_circumflex dead_tilde dead_caron
+key BKSL '''' * dead_doubleacute ×
+key AC01 a A ª º caps
+key AC02 r R ® ™ caps
+key AC03 s S ß § caps
+key AC04 t T þ Þ caps
+key AC05 d D ð Ð caps
+key AC06 h H ħ Ħ caps
+key AC07 n N dead_hook dead_horn caps
+key AC08 e E € ¢ caps
+key AC09 i I → ı caps
+key AC10 o O œ Œ caps
+key AC11 æ Æ dead_circumflex dead_caron caps
+key LSGT < > ½ ¾
+key AB01 z Z « < caps
+key AB02 x X » > caps
+key AB03 c C © © caps
+key AB04 v V „ ‚ caps
+key AB05 b B “ ‘ caps
+key AB06 k K ĸ & caps
+key AB07 m M µ º caps
+key AB08 , ; dead_cedilla dead_ogonek
+key AB09 . : … ·
+key AB10 - _ – —
+key SPCE space space nobreakspace  
+key KPDL KP_Delete KP_Separator
+key KPMU KP_Multiply ⋅ 0x010000d7 VoidSymbol XF86ClearGrab type=CTRL+ALT
+key KPSU KP_Subtract − − VoidSymbol XF86Prev_VMode type=CTRL+ALT
+key KPAD KP_Add 0x0100002b 0x0100002b VoidSymbol XF86Next_VMode type=CTRL+ALT
+key KPDV KP_Divide ∕ 0x010000f7 VoidSymbol XF86Ungrab type=CTRL+ALT

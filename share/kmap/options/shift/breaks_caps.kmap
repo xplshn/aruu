@@ -1,0 +1,4 @@
+kmap 1
+id shift:breaks_caps
+key LFSH Shift_L Caps_Lock type=ALPHABETIC
+key RTSH Shift_R Caps_Lock type=ALPHABETIC

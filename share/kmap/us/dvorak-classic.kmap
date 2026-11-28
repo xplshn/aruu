@@ -1,0 +1,55 @@
+kmap 1
+id us-dvorak-classic
+layout us
+variant dvorak-classic
+name English (classic Dvorak)
+key TLDE ` ~ dead_grave dead_tilde
+key AE01 [ {
+key AE02 7 &
+key AE03 5 %
+key AE04 3 '#'
+key AE05 1 !
+key AE06 9 ( dead_grave
+key AE07 0 )
+key AE08 2 @
+key AE09 4 $
+key AE10 6 ^ dead_circumflex dead_circumflex
+key AE11 8 *
+key AE12 ] } dead_tilde
+key AD01 / ?
+key AD02 , < dead_cedilla dead_caron
+key AD03 . > dead_abovedot ·
+key AD04 p P caps
+key AD05 y Y caps
+key AD06 f F caps
+key AD07 g G caps
+key AD08 c C caps
+key AD09 r R caps
+key AD10 l L caps
+key AD11 '''' " dead_acute dead_diaeresis
+key AD12 = +
+key BKSL \ |
+key AC01 a A caps
+key AC02 o O caps
+key AC03 e E caps
+key AC04 u U caps
+key AC05 i I caps
+key AC06 d D caps
+key AC07 h H caps
+key AC08 t T caps
+key AC09 n N caps
+key AC10 s S caps
+key AC11 - _
+key LSGT < > | ¦
+key AB01 ; : dead_ogonek dead_doubleacute
+key AB02 q Q caps
+key AB03 j J caps
+key AB04 k K caps
+key AB05 x X caps
+key AB06 b B caps
+key AB07 m M caps
+key AB08 w W caps
+key AB09 v V caps
+key AB10 z Z caps
+key SPCE space
+key KPDL KP_Delete KP_Decimal

@@ -1,0 +1,56 @@
+kmap 1
+id in-ben_baishakhi
+layout in
+variant ben_baishakhi
+name Bangla (India, Baishakhi)
+level3 ralt
+key TLDE U200D U200C
+key AE01 ১ !
+key AE02 ২ @
+key AE03 ৩ '#'
+key AE04 ৪ $ ৲
+key AE05 ৫ %
+key AE06 ৬ ^ ৗ
+key AE07 ৭ &
+key AE08 ৮ * ৺
+key AE09 ৯ (
+key AE10 ০ )
+key AE11 - _
+key AE12 = +
+key AD01 ড ঢ
+key AD02 ী ূ
+key AD03 ে এ ঐ
+key AD04 র ৃ ঋ
+key AD05 ট ঠ
+key AD06 য য়
+key AD07 ু উ ঊ
+key AD08 ি ই ঈ
+key AD09 ো ও ঔ
+key AD10 প ফ
+key AD11 [ {
+key AD12 ] }
+key BKSL \ |
+key AC01 া অ আ
+key AC02 স শ ষ
+key AC03 দ ধ
+key AC04 ত থ ৎ
+key AC05 গ ঘ
+key AC06 ্ হ ঃ
+key AC07 জ ঝ
+key AC08 ক খ
+key AC09 ল । ঌ
+key AC10 ; :
+key AC11 '''' "
+key LSGT < > | ¦
+key AB01 ৈ ৌ
+key AB02 ড় ঢ়
+key AB03 চ ছ
+key AB04 ৱ ৰ
+key AB05 ব ভ
+key AB06 ন ণ ঞ
+key AB07 ম ঙ ঁ
+key AB08 , <
+key AB09 . > ়
+key AB10 / ? ং
+key SPCE space
+key KPDL KP_Delete KP_Decimal

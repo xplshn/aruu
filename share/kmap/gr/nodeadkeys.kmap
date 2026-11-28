@@ -1,0 +1,55 @@
+kmap 1
+id gr-nodeadkeys
+layout gr
+variant nodeadkeys
+name Greek (no dead keys)
+key TLDE ` ~
+key AE01 1 !
+key AE02 2 @
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 ^
+key AE07 7 &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 ; :
+key AD02 ς Σ caps
+key AD03 ε Ε caps
+key AD04 ρ Ρ caps
+key AD05 τ Τ caps
+key AD06 υ Υ caps
+key AD07 θ Θ caps
+key AD08 ι Ι caps
+key AD09 ο Ο caps
+key AD10 π Π caps
+key AD11 [ {
+key AD12 ] }
+key BKSL \ |
+key AC01 α Α caps
+key AC02 σ Σ caps
+key AC03 δ Δ caps
+key AC04 φ Φ caps
+key AC05 γ Γ caps
+key AC06 η Η caps
+key AC07 ξ Ξ caps
+key AC08 κ Κ caps
+key AC09 λ Λ caps
+key AC10 ; :
+key AC11 '''' "
+key LSGT « » | ¦
+key AB01 ζ Ζ caps
+key AB02 χ Χ caps
+key AB03 ψ Ψ caps
+key AB04 ω Ω caps
+key AB05 β Β caps
+key AB06 ν Ν caps
+key AB07 μ Μ caps
+key AB08 , <
+key AB09 . >
+key AB10 / ?
+key SPCE space
+key KPDL KP_Delete KP_Separator

@@ -2,13 +2,13 @@
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700 /* crypt in unistd.h */
 #endif
-#if FEATURE_PASSWD_EXT
+/* pw_update_file reads and writes entries with fgetpwent and putpwent,
+ * which musl declares only under _GNU_SOURCE */
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE /* musl declares fgetpwent/putpwent only under it */
+#define _GNU_SOURCE
 #endif
 #ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
-#endif
 #endif
 #include "../passwd.h"
 #include "../paths.h"

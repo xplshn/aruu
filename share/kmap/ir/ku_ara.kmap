@@ -1,0 +1,56 @@
+kmap 1
+id ir-ku_ara
+layout ir
+variant ku_ara
+name Kurdish (Iran, Arabic-Latin)
+level3 ralt
+key TLDE U200D ÷ ~
+key AE01 ١ ! 1 `
+key AE02 ٢ @ 2 @
+key AE03 ٣ '#' 3 ٫
+key AE04 ٤ $ 4 ﷼
+key AE05 ٥ % 5 ٪
+key AE06 ٦ ^ 6 ×
+key AE07 ٧ & 7 ،
+key AE08 ٨ * 8 enfilledcircbullet
+key AE09 ٩ ) 9 U200E
+key AE10 ٠ ( 0 U200F
+key AE11 - ـ _
+key AE12 = + −
+key AD01 ق X q Q
+key AD02 و X w W
+key AD03 ە ه e E
+key AD04 ر ڕ r R
+key AD05 ت ط t T
+key AD06 ی ێ y Y
+key AD07 ئ ء u U
+key AD08 ح ع i I
+key AD09 ۆ ؤ o O
+key AD10 پ ث p P
+key AD11 ] } û Û
+key AD12 [ { ş Ş
+key BKSL \ | ç Ç
+key AC01 ا آ a A
+key AC02 س ش s S
+key AC03 د ذ d D
+key AC04 ف إ f F
+key AC05 گ غ g G
+key AC06 ه U200C h H
+key AC07 ژ أ j J
+key AC08 ک ك k K
+key AC09 ل ڵ l L
+key AC10 ؛ : ê Ê
+key AC11 '''' " î Î
+key LSGT < > | ¦
+key AB01 ز ض z Z
+key AB02 خ ص x X
+key AB03 ج چ c C
+key AB04 ڤ ظ v V
+key AB05 ب U0649 b B
+key AB06 ن ة n N
+key AB07 م ـ m M
+key AB08 ، > ,
+key AB09 . < ''''
+key AB10 / ؟ ?
+key SPCE space U200C nobreakspace
+key KPDL KP_Delete KP_Decimal

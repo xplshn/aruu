@@ -1,0 +1,3 @@
+kmap 1
+id keypad:pointerkeys
+key NMLK Num_Lock Pointer_EnableKeys

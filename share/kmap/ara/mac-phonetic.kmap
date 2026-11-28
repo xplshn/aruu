@@ -1,0 +1,56 @@
+kmap 1
+id ara-mac-phonetic
+layout ara
+variant mac-phonetic
+name Arabic (Macintosh, phonetic)
+level3 ralt
+key TLDE ـ ـ > <
+key AE01 ١ ! إ ! 1 type=FOUR_LEVEL_PLUS_LOCK
+key AE02 ٢ ء ❊ ❊ 2 type=FOUR_LEVEL_PLUS_LOCK
+key AE03 ٣ أ '#' '#' 3 type=FOUR_LEVEL_PLUS_LOCK
+key AE04 ٤ آ $ € 4 type=FOUR_LEVEL_PLUS_LOCK
+key AE05 ٥ إ ٪ ٪ 5 type=FOUR_LEVEL_PLUS_LOCK
+key AE06 ٦ ئ & & 6 type=FOUR_LEVEL_PLUS_LOCK
+key AE07 ٧ ؤ ^ ^ 7 type=FOUR_LEVEL_PLUS_LOCK
+key AE08 ٨ ى * * 8 type=FOUR_LEVEL_PLUS_LOCK
+key AE09 ٩ ) ) ) 9 type=FOUR_LEVEL_PLUS_LOCK
+key AE10 ٠ ( ( ( 0 type=FOUR_LEVEL_PLUS_LOCK
+key AE11 - _ _ _
+key AE12 = + + +
+key AD01 ق ڤ ڤ گ
+key AD02 ش ّ ّ ّ
+key AD03 ع غ ی VoidSymbol
+key AD04 ر ز غ ڑ
+key AD05 ت ث ط ة
+key AD06 ط ظ ث ى
+key AD07 و ے ُ ٌ
+key AD08 ي ى ِ ٍ
+key AD09 ه ة ْ ە
+key AD10 ة ت ّ پ
+key AD11 ث } ] }
+key AD12 ظ { [ {
+key BKSL dead_hamza إ أ آ
+key AC01 ا آ َ ً
+key AC02 س ش ص ّ
+key AC03 د ذ ض ڈ
+key AC04 ف ق ڤ ڤ
+key AC05 غ ع ع گ
+key AC06 ح خ ه چ
+key AC07 ج چ خ ژ
+key AC08 ك گ خ ک
+key AC09 ل ❊ VoidSymbol VoidSymbol
+key AC10 ؛ : VoidSymbol VoidSymbol
+key AC11 '''' " ٱ VoidSymbol
+key LSGT ـ ـ > <
+key AB01 ز ژ ظ ژ
+key AB02 خ ح ح VoidSymbol
+key AB03 ص ض ث چ
+key AB04 ذ د ظ ڤ
+key AB05 ب پ پ ٹ
+key AB06 ن ث VoidSymbol ں
+key AB07 م آ آ آ
+key AB08 ، > » ❊
+key AB09 . < « VoidSymbol
+key AB10 \ ؟ / \
+key SPCE space space nobreakspace nobreakspace
+key KPDL KP_Delete KP_Decimal

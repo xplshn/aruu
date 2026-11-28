@@ -1,0 +1,56 @@
+kmap 1
+id az-standard
+layout az
+variant standard
+name Azerbaijani (standard)
+level3 ralt
+key TLDE '#' ~ `
+key AE01 1 !
+key AE02 2 " @
+key AE03 3 №
+key AE04 4 ; ₼ $
+key AE05 5 %
+key AE06 6 : ^
+key AE07 7 ? &
+key AE08 8 *
+key AE09 9 (
+key AE10 0 )
+key AE11 - _
+key AE12 = +
+key AD01 p P caps
+key AD02 ü Ü caps
+key AD03 ş Ş caps
+key AD04 u U caps
+key AD05 d D caps
+key AD06 b B caps
+key AD07 m M caps
+key AD08 y Y caps
+key AD09 o O caps
+key AD10 h H caps
+key AD11 x X [ { caps
+key AD12 j J ] } caps
+key BKSL \ |
+key AC01 g G caps
+key AC02 ı I caps
+key AC03 s S caps
+key AC04 a A caps
+key AC05 r R caps
+key AC06 n N caps
+key AC07 ə Ə caps
+key AC08 l L caps
+key AC09 i İ
+key AC10 c C caps
+key AC11 ğ Ğ '''' " caps
+key LSGT < > | ¦
+key AB01 ç Ç caps
+key AB02 f F caps
+key AB03 v V caps
+key AB04 t T caps
+key AB05 k K caps
+key AB06 e E caps
+key AB07 q Q caps
+key AB08 z Z < caps
+key AB09 ö Ö > caps
+key AB10 . , /
+key SPCE space
+key KPDL KP_Delete KP_Decimal

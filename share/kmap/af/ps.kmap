@@ -1,0 +1,56 @@
+kmap 1
+id af-ps
+layout af
+variant ps
+name Pashto
+level3 ralt
+key TLDE U200D 0x010000f7 dead_tilde
+key AE01 ۱ ! 0x01000060
+key AE02 ۲ ٬ 0x01000040
+key AE03 ۳ ٫ '#'
+key AE04 ۴  0x01000024
+key AE05 ۵ ٪ 0x01000025
+key AE06 ۶ × 0x0100005e
+key AE07 ۷ 0x010000bb 0x01000026
+key AE08 ۸ 0x010000ab •
+key AE09 ۹ 0x01000029 U200E
+key AE10 ۰ 0x01000028 U200F
+key AE11 - ـ 0x0100005f
+key AE12 = +
+key AD01 ض ْ 0x010000b0
+key AD02 ص ٌ ٓ
+key AD03 ث ٍ U20AC
+key AD04 ق ً ﴾
+key AD05 ف ُ ﴿
+key AD06 غ ِ 
+key AD07 ع َ 
+key AD08 ه ّ ٰ
+key AD09 خ ځ 0x01000027
+key AD10 ح څ 0x01000022
+key AD11 ج 0x0100005d 0x0100007d
+key AD12 چ 0x0100005b 0x0100007b
+key BKSL \ 0x0100002a 0x0100007c
+key AC01 ش ښ
+key AC02 س ئ ے
+key AC03 ی ي U0649
+key AC04 ب پ ں
+key AC05 ل أ ڷ
+key AC06 ا آ ٱ
+key AC07 ت ټ ٹ
+key AC08 ن ڼ 0x0100003e
+key AC09 م U0629 0x0100003c
+key AC10 ک : U0643
+key AC11 ګ ؛ گ
+key LSGT < > | ¦
+key AB01 ۍ U0638 0x0100003f
+key AB02 ې U0637 0x0100003b
+key AB03 ز ژ ٕ
+key AB04 ر U0621 ٔ
+key AB05 ذ U200C U0625
+key AB06 د ډ ڈ
+key AB07 ړ U0624 ڑ
+key AB08 و U060C 0x0100002c
+key AB09 ږ 0x0100002e ۇ
+key AB10 / ؟ ۉ
+key SPCE space U200C nobreakspace
+key KPDL KP_Delete KP_Decimal

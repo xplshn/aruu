@@ -1,0 +1,56 @@
+kmap 1
+id ph-dvorak
+layout ph
+variant dvorak
+name Filipino (Dvorak, Latin)
+level3 ralt
+key TLDE ` ~ combining_grave combining_tilde
+key AE01 1 ! ¹ ¡
+key AE02 2 @ ² ¤
+key AE03 3 '#' ³ £
+key AE04 4 $ ¼ U20AC
+key AE05 5 % ½ °
+key AE06 6 ^ ¾ U0302
+key AE07 7 & U215B U2190
+key AE08 8 * U215C U2192
+key AE09 9 ( U215D U2191
+key AE10 0 ) U215E U2193
+key AE11 [ { VoidSymbol VoidSymbol
+key AE12 ] } VoidSymbol VoidSymbol
+key AD01 '''' " combining_acute U030B
+key AD02 , < U0327 U0328
+key AD03 . > U2026 ␣
+key AD04 p P ₱ VoidSymbol caps
+key AD05 y Y ¥ VoidSymbol caps
+key AD06 f F VoidSymbol ª caps
+key AD07 g G VoidSymbol VoidSymbol caps
+key AD08 c C © ¢ caps
+key AD09 r R ® ¶ caps
+key AD10 l L VoidSymbol VoidSymbol caps
+key AD11 / ? ÷ ¿
+key AD12 = + ± ∓
+key BKSL \ | ə Ə
+key AC01 a A æ Æ caps
+key AC02 o O ø Ø caps
+key AC03 e E U0153 U0152 caps
+key AC04 u U VoidSymbol VoidSymbol caps
+key AC05 i I U0131 U0130 caps
+key AC06 d D VoidSymbol VoidSymbol caps
+key AC07 h H VoidSymbol VoidSymbol caps
+key AC08 t T U2122 VoidSymbol caps
+key AC09 n N ñ Ñ caps
+key AC10 s S § VoidSymbol caps
+key AC11 - _ ¬ U0360
+key LSGT < > | ¦
+key AB01 ; : VoidSymbol VoidSymbol
+key AB02 q Q VoidSymbol VoidSymbol caps
+key AB03 j J VoidSymbol VoidSymbol caps
+key AB04 k K VoidSymbol VoidSymbol caps
+key AB05 x X × · caps
+key AB06 b B U201D U2019 caps
+key AB07 m M µ º caps
+key AB08 w W VoidSymbol VoidSymbol caps
+key AB09 v V U201C U2018 caps
+key AB10 z Z « » caps
+key SPCE space
+key KPDL KP_Delete KP_Decimal

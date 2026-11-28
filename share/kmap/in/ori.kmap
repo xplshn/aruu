@@ -1,0 +1,56 @@
+kmap 1
+id in-ori
+layout in
+variant ori
+name Oriya
+level3 ralt
+key TLDE none
+key AE01 ୧
+key AE02 ୨
+key AE03 ୩
+key AE04 ୪ none ₹
+key AE05 ୫
+key AE06 ୬
+key AE07 ୭
+key AE08 ୮
+key AE09 ୯
+key AE10 ୦
+key AE11 ଃ
+key AE12 ୃ ଋ
+key AD01 ୌ ଔ
+key AD02 ୈ ଐ
+key AD03 ା ଆ
+key AD04 ୀ ଈ
+key AD05 ୂ ଊ
+key AD06 ବ ଭ
+key AD07 ହ ଙ
+key AD08 ଗ ଘ
+key AD09 ଦ ଧ
+key AD10 ଜ ଝ
+key AD11 ଡ ଢ
+key AD12 ଼ ଞ
+key BKSL \ |
+key AC01 ୋ ଓ
+key AC02 େ ଏ
+key AC03 ୍ ଅ
+key AC04 ି ଇ
+key AC05 ୁ ଉ
+key AC06 ପ ଫ
+key AC07 ର
+key AC08 କ ଖ
+key AC09 ତ ଥ
+key AC10 ଚ ଛ
+key AC11 ଟ ଠ
+key LSGT < > | ¦
+key AB01 none
+key AB02 ଂ ଁ
+key AB03 ମ ଣ
+key AB04 ନ
+key AB05 ଵ
+key AB06 ଲ ଳ
+key AB07 ସ ଶ
+key AB08 , ଷ
+key AB09 .
+key AB10 ଯ @
+key SPCE space
+key KPDL KP_Delete KP_Decimal

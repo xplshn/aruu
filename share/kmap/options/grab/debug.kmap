@@ -1,0 +1,4 @@
+kmap 1
+id grab:debug
+key FK11 F11 F11 F11 F11 XF86LogGrabInfo type=CTRL+ALT
+key FK12 F12 F12 F12 F12 XF86LogWindowTree type=CTRL+ALT

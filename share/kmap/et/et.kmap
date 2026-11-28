@@ -1,0 +1,55 @@
+kmap 1
+id et
+layout et
+name Amharic
+key TLDE none
+key AE01 ፩ ፲
+key AE02 ፪ ፳
+key AE03 ፫ ፴
+key AE04 ፬ ፵
+key AE05 ፭ ፶
+key AE06 ፮ ፷
+key AE07 ፯ ፸
+key AE08 ፰ ፹
+key AE09 ፱ ፺
+key AE10 ፻ ፼
+key AE11 - _
+key AE12 = +
+key AD01 ቀ ቐ
+key AD02 ወ VoidSymbol
+key AD03 dead_e dead_E
+key AD04 ረ VoidSymbol
+key AD05 ተ ጠ
+key AD06 የ VoidSymbol
+key AD07 dead_u dead_U
+key AD08 dead_i dead_I
+key AD09 dead_o dead_O
+key AD10 ፐ ጰ
+key AD11 ፀ ጸ
+key AD12 ጨ ኀ
+key BKSL VoidSymbol ‐
+key AC01 dead_a dead_A
+key AC02 ሰ ሠ
+key AC03 ደ ዸ
+key AC04 ፈ VoidSymbol
+key AC05 ገ ጘ
+key AC06 ሀ ሐ
+key AC07 ጀ VoidSymbol
+key AC08 ከ ኸ
+key AC09 ለ VoidSymbol
+key AC10 ። ፡
+key AC11 ፦ ፥
+key LSGT < > | ¦
+key AB01 ዘ ዠ
+key AB02 አ ዐ
+key AB03 ቸ dead_capital_schwa
+key AB04 ሸ ቨ
+key AB05 በ VoidSymbol
+key AB06 ነ ኘ
+key AB07 መ VoidSymbol
+key AB08 ፣ VoidSymbol
+key AB09 ፤ VoidSymbol
+key AB10 ፧ ?
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key I219 ISO_Next_Group ISO_Prev_Group

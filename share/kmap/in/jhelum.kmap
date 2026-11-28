@@ -1,0 +1,56 @@
+kmap 1
+id in-jhelum
+layout in
+variant jhelum
+name Punjabi (Gurmukhi Jhelum)
+level3 ralt
+key TLDE ` ~ ਂ ਁ
+key AE01 1 ! ੧ !
+key AE02 2 @ ੨ @
+key AE03 3 '#' ੩ '#'
+key AE04 4 $ ੪
+key AE05 5 % ੫ %
+key AE06 6 ੳ ੬ ^
+key AE07 7 ੲ ੭ &
+key AE08 8 * ੮ *
+key AE09 9 ( ੯ (
+key AE10 0 ) ੦ )
+key AE11 - _ type=FOUR_LEVEL
+key AE12 = + type=FOUR_LEVEL
+key AD01 ੌ ਔ type=FOUR_LEVEL
+key AD02 ੈ ਐ type=FOUR_LEVEL
+key AD03 ਾ ਆ type=FOUR_LEVEL
+key AD04 ੀ ਈ ₹
+key AD05 ੂ ਊ type=FOUR_LEVEL
+key AD06 ਰ ੜ type=FOUR_LEVEL
+key AD07 ਦ ਧ type=FOUR_LEVEL
+key AD08 ਗ ਘ ਗ਼
+key AD09 ਤ ਟ type=FOUR_LEVEL
+key AD10 ਪ ਫ਼ VoidSymbol ਫ਼
+key AD11 ਡ ਢ [ {
+key AD12 ਙ ਞ ] }
+key BKSL । ॥ | \
+key AC01 ੋ ਓ type=FOUR_LEVEL
+key AC02 ੇ ਏ type=FOUR_LEVEL
+key AC03 ੍ ਅ type=FOUR_LEVEL
+key AC04 ਿ ਇ type=FOUR_LEVEL
+key AC05 ੁ ਉ type=FOUR_LEVEL
+key AC06 ਹ ਠ type=FOUR_LEVEL
+key AC07 ਜ ਝ ਜ਼
+key AC08 ਕ ਖ VoidSymbol ਖ਼
+key AC09 ਲ ਥ ਲ਼
+key AC10 ਸ : ਸ਼
+key AC11 '''' " type=FOUR_LEVEL
+key LSGT < > | ¦
+key AB01 ੱ ਼ type=FOUR_LEVEL
+key AB02 ਂ ੰ type=FOUR_LEVEL
+key AB03 ਚ ਛ type=FOUR_LEVEL
+key AB04 ਵ ਯ type=FOUR_LEVEL
+key AB05 ਬ ਭ type=FOUR_LEVEL
+key AB06 ਨ ਣ type=FOUR_LEVEL
+key AB07 ਮ ਮ type=FOUR_LEVEL
+key AB08 , ☬ type=FOUR_LEVEL
+key AB09 . ੴ type=FOUR_LEVEL
+key AB10 / ? type=FOUR_LEVEL
+key SPCE space
+key KPDL KP_Delete KP_Decimal

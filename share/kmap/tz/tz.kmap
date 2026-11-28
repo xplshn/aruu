@@ -1,0 +1,54 @@
+kmap 1
+id tz
+layout tz
+name Swahili (Tanzania)
+key TLDE ٰ VoidSymbol
+key AE01 ١ VoidSymbol
+key AE02 ٢ VoidSymbol
+key AE03 ٣ VoidSymbol
+key AE04 ٤ VoidSymbol
+key AE05 ٥ ٪
+key AE06 ٦ VoidSymbol
+key AE07 ٧ VoidSymbol
+key AE08 ٨ VoidSymbol
+key AE09 ٩ ﴾
+key AE10 ٠ ﴿
+key AE11 - ـ
+key AE12 = +
+key AD01 ق گ
+key AD02 و ؤ
+key AD03 ٖ ع
+key AD04 ر ٹ
+key AD05 ت ط
+key AD06 ي ى
+key AD07 ُ ٌ
+key AD08 ِ ئ
+key AD09 ْ ٗ
+key AD10 پ ة
+key AD11 none
+key AD12 VoidSymbol VoidSymbol
+key BKSL \ |
+key AC01 َ ا
+key AC02 س ص
+key AC03 د ض
+key AC04 ف ً
+key AC05 ڠ غ
+key AC06 ه ح
+key AC07 ج VoidSymbol
+key AC08 ك ٍ
+key AC09 ل ّ
+key AC10 ؛ VoidSymbol
+key AC11 ء VoidSymbol
+key LSGT < > | ¦
+key AB01 ز ظ
+key AB02 خ VoidSymbol
+key AB03 چ ش
+key AB04 ڨ ث
+key AB05 ب ذ
+key AB06 ن VoidSymbol
+key AB07 م VoidSymbol
+key AB08 ، إ
+key AB09 ۔ أ
+key AB10 VoidSymbol ؟
+key SPCE space
+key KPDL KP_Delete KP_Decimal

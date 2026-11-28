@@ -1,0 +1,60 @@
+kmap 1
+id jp-dvorak
+layout jp
+variant dvorak
+name Japanese (Dvorak)
+key TLDE Zenkaku_Hankaku Kanji type=PC_ALT_LEVEL2
+key AE01 1 !
+key AE02 2 "
+key AE03 3 '#'
+key AE04 4 $
+key AE05 5 %
+key AE06 6 &
+key AE07 7 ''''
+key AE08 8 (
+key AE09 9 )
+key AE10 0
+key AE11 @ `
+key AE12 ^ ~
+key AE13 ¥ |
+key AD01 : *
+key AD02 , <
+key AD03 . >
+key AD04 p P caps
+key AD05 y Y caps
+key AD06 f F caps
+key AD07 g G caps
+key AD08 c C caps
+key AD09 r R caps
+key AD10 l L caps
+key AD11 / ?
+key AD12 [ {
+key BKSL ] }
+key AC01 a A caps
+key AC02 o O caps
+key AC03 e E caps
+key AC04 u U caps
+key AC05 i I caps
+key AC06 d D caps
+key AC07 h H caps
+key AC08 t T caps
+key AC09 n N caps
+key AC10 s S caps
+key AC11 - =
+key LSGT < > | ¦
+key AB01 ; +
+key AB02 q Q caps
+key AB03 j J caps
+key AB04 k K caps
+key AB05 x X caps
+key AB06 b B caps
+key AB07 m M caps
+key AB08 w W caps
+key AB09 v V caps
+key AB10 z Z caps
+key AB11 \ _
+key SPCE space
+key KPDL KP_Delete KP_Decimal
+key CAPS Eisu_toggle Caps_Lock
+key HKTG Hiragana_Katakana Romaji type=PC_ALT_LEVEL2
+key PRSC Print Execute type=PC_ALT_LEVEL2
