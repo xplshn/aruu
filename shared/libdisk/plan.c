@@ -167,6 +167,13 @@ plan_check(const struct plan *p, unsigned need, char *why, size_t n)
 
     if (!l->used)
       continue;
+    if (a->format && strcmp(a->fs, "ext4") == 0) {
+      uint64_t sectors = l->end - l->start + 1;
+      if (!p->label.sec_size || MKFS_EXT4_BLOCK_SIZE % p->label.sec_size ||
+          sectors > UINT64_MAX / p->label.sec_size ||
+          !mkfs_ext4_size_ok(sectors * p->label.sec_size))
+        return fail(why, n, "%s", "ext4 needs 8 MiB to below 16 TiB and sectors dividing 4 KiB");
+    }
     if (a->mount[0] && a->mount[0] != '/')
       return fail(why, n, "%s is not a place to mount: it starts with a /", a->mount);
     if (a->mount[0] && !a->fs[0])
@@ -294,18 +301,8 @@ plan_mkfs_argv(const struct plan *p, int slot, char **argv, int max, char *store
     return -1;
   argv[0] = NULL;
   if (strcmp(a->fs, "ext4") == 0) {
-    char size[32];
-
-    /* MICE's ext4 maker, which is told the size of what it makes */
-    snprintf(size, sizeof size, "%llu",
-             (unsigned long long)((p->label.part[slot].end - p->label.part[slot].start + 1) * p->label.sec_size));
-    rc |= put(argv, &n, max, store, store_n, &used, "make_ext4fs");
-    rc |= put(argv, &n, max, store, store_n, &used, "-l");
-    rc |= put(argv, &n, max, store, store_n, &used, size);
-    /* its own UUID: the one make_ext4fs derives from the label is the same
-     * for two filesystems of one label, and fstab names them by it */
-    rc |= put(argv, &n, max, store, store_n, &used, "-U");
-    rc |= put(argv, &n, max, store, store_n, &used, "random");
+    /* mkfs.ext4 generates a fresh UUID, even for filesystems with the same label. */
+    rc |= put(argv, &n, max, store, store_n, &used, "mkfs.ext4");
     if (a->label[0]) {
       rc |= put(argv, &n, max, store, store_n, &used, "-L");
       rc |= put(argv, &n, max, store, store_n, &used, a->label);
@@ -451,6 +448,7 @@ plan_guided(struct plan *p, const char *disk, uint64_t swap_mib, const char *roo
 {
   struct BlockDev dev;
   uint64_t        mib;
+  char            why[160];
   int             rc = 0;
 
   memset(p, 0, sizeof *p);
@@ -469,7 +467,9 @@ plan_guided(struct plan *p, const char *disk, uint64_t swap_mib, const char *roo
   if (swap_mib)
     rc |= plan_add(p, 0, swap_mib * mib, "8200", "SWAP", "swap", "", "") < 0;
   rc |= plan_add(p, 0, 0, "8300", "ROOT", root_fs, "/", "root") < 0;
-  return rc ? -1 : 0;
+  if (rc)
+    return -1;
+  return plan_check(p, 0, why, sizeof why);
 }
 
 int

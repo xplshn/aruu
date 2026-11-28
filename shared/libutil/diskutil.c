@@ -486,9 +486,11 @@ blockdev_detect_fs(
     if (val == fs->magic1 || (fs->magic2 && val == fs->magic2)) {
       const char *type_name = fs->name;
       if (strcmp(fs->name, "ext") == 0) {
-        /* ext4 has a journal too: its own features (extents, 64bit,
-         * flex_bg) are looked for before the journal that makes ext3 */
-        if ((buf[1120] & 0xC0) || (buf[1121] & 0x02))
+        /* Extents, 64-bit descriptors, flex_bg and extra inode fields
+         * identify ext4 even when the filesystem also has a journal. */
+        if (read_size < 1128)
+          continue;
+        if ((buf[1120] & 0xc0) || (buf[1121] & 0x02) || (buf[1124] & 0x40))
           type_name = "ext4";
         else if (buf[1116] & 4)
           type_name = "ext3";

@@ -203,7 +203,7 @@ config_resolve() {
         CPPFLAGS_TLS=${CPPFLAGS_TLS:-}
         NINJA_TRY=${NINJA_TRY:-samu,ninja}
         LDFLAGS="${LDFLAGS:-} ${LDFLAGS_TLS}"
-        LDLIBS="${LDLIBS:-} ${LDLIBS_TLS}"
+        LDLIBS="${LDLIBS:-}"
 
         for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
                 eval "${g}=\${${g}:-0}"
@@ -229,7 +229,7 @@ config_resolve() {
                 done
                 tools=$(printf '%s\n' ${tools} | sort -u | grep -v '^$' || true)
                 for b in ${tools}; do
-                        u_tool=$(printf '%s' "$b" | tr 'a-z-' 'A-Z_')
+                        u_tool=$(printf '%s' "$b" | tr 'a-z.-' 'A-Z__')
                         var_name="BUILD_${u_category}_${u_tool}"
                         eval "has_override=\${${var_name}+yes}"
                         if [ "$has_override" = yes ]; then

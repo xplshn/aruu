@@ -594,6 +594,11 @@ main(int argc, char *argv[])
     usage();
   p = ecalloc(1, sizeof *p);
   load(p, argv[2]);
+  if (!strcmp(argv[1], "write") || !strcmp(argv[1], "mkfs")) {
+    char why[200];
+    if (plan_check(p, 0, why, sizeof why) < 0)
+      eprintf("%s\n", why);
+  }
   if (strcmp(argv[1], "show") == 0)
     rc = do_show(p);
   else if (strcmp(argv[1], "gaps") == 0)
