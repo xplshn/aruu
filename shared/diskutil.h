@@ -6,6 +6,15 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/stat.h>
+
+/* The formatter uses 4 KiB blocks and 32-bit on-disk block counts. */
+#define MKFS_EXT4_BLOCK_SIZE 4096
+static inline int
+mkfs_ext4_size_ok(uint64_t bytes)
+{
+  return bytes >= (8U << 20) && bytes / MKFS_EXT4_BLOCK_SIZE <= UINT32_MAX;
+}
 
 struct BlockDev {
   int      fd;
@@ -49,6 +58,9 @@ void                 blockdev_free_list(struct BlockDevInfo *list);
 /* a backend per kernel: the size of a device, rereading a table written
  * to it, and the list of disks. blockdev_probe_list opens the names most
  * systems give disks, for a kernel that has no way to list them */
+#if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
+void                 blockdev_check_loop(const struct stat *, const char *);
+#endif
 void                 blockdev_sys_size(struct BlockDev *dev);
 void                 blockdev_sys_reread(struct BlockDev *dev);
 struct BlockDevInfo *blockdev_probe_list(void);

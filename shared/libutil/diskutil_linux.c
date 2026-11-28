@@ -3,6 +3,9 @@
 #include "../util.h"
 
 #if defined(__linux__) && !defined(ARUU_FORCE_POSIX)
+#include <dirent.h>
+#include <errno.h>
+#include <limits.h>
 #include <linux/fs.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,6 +26,55 @@ blockdev_sys_size(struct BlockDev *dev)
   if (ioctl(dev->fd, BLKSSZGET, &sec_size) >= 0)
     dev->sec_size = sec_size;
 #pragma GCC diagnostic pop
+}
+
+/* sysfs exposes the backing path of each attached loop, including unmounted ones. */
+void
+blockdev_check_loop(const struct stat *target, const char *name)
+{
+  struct dirent *de;
+  struct stat st;
+  char entry[PATH_MAX], *path = NULL;
+  size_t cap = 0;
+  ssize_t n;
+  DIR *dir;
+  FILE *f;
+
+  dir = opendir(ARUU_LINUX_PATH_SYS_BLOCK);
+  if (!dir) {
+    if (errno == ENOENT)
+      return;
+    eprintf("%s:", ARUU_LINUX_PATH_SYS_BLOCK);
+  }
+  for (;;) {
+    errno = 0;
+    if (!(de = readdir(dir))) {
+      if (errno)
+        eprintf("%s:", ARUU_LINUX_PATH_SYS_BLOCK);
+      break;
+    }
+    if (strncmp(de->d_name, "loop", 4))
+      continue;
+    if (snprintf(entry, sizeof entry, "%s/%s/loop/backing_file",
+                 ARUU_LINUX_PATH_SYS_BLOCK, de->d_name) >= (int)sizeof entry)
+      eprintf("%s: loop path too long\n", name);
+    if (!(f = fopen(entry, "r"))) {
+      if (errno == ENOENT)
+        continue;
+      eprintf("%s:", entry);
+    }
+    n = getdelim(&path, &cap, '\0', f);
+    if (n < 0 && !feof(f))
+      eprintf("%s:", entry);
+    fclose(f);
+    if (n > 0 && path[n - 1] == '\n')
+      path[n - 1] = '\0';
+    if (n > 0 && stat(path, &st) == 0 && st.st_dev == target->st_dev &&
+        st.st_ino == target->st_ino)
+      eprintf("%s: attached to a loop device\n", name);
+  }
+  free(path);
+  closedir(dir);
 }
 
 void

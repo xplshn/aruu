@@ -12,7 +12,7 @@
 #include <unistd.h>
 static int nlines; static void line(const char *l, void *a){ (void)a; nlines++; puts(l); }
 int main(void){
-  char path[]="/tmp/plan_test.XXXXXX"; int fd=mkstemp(path); assert(fd>=0 && ftruncate(fd,(off_t)1024<<20)==0); close(fd);
+  char path[]="/tmp/plan_test.XXXXXX"; int fd=mkstemp(path); assert(fd>=0 && ftruncate(fd,(off_t)1<<40)==0); close(fd);
   struct plan before, p; char why[200]; char *argv[16]; char store[256];
   assert(plan_read_disk(&before,path)==0 && before.label.kind==LABEL_NONE);
   p=before;
@@ -22,9 +22,14 @@ int main(void){
   assert(plan_add(&p,0,64*2048,"ef00","ESP","vfat","/boot/efi","ESP")==1);
   assert(plan_add(&p,0,0,"8300","ROOT","ext4","/","")==2);
   assert(plan_check(&p,PLAN_NEED_ROOT|PLAN_NEED_BOOT,why,sizeof why)==0);
+  { uint64_t end = p.label.part[2].end;
+    p.label.part[2].end = p.label.part[2].start + 2047;
+    assert(plan_check(&p,0,why,sizeof why)<0);
+    p.label.part[2].end = end; }
   assert(plan_changes(&before,&p,line,NULL)>=3);
-  assert(plan_mkfs_argv(&p,2,argv,16,store,sizeof store)==0 && !strcmp(argv[0],"make_ext4fs") && !strcmp(argv[1],"-l"));
-  assert(argv[2] && argv[3] && argv[4] == NULL);
+  char target[PLAN_PATH + 8];
+  plan_part_path(p.disk, 2, target, sizeof target);
+  assert(plan_mkfs_argv(&p,2,argv,16,store,sizeof store)==0 && !strcmp(argv[0],"mkfs.ext4") && !strcmp(argv[1],target) && !argv[2]);
   assert(plan_write_table(&p)==0);
   FILE *f=tmpfile(); assert(plan_save(&p,f)==0); rewind(f);
   struct plan q; assert(plan_load(&q,f,why,sizeof why)==0);

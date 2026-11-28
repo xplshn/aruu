@@ -148,7 +148,7 @@ xsi:
 	mknod, passwd, su
 
 extra:
-	b3sum, blkid, fdisk, lsblk, mkfs.fat, sync, yap
+	b3sum, blkid, fdisk, lsblk, mkfs.ext4, mkfs.fat, sync, yap
 
 TODOs / PENDING RELEASE
 =======================
@@ -206,6 +206,7 @@ Copyright (c) 2014 Roberto E. Vargas Caballero [k0ga@shike2.com](mailto:k0ga@shi
 Copyright (c) 2014 Silvan Jegen [s.jegen@gmail.com](mailto:s.jegen@gmail.com)
 Copyright (c) 2014 Tuukka Kataja [stuge@xor.fi](mailto:stuge@xor.fi)
 Copyright (c) 2015 Dionysis Grigoropoulos [info@erethon.com](mailto:info@erethon.com)
+Copyright (c) 2015 Grzegorz Kostka [kostka.grzegorz@gmail.com](mailto:kostka.grzegorz@gmail.com)
 Copyright (c) 2015 Quentin Rameau [quinq@fifth.space](mailto:quinq@fifth.space)
 Copyright (c) 2015 Risto Salminen [ripejcp@gmail.com](mailto:ripejcp@gmail.com)
 Copyright (c) 2015 Tai Chi Minh Ralph Eastwood [tcmreastwood@gmail.com](mailto:tcmreastwood@gmail.com)
@@ -216,6 +217,7 @@ Copyright (c) 2026 xplshn [anto@xplshn.com.ar](mailto:anto@xplshn.com.ar) (https
 
 Portions of this software (specifically utils under net/) are partially based on code written by Rob Landley
 Our line editing library is partially based on work by Salvatore Sanfilippo (linenoise) and JC Wang (crossline)
+mkfs.ext4 is based on lwext4's formatter (BSD 3-Clause).
 mkfs.fat is a port of OpenBSD's newfs_msdos (BSD 2-Clause).
 The rest are based on SBASE/UBASE source code
 

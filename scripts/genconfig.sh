@@ -203,7 +203,7 @@ config_resolve() {
         CPPFLAGS_TLS=${CPPFLAGS_TLS:-}
         NINJA_TRY=${NINJA_TRY:-samu,ninja}
         LDFLAGS="${LDFLAGS:-} ${LDFLAGS_TLS}"
-        LDLIBS="${LDLIBS:-} ${LDLIBS_TLS}"
+        LDLIBS="${LDLIBS:-}"
 
         for g in BUILD_POSIX BUILD_XSI BUILD_NET BUILD_PSEUDO BUILD_EXTRA BUILD_LINUX BUILD_DEV; do
                 eval "${g}=\${${g}:-0}"

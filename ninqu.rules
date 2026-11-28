@@ -568,7 +568,7 @@
   find shared -name '*.a' -exec rm -f {} +
 
   printf ' CLEAN compiled binaries\n'
-  find cmd -type f '(' ! -name '*.*' -o -name 'mkfs.fat' ')' -perm -100 -exec rm -f {} +
+  find cmd -type f '(' ! -name '*.*' -o -name 'mkfs.fat' -o -name 'mkfs.ext4' ')' -perm -100 -exec rm -f {} +
 
   sh scripts/genconfig.sh clean
   rm -f scripts/mk/config.mk scripts/mk/config.kv scripts/mk/rules.mk shared/libutil/nofork_list.h
@@ -606,7 +606,7 @@
   m=\"$DESTDIR$(MANPREFIX)\"
   mkdir -p \"$d/bin\" \"$m/man1\" \"$m/man8\" \"$d/lib\" \"$d/include/aruu\"
 
-  find cmd -type f '(' ! -name '*.*' -o -name 'mkfs.fat' ')' -perm -100 | while read -r bin; do
+  find cmd -type f '(' ! -name '*.*' -o -name 'mkfs.fat' -o -name 'mkfs.ext4' ')' -perm -100 | while read -r bin; do
   name=${bin##*/}
       printf '  INSTALL %s/bin/%s\n' '$(PREFIX)' \"$name\"
       cp \"$bin\" \"$d/bin/$name\"
@@ -648,7 +648,7 @@
     m=\"$DESTDIR$(MANPREFIX)\"
     mkdir -p \"$d/bin\" \"$m/man1\" \"$m/man8\" \"$d/lib\" \"$d/include/aruu\"
 
-    find cmd -type f '(' ! -name '*.*' -o -name 'mkfs.fat' ')' -perm -100 ! -path 'cmd/dev/*' | while read -r bin; do
+    find cmd -type f '(' ! -name '*.*' -o -name 'mkfs.fat' -o -name 'mkfs.ext4' ')' -perm -100 ! -path 'cmd/dev/*' | while read -r bin; do
   name=${bin##*/}
       printf '  INSTALL %s/bin/%s\n' '$(PREFIX)' \"$name\"
       cp \"$bin\" \"$d/bin/$name\"
@@ -683,7 +683,7 @@
     case \"$DESTDIR\" in /usr|/usr/*) printf 'ARUU cannot remove from usr\n' >&2; exit 1 ;; esac
     d=\"$DESTDIR$(PREFIX)\"
     m=\"$DESTDIR$(MANPREFIX)\"
-    find cmd -type f '(' ! -name '*.*' -o -name 'mkfs.fat' ')' -perm -100 | while read -r bin; do
+    find cmd -type f '(' ! -name '*.*' -o -name 'mkfs.fat' -o -name 'mkfs.ext4' ')' -perm -100 | while read -r bin; do
       name=${bin##*/}
       printf '  REMOVE %s/bin/%s\n' '$(PREFIX)' \"$name\"
       rm -f \"$d/bin/$name\"
@@ -899,7 +899,7 @@
   (dep BOX_DISPATCH BOX_OBJ POSIX_BC_BOX POSIX_AWK_BOX POSIX_SH_BOX POSIX_MAKE_BOX EXTRA_YAP_BOX NINQU_BOX LIBDISK LIBUTIL LIBUTF LIBREDLINE LIBBLAKE3 LIBMAGIC)
   (out "aruu-box")
   (description "single multi-call binary, one dispatch table for every enabled tool")
-  (shell "$(CC) $(CPPFLAGS) $(CFLAGS) -o $(OUT) $(IN) $(LDFLAGS) $(LDLIBS) $(BOX_EXTRA_LIBS)")
+  (shell "$(CC) $(CPPFLAGS) $(CFLAGS) -o $(OUT) $(IN) $(LDFLAGS) $(LDLIBS) $(LDLIBS_TLS) $(BOX_EXTRA_LIBS)")
   (group box))
 
   (group box BOX)
