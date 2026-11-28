@@ -200,6 +200,7 @@
   (mkpasswd "-lcrypt")
   (login "-lcrypt")
   (su "-lcrypt")
+  (usermod "-lcrypt")
   (host "-lresolv")
   (b3sum "-Lshared/libblake3 -lblake3")
   (file "shared/libmagic/libmagic.a"))
