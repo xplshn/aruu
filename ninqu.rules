@@ -941,7 +941,7 @@
   (shell "$(CC) $(CPPFLAGS) $(CFLAGS) -o $(OUT) $(IN) $(LDFLAGS) $(LDLIBS) $(BOX_EXTRA_LIBS)")
   (group box))
 
-  (group box BOX)
+  (group box BOX SETUID_BIN)
 
   ; -------------------------------------------------------------------
   ; top level. (group all) contains every build target except clean
