@@ -617,6 +617,10 @@
       cp \"$bin\" \"$d/bin/$name\"
       chmod 755 \"$d/bin/$name\"
     done
+    # they run as root for whoever runs them (see SETUID_BIN)
+    for name in su passwd; do
+      [ ! -f \"$d/bin/$name\" ] || chmod 4755 \"$d/bin/$name\"
+    done
 
     find man/man1 man/man8 -type f -name '*.[18]' 2>/dev/null | while read -r f; do
       sec=${f%/*}; sec=${sec##*/}
@@ -663,6 +667,10 @@
       printf '  INSTALL %s/bin/%s\n' '$(PREFIX)' \"$name\"
       cp \"$bin\" \"$d/bin/$name\"
       chmod 755 \"$d/bin/$name\"
+    done
+    # they run as root for whoever runs them (see SETUID_BIN)
+    for name in su passwd; do
+      [ ! -f \"$d/bin/$name\" ] || chmod 4755 \"$d/bin/$name\"
     done
 
     find man/man1 man/man8 -type f -name '*.[18]' 2>/dev/null | while read -r f; do
@@ -790,6 +798,7 @@
   (rule BOX_OBJ
   (glob "cmd/posix/*.c" "cmd/linux/*.c" "cmd/net/*.c" "cmd/pseudo/*.c"
         "cmd/xsi/*.c" "cmd/extra/*.c")
+  (skip "su.c" "passwd.c")
   (gate build_$(CATEGORY_OF:$(DIR))_$(IDENT))
   (dep $(MATCH) FEATURES_H)
   (after LIBUTIL LIBUTF LIBREDLINE NOFORK_LIST_H GETCONF_H)
@@ -890,6 +899,21 @@
   ; an output from BOX_OBJ or a custom box rule. the script derives categories
   ; and tool names directly from these paths and outputs the dispatch code
   ;
+  ; a tool that runs as root for whoever runs it (setuid: su, and passwd,
+  ; which writes the shadow file) is never part of the box, which would
+  ; make every tool in it setuid. each is a binary of its own under
+  ; setuid/, which install makes setuid root
+  ;
+  (rule SETUID_BIN
+  (glob "cmd/xsi/su.c" "cmd/xsi/passwd.c")
+  (gate build_xsi_$(IDENT))
+  (dep $(MATCH) LIBDISK LIBUTIL LIBUTF LIBBLAKE3 LIBMAGIC)
+  (after "scripts/mk/features.h")
+  (out "setuid/$(BASESTEM)")
+  (description "a tool that runs as root for whoever runs it, kept out of the box")
+  (exec $(CC) $(CPPFLAGS) $(CFLAGS) -o $(OUT) $(IN) $(LDFLAGS) $(LDLIBS) $(EXTRA_LIBS:$(BASESTEM)))
+  (group box))
+
   (rule BOX_DISPATCH
   (dep BOX_OBJ POSIX_BC_BOX POSIX_AWK_BOX POSIX_SH_BOX POSIX_MAKE_BOX EXTRA_YAP_BOX NINQU_BOX)
   (out ".box/aruu-box.c")
